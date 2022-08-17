@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Lighthouse
+Comment=An application that can controls BLE smart lights, as well as your computer with the help of BLE remotes (or with the mobile companion app) 
+Exec=lighthouse
+Icon=lighthouse
+Categories=Utility;DataVisualization;Qt;

@@ -1,0 +1,188 @@
+/*!
+ * This file is part of Lighthouse.
+ * Copyright (c) 2022 Emeric Grange - All Rights Reserved
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * \date      2018
+ * \author    Emeric Grange <emeric.grange@gmail.com>
+ */
+
+#ifndef DEVICE_MANAGER_H
+#define DEVICE_MANAGER_H
+/* ************************************************************************** */
+
+#include "DeviceFilter.h"
+
+#include <QObject>
+#include <QVariant>
+#include <QList>
+#include <QTimer>
+
+#include <QBluetoothLocalDevice>
+#include <QBluetoothDeviceDiscoveryAgent>
+QT_FORWARD_DECLARE_CLASS(QBluetoothDeviceInfo)
+QT_FORWARD_DECLARE_CLASS(QLowEnergyController)
+QT_FORWARD_DECLARE_CLASS(QLowEnergyConnectionParameters)
+
+/* ************************************************************************** */
+
+/*!
+ * \brief The DeviceManager class
+ */
+class DeviceManager: public QObject
+{
+    Q_OBJECT
+
+    Q_PROPERTY(bool hasDevices READ areDevicesAvailable NOTIFY devicesListUpdated)
+    Q_PROPERTY(DeviceFilter *devicesList READ getDevicesFiltered NOTIFY devicesListUpdated)
+
+    Q_PROPERTY(bool listening READ isListening NOTIFY listeningChanged)
+    Q_PROPERTY(bool scanning READ isScanning NOTIFY scanningChanged)
+    Q_PROPERTY(bool updating READ isUpdating NOTIFY updatingChanged)
+    Q_PROPERTY(bool syncing READ isSyncing NOTIFY syncingChanged)
+
+    Q_PROPERTY(bool bluetooth READ hasBluetooth NOTIFY bluetoothChanged)
+    Q_PROPERTY(bool bluetoothAdapter READ hasBluetoothAdapter NOTIFY bluetoothChanged)
+    Q_PROPERTY(bool bluetoothEnabled READ hasBluetoothEnabled NOTIFY bluetoothChanged)
+    Q_PROPERTY(bool bluetoothPermissions READ hasBluetoothPermissions NOTIFY bluetoothChanged)
+
+    Q_PROPERTY(DeviceFilter *devicesNearby READ getDevicesNearby NOTIFY devicesNearbyUpdated)
+
+    static const int ble_scanning_duration = 30;
+    static const int ble_listening_duration = 0;
+    static const int ble_listening_duration_nearby = 0;
+    static const int ble_listening_duration_background = 45;
+
+    bool m_dbInternal = false;
+    bool m_dbExternal = false;
+    bool m_btA = false;
+    bool m_btE = false;
+    bool m_btP = true;
+
+    bool m_daemonMode = false;
+
+    QBluetoothLocalDevice *m_bluetoothAdapter = nullptr;
+    QBluetoothDeviceDiscoveryAgent *m_discoveryAgent = nullptr;
+    QLowEnergyConnectionParameters *m_ble_params = nullptr;
+
+    QList <QString> m_devices_blacklist;
+
+    DeviceModel *m_devices_nearby_model = nullptr;
+    DeviceFilter *m_devices_nearby_filter = nullptr;
+
+    DeviceModel *m_devices_model = nullptr;
+    DeviceFilter *m_devices_filter = nullptr;
+
+    bool m_listening = false;
+    bool isListening() const;
+
+    bool m_scanning = false;
+    bool isScanning() const;
+
+    bool m_updating = false;
+    bool isUpdating() const;
+
+    bool m_syncing = false;
+    bool isSyncing() const;
+
+    bool hasBluetooth() const;
+    bool hasBluetoothAdapter() const;
+    bool hasBluetoothEnabled() const;
+    bool hasBluetoothPermissions() const;
+
+    void checkBluetoothIos();
+    void startBleAgent();
+
+public:
+    DeviceManager(bool daemon = false);
+    ~DeviceManager();
+
+    static int getLastRun();
+
+    Q_INVOKABLE bool checkBluetooth();
+    Q_INVOKABLE void enableBluetooth(bool enforceUserPermissionCheck = false);
+
+    Q_INVOKABLE bool checkBluetoothPermissions();
+
+    Q_INVOKABLE bool areDevicesAvailable() const { return m_devices_model->hasDevices(); }
+
+    Q_INVOKABLE void removeDevice(const QString &address);
+    Q_INVOKABLE void removeDeviceData(const QString &address);
+
+    Q_INVOKABLE void scanNearby_start();
+    Q_INVOKABLE void scanNearby_stop();
+
+    Q_INVOKABLE void blacklistBleDevice(const QString &addr);
+    Q_INVOKABLE void whitelistBleDevice(const QString &addr);
+    Q_INVOKABLE bool isBleDeviceBlacklisted(const QString &addr);
+
+    Q_INVOKABLE void scanDevices_start();
+    Q_INVOKABLE void scanDevices_stop();
+
+    Q_INVOKABLE void listenDevices_start();
+    Q_INVOKABLE void listenDevices_stop();
+
+    Q_INVOKABLE void disconnectDevices();
+
+    Q_INVOKABLE void orderby_manual();
+    Q_INVOKABLE void orderby_model();
+    Q_INVOKABLE void orderby_name();
+    Q_INVOKABLE void orderby_location();
+    Q_INVOKABLE void orderby_waterlevel();
+    Q_INVOKABLE void orderby_plant();
+    Q_INVOKABLE void orderby_insideoutside();
+
+    DeviceFilter *getDevicesNearby() const { return m_devices_nearby_filter; }
+
+    DeviceFilter *getDevicesFiltered() const { return m_devices_filter; }
+
+    Q_INVOKABLE QVariant getDeviceByProxyIndex(const int index) const
+    {
+        QModelIndex proxyIndex = m_devices_filter->index(index, 0);
+        return QVariant::fromValue(m_devices_filter->data(proxyIndex, DeviceModel::PointerRole));
+    }
+
+    void invalidate();
+
+private slots:
+    // QBluetoothLocalDevice related
+    void bluetoothHostModeStateChanged(QBluetoothLocalDevice::HostMode);
+    void bluetoothStatusChanged();
+
+    // QBluetoothDeviceDiscoveryAgent related
+    void bluetoothHostModeStateChangedIos();
+    void addNearbyBleDevice(const QBluetoothDeviceInfo &info);
+    void updateNearbyBleDevice(const QBluetoothDeviceInfo &info, QBluetoothDeviceInfo::Fields updatedFields);
+    void addBleDevice(const QBluetoothDeviceInfo &info);
+    void updateBleDevice(const QBluetoothDeviceInfo &info, QBluetoothDeviceInfo::Fields updatedFields);
+    void updateBleDevice_simple(const QBluetoothDeviceInfo &info);
+    void deviceDiscoveryError(QBluetoothDeviceDiscoveryAgent::Error);
+    void deviceDiscoveryFinished();
+    void deviceDiscoveryStopped();
+
+Q_SIGNALS:
+    void devicesListUpdated();
+    void devicesNearbyUpdated();
+    void devicesBlacklistUpdated();
+
+    void bluetoothChanged();
+    void listeningChanged();
+    void scanningChanged();
+    void updatingChanged();
+    void syncingChanged();
+};
+
+/* ************************************************************************** */
+#endif // DEVICE_MANAGER_H
