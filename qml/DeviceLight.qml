@@ -86,10 +86,11 @@ Loader {
         function loadDevice() {
             //console.log("DeviceLight // loadDevice() >> " + currentDevice)
 
+            btnLightMode.visible = false
+
             currentDevice.actionConnect()
 
             updateHeader()
-            updateData()
         }
 
         function updateHeader() {
@@ -124,12 +125,13 @@ Loader {
             slider_color.value = Qt.rgba(r / 255, g / 255, b / 255, 1).hsvHue
 
             if (r !== 0 || g !== 0 || b !== 0) {
-                btnLightMode.selected = qsTr("colors")
+                btnLightMode.currentSelection = 4 // color
             } else if (a !== 0) {
-                btnLightMode.selected = qsTr("light")
+                btnLightMode.currentSelection = 2 // light
             } else {
-                btnLightMode.selected = qsTr("off")
+                btnLightMode.currentSelection = 1 // off
             }
+            btnLightMode.visible = true
 
             colorSaved.selection = -1
         }
@@ -409,130 +411,51 @@ Loader {
                         height: 40
 
                         Rectangle {
-                            width: btnLightMode.width+32
-                            height: 32
-                            anchors.centerIn: parent
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.verticalCenter: parent.verticalCenter
+                            height: 36
 
                             radius: 16
-                            color: "white"
-                            border.color: Theme.colorComponentDown
-                            border.width: 2
+                            color: Theme.colorComponentBackground
 
-                            Row {
-                                id: btnLightMode
-                                anchors.left: parent.left
-                                anchors.leftMargin: 16
-                                anchors.verticalCenter: parent.verticalCenter
-                                height: 32
-                                spacing: 32
+                            Text {
+                                anchors.centerIn: parent
 
-                                property string selected
-                                property int value: {
-                                    if (selected === qsTr("off")) return 0
-                                    if (selected === qsTr("light")) return 1
-                                    if (selected === qsTr("colors")) return 2
-                                    else return 2
+                                text: qsTr("Loading...")
+                                textFormat: Text.PlainText
+                                color: Theme.colorText
+                                font.pixelSize: Theme.fontSizeComponent
+                            }
+                        }
+
+                        SelectorMenu {
+                            id: btnLightMode
+                            anchors.centerIn: parent
+                            height: 36
+
+                            currentSelection: 0
+                            model: ListModel {
+                                id: lmSelectorMenuTxt2
+                                ListElement { idx: 1; txt: "off"; src: ""; sz: 0; }
+                                ListElement { idx: 2; txt: "light"; src: ""; sz: 0; }
+                                ListElement { idx: 3; txt: "warmth"; src: ""; sz: 0; }
+                                ListElement { idx: 4; txt: "colors"; src: ""; sz: 0; }
+                            }
+
+                            onMenuSelected: (index) => {
+                                //console.log("SelectorMenu clicked #" + index)
+                                currentSelection = index
+
+                                if (currentSelection === 1) {
+                                    currentDevice.setOff()
                                 }
-
-                                function clicked() {
-                                    if (selected === qsTr("off")) {
-                                        currentDevice.setOff()
-                                    }
-                                    if (selected === qsTr("light")) {
-                                        currentDevice.setColors_float(slider_luminosity.value, 0, 0, 0)
-                                    }
-                                    if (selected === qsTr("colors")) {
-                                        var clr = Qt.hsva(slider_color.value, 1, 1, 1)
-                                        currentDevice.setColors_float(slider_luminosity.value, clr.r, clr.g, clr.b)
-                                    }
+                                else if (currentSelection === 2) {
+                                    currentDevice.setColors_float(slider_luminosity.value, 0, 0, 0)
                                 }
-
-                                Text {
-                                    id: btnOff
-                                    anchors.verticalCenter: parent.verticalCenter
-
-                                    property bool selected: false
-                                    text: qsTr("off")
-                                    font.pixelSize: Theme.fontSizeComponent
-                                    //font.bold: (btnLightMode.selected === btnOff.text) ? true : false
-                                    color: (btnLightMode.selected === btnOff.text) ? "white" : Theme.colorSubText
-
-                                    Rectangle {
-                                        anchors.fill: parent
-                                        anchors.topMargin: -8
-                                        anchors.leftMargin: -16
-                                        anchors.rightMargin: -16
-                                        anchors.bottomMargin: -8
-                                        z: -1
-                                        radius: 32
-                                        color: (btnLightMode.selected === btnOff.text) ? Theme.colorPrimary : "transparent"
-
-                                        MouseArea {
-                                            anchors.fill: parent
-                                            onClicked: {
-                                                btnLightMode.selected = btnOff.text
-                                                btnLightMode.clicked()
-                                            }
-                                        }
-                                    }
-                                }
-                                Text {
-                                    id: btnLight
-                                    anchors.verticalCenter: parent.verticalCenter
-
-                                    property bool selected: false
-                                    text: qsTr("light")
-                                    font.pixelSize: Theme.fontSizeComponent
-                                    //font.bold: (btnLightMode.selected === btnLight.text) ? true : false
-                                    color: (btnLightMode.selected === btnLight.text) ? "white" : Theme.colorSubText
-
-                                    Rectangle {
-                                        anchors.fill: parent
-                                        anchors.topMargin: -8
-                                        anchors.leftMargin: -16
-                                        anchors.rightMargin: -16
-                                        anchors.bottomMargin: -8
-                                        z: -1
-                                        radius: 32
-                                        color: (btnLightMode.selected === btnLight.text) ? Theme.colorPrimary : "transparent"
-
-                                        MouseArea {
-                                            anchors.fill: parent
-                                            onClicked: {
-                                                btnLightMode.selected = btnLight.text
-                                                btnLightMode.clicked()
-                                            }
-                                        }
-                                    }
-                                }
-                                Text {
-                                    id: btnColors
-                                    anchors.verticalCenter: parent.verticalCenter
-
-                                    property bool selected: false
-                                    text: qsTr("colors")
-                                    font.pixelSize: Theme.fontSizeComponent
-                                    //font.bold: (btnLightMode.selected === btnColors.text) ? true : false
-                                    color: (btnLightMode.selected === btnColors.text) ? "white" : Theme.colorSubText
-
-                                    Rectangle {
-                                        anchors.fill: parent
-                                        anchors.topMargin: -8
-                                        anchors.leftMargin: -16
-                                        anchors.rightMargin: -16
-                                        anchors.bottomMargin: -8
-                                        z: -1
-                                        radius: 32
-                                        color: (btnLightMode.selected === btnColors.text) ? Theme.colorPrimary : "transparent"
-
-                                        MouseArea {
-                                            anchors.fill: parent
-                                            onClicked: {
-                                                btnLightMode.selected = btnColors.text
-                                                btnLightMode.clicked()
-                                            }
-                                        }
-                                    }
+                                else if (currentSelection === 4) {
+                                    var clr = Qt.hsva(slider_color.value, 1, 1, 1)
+                                    currentDevice.setColors_float(slider_luminosity.value, clr.r, clr.g, clr.b)
                                 }
                             }
                         }
@@ -557,9 +480,9 @@ Loader {
                             from: 0.0
                             to: 1.0
                             stepSize: 0.05
-
-                            visible: (btnLightMode.selected === "light" ||
-                                      btnLightMode.selected === "colors")
+                            visible: (btnLightMode.currentSelection === 2 ||
+                                      btnLightMode.currentSelection === 3 ||
+                                      btnLightMode.currentSelection === 4)
 
                             onMoved: {
                                 var l = slider_luminosity.value
@@ -590,7 +513,7 @@ Loader {
                             to: 1.0
                             stepSize: 0.05
 
-                            visible: (btnLightMode.selected === "colors")
+                            visible: (btnLightMode.currentSelection === 4)
 
                             onMoved: {
                                 var lum = slider_luminosity.value
@@ -621,7 +544,7 @@ Loader {
                         rows: 2
                         spacing: 12
 
-                        visible: (btnLightMode.selected === "colors")
+                        visible: (btnLightMode.currentSelection === 4)
 
                         property int ww: isPhone ? 48 : 80
                         property int hh: 48
