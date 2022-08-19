@@ -86,11 +86,14 @@ DeviceManager::DeviceManager(bool daemon)
     if (m_dbInternal || m_dbExternal)
     {
         // Load blacklist
-        QSqlQuery queryBlacklist;
-        queryBlacklist.exec("SELECT deviceAddr FROM devicesBlacklist");
-        while (queryBlacklist.next())
+        if (!m_daemonMode)
         {
-            m_devices_blacklist.push_back(queryBlacklist.value(0).toString());
+            QSqlQuery queryBlacklist;
+            queryBlacklist.exec("SELECT deviceAddr FROM devicesBlacklist");
+            while (queryBlacklist.next())
+            {
+                m_devices_blacklist.push_back(queryBlacklist.value(0).toString());
+            }
         }
 
         // Load saved devices
@@ -509,12 +512,23 @@ void DeviceManager::deviceDiscoveryError(QBluetoothDeviceDiscoveryAgent::Error e
         //refreshDevices_stop();
         Q_EMIT bluetoothChanged();
     }
+
+    if (m_scanning)
+    {
+        m_scanning = false;
+        Q_EMIT scanningChanged();
+    }
 }
 
 void DeviceManager::deviceDiscoveryFinished()
 {
     //qDebug() << "DeviceManager::deviceDiscoveryFinished()";
 
+    if (m_scanning)
+    {
+        m_scanning = false;
+        Q_EMIT scanningChanged();
+    }
     if (m_listening)
     {
         m_listening = false;
@@ -526,6 +540,11 @@ void DeviceManager::deviceDiscoveryStopped()
 {
     //qDebug() << "DeviceManager::deviceDiscoveryStopped()";
 
+    if (m_scanning)
+    {
+        m_scanning = false;
+        Q_EMIT scanningChanged();
+    }
     if (m_listening)
     {
         m_listening = false;

@@ -160,7 +160,7 @@ linux:!android {
 
 macx {
     # Bundle name
-    QMAKE_TARGET_BUNDLE_PREFIX = com.emeric
+    QMAKE_TARGET_BUNDLE_PREFIX = io.emeric
     QMAKE_BUNDLE = lighthouse
 
     # OS icons
@@ -220,7 +220,7 @@ android {
     #message("ANDROID_TARGET_ARCH: $$ANDROID_TARGET_ARCH")
 
     # Bundle name
-    QMAKE_TARGET_BUNDLE_PREFIX = com.emeric
+    QMAKE_TARGET_BUNDLE_PREFIX = io.emeric
     QMAKE_BUNDLE = lighthouse
 
     DISTFILES += $${PWD}/assets/android/AndroidManifest.xml \
@@ -237,7 +237,7 @@ ios {
     CONFIG += no_autoqmake
 
     # Bundle name
-    QMAKE_TARGET_BUNDLE_PREFIX = com.emeric
+    QMAKE_TARGET_BUNDLE_PREFIX = io.emeric
     QMAKE_BUNDLE = lighthouse
 
     # OS infos

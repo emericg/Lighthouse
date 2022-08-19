@@ -11,7 +11,6 @@ Item {
     implicitHeight: 128
 
     property var boxDevice: pointer
-    property bool hasHygro: false
 
     property bool wideAssMode: (width >= 380) || (isTablet && width >= 480)
     property bool bigAssMode: false
@@ -27,7 +26,7 @@ Item {
         function onRssiUpdated() { updateSensorRSSI() }
         function onDataUpdated() { updateSensorData() }
         function onRefreshUpdated() { updateSensorData() }
-    }
+    }/*
     Connections {
         target: ThemeEngine
         function onCurrentThemeChanged() {
@@ -35,15 +34,7 @@ Item {
             updateSensorStatus()
             updateSensorData()
         }
-    }
-    Connections {
-        target: settingsManager
-        function onAppLanguageChanged() {
-            updateSensorSettings()
-            updateSensorStatus()
-            updateSensorData()
-        }
-    }
+    }*/
 
     Component.onCompleted: initBoxData()
 
@@ -51,7 +42,7 @@ Item {
 
     function initBoxData() {
         // Set icon
-        imageDevice.source = UtilsDeviceSensors.getDeviceIcon(boxDevice, hasHygro)
+        imageDevice.source = UtilsDeviceSensors.getDeviceIcon(boxDevice, false)
 
         updateSensorSettings()
         updateSensorStatus()

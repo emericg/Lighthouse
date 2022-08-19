@@ -97,30 +97,7 @@ void DeviceManager::updateBleDevice(const QBluetoothDeviceInfo &info,
             return;
         }
     }
-/*
-    if (info.name() == "YLKG" ||
-        info.name() == "yee-rc" ||
-        info.address().toString() == "")
-    {
-        const QList<quint16> &manufacturerIds = info.manufacturerIds();
-        for (const auto id: manufacturerIds)
-        {
-            qDebug() << info.name() << info.address() << Qt::hex
-                     << "ID" << id
-                     << "manufacturer data" << Qt::dec << info.manufacturerData(id).count() << Qt::hex
-                     << "bytes:" << info.manufacturerData(id).toHex();
-        }
 
-        const QList<QBluetoothUuid> &serviceIds = info.serviceIds();
-        for (const auto id: serviceIds)
-        {
-            qDebug() << info.name() << info.address() << Qt::hex
-                     << "ID" << id
-                     << "service data" << Qt::dec << info.serviceData(id).count() << Qt::hex
-                     << "bytes:" << info.serviceData(id).toHex();
-        }
-    }
-*/
     // Dynamic scanning ////////////////////////////////////////////////////////
     {
         //qDebug() << "addBleDevice() FROM DYNAMIC SCANNING";
