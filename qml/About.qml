@@ -331,7 +331,7 @@ Loader {
                     anchors.bottom: parent.bottom
                     onClicked: {
                         if (Qt.platform.os === "android")
-                            Qt.openUrlExternally("market://details?id=com.emeric.lighthouse")
+                            Qt.openUrlExternally("market://details?id=io.emeric.lighthouse")
                         else if (Qt.platform.os === "ios")
                             Qt.openUrlExternally("itms-apps://itunes.apple.com/app/1476046123")
                     }

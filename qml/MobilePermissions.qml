@@ -430,7 +430,7 @@ Item {
                 source: "qrc:/assets/icons_material/duotone-tune-24px.svg"
                 sourceSize: 20
 
-                onClicked: utilsApp.openAndroidAppInfo("com.emeric.lighthouse")
+                onClicked: utilsApp.openAndroidAppInfo("io.emeric.lighthouse")
             }
 
             ////////
