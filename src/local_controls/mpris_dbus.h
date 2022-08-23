@@ -45,8 +45,8 @@ class MprisController: public QObject
 
     Q_PROPERTY(QString playerName READ getPlayerName NOTIFY playerUpdated)
     Q_PROPERTY(QString playbackStatus READ getPlaybackStatus NOTIFY statusUpdated)
-    //Q_PROPERTY(qint64 position READ getPosition WRITE setPosition NOTIFY statusUpdated)
-    //Q_PROPERTY(float volume READ getVolume WRITE setVolume NOTIFY volumeUpdated)
+    Q_PROPERTY(qint64 position READ getPosition WRITE setPosition NOTIFY statusUpdated)
+    Q_PROPERTY(float volume READ getVolume WRITE setVolume NOTIFY volumeUpdated)
 
     Q_PROPERTY(QString metaTitle READ getTitle NOTIFY metadataUpdated)
     Q_PROPERTY(QString metaArtist READ getArtist NOTIFY metadataUpdated)
@@ -111,12 +111,12 @@ public:
 
     QString getPlayerName() const { return m_playerName; }
     QString getPlaybackStatus() const  { return m_playbackStatus; }
-/*
+
     qint64 getPosition() const { return m_position; }
     void setPosition(int64_t pos);
     float getVolume() const { return m_volume; }
     void setVolume(float vol);
-*/
+
     QString getTitle() const { return m_metaTitle; }
     QString getArtist() const { return m_metaArtist; }
     QString getAlbum() const { return m_metaAlbum; }

@@ -151,8 +151,8 @@ void NetworkServer::readPress()
     {
         LocalControls *ctrls = LocalControls::getInstance();
         if (nextPress == "press:playpause") ctrls->action(LocalActions::ACTION_KEYBOARD_media_playpause);
-        else if (nextPress == "press:next") ctrls->action(LocalActions::ACTION_KEYBOARD_media_playpause);
-        else if (nextPress == "press:prev") ctrls->action(LocalActions::ACTION_KEYBOARD_media_playpause);
+        else if (nextPress == "press:next") ctrls->action(LocalActions::ACTION_KEYBOARD_media_next);
+        else if (nextPress == "press:prev") ctrls->action(LocalActions::ACTION_KEYBOARD_media_prev);
         else if (nextPress == "press:mute") ctrls->action(LocalActions::ACTION_KEYBOARD_volume_mute);
         else if (nextPress == "press:volumeup") ctrls->action(LocalActions::ACTION_KEYBOARD_volume_up);
         else if (nextPress == "press:volumedown") ctrls->action(LocalActions::ACTION_KEYBOARD_volume_down);

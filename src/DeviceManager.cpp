@@ -594,7 +594,7 @@ void DeviceManager::listenDevices_start()
         {
             if (m_discoveryAgent->isActive())
             {
-                m_discoveryAgent->stop();
+                //m_discoveryAgent->stop();
             }
 
             disconnect(m_discoveryAgent, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered,

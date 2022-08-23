@@ -71,6 +71,8 @@ MprisController::~MprisController()
 
 bool MprisController::select_player()
 {
+    QString player_was = m_player_selected;
+
     m_player_registered.clear();
     m_player_selected.clear();
 
@@ -100,7 +102,7 @@ bool MprisController::select_player()
                     m_canGoNext = remoteAppPlayer.property("CanGoNext").toBool();
 
                     m_playbackStatus = remoteAppPlayer.property("PlaybackStatus").toString();
-                    //Q_EMIT statusUpdated();
+                    Q_EMIT statusUpdated();
 
                     if (m_playbackStatus == "Playing")
                     {
@@ -131,6 +133,11 @@ bool MprisController::select_player()
             // if we have player(s) but none is currently playing, then use the first one we have
             m_player_selected = m_player_registered.first();
         }
+
+        if (m_player_selected != player_was)
+        {
+            Q_EMIT playerUpdated();
+        }
     }
     else
     {
@@ -138,6 +145,18 @@ bool MprisController::select_player()
     }
 
     return !m_player_selected.isEmpty();
+}
+
+/* ************************************************************************** */
+
+void MprisController::setPosition(int64_t pos)
+{
+    //
+}
+
+void MprisController::setVolume(float vol)
+{
+    //
 }
 
 /* ************************************************************************** */
