@@ -6,8 +6,9 @@ DEFINES+= APP_VERSION=\\\"$$VERSION\\\"
 
 CONFIG += c++17
 QT     += core bluetooth network sql
-QT     += multimedia
-QT     += qml quick quickcontrols2 svg widgets
+QT     += multimedia # to play sound effects on actions
+QT     += qml quick quickcontrols2 svg
+QT     += widgets # for proper systray support
 
 # Validate Qt version
 !versionAtLeast(QT_VERSION, 6.3) : error("You need at least Qt version 6.3 for $${TARGET}")
