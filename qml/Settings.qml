@@ -740,8 +740,7 @@ Loader {
 
                 color: Theme.colorForeground
 
-                // Android only
-                visible: (Qt.platform.os === "android")
+                visible: isMobile
 
                 IconSvg {
                     width: 24
@@ -779,8 +778,7 @@ Loader {
                 anchors.right: parent.right
                 anchors.rightMargin: screenPaddingRight
 
-                // Android only
-                visible: (Qt.platform.os === "android")
+                visible: isMobile
 
                 IconSvg {
                     id: image_remoteServer_host
@@ -831,8 +829,7 @@ Loader {
                 anchors.right: parent.right
                 anchors.rightMargin: screenPaddingRight
 
-                // Android only
-                visible: (Qt.platform.os === "android")
+                visible: isMobile
 
                 IconSvg {
                     id: image_remoteServer_port
@@ -856,8 +853,8 @@ Loader {
                     height: 36
 
                     placeholderText: qsTr("Port")
-                    text: settingsManager.mysqlPort
-                    onEditingFinished: settingsManager.mysqlPort = parseInt(text, 10)
+                    text: settingsManager.netctrlPort
+                    onEditingFinished: settingsManager.netctrlPort = parseInt(text, 10)
                     validator: IntValidator { bottom: 1; top: 65535; }
                     selectByMouse: true
 /*

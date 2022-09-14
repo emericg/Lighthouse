@@ -188,12 +188,17 @@ bool DeviceManager::isScanning() const
 
 bool DeviceManager::isUpdating() const
 {
-    return false;
+    return m_updating;
 }
 
 bool DeviceManager::isSyncing() const
 {
-    return false;
+    return m_syncing;
+}
+
+bool DeviceManager::isAdvertising() const
+{
+    return m_advertising;
 }
 
 /* ************************************************************************** */
@@ -255,21 +260,7 @@ void DeviceManager::enableBluetooth(bool enforceUserPermissionCheck)
     bool btA_was = m_btA;
     bool btE_was = m_btE;
     bool btP_was = m_btP;
-/*
-    // List Bluetooth adapters
-    QList<QBluetoothHostInfo> adaptersList = QBluetoothLocalDevice::allDevices();
-    if (adaptersList.size() > 0)
-    {
-        for (QBluetoothHostInfo a: adaptersList)
-        {
-            qDebug() << "- Bluetooth adapter:" << a.name();
-        }
-    }
-    else
-    {
-        qDebug() << "> No Bluetooth adapter found...";
-    }
-*/
+
     // Invalid adapter? (ex: plugged off)
     if (m_bluetoothAdapter && !m_bluetoothAdapter->isValid())
     {
@@ -277,10 +268,10 @@ void DeviceManager::enableBluetooth(bool enforceUserPermissionCheck)
         m_bluetoothAdapter = nullptr;
     }
 
-    // We only try the "first" available Bluetooth adapter
-    // TODO // Handle multiple adapters?
+    // Select an adapter (if none currently selected)
     if (!m_bluetoothAdapter)
     {
+        // Correspond to the "first available" or "default" Bluetooth adapter
         m_bluetoothAdapter = new QBluetoothLocalDevice();
         if (m_bluetoothAdapter)
         {
@@ -402,6 +393,8 @@ void DeviceManager::startBleAgent()
         m_discoveryAgent = new QBluetoothDeviceDiscoveryAgent();
         if (m_discoveryAgent)
         {
+            //qDebug() << "Scanning method supported:" << m_discoveryAgent->supportedDiscoveryMethods();
+
             connect(m_discoveryAgent, QOverload<QBluetoothDeviceDiscoveryAgent::Error>::of(&QBluetoothDeviceDiscoveryAgent::errorOccurred),
                     this, &DeviceManager::deviceDiscoveryError, Qt::UniqueConnection);
         }
@@ -539,6 +532,9 @@ void DeviceManager::deviceDiscoveryFinished()
 void DeviceManager::deviceDiscoveryStopped()
 {
     //qDebug() << "DeviceManager::deviceDiscoveryStopped()";
+
+    //NotificationManager *nm = NotificationManager::getInstance();
+    //nm->setNotification("DeviceManager::deviceDiscoveryStopped() > " + QDateTime::currentDateTime().toString());
 
     if (m_scanning)
     {
