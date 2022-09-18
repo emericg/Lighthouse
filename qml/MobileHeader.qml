@@ -37,6 +37,9 @@ Rectangle {
     function rightMenuIsOpen() { return actionMenu.visible; }
     function rightMenuClose() { actionMenu.close(); }
 
+    signal deviceConnectButtonClicked()
+    signal deviceDisconnectButtonClicked()
+
     signal deviceRebootButtonClicked()
     signal deviceCalibrateButtonClicked()
     signal deviceWateringButtonClicked()
@@ -156,9 +159,7 @@ Rectangle {
                 height: headerHeight
 
                 visible: (deviceManager.bluetooth &&
-                          (appContent.state === "DevicePlantSensor" ||
-                           appContent.state === "DeviceThermometer" ||
-                           (appContent.state === "DeviceEnvironmental" && selectedDevice.hasBluetoothConnection)))
+                          (appContent.state === "DeviceLight"))
 
                 onClicked: {
                     rightMenuClicked()

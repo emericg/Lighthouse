@@ -53,7 +53,7 @@ void NetworkServer::startServer()
     m_tcpServer = new QTcpServer(this);
     if (m_tcpServer->listen(QHostAddress::Any, m_tcpServerPort))
     {
-        QString ipAddress;
+        m_serverAddress.clear();
         QList<QHostAddress> ipAddressesList = QNetworkInterface::allAddresses();
 
         // use the first non-localhost IPv4 address
@@ -62,24 +62,26 @@ void NetworkServer::startServer()
             if (ipAddressesList.at(i) != QHostAddress::LocalHost &&
                 ipAddressesList.at(i).toIPv4Address())
             {
-                ipAddress = ipAddressesList.at(i).toString();
+                m_serverAddress = ipAddressesList.at(i).toString();
                 break;
             }
         }
         // if we did not find one, use IPv4 localhost
-        if (ipAddress.isEmpty())
+        if (m_serverAddress.isEmpty())
         {
-            ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
+            m_serverAddress = QHostAddress(QHostAddress::LocalHost).toString();
         }
 
         m_serverRunning = true;
-        qDebug() << "NetworkServer::startServer( IP:" << ipAddress << "port:" << m_tcpServer->serverPort() << ")";
+        qDebug() << "NetworkServer::startServer( IP:" << m_serverAddress << "port:" << m_tcpServer->serverPort() << ")";
     }
     else
     {
         qWarning() << "Unable to start the NetworkServer:" << m_tcpServer->errorString();
         m_serverRunning = false;
     }
+
+    Q_EMIT serverEvent();
 }
 
 void NetworkServer::stopServer()
@@ -92,6 +94,9 @@ void NetworkServer::stopServer()
 
         delete m_tcpServer;
         m_tcpServer = nullptr;
+
+        m_serverRunning = false;
+        Q_EMIT serverEvent();
     }
 }
 

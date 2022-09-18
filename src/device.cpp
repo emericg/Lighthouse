@@ -202,6 +202,15 @@ void Device::actionConnect()
 
 /* ************************************************************************** */
 
+void Device::actionDisconnect()
+{
+    //qDebug() << "Device::actionConnect()" << getAddress() << getName();
+
+    deviceDisconnect();
+}
+
+/* ************************************************************************** */
+
 void Device::actionScan()
 {
     //qDebug() << "Device::actionScan()" << getAddress() << getName();
@@ -673,6 +682,11 @@ bool Device::isErrored() const
 bool Device::isBusy() const
 {
     return (m_ble_status >= DeviceUtils::DEVICE_CONNECTING);
+}
+
+bool Device::isConnected() const
+{
+    return (m_ble_status >= DeviceUtils::DEVICE_CONNECTED);
 }
 
 bool Device::isWorking() const

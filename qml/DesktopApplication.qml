@@ -90,25 +90,14 @@ ApplicationWindow {
             }
         }
 
-        function onDeviceLedButtonClicked() {
+        function onDeviceConnectButtonClicked() {
             if (selectedDevice) {
-                selectedDevice.actionLedBlink()
+                selectedDevice.actionConnect()
             }
         }
-        function onDeviceWateringButtonClicked() {
+        function onDeviceDisconnectButtonClicked() {
             if (selectedDevice) {
-                selectedDevice.actionWatering()
-            }
-        }
-        function onDeviceRebootButtonClicked() {
-            if (selectedDevice) {
-                selectedDevice.actionReboot()
-            }
-        }
-
-        function onDeviceRefreshHistoryButtonClicked() {
-            if (selectedDevice) {
-                selectedDevice.refreshStartHistory()
+                selectedDevice.actionDisconnect()
             }
         }
 
@@ -148,7 +137,18 @@ ApplicationWindow {
             }
         }
 
-        function onPlantsButtonClicked() { appContent.state = "DeviceList" }
+        function onDeviceLedButtonClicked() {
+            if (selectedDevice) {
+                selectedDevice.actionLedBlink()
+            }
+        }
+        function onDeviceRebootButtonClicked() {
+            if (selectedDevice) {
+                selectedDevice.actionReboot()
+            }
+        }
+
+        function onDevicesButtonClicked() { appContent.state = "DeviceList" }
         function onSettingsButtonClicked() { screenSettings.loadScreen() }
         function onAboutButtonClicked() { screenAbout.loadScreen() }
     }
@@ -236,12 +236,6 @@ ApplicationWindow {
             if (screenDeviceList.selectionList.length !== 0) {
                 screenDeviceList.exitSelectionMode()
             }
-        } else if (appContent.state === "DevicePlantSensor") {
-            screenDevicePlantSensor.backAction()
-        } else if (appContent.state === "DeviceThermometer") {
-            screenDeviceThermometer.backAction()
-        } else if (appContent.state === "DeviceEnvironmental") {
-            screenDeviceEnvironmental.backAction()
         } else if (appContent.state === "DeviceBeacon") {
             screenDeviceBeacon.backAction()
         } else if (appContent.state === "DeviceRemote") {
@@ -263,13 +257,7 @@ ApplicationWindow {
         if (appContent.state === "DeviceList") {
             appContent.previousStates.pop()
 
-            if (appContent.previousStates[appContent.previousStates.length-1] === "DevicePlantSensor")
-                appContent.state = "DevicePlantSensor"
-            else if (appContent.previousStates[appContent.previousStates.length-1] === "DeviceThermometer")
-                appContent.state = "DeviceThermometer"
-            else if (appContent.previousStates[appContent.previousStates.length-1] === "DeviceEnvironmental")
-                appContent.state = "DeviceEnvironmental"
-            else if (appContent.previousStates[appContent.previousStates.length-1] === "DeviceBeacon")
+            if (appContent.previousStates[appContent.previousStates.length-1] === "DeviceBeacon")
                 appContent.state = "DeviceBeacon"
             else if (appContent.previousStates[appContent.previousStates.length-1] === "DeviceRemote")
                 appContent.state = "DeviceRemote"

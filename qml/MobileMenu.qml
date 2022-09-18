@@ -15,14 +15,15 @@ Rectangle {
     height: hhh + screenPaddingBottom
     color: appWindow.isTablet ? Theme.colorTabletmenu : Theme.colorBackground
 
-    visible: (isTablet && (appContent.state === "DevicePlantSensor" ||
-                           appContent.state === "DeviceList" ||
-                           appContent.state === "DeviceBrowser" ||
-                           appContent.state === "PlantBrowser" ||
+    visible: (isTablet && (appContent.state === "DeviceList" ||
+                           appContent.state === "DeviceBeacon" ||
+                           appContent.state === "DeviceRemote" ||
+                           appContent.state === "DeviceLight" ||
                            appContent.state === "Settings" ||
-                           appContent.state === "About")) ||
+                           appContent.state === "About" ||
+                           appContent.state === "Permissions")) ||
              (isPhone && screenOrientation === Qt.PortraitOrientation &&
-                          (appContent.state === "DevicePlantSensor"))
+                          (appContent.state === "DeviceLight"))
 
     ////////////////////////////////////////////////////////////////////////////
 
@@ -80,16 +81,15 @@ Rectangle {
         spacing: (!appWindow.wideMode || (appWindow.isPhone && utilsScreen.screenSize < 5.0)) ? -10 : 20
 
         visible: (appContent.state === "DeviceList" ||
-                  appContent.state === "DeviceBrowser" ||
-                  appContent.state === "PlantBrowser" ||
                   appContent.state === "Settings" ||
-                  appContent.state === "About")
+                  appContent.state === "About" ||
+                  appContent.state === "Permissions")
 
         MobileMenuItem_horizontal {
             id: menuMainView
             height: mobileMenu.hhh
 
-            text: qsTr("Sensors")
+            text: qsTr("Device list")
             source: "qrc:/assets/icons_material/lightbulb_FILL0_wght400_GRAD0_opsz48.svg"
             sourceSize: mobileMenu.hhi
             colorContent: Theme.colorTabletmenuContent

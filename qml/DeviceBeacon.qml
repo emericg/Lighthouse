@@ -57,14 +57,7 @@ Loader {
             function onStatusUpdated() { updateHeader() }
             function onDataUpdated() { updateData() }
         }
-    /*
-        Connections {
-            target: settingsManager
-            function onAppLanguageChanged() {
-                updateData()
-            }
-        }
-    */
+
         Connections {
             target: appHeader
             // desktop only
@@ -79,12 +72,7 @@ Loader {
                 //
             }
         }
-    /*
-        Timer {
-            interval: 60000; running: true; repeat: true;
-            onTriggered: updateStatusText()
-        }
-    */
+
         Keys.onPressed: (event) => {
             if (event.key === Qt.Key_Backspace) {
                 event.accepted = true

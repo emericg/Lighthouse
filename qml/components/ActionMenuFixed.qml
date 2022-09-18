@@ -43,107 +43,39 @@ Popup {
         spacing: 4
 
         ////////
-
-        ActionMenuItem {
-            id: actionUpdate
-
-            index: 0
-            text: qsTr("Update data")
-            source: "qrc:/assets/icons_material/baseline-refresh-24px.svg"
-            layoutDirection: actionMenu.layoutDirection
-            visible: (deviceManager.bluetooth && (selectedDevice && selectedDevice.hasBluetoothConnection))
-
-            onClicked: {
-                deviceRefreshButtonClicked()
-                menuSelected(index)
-                close()
-            }
-        }
-
-        ActionMenuItem {
-            id: actionRealtime
-
-            index: 1
-            text: qsTr("Real time data")
-            source: "qrc:/assets/icons_material/duotone-update-24px.svg"
-            layoutDirection: actionMenu.layoutDirection
-            visible: (deviceManager.bluetooth && (selectedDevice && selectedDevice.hasRealTime))
-
-            onClicked: {
-                deviceRefreshRealtimeButtonClicked()
-                menuSelected(index)
-                close()
-            }
-        }
-
-        ////////
-
+/*
         Rectangle {
             width: parent.width; height: 1;
             color: Theme.colorSeparator
-            visible: (actionLed.visible || actionGraphMode.visible)
+            visible: (actionGraphMode.visible)
         }
-
+*/
         ActionMenuItem {
-            id: actionLed
+            id: actionConnect
 
-            index: 8
-            text: qsTr("Blink LED")
-            source: "qrc:/assets/icons_material/lightbulb_FILL0_wght400_GRAD0_opsz48.svg"
+            index: 1
+            text: qsTr("Connect")
+            source: "qrc:/assets/icons_material/baseline-bluetooth_disabled-24px.svg"
             layoutDirection: actionMenu.layoutDirection
-            visible: (deviceManager.bluetooth && (selectedDevice && selectedDevice.hasLED))
+            visible: (deviceManager.bluetooth && selectedDevice && !selectedDevice.busy)
 
             onClicked: {
-                deviceLedButtonClicked()
+                deviceConnectButtonClicked()
                 menuSelected(index)
                 close()
             }
         }
-
         ActionMenuItem {
-            id: actionGraphMode
+            id: actionDisconnect
 
-            index: 16
-            text: qsTr("Switch graph")
-            source: (settingsManager.graphThermometer === "minmax") ? "qrc:/assets/icons_material/duotone-insert_chart-24px.svg" : "qrc:/assets/icons_material/baseline-timeline-24px.svg"
+            index: 2
+            text: qsTr("Disconnect")
+            source: "qrc:/assets/icons_material/baseline-bluetooth_disabled-24px.svg"
             layoutDirection: actionMenu.layoutDirection
-            visible: (appContent.state === "DeviceThermometer")
+            visible: (deviceManager.bluetooth && selectedDevice && selectedDevice.busy)
 
             onClicked: {
-                if (settingsManager.graphThermometer === "minmax") settingsManager.graphThermometer = "lines"
-                else settingsManager.graphThermometer = "minmax"
-                menuSelected(index)
-                close()
-            }
-        }
-
-        ActionMenuItem {
-            id: actionShowSettings
-
-            index: 17
-            text: qsTr("Sensor infos")
-            source: "qrc:/assets/icons_material/duotone-memory-24px.svg"
-            layoutDirection: actionMenu.layoutDirection
-            visible: (appContent.state === "DeviceThermometer" || appContent.state === "DeviceEnvironmental")
-
-            onClicked: {
-                deviceSettingsButtonClicked()
-                menuSelected(index)
-                close()
-            }
-        }
-
-        ActionMenuItem {
-            id: actionReboot
-
-            index: 32
-            text: qsTr("Reboot sensor")
-            source: "qrc:/assets/icons_material/baseline-refresh-24px.svg"
-            layoutDirection: actionMenu.layoutDirection
-            visible: (deviceManager.bluetooth && (selectedDevice && selectedDevice.hasReboot))
-
-            onClicked: {
-                deviceRebootButtonClicked()
+                deviceDisconnectButtonClicked()
                 menuSelected(index)
                 close()
             }

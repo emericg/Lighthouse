@@ -544,6 +544,20 @@ Loader {
                 color: Theme.colorSubText
                 font.pixelSize: Theme.fontSizeContentSmall
             }
+            Text {
+                anchors.left: parent.left
+                anchors.leftMargin: screenPaddingLeft + 64
+                anchors.right: parent.right
+                anchors.rightMargin: 12
+
+                visible: networkServer.running
+
+                text: qsTr("Running on %1 @ %2").arg(networkServer.serverAddress).arg(networkServer.serverPort)
+                textFormat: Text.PlainText
+                wrapMode: Text.WordWrap
+                color: Theme.colorSubText
+                font.pixelSize: Theme.fontSizeContentSmall
+            }
 
             ////////
 

@@ -16,6 +16,9 @@ Rectangle {
     signal backButtonClicked()
     signal rightMenuClicked() // compatibility
 
+    signal deviceConnectButtonClicked()
+    signal deviceDisconnectButtonClicked()
+
     signal deviceRebootButtonClicked()
     signal deviceCalibrateButtonClicked()
     signal deviceWateringButtonClicked()
@@ -33,7 +36,7 @@ Rectangle {
     signal refreshButtonClicked()
     signal syncButtonClicked()
     signal scanButtonClicked()
-    signal plantsButtonClicked()
+    signal devicesButtonClicked()
     signal settingsButtonClicked()
     signal aboutButtonClicked()
 
@@ -152,7 +155,7 @@ Rectangle {
         anchors.top: parent.top
         anchors.topMargin: 0
         anchors.right: parent.right
-        anchors.rightMargin: 0
+        anchors.rightMargin: 12
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 0
 
@@ -237,12 +240,33 @@ Rectangle {
 
         Row {
             id: menuDevice
+            anchors.verticalCenter: parent.verticalCenter
             spacing: 0
 
             visible: (appContent.state === "DeviceBeacon" ||
+                      appContent.state === "DeviceRemote" ||
                       appContent.state === "DeviceLight")
 
-            // TODO
+            ButtonCompactable {
+                id: buttonDisConnect
+                height: compact ? 36 : 34
+                anchors.verticalCenter: parent.verticalCenter
+
+                backgroundColor: Theme.colorHeaderHighlight
+                textColor: Theme.colorHeaderContent
+                iconColor: Theme.colorHeaderContent
+
+                visible: (deviceManager.bluetooth && selectedDevice &&
+                          (appContent.state === "DeviceLight"))
+
+                source: selectedDevice.connected ?
+                            "qrc:/assets/icons_material/baseline-bluetooth_disabled-24px.svg" :
+                            "qrc:/assets/icons_material/duotone-bluetooth_connected-24px.svg"
+                tooltipText: (selectedDevice && selectedDevice.connected) ?
+                                 qsTr("Disconnect") : qsTr("Connect")
+
+                onClicked: selectedDevice.connected ? deviceDisconnectButtonClicked() : deviceConnectButtonClicked()
+            }
         }
 
         // MAIN MENU //////////
@@ -251,7 +275,6 @@ Rectangle {
             id: menuMain
 
             visible: (appContent.state === "DeviceList" ||
-                      appContent.state === "DeviceBrowser" ||
                       appContent.state === "Settings" ||
                       appContent.state === "About")
             spacing: 0
@@ -266,7 +289,7 @@ Rectangle {
                 colorHighlight: Theme.colorHeaderHighlight
 
                 selected: (appContent.state === "DeviceList")
-                onClicked: plantsButtonClicked()
+                onClicked: devicesButtonClicked()
             }
             DesktopHeaderItem {
                 id: menuSettings

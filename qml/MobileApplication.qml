@@ -181,35 +181,14 @@ ApplicationWindow {
             //
         }
 
-        function onDeviceLedButtonClicked() {
+        function onDeviceConnectButtonClicked() {
             if (selectedDevice) {
-                selectedDevice.actionLedBlink()
+                selectedDevice.actionConnect()
             }
         }
-        function onDeviceWateringButtonClicked() {
+        function onDeviceDisconnectButtonClicked() {
             if (selectedDevice) {
-                selectedDevice.actionWatering()
-            }
-        }
-        function onDeviceCalibrateButtonClicked() {
-            if (selectedDevice) {
-                popupCalibration.open()
-            }
-        }
-        function onDeviceRebootButtonClicked() {
-            if (selectedDevice) {
-                selectedDevice.actionReboot()
-            }
-        }
-
-        function onDeviceClearButtonClicked() {
-            if (selectedDevice) {
-                popupDeleteData.open()
-            }
-        }
-        function onDeviceRefreshHistoryButtonClicked() {
-            if (selectedDevice) {
-                selectedDevice.refreshStartHistory()
+                selectedDevice.actionDisconnect()
             }
         }
 
@@ -221,6 +200,17 @@ ApplicationWindow {
         function onDeviceRefreshButtonClicked() {
             if (selectedDevice) {
                 deviceManager.updateDevice(selectedDevice.deviceAddress)
+            }
+        }
+
+        function onDeviceLedButtonClicked() {
+            if (selectedDevice) {
+                selectedDevice.actionLedBlink()
+            }
+        }
+        function onDeviceRebootButtonClicked() {
+            if (selectedDevice) {
+                selectedDevice.actionReboot()
             }
         }
     }
@@ -316,12 +306,12 @@ ApplicationWindow {
                     else
                         exitTimer.start()
                 }
-            } else if (appContent.state === "DevicePlantSensor") {
-                screenDevicePlantSensor.backAction()
-            } else if (appContent.state === "DeviceThermometer") {
-                screenDeviceThermometer.backAction()
-            } else if (appContent.state === "DeviceEnvironmental") {
-                screenDeviceEnvironmental.backAction()
+            } else if (appContent.state === "DeviceBeacon") {
+                screenDeviceBeacon.backAction()
+            } else if (appContent.state === "DeviceRemote") {
+                screenDeviceRemove.backAction()
+            } else if (appContent.state === "DeviceLight") {
+                screenDeviceLight.backAction()
             } else if (appContent.state === "Permissions") {
                 appContent.state = screenPermissions.entryPoint
             } else if (appContent.state === "Tutorial") {

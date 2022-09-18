@@ -37,9 +37,13 @@ class NetworkServer : public QObject
     Q_PROPERTY(bool running READ isRunning NOTIFY serverEvent)
     Q_PROPERTY(bool clientConnected READ isClientConnected NOTIFY connectionEvent)
 
+    Q_PROPERTY(QString serverAddress READ getServerAddress NOTIFY serverEvent)
+    Q_PROPERTY(int serverPort READ getServerPort NOTIFY serverEvent)
+
     QTcpServer *m_tcpServer = nullptr;
-    unsigned m_tcpServerPort = 5555;
     bool m_serverRunning = false;
+    QString m_serverAddress;
+    unsigned m_tcpServerPort = 5555;
 
     QTcpSocket *m_clientConnection = nullptr;
     QDataStream m_clientDataStream;
@@ -47,6 +51,8 @@ class NetworkServer : public QObject
 
     bool isRunning() const { return m_serverRunning; }
     bool isClientConnected() const { return m_clientConnected; }
+    QString getServerAddress() const { return m_serverAddress; }
+    int getServerPort() const { return m_tcpServerPort; }
 
 signals:
     void serverEvent();
