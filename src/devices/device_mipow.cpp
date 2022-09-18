@@ -66,7 +66,7 @@ DeviceMiPow::~DeviceMiPow()
 
 void DeviceMiPow::serviceScanDone()
 {
-    qDebug() << "DeviceMiPow::serviceScanDone(" << m_deviceAddress << ")";
+    //qDebug() << "DeviceMiPow::serviceScanDone(" << m_deviceAddress << ")";
 
     if (serviceInfos)
     {
@@ -108,7 +108,7 @@ void DeviceMiPow::serviceScanDone()
 
 void DeviceMiPow::addLowEnergyService(const QBluetoothUuid &uuid)
 {
-    qDebug() << "DeviceMiPow::addLowEnergyService(" << uuid.toString() << ")";
+    //qDebug() << "DeviceMiPow::addLowEnergyService(" << uuid.toString() << ")";
 /*
     if (uuid.toString() == "{0000180a-0000-1000-8000-00805f9b34fb}") // device information
     {
@@ -160,7 +160,7 @@ void DeviceMiPow::serviceDetailsDiscovered_infos(QLowEnergyService::ServiceState
                m_deviceFirmware = chf.value();
                Q_EMIT sensorUpdated();
 
-               qDebug() << "firmware: " << m_deviceFirmware;
+               //qDebug() << "firmware: " << m_deviceFirmware;
             }
         }
     }
@@ -182,7 +182,7 @@ void DeviceMiPow::serviceDetailsDiscovered_battery(QLowEnergyService::ServiceSta
                 m_deviceBattery = static_cast<char>(cbat.value().constData()[0]);
                 Q_EMIT sensorUpdated();
 
-                qDebug() << "battery: " << m_deviceBattery;
+                //qDebug() << "battery: " << m_deviceBattery;
             }
         }
     }
@@ -214,7 +214,7 @@ void DeviceMiPow::serviceDetailsDiscovered_data(QLowEnergyService::ServiceState 
 
 void DeviceMiPow::serviceError(QLowEnergyService::ServiceError error)
 {
-    qDebug() << "DeviceMiPow::serviceError(err:" << error;
+    //qDebug() << "DeviceMiPow::serviceError(err:" << error;
 }
 
 /* ************************************************************************** */
@@ -222,19 +222,19 @@ void DeviceMiPow::serviceError(QLowEnergyService::ServiceError error)
 
 void DeviceMiPow::setMode(unsigned value)
 {
-    qDebug() << "DeviceMiPow::setMode(" << value << ")";
+    //qDebug() << "DeviceMiPow::setMode(" << value << ")";
 }
 
 void DeviceMiPow::setEffect(unsigned value)
 {
-    qDebug() << "DeviceMiPow::setEffect(" << value << ")";
+    //qDebug() << "DeviceMiPow::setEffect(" << value << ")";
 }
 
 /* ************************************************************************** */
 
 void DeviceMiPow::setOff()
 {
-    qDebug() << "DeviceMiPow::setOff()";
+    //qDebug() << "DeviceMiPow::setOff()";
 
     if (serviceData && m_ble_status >= DeviceUtils::DEVICE_CONNECTED)
     {
@@ -252,7 +252,7 @@ void DeviceMiPow::setOff()
 
 void DeviceMiPow::setLuminosity(unsigned brightness)
 {
-    qDebug() << "DeviceMiPow::setLuminosity(" << brightness << ")";
+    //qDebug() << "DeviceMiPow::setLuminosity(" << brightness << ")";
 
     if (serviceData && m_ble_status >= DeviceUtils::DEVICE_CONNECTED)
     {
@@ -272,7 +272,7 @@ void DeviceMiPow::setLuminosity(unsigned brightness)
 
 void DeviceMiPow::setColors(unsigned brightness, unsigned r, unsigned g, unsigned b)
 {
-    qDebug() << "DeviceMiPow::setColors(" << brightness << r << g << b << ")";
+    //qDebug() << "DeviceMiPow::setColors(" << brightness << r << g << b << ")";
 
     if (serviceData && m_ble_status >= DeviceUtils::DEVICE_CONNECTED)
     {
@@ -300,7 +300,7 @@ void DeviceMiPow::setLuminosity_float(float value)
 
 void DeviceMiPow::setColors_float(float bright, float r, float g, float b)
 {
-    qDebug() << "DeviceMiPow::setColors_float(" << bright << r << g << b << ")";
+    //qDebug() << "DeviceMiPow::setColors_float(" << bright << r << g << b << ")";
 
     int br = bright * 255;
     int rr = r * 255;
@@ -312,7 +312,7 @@ void DeviceMiPow::setColors_float(float bright, float r, float g, float b)
 
 void DeviceMiPow::setColors_rgb_hex(QString rgb_hex)
 {
-    qDebug() << "DeviceMiPow::setColors_aaa(" << rgb_hex << ")";
+    //qDebug() << "DeviceMiPow::setColors_rgb_hex(" << rgb_hex << ")";
 
     QColor clr;
     clr.setNamedColor(rgb_hex);
@@ -357,8 +357,8 @@ void DeviceMiPow::bleReadDone(const QLowEnergyCharacteristic &c, const QByteArra
         m_colors = (argb & 0x00ffffff);
         Q_EMIT dataUpdated();
 
-        qDebug() << "initial read / argb:   " << argb;
-        qDebug() << "initial read / brightness:   " << m_brightness << "   /   m_colors:   " << m_colors;
+        //qDebug() << "initial read / argb:   " << argb;
+        //qDebug() << "initial read / brightness:   " << m_brightness << "   /   m_colors:   " << m_colors;
     }
 }
 

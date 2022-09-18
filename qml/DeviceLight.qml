@@ -19,13 +19,16 @@ Loader {
 
         appContent.state = "DeviceLight"
 
-        // set device
-        if (clickedDevice === currentDevice) return
-        currentDevice = clickedDevice
+        if (clickedDevice === currentDevice) {
+            deviceLight.item.updateData()
+        } else {
+            // set device
+            currentDevice = clickedDevice
 
-        // load screen
-        deviceLight.active = true
-        deviceLight.item.loadDevice()
+            // load screen
+            deviceLight.active = true
+            deviceLight.item.loadDevice()
+        }
     }
 
     ////////
@@ -36,8 +39,8 @@ Loader {
     }
 
     active: false
-
     asynchronous: false
+
     sourceComponent: Item {
         id: itemDeviceLight
         implicitWidth: 480
@@ -55,7 +58,6 @@ Loader {
 
         Connections {
             target: currentDevice
-            function onStatusUpdated() { updateHeader() }
             function onDataUpdated() { updateData() }
         }
 
@@ -97,23 +99,12 @@ Loader {
             if (typeof currentDevice === "undefined" || !currentDevice) return
             if (!currentDevice.isLight) return
             //console.log("DeviceLight // updateHeader() >> " + currentDevice)
-
-            // Status
-            updateStatusText()
-        }
-
-        function updateStatusText() {
-            if (typeof currentDevice === "undefined" || !currentDevice) return
-            if (!currentDevice.isLight) return
-            //console.log("DeviceLight // updateStatusText() >> " + currentDevice)
-
-            // Status
-            textStatus.text = UtilsDeviceSensors.getDeviceStatusText(currentDevice.status)
         }
 
         function updateData() {
             if (typeof currentDevice === "undefined" || !currentDevice) return
             if (!currentDevice.isLight) return
+            if (!currentDevice.connected) return
             //console.log("DeviceLight // updateData() >> " + currentDevice)
 
             var a = currentDevice.getLuminosity()
@@ -243,7 +234,7 @@ Loader {
                         width: status.width - status.spacing - imageStatus.width
                         anchors.verticalCenter: parent.verticalCenter
 
-                        text: qsTr("Loading...")
+                        text: UtilsDeviceSensors.getDeviceStatusText(currentDevice.status)
                         color: cccc
                         font.bold: false
                         font.pixelSize: 17
@@ -356,43 +347,9 @@ Loader {
 
                 ////////
 
-                Rectangle {
+                ItemLoadData {
                     id: itemLoadData
                     anchors.centerIn: parent
-
-                    width: singleColumn ? (parent.width*0.26) : (parent.height*0.26)
-                    height: width
-                    radius: width
-                    color: Theme.colorForeground
-                    opacity: 0.8
-
-                    visible: (currentDevice.status !== DeviceUtils.DEVICE_CONNECTED)
-
-                    IconSvg {
-                        anchors.centerIn: parent
-                        width: parent.width*0.8
-                        height: width
-
-                        source: {
-                            if (currentDevice.status === DeviceUtils.DEVICE_CONNECTED)
-                                return ""
-                            else if (currentDevice.status === DeviceUtils.DEVICE_CONNECTING)
-                                return "qrc:/assets/icons_material/duotone-bluetooth_connected-24px.svg"
-                            else
-                                return "qrc:/assets/icons_material/baseline-bluetooth_disabled-24px.svg"
-                        }
-
-                        fillMode: Image.PreserveAspectFit
-                        color: Theme.colorSubText
-                        smooth: true
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            currentDevice.actionConnect()
-                        }
-                    }
                 }
 
                 ////////
