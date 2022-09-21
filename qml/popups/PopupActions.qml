@@ -152,7 +152,7 @@ Popup {
 
                         text: qsTr("SINGLE PRESS")
                         textColor: "white"
-                        backgroundColor: Theme.colorHeaderHighlight
+                        color: Theme.colorHeaderHighlight
                     }
                 }
             }
@@ -247,9 +247,8 @@ Popup {
 
                         ItemTag {
                             text: UtilsActions.getActionName(modelData)
-
                             textColor: (modelData === currentButtonAction) ? "white" : Theme.colorSubText
-                            backgroundColor: (modelData === currentButtonAction) ? Theme.colorPrimary : Theme.colorForeground
+                            color: (modelData === currentButtonAction) ? Theme.colorPrimary : Theme.colorForeground
 
                             MouseArea {
                                 anchors.fill: parent
@@ -285,9 +284,8 @@ Popup {
 
                         ItemTag {
                             text: UtilsActions.getActionName(modelData)
-
                             textColor: (modelData === currentButtonAction) ? "white" : Theme.colorSubText
-                            backgroundColor: (modelData === currentButtonAction) ? Theme.colorPrimary : Theme.colorForeground
+                            color: (modelData === currentButtonAction) ? Theme.colorPrimary : Theme.colorForeground
 
                             MouseArea {
                                 anchors.fill: parent
@@ -325,9 +323,8 @@ Popup {
 
                         ItemTag {
                             text: UtilsActions.getActionName(modelData)
-
                             textColor: (modelData === currentButtonAction) ? "white" : Theme.colorSubText
-                            backgroundColor: (modelData === currentButtonAction) ? Theme.colorPrimary : Theme.colorForeground
+                            color: (modelData === currentButtonAction) ? Theme.colorPrimary : Theme.colorForeground
 
                             MouseArea {
                                 anchors.fill: parent
@@ -362,9 +359,8 @@ Popup {
 
                         ItemTag {
                             text: UtilsActions.getActionName(modelData)
-
                             textColor: (modelData === currentButtonAction) ? "white" : Theme.colorSubText
-                            backgroundColor: (modelData === currentButtonAction) ? Theme.colorPrimary : Theme.colorForeground
+                            color: (modelData === currentButtonAction) ? Theme.colorPrimary : Theme.colorForeground
 
                             MouseArea {
                                 anchors.fill: parent
