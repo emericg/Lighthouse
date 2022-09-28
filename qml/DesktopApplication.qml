@@ -179,14 +179,13 @@ ApplicationWindow {
                 case Qt.ApplicationActive:
                     //console.log("Qt.ApplicationActive")
 
-                    deviceManager.listenDevices_start()
-                    mprisControls.select_player()
-
                     // Check if we need an 'automatic' theme change
                     Theme.loadTheme(settingsManager.appTheme)
 
                     // Check Bluetooth anyway (on macOS)
                     //if (Qt.platform.os === "osx") deviceManager.checkBluetooth()
+
+                    mprisControls.select_player()
 
                     break
             }

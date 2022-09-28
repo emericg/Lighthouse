@@ -259,7 +259,7 @@ Rectangle {
                 visible: (deviceManager.bluetooth && selectedDevice &&
                           (appContent.state === "DeviceLight"))
 
-                source: selectedDevice.connected ?
+                source: (selectedDevice && selectedDevice.connected) ?
                             "qrc:/assets/icons_material/baseline-bluetooth_disabled-24px.svg" :
                             "qrc:/assets/icons_material/duotone-bluetooth_connected-24px.svg"
                 tooltipText: (selectedDevice && selectedDevice.connected) ?

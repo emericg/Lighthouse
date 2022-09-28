@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
     MenubarManager *mb = MenubarManager::getInstance();
     NotificationManager *nm = NotificationManager::getInstance();
     DeviceManager *dm = new DeviceManager;
-    if (!sm || !st ||!mb || !nm || !dm)
+    if (!sm || !db || !st ||!mb || !nm || !dm)
     {
         qWarning() << "Cannot init Lighthouse components!";
         return EXIT_FAILURE;
@@ -119,7 +119,11 @@ int main(int argc, char *argv[])
     networkClient->connectToServer();
 #else
     networkServer = new NetworkServer();
+
     mprisControls = MprisController::getInstance();
+    mprisControls->select_player();
+
+    dm->listenDevices_start();
 #endif
 
     // Init generic utils

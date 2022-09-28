@@ -62,10 +62,8 @@ class DeviceManager: public QObject
 
     Q_PROPERTY(DeviceFilter *devicesNearby READ getDevicesNearby NOTIFY devicesNearbyUpdated)
 
-    static const int ble_scanning_duration = 30;
-    static const int ble_listening_duration = 0;
-    static const int ble_listening_duration_nearby = 0;
-    static const int ble_listening_duration_background = 45;
+    static const int ble_listening_duration_desktop = 300;
+    static const int ble_listening_duration_mobile = 0;
 
     bool m_dbInternal = false;
     bool m_dbExternal = false;

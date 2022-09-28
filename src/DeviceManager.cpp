@@ -546,6 +546,14 @@ void DeviceManager::deviceDiscoveryStopped()
         m_listening = false;
         Q_EMIT listeningChanged();
     }
+
+#if defined(Q_OS_LINUX) || defined(Q_OS_MAC) || defined(Q_OS_WINDOWS)
+    // on desktop, we can have auto-restart
+    if (ble_listening_duration_desktop > 0)
+    {
+        listenDevices_start();
+    }
+#endif
 }
 
 void DeviceManager::bluetoothHostModeStateChangedIos()
@@ -614,7 +622,11 @@ void DeviceManager::listenDevices_start()
             connect(m_discoveryAgent, &QBluetoothDeviceDiscoveryAgent::deviceUpdated,
                     this, &DeviceManager::updateBleDevice, Qt::UniqueConnection);
 
-            m_discoveryAgent->setLowEnergyDiscoveryTimeout(ble_listening_duration);
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+            m_discoveryAgent->setLowEnergyDiscoveryTimeout(ble_listening_duration_mobile*1000);
+#else
+            m_discoveryAgent->setLowEnergyDiscoveryTimeout(ble_listening_duration_desktop*1000);
+#endif
 
             if (hasBluetoothPermissions())
             {
