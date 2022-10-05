@@ -46,12 +46,15 @@ void NetworkClient::connectToServer()
     m_host = SettingsManager::getInstance()->getNetCtrlHost();
     m_port = SettingsManager::getInstance()->getNetCtrlPort();
 
+    //qDebug() << "NetworkClient::connectToServer(" << m_host << "/" << m_port << ")";
+
     m_tcpSocket->abort();
     m_tcpSocket->connectToHost(m_host, m_port);
 }
 
 void NetworkClient::disconnectFromServer()
 {
+    //qDebug() << "NetworkClient::disconnectFromServer()";
     m_tcpSocket->abort();
 }
 
@@ -63,6 +66,7 @@ void NetworkClient::connected()
 
 void NetworkClient::disconnected()
 {
+    //qDebug() << "NetworkClient::disconnected()";
     m_connected = false;
     Q_EMIT connectionEvent();
 }
@@ -72,6 +76,7 @@ void NetworkClient::displayError(QAbstractSocket::SocketError socketError)
     switch (socketError)
     {
     case QAbstractSocket::RemoteHostClosedError:
+        qWarning() << "RemoteHostClosedError";
         break;
     case QAbstractSocket::HostNotFoundError:
         qWarning() << "The host was not found. Please check the host name and port settings";
@@ -99,7 +104,7 @@ void NetworkClient::readMetadata()
         return;
     }
 
-    qDebug() << "NetworkClient::readMetadata() >" << metadata;
+    //qDebug() << "NetworkClient::readMetadata() >" << metadata;
 }
 
 void NetworkClient::sendPress(int btn)

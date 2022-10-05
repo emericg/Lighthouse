@@ -54,7 +54,7 @@ void NetworkServer::startServer()
     if (m_tcpServer->listen(QHostAddress::Any, m_tcpServerPort))
     {
         m_serverAddress.clear();
-        QList<QHostAddress> ipAddressesList = QNetworkInterface::allAddresses();
+        QList <QHostAddress> ipAddressesList = QNetworkInterface::allAddresses();
 
         // use the first non-localhost IPv4 address
         for (int i = 0; i < ipAddressesList.size(); ++i)
@@ -104,7 +104,12 @@ void NetworkServer::stopServer()
 
 void NetworkServer::newClientConnection()
 {
-    //qDebug() << "NetworkServer::newClientConnection()";
+    qDebug() << "NetworkServer::newClientConnection()";
+
+    QTcpSocket *conn = m_tcpServer->nextPendingConnection();
+    if (conn && conn->peerAddress().toString() == "127.0.0.1") return;
+    if (conn && conn->localPort() != m_tcpServerPort) return;
+    if (!conn) return;
 
     if (m_clientConnection)
     {
@@ -112,22 +117,27 @@ void NetworkServer::newClientConnection()
         m_clientConnection->deleteLater();
     }
 
-    m_clientConnection = m_tcpServer->nextPendingConnection();
-    connect(m_clientConnection, &QIODevice::readyRead, this, &NetworkServer::readPress);
-    connect(m_clientConnection, &QAbstractSocket::disconnected, this, &NetworkServer::closeClientConnection);
+    m_clientConnection = conn;
+    if (m_clientConnection)
+    {
+        //qDebug() << "NetworkServer::newClientConnection(ACCEPTED)";
+        connect(m_clientConnection, &QIODevice::readyRead, this, &NetworkServer::readPress);
+        connect(m_clientConnection, &QAbstractSocket::disconnected, this, &NetworkServer::closeClientConnection);
 
-    m_clientConnected = true;
-    Q_EMIT connectionEvent();
+        m_clientConnected = true;
+        Q_EMIT connectionEvent();
 
-    m_clientDataStream.setDevice(m_clientConnection);
-    m_clientDataStream.setVersion(QDataStream::Qt_6_0);
+        m_clientDataStream.abortTransaction();
+        m_clientDataStream.setDevice(m_clientConnection);
+        m_clientDataStream.setVersion(QDataStream::Qt_6_0);
 
-    QByteArray block;
-    QDataStream out(&block, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_6_0);
-    out << QString("WELCOME CLIENT");
+        QByteArray block;
+        QDataStream out(&block, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_6_0);
+        out << QString("WELCOME CLIENT");
 
-    m_clientConnection->write(block);
+        m_clientConnection->write(block);
+    }
 }
 
 void NetworkServer::closeClientConnection()
@@ -136,6 +146,7 @@ void NetworkServer::closeClientConnection()
 
     if (m_clientConnection)
     {
+        m_clientConnection->close();
         m_clientConnection->deleteLater();
         m_clientConnection = nullptr;
     }
