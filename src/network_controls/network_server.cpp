@@ -104,13 +104,18 @@ void NetworkServer::stopServer()
 
 void NetworkServer::newClientConnection()
 {
-    qDebug() << "NetworkServer::newClientConnection()";
-
     QTcpSocket *conn = m_tcpServer->nextPendingConnection();
+    if (conn && conn->peerAddress().toString() == "::ffff:127.0.0.1") return;
     if (conn && conn->peerAddress().toString() == "127.0.0.1") return;
     if (conn && conn->localPort() != m_tcpServerPort) return;
     if (!conn) return;
-
+/*
+    qDebug() << "NetworkServer::newClientConnection()";
+    qDebug() << "- " << conn->peerAddress();
+    qDebug() << "- " << conn->peerName();
+    qDebug() << "- " << conn->peerPort();
+    qDebug() << "- " << conn->localPort();
+*/
     if (m_clientConnection)
     {
         m_clientConnection->close();
@@ -127,7 +132,7 @@ void NetworkServer::newClientConnection()
         m_clientConnected = true;
         Q_EMIT connectionEvent();
 
-        m_clientDataStream.abortTransaction();
+        //m_clientDataStream.abortTransaction();
         m_clientDataStream.setDevice(m_clientConnection);
         m_clientDataStream.setVersion(QDataStream::Qt_6_0);
 

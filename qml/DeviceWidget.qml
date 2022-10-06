@@ -234,7 +234,7 @@ Item {
                     }
 
                     // regular click
-                    //if (boxDevice.rssi > 0) {
+                    if (isDesktop) {
                         selectedDevice = boxDevice
 
                         if (boxDevice.isRemote) {
@@ -246,7 +246,7 @@ Item {
                         } else if (boxDevice.isLight) {
                             screenDeviceLight.loadDevice(boxDevice)
                         }
-                    //}
+                    }
                 }
 
                 if (mouse.button === Qt.MiddleButton) {

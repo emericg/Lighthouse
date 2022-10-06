@@ -99,27 +99,31 @@ void NetworkClient::readMetadata()
     QString metadata;
     m_dataInput >> metadata;
 
-    if (!m_dataInput.commitTransaction())
+    if (m_dataInput.commitTransaction())
     {
-        return;
+        qDebug() << "NetworkClient::readMetadata() >" << metadata;
     }
-
-    //qDebug() << "NetworkClient::readMetadata() >" << metadata;
+    else
+    {
+        qWarning() << "NetworkClient::readMetadata() m_dataInput commit failed";
+    }
 }
 
 void NetworkClient::sendPress(int btn)
 {
-    QByteArray block;
-    QDataStream out(&block, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_6_0);
+    //qDebug() << "NetworkClient::sendPress()";
 
-    if (btn == 1) out << QString("press:playpause");
-    if (btn == 2) out << QString("press:stop");
-    if (btn == 3) out << QString("press:next");
-    if (btn == 4) out << QString("press:prev");
-    if (btn == 5) out << QString("press:mute");
-    if (btn == 6) out << QString("press:volumeup");
-    if (btn == 7) out << QString("press:volumedown");
+    QByteArray block;
+    QDataStream dataOutput(&block, QIODevice::WriteOnly);
+    dataOutput.setVersion(QDataStream::Qt_6_0);
+
+    if (btn == 1) dataOutput << QString("press:playpause");
+    if (btn == 2) dataOutput << QString("press:stop");
+    if (btn == 3) dataOutput << QString("press:next");
+    if (btn == 4) dataOutput << QString("press:prev");
+    if (btn == 5) dataOutput << QString("press:mute");
+    if (btn == 6) dataOutput << QString("press:volumeup");
+    if (btn == 7) dataOutput << QString("press:volumedown");
 
     m_tcpSocket->write(block);
 }
