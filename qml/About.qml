@@ -10,7 +10,10 @@ Loader {
     ////////
 
     function loadScreen() {
+        // load screen
         aboutScreen.active = true
+
+        // change screen
         appContent.state = "About"
     }
 
@@ -28,7 +31,7 @@ Loader {
     asynchronous: false
     sourceComponent: Flickable {
         anchors.fill: parent
-        contentWidth: parent.width
+        contentWidth: -1
         contentHeight: column.height
 
         boundsBehavior: isDesktop ? Flickable.OvershootBounds : Flickable.DragAndOvershootBounds
@@ -47,7 +50,7 @@ Loader {
 
             ////////////////
 
-            Rectangle {
+            Rectangle { // header
                 anchors.left: parent.left
                 anchors.leftMargin: -(screenPaddingLeft + 16)
                 anchors.right: parent.right
@@ -60,6 +63,7 @@ Loader {
                     id: logo
                     anchors.left: parent.left
                     anchors.leftMargin: 16
+                    anchors.verticalCenter: parent.verticalCenter
 
                     z: 2
                     height: 128
@@ -135,6 +139,15 @@ Loader {
                         source: "qrc:/assets/logos/github.svg"
                         onClicked: Qt.openUrlExternally("https://github.com/emericg/Lighthouse")
                     }
+                }
+
+                Rectangle {
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    height: 1
+                    visible: isDesktop
+                    color: Theme.colorSeparator
                 }
             }
 
@@ -230,8 +243,8 @@ Loader {
 
                 IconSvg {
                     id: authorImg
-                    width: 31
-                    height: 31
+                    width: 32
+                    height: 32
                     anchors.left: parent.left
                     anchors.leftMargin: 0
                     anchors.verticalCenter: parent.verticalCenter
@@ -257,6 +270,7 @@ Loader {
 
                     MouseArea {
                         anchors.fill: parent
+                        anchors.margins: -12
                         acceptedButtons: Qt.NoButton
                         cursorShape: authorTxt.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
                     }
@@ -268,7 +282,6 @@ Loader {
                     anchors.right: parent.right
                     anchors.rightMargin: 0
                     anchors.verticalCenter: parent.verticalCenter
-                    visible: singleColumn
 
                     source: "qrc:/assets/icons_material/duotone-launch-24px.svg"
                     color: Theme.colorIcon
@@ -289,8 +302,8 @@ Loader {
 
                 IconSvg {
                     id: rateImg
-                    width: 31
-                    height: 31
+                    width: 32
+                    height: 32
                     anchors.left: parent.left
                     anchors.leftMargin: 0
                     anchors.verticalCenter: parent.verticalCenter
@@ -317,7 +330,6 @@ Loader {
                     anchors.right: parent.right
                     anchors.rightMargin: 0
                     anchors.verticalCenter: parent.verticalCenter
-                    visible: singleColumn
 
                     source: "qrc:/assets/icons_material/duotone-launch-24px.svg"
                     color: Theme.colorIcon
@@ -329,11 +341,14 @@ Loader {
                     anchors.right: singleColumn ? parent.right : rateTxt.right
                     anchors.rightMargin: singleColumn ? 0 : -24
                     anchors.bottom: parent.bottom
+
                     onClicked: {
                         if (Qt.platform.os === "android")
                             Qt.openUrlExternally("market://details?id=io.emeric.lighthouse")
                         else if (Qt.platform.os === "ios")
                             Qt.openUrlExternally("itms-apps://itunes.apple.com/app/1476046123")
+                        else
+                            Qt.openUrlExternally("https://github.com/emericg/Lighthouse/stargazers")
                     }
                 }
             }
@@ -349,8 +364,8 @@ Loader {
                 anchors.rightMargin: 0
 
                 IconSvg {
-                    width: 27
-                    height: 27
+                    width: 28
+                    height: 28
                     anchors.left: parent.left
                     anchors.leftMargin: 2
                     anchors.verticalCenter: parent.verticalCenter
@@ -371,12 +386,24 @@ Loader {
                     color: Theme.colorText
                 }
 
+                IconSvg {
+                    width: 24
+                    height: 24
+                    anchors.right: parent.right
+                    anchors.rightMargin: -2
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    source: "qrc:/assets/icons_material/baseline-chevron_right-24px.svg"
+                    color: Theme.colorIcon
+                }
+
                 MouseArea {
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.right: singleColumn ? parent.right : tutoTxt.right
                     anchors.rightMargin: singleColumn ? 0 : -24
                     anchors.bottom: parent.bottom
+
                     onClicked: screenTutorial.loadScreenFrom("About")
                 }
             }
@@ -437,14 +464,18 @@ Loader {
                     anchors.right: parent.right
                     anchors.rightMargin: 0
                     anchors.verticalCenter: parent.verticalCenter
-                    visible: singleColumn
 
                     source: "qrc:/assets/icons_material/duotone-launch-24px.svg"
                     color: Theme.colorIcon
                 }
 
                 MouseArea {
-                    anchors.fill: parent
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: singleColumn ? parent.right : releasenotesTxt.right
+                    anchors.rightMargin: singleColumn ? 0 : -24
+                    anchors.bottom: parent.bottom
+
                     onClicked: Qt.openUrlExternally("https://github.com/emericg/Lighthouse/releases")
                 }
             }
@@ -515,7 +546,12 @@ Loader {
                 }
 
                 MouseArea {
-                    anchors.fill: parent
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: singleColumn ? parent.right : permissionsTxt.right
+                    anchors.rightMargin: singleColumn ? 0 : -24
+                    anchors.bottom: parent.bottom
+
                     onClicked: screenPermissions.loadScreenFrom("About")
                 }
             }

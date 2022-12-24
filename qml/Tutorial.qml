@@ -1,5 +1,5 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
+import QtQuick
+import QtQuick.Controls
 
 import ThemeEngine 1.0
 
@@ -42,12 +42,15 @@ Rectangle {
                 tutorialPages.enableAnimation()
             }
 
+            ////////////////
+
             SwipeView {
                 id: tutorialPages
                 anchors.fill: parent
                 anchors.leftMargin: screenPaddingLeft
                 anchors.rightMargin: screenPaddingRight
                 anchors.bottomMargin: 56
+                property int margins: isPhone ? 24 : 40
 
                 currentIndex: 0
                 onCurrentIndexChanged: {
@@ -96,12 +99,12 @@ Rectangle {
                 }
             }
 
-            ////////
+            ////////////////
 
             Text {
                 id: pagePrevious
                 anchors.left: parent.left
-                anchors.leftMargin: 32
+                anchors.leftMargin: tutorialPages.margins
                 anchors.verticalCenter: pageIndicator.verticalCenter
 
                 visible: (tutorialPages.currentIndex !== 0)
@@ -120,6 +123,7 @@ Rectangle {
                     hoverEnabled: true
                     onEntered: parent.opacity = 1
                     onExited: parent.opacity = 0.8
+                    onCanceled: parent.opacity = 0.8
                     onClicked: tutorialPages.currentIndex--
                 }
             }
@@ -128,7 +132,7 @@ Rectangle {
                 id: pageIndicator
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
-                anchors.bottomMargin: 16
+                anchors.bottomMargin: tutorialPages.margins/2
 
                 count: tutorialPages.count
                 currentIndex: tutorialPages.currentIndex
@@ -137,10 +141,10 @@ Rectangle {
             Text {
                 id: pageNext
                 anchors.right: parent.right
-                anchors.rightMargin: 32
+                anchors.rightMargin: tutorialPages.margins
                 anchors.verticalCenter: pageIndicator.verticalCenter
 
-                text: (tutorialPages.currentIndex === tutorialPages.count-1) ? qsTr("All right!") : qsTr("Next")
+                text: (tutorialPages.currentIndex === tutorialPages.count-1) ? qsTr("Start") : qsTr("Next")
                 textFormat: Text.PlainText
                 color: Theme.colorHeaderContent
                 font.bold: true
@@ -154,9 +158,12 @@ Rectangle {
                     hoverEnabled: true
                     onEntered: parent.opacity = 1
                     onExited: parent.opacity = 0.8
+                    onCanceled: parent.opacity = 0.8
                     onClicked: tutorialPages.currentIndex++
                 }
             }
+
+            ////////////////
         }
     }
 }

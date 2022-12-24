@@ -196,7 +196,12 @@ Item {
 
         radius: 4
         border.width: 2
-        border.color: singleColumn ? "transparent" : Theme.colorSeparator
+        border.color: {
+            if (singleColumn) return "transparent"
+            if (mousearea.containsPress) return Theme.colorSecondary
+            return Theme.colorSeparator
+        }
+        Behavior on border.color { ColorAnimation { duration: 133 } }
 
         color: boxDevice.selected ? Theme.colorSeparator : Theme.colorDeviceWidget
         Behavior on color { ColorAnimation { duration: 133 } }
@@ -215,6 +220,7 @@ Item {
         opacity: boxDevice.deviceEnabled ? 1 : 0.66
 
         MouseArea {
+            id: mousearea
             anchors.fill: parent
             acceptedButtons: Qt.LeftButton | Qt.MiddleButton
 
@@ -234,17 +240,17 @@ Item {
                     }
 
                     // regular click
+                    selectedDevice = boxDevice
+                    if (boxDevice.isLight) {
+                        screenDeviceLight.loadDevice(boxDevice)
+                    }
                     if (isDesktop) {
-                        selectedDevice = boxDevice
-
                         if (boxDevice.isRemote) {
                             screenDeviceRemote.loadDevice(boxDevice)
                         } else if (boxDevice.isBeacon) {
                             screenDeviceBeacon.loadDevice(boxDevice)
                         } else if (boxDevice.isPGP) {
                             screenDevicePGP.loadDevice(boxDevice)
-                        } else if (boxDevice.isLight) {
-                            screenDeviceLight.loadDevice(boxDevice)
                         }
                     }
                 }
