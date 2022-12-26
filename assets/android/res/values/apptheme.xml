@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="AppTheme">
-        <item name="android:windowBackground">@drawable/splash</item>
-    </style>
+  <style name="AppTheme">
+    <item name="android:windowBackground">@drawable/splash</item>
+    <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    <item name="android:windowActionBar">true</item>
+    <item name="android:windowLightNavigationBar">true</item>
+    <item name="android:colorPrimary">@android:color/white</item>
+    <item name="android:colorPrimaryDark">@android:color/white</item>
+    <item name="android:statusBarColor">@android:color/white</item>
+    <item name="android:navigationBarColor">@android:color/white</item>
+  </style>
 </resources>

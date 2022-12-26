@@ -46,8 +46,13 @@ class DeviceManager: public QObject
     Q_OBJECT
 
     Q_PROPERTY(bool hasDevices READ areDevicesAvailable NOTIFY devicesListUpdated)
+
     Q_PROPERTY(DeviceFilter *devicesList READ getDevicesFiltered NOTIFY devicesListUpdated)
     Q_PROPERTY(int deviceCount READ getDeviceCount NOTIFY devicesListUpdated)
+
+    Q_PROPERTY(DeviceFilter *devicesNearby READ getDevicesNearby NOTIFY devicesNearbyUpdated)
+
+    ////////
 
     Q_PROPERTY(bool listening READ isListening NOTIFY listeningChanged)
     Q_PROPERTY(bool scanning READ isScanning NOTIFY scanningChanged)
@@ -59,8 +64,6 @@ class DeviceManager: public QObject
     Q_PROPERTY(bool bluetoothAdapter READ hasBluetoothAdapter NOTIFY bluetoothChanged)
     Q_PROPERTY(bool bluetoothEnabled READ hasBluetoothEnabled NOTIFY bluetoothChanged)
     Q_PROPERTY(bool bluetoothPermissions READ hasBluetoothPermissions NOTIFY bluetoothChanged)
-
-    Q_PROPERTY(DeviceFilter *devicesNearby READ getDevicesNearby NOTIFY devicesNearbyUpdated)
 
     static const int ble_listening_duration_desktop = 300;
     static const int ble_listening_duration_mobile = 0;
@@ -117,6 +120,9 @@ class DeviceManager: public QObject
 
     void setLastRun();
 
+    QTimer m_updateTimer;
+    void setUpdateTimer(int updateIntervalMin = 0);
+
 Q_SIGNALS:
     void bluetoothChanged();
 
@@ -136,7 +142,6 @@ private slots:
     void bluetoothStatusChanged();
 
     // QBluetoothDeviceDiscoveryAgent related
-    void bluetoothHostModeStateChangedIos();
     void addNearbyBleDevice(const QBluetoothDeviceInfo &info);
     void updateNearbyBleDevice(const QBluetoothDeviceInfo &info, QBluetoothDeviceInfo::Fields updatedFields);
     void addBleDevice(const QBluetoothDeviceInfo &info);
@@ -177,6 +182,9 @@ public:
     Q_INVOKABLE void removeDevice(const QString &address);
     Q_INVOKABLE void removeDeviceData(const QString &address);
 
+    Q_INVOKABLE void refreshDevices_start();
+    Q_INVOKABLE void refreshDevices_stop();
+
     // Devices list management
     Q_INVOKABLE bool areDevicesAvailable() const { return m_devices_model->hasDevices(); }
     DeviceFilter *getDevicesNearby() const { return m_devices_nearby_filter; }
@@ -192,8 +200,9 @@ public:
     Q_INVOKABLE void orderby_insideoutside();
     void orderby(int role, Qt::SortOrder order);
 
-    Q_INVOKABLE QVariant getDeviceByProxyIndex(const int index) const
+    Q_INVOKABLE QVariant getDeviceByProxyIndex(const int index, const int deviceType = 0) const
     {
+        Q_UNUSED(deviceType)
         QModelIndex proxyIndex = m_devices_filter->index(index, 0);
         return QVariant::fromValue(m_devices_filter->data(proxyIndex, DeviceModel::PointerRole));
     }

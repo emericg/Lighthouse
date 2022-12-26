@@ -472,9 +472,6 @@ void Device::refreshDataFinished(bool status, bool cached)
         // Only update data on success
         Q_EMIT dataUpdated();
 
-        // Reset update timer
-        setUpdateTimer();
-
         // Reset last error
         m_lastError = QDateTime();
         Q_EMIT statusUpdated();
@@ -495,9 +492,6 @@ void Device::refreshDataFinished(bool status, bool cached)
         {
             m_lastError = QDateTime::currentDateTime();
             Q_EMIT statusUpdated();
-
-            // Set error timer value
-            setUpdateTimer(SettingsManager::s_intervalErrorUpdate);
         }
     }
 
@@ -561,42 +555,6 @@ void Device::refreshRealtimeFinished()
 
 /* ************************************************************************** */
 /* ************************************************************************** */
-
-void Device::setUpdateTimer(int updateIntervalMin)
-{
-#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
-    return; // we do not update every x hours on mobile, we update everytime the app is on the foreground
-#endif
-
-    // If no interval is provided, load the one from settings
-    if (updateIntervalMin <= 0)
-    {
-        SettingsManager *sm = SettingsManager::getInstance();
-
-        if (getDeviceType() == DeviceUtils::DEVICE_PLANTSENSOR)
-            updateIntervalMin = sm->getUpdateIntervalPlant();
-        else
-            updateIntervalMin = sm->getUpdateIntervalThermo();
-    }
-
-    // Validate the interval
-    if (updateIntervalMin < 5 || updateIntervalMin > 120)
-    {
-        if (getDeviceType() == DeviceUtils::DEVICE_PLANTSENSOR)
-            updateIntervalMin = SettingsManager::s_intervalPlantUpdate;
-        else if (getDeviceType() == DeviceUtils::DEVICE_THERMOMETER)
-            updateIntervalMin = SettingsManager::s_intervalThermometerUpdate;
-        else
-            updateIntervalMin = SettingsManager::s_intervalEnvironmentalUpdate;
-    }
-
-    // Is our timer already set to this particular interval?
-    if (m_updateTimer.interval() != updateIntervalMin*60*1000)
-    {
-        m_updateTimer.setInterval(updateIntervalMin*60*1000);
-        m_updateTimer.start();
-    }
-}
 
 void Device::setTimeoutTimer()
 {
@@ -1279,13 +1237,11 @@ void Device::deviceConnected()
     if (m_ble_action == DeviceUtils::ACTION_UPDATE_REALTIME ||
         m_ble_action == DeviceUtils::ACTION_UPDATE_HISTORY)
     {
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
         // Keep screen on
         UtilsScreen *utilsScreen = UtilsScreen::getInstance();
-        if (utilsScreen)
-        {
-            utilsScreen->keepScreenOn(true);
-        }
-
+        if (utilsScreen) utilsScreen->keepScreenOn(true);
+#endif
         // Stop timeout timer, we'll be long...
         m_timeoutTimer.stop();
     }
@@ -1339,11 +1295,10 @@ void Device::deviceDisconnected()
     if (m_ble_action == DeviceUtils::ACTION_UPDATE_REALTIME ||
         m_ble_action == DeviceUtils::ACTION_UPDATE_HISTORY)
     {
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
         UtilsScreen *utilsScreen = UtilsScreen::getInstance();
-        if (utilsScreen)
-        {
-            utilsScreen->keepScreenOn(false);
-        }
+        if (utilsScreen) utilsScreen->keepScreenOn(false);
+#endif
     }
 
     if (m_ble_status == DeviceUtils::DEVICE_UPDATING)

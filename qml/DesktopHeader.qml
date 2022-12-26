@@ -155,7 +155,7 @@ Rectangle {
         anchors.top: parent.top
         anchors.topMargin: 0
         anchors.right: parent.right
-        anchors.rightMargin: 12
+        anchors.rightMargin: 0
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 0
 

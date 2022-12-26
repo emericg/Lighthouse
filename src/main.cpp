@@ -59,7 +59,6 @@ int main(int argc, char *argv[])
     // Arguments parsing ///////////////////////////////////////////////////////
 
     bool start_minimized = false;
-    bool start_daemon = false;
     for (int i = 1; i < argc; i++)
     {
         if (argv[i])
@@ -68,12 +67,15 @@ int main(int argc, char *argv[])
 
             if (QString::fromLocal8Bit(argv[i]) == "--start-minimized")
                 start_minimized = true;
-            if (QString::fromLocal8Bit(argv[i]) == "--start-daemon")
-                start_daemon = true;
         }
     }
 
     // GUI application /////////////////////////////////////////////////////////
+
+#if defined(Q_OS_ANDROID)
+    // Set navbar color, same as the loading screen
+    MobileUI::setNavbarColor("white");
+#endif
 
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
     // NVIDIA suspend&resume hack
@@ -91,7 +93,6 @@ int main(int argc, char *argv[])
     app.setOrganizationDomain("Lighthouse");
 
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
-    // Application icon
     QIcon appIcon(":/assets/logos/logo.svg");
     app.setWindowIcon(appIcon);
 #endif
@@ -103,7 +104,7 @@ int main(int argc, char *argv[])
     MenubarManager *mb = MenubarManager::getInstance();
     NotificationManager *nm = NotificationManager::getInstance();
     DeviceManager *dm = new DeviceManager;
-    if (!sm || !db || !st ||!mb || !nm || !dm)
+    if (!sm || !db || !st || !mb || !nm || !dm)
     {
         qWarning() << "Cannot init Lighthouse components!";
         return EXIT_FAILURE;
@@ -209,7 +210,7 @@ int main(int argc, char *argv[])
 #endif // desktop section
 
 #if defined(Q_OS_ANDROID)
-    QNativeInterface::QAndroidApplication::hideSplashScreen(666);
+    QNativeInterface::QAndroidApplication::hideSplashScreen(333);
 #endif
 
     return app.exec();

@@ -53,10 +53,13 @@ DeviceManager::DeviceManager(bool daemon)
 {
     m_daemonMode = daemon;
 
-    // Data model init
+    // Data model init (unified)
     m_devices_model = new DeviceModel(this);
     m_devices_filter = new DeviceFilter(this);
     m_devices_filter->setSourceModel(m_devices_model);
+    m_devices_filter->setDynamicSortFilter(true);
+
+    // Data model filtering
     SettingsManager *sm = SettingsManager::getInstance();
     if (sm)
     {
@@ -130,9 +133,6 @@ DeviceManager::DeviceManager(bool daemon)
 
             if (d)
             {
-                //connect(d, &Device::deviceUpdated, this, &DeviceManager::refreshDevices_finished);
-                //connect(d, &Device::deviceSynced, this, &DeviceManager::syncDevices_finished);
-
                 m_devices_model->addDevice(d);
                 //qDebug() << "* Device added (from database): " << deviceName << "/" << deviceAddr;
             }
@@ -252,18 +252,19 @@ void DeviceManager::enableBluetooth(bool enforceUserPermissionCheck)
 {
     //qDebug() << "DeviceManager::enableBluetooth() enforce:" << enforceUserPermissionCheck;
 
+    bool btA_was = m_btA;
+    bool btE_was = m_btE;
+    bool btP_was = m_btP;
+
 #if defined(Q_OS_IOS)
     checkBluetoothIos();
     return;
 #endif
 
-    bool btA_was = m_btA;
-    bool btE_was = m_btE;
-    bool btP_was = m_btP;
-
     // Invalid adapter? (ex: plugged off)
     if (m_bluetoothAdapter && !m_bluetoothAdapter->isValid())
     {
+        qDebug() << "DeviceManager::enableBluetooth() deleting current adapter";
         delete m_bluetoothAdapter;
         m_bluetoothAdapter = nullptr;
     }
@@ -289,11 +290,6 @@ void DeviceManager::enableBluetooth(bool enforceUserPermissionCheck)
         if (m_bluetoothAdapter->hostMode() > QBluetoothLocalDevice::HostMode::HostPoweredOff)
         {
             m_btE = true; // was already activated
-
-#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
-            // Already powered on? Power on again anyway. It helps on android...
-            //m_bluetoothAdapter->powerOn();
-#endif
         }
         else // Try to activate the adapter
         {
@@ -428,10 +424,10 @@ void DeviceManager::checkBluetoothIos()
         disconnect(m_discoveryAgent, &QBluetoothDeviceDiscoveryAgent::deviceUpdated,
                    this, &DeviceManager::updateNearbyBleDevice);
 
-        disconnect(m_discoveryAgent, &QBluetoothDeviceDiscoveryAgent::finished,
-                   this, &DeviceManager::deviceDiscoveryFinished);
         connect(m_discoveryAgent, &QBluetoothDeviceDiscoveryAgent::finished,
-                this, &DeviceManager::bluetoothHostModeStateChangedIos, Qt::UniqueConnection);
+                this, &DeviceManager::deviceDiscoveryFinished, Qt::UniqueConnection);
+        connect(m_discoveryAgent, &QBluetoothDeviceDiscoveryAgent::canceled,
+                this, &DeviceManager::deviceDiscoveryStopped, Qt::UniqueConnection);
 
         m_discoveryAgent->setLowEnergyDiscoveryTimeout(8); // 8ms
         m_discoveryAgent->start(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
@@ -452,7 +448,6 @@ void DeviceManager::deviceDiscoveryError(QBluetoothDeviceDiscoveryAgent::Error e
         if (m_btE)
         {
             m_btE = false;
-            //refreshDevices_stop();
             Q_EMIT bluetoothChanged();
         }
     }
@@ -462,7 +457,6 @@ void DeviceManager::deviceDiscoveryError(QBluetoothDeviceDiscoveryAgent::Error e
 
         m_btA = false;
         m_btE = false;
-        //refreshDevices_stop();
         Q_EMIT bluetoothChanged();
     }
     else if (error == QBluetoothDeviceDiscoveryAgent::InvalidBluetoothAdapterError)
@@ -474,7 +468,6 @@ void DeviceManager::deviceDiscoveryError(QBluetoothDeviceDiscoveryAgent::Error e
         if (m_btE)
         {
             m_btE = false;
-            //refreshDevices_stop();
             Q_EMIT bluetoothChanged();
         }
     }
@@ -484,7 +477,6 @@ void DeviceManager::deviceDiscoveryError(QBluetoothDeviceDiscoveryAgent::Error e
 
         m_btA = false;
         m_btE = false;
-        //refreshDevices_stop();
         Q_EMIT bluetoothChanged();
     }
     else if (error == QBluetoothDeviceDiscoveryAgent::UnsupportedDiscoveryMethod)
@@ -493,7 +485,6 @@ void DeviceManager::deviceDiscoveryError(QBluetoothDeviceDiscoveryAgent::Error e
 
         m_btE = false;
         m_btP = false;
-        //refreshDevices_stop();
         Q_EMIT bluetoothChanged();
     }
     else
@@ -502,14 +493,22 @@ void DeviceManager::deviceDiscoveryError(QBluetoothDeviceDiscoveryAgent::Error e
 
         m_btA = false;
         m_btE = false;
-        //refreshDevices_stop();
         Q_EMIT bluetoothChanged();
     }
+
+    listenDevices_stop();
+    refreshDevices_stop();
+    scanDevices_stop();
 
     if (m_scanning)
     {
         m_scanning = false;
         Q_EMIT scanningChanged();
+    }
+    if (m_listening)
+    {
+        m_listening = false;
+        Q_EMIT listeningChanged();
     }
 }
 
@@ -527,14 +526,19 @@ void DeviceManager::deviceDiscoveryFinished()
         m_listening = false;
         Q_EMIT listeningChanged();
     }
+
+#if defined(Q_OS_IOS)
+    if (!m_btE)
+    {
+        m_btE = true;
+        Q_EMIT bluetoothChanged();
+    }
+#endif
 }
 
 void DeviceManager::deviceDiscoveryStopped()
 {
     //qDebug() << "DeviceManager::deviceDiscoveryStopped()";
-
-    //NotificationManager *nm = NotificationManager::getInstance();
-    //nm->setNotification("DeviceManager::deviceDiscoveryStopped() > " + QDateTime::currentDateTime().toString());
 
     if (m_scanning)
     {
@@ -545,26 +549,6 @@ void DeviceManager::deviceDiscoveryStopped()
     {
         m_listening = false;
         Q_EMIT listeningChanged();
-    }
-
-#if defined(Q_OS_LINUX) || defined(Q_OS_MAC) || defined(Q_OS_WINDOWS)
-    // on desktop, we can have auto-restart
-    if (ble_listening_duration_desktop > 0)
-    {
-        listenDevices_start();
-    }
-#endif
-}
-
-void DeviceManager::bluetoothHostModeStateChangedIos()
-{
-    //qDebug() << "DeviceManager::bluetoothHostModeStateChangedIos()";
-
-    if (!m_btE)
-    {
-        m_btA = true;
-        m_btE = true;
-        Q_EMIT bluetoothChanged();
     }
 }
 
@@ -579,6 +563,18 @@ void DeviceManager::scanDevices_start()
 void DeviceManager::scanDevices_stop()
 {
     //qDebug() << "DeviceManager::scanDevices_stop()";
+}
+
+/* ************************************************************************** */
+
+void DeviceManager::refreshDevices_start()
+{
+    //qDebug() << "DeviceManager::refreshDevices_start()";
+}
+
+void DeviceManager::refreshDevices_stop()
+{
+    //qDebug() << "DeviceManager::refreshDevices_stop()";
 }
 
 /* ************************************************************************** */
@@ -600,6 +596,8 @@ void DeviceManager::listenDevices_start()
             {
                 // force on/off
                 m_discoveryAgent->stop();
+                m_scanning = false;
+                Q_EMIT scanningChanged();
             }
 
             disconnect(m_discoveryAgent, &QBluetoothDeviceDiscoveryAgent::deviceDiscovered,
@@ -848,14 +846,19 @@ void DeviceManager::addBleDevice(const QBluetoothDeviceInfo &info)
                 addDevice.bindValue(":deviceAddr", d->getAddress());
                 addDevice.bindValue(":deviceModel", d->getModel());
                 addDevice.bindValue(":deviceName", d->getName());
-                addDevice.exec();
+
+                if (addDevice.exec() == false)
+                {
+                    qWarning() << "> addDevice.exec() ERROR"
+                               << addDevice.lastError().type() << ":" << addDevice.lastError().text();
+                }
             }
         }
 
         // Add it to the UI
         m_devices_model->addDevice(d);
-        Q_EMIT devicesListUpdated();
 
+        Q_EMIT devicesListUpdated();
         qDebug() << "Device added (from BLE discovery): " << d->getName() << "/" << d->getAddress();
     }
     else
@@ -894,6 +897,7 @@ void DeviceManager::removeDevice(const QString &address)
                 QSqlQuery removeDevice;
                 removeDevice.prepare("DELETE FROM devices WHERE deviceAddr = :deviceAddr");
                 removeDevice.bindValue(":deviceAddr", dd->getAddress());
+
                 if (removeDevice.exec() == false)
                 {
                     qWarning() << "> removeDevice.exec() ERROR"
@@ -902,7 +906,7 @@ void DeviceManager::removeDevice(const QString &address)
             }
 
             // Remove device
-            m_devices_model->removeDevice(dd);
+            m_devices_model->removeDevice(dd, true);
             Q_EMIT devicesListUpdated();
 
             break;
@@ -939,53 +943,48 @@ void DeviceManager::invalidate()
     m_devices_filter->invalidate();
 }
 
+void DeviceManager::orderby(int role, Qt::SortOrder order)
+{
+    m_devices_filter->setSortRole(role);
+    m_devices_filter->sort(0, order);
+    m_devices_filter->invalidate();
+}
+
+/* ************************************************************************** */
+
 void DeviceManager::orderby_manual()
 {
-    m_devices_filter->setSortRole(DeviceModel::DeviceModelRole);
-    m_devices_filter->sort(0, Qt::AscendingOrder);
-    m_devices_filter->invalidate();
+    orderby(DeviceModel::ManualIndexRole, Qt::AscendingOrder);
 }
 
 void DeviceManager::orderby_model()
 {
-    m_devices_filter->setSortRole(DeviceModel::DeviceModelRole);
-    m_devices_filter->sort(0, Qt::AscendingOrder);
-    m_devices_filter->invalidate();
+    orderby(DeviceModel::DeviceModelRole, Qt::AscendingOrder);
 }
 
 void DeviceManager::orderby_name()
 {
-    m_devices_filter->setSortRole(DeviceModel::DeviceNameRole);
-    m_devices_filter->sort(0, Qt::AscendingOrder);
-    m_devices_filter->invalidate();
+    orderby(DeviceModel::DeviceNameRole, Qt::AscendingOrder);
 }
 
 void DeviceManager::orderby_location()
 {
-    m_devices_filter->setSortRole(DeviceModel::AssociatedLocationRole);
-    m_devices_filter->sort(0, Qt::AscendingOrder);
-    m_devices_filter->invalidate();
+    orderby(DeviceModel::AssociatedLocationRole, Qt::AscendingOrder);
 }
 
 void DeviceManager::orderby_waterlevel()
 {
-    m_devices_filter->setSortRole(DeviceModel::SoilMoistureRole);
-    m_devices_filter->sort(0, Qt::AscendingOrder);
-    m_devices_filter->invalidate();
+    orderby(DeviceModel::SoilMoistureRole, Qt::AscendingOrder);
 }
 
 void DeviceManager::orderby_plant()
 {
-    m_devices_filter->setSortRole(DeviceModel::PlantNameRole);
-    m_devices_filter->sort(0, Qt::AscendingOrder);
-    m_devices_filter->invalidate();
+    orderby(DeviceModel::PlantNameRole, Qt::AscendingOrder);
 }
 
 void DeviceManager::orderby_insideoutside()
 {
-    m_devices_filter->setSortRole(DeviceModel::InsideOutsideRole);
-    m_devices_filter->sort(0, Qt::AscendingOrder);
-    m_devices_filter->invalidate();
+    orderby(DeviceModel::InsideOutsideRole, Qt::AscendingOrder);
 }
 
 /* ************************************************************************** */

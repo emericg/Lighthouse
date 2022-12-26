@@ -553,7 +553,7 @@ Loader {
                 anchors.right: parent.right
                 anchors.rightMargin: 12
 
-                visible: networkServer.running
+                visible: networkServer && networkServer.running
 
                 text: qsTr("Running on %1 @ %2").arg(networkServer.serverAddress).arg(networkServer.serverPort)
                 textFormat: Text.PlainText

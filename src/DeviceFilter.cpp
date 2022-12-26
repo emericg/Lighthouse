@@ -165,6 +165,8 @@ QVariant DeviceModel::data(const QModelIndex &index, int role) const
             } else if (device->getName() == "Qingping Temp RH Barometer") {
                 return "p";
             } else if (device->getName().startsWith("6003#")) { // air quality
+                return "t";
+            } else if (device->getName() == "CGDN1") {
                 return "w";
             } else if (device->getName() == "JQJCY01YM") {
                 return "x";
@@ -231,13 +233,13 @@ void DeviceModel::addDevice(Device *d)
     }
 }
 
-void DeviceModel::removeDevice(Device *d)
+void DeviceModel::removeDevice(Device *d, bool del)
 {
     if (d)
     {
         beginRemoveRows(QModelIndex(), m_devices.indexOf(d), m_devices.indexOf(d));
         m_devices.removeOne(d);
-        delete d;
+        if (del) delete d;
         endRemoveRows();
     }
 }
