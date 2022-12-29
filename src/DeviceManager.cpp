@@ -250,7 +250,7 @@ bool DeviceManager::checkBluetooth()
 
 void DeviceManager::enableBluetooth(bool enforceUserPermissionCheck)
 {
-    //qDebug() << "DeviceManager::enableBluetooth() enforce:" << enforceUserPermissionCheck;
+    qDebug() << "DeviceManager::enableBluetooth() enforce:" << enforceUserPermissionCheck;
 
     bool btA_was = m_btA;
     bool btE_was = m_btE;
@@ -356,6 +356,9 @@ void DeviceManager::bluetoothHostModeStateChanged(QBluetoothLocalDevice::HostMod
     else
     {
         m_btE = false;
+
+        // Try to force re-enable?
+        QTimer::singleShot(666, this, SLOT(enableBluetooth()));
     }
 
     Q_EMIT bluetoothChanged();
@@ -363,7 +366,7 @@ void DeviceManager::bluetoothHostModeStateChanged(QBluetoothLocalDevice::HostMod
 
 void DeviceManager::bluetoothStatusChanged()
 {
-    //qDebug() << "DeviceManager::bluetoothStatusChanged() bt adapter:" << m_btA << " /  bt enabled:" << m_btE;
+    qDebug() << "DeviceManager::bluetoothStatusChanged() bt adapter:" << m_btA << " /  bt enabled:" << m_btE;
 
     if (m_btA && m_btE)
     {
@@ -373,6 +376,9 @@ void DeviceManager::bluetoothStatusChanged()
     {
         // Bluetooth disabled, force disconnection
         listenDevices_stop();
+
+        // Try to force re-enable?
+        QTimer::singleShot(666, this, SLOT(enableBluetooth()));
     }
 }
 
