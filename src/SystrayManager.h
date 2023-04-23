@@ -27,10 +27,10 @@
 #include <QSystemTrayIcon>
 #include <QTimer>
 
-QT_FORWARD_DECLARE_CLASS(QMenu)
-QT_FORWARD_DECLARE_CLASS(QAction)
-QT_FORWARD_DECLARE_CLASS(QApplication)
-QT_FORWARD_DECLARE_CLASS(QQuickWindow)
+class QMenu;
+class QAction;
+class QApplication;
+class QQuickWindow;
 
 /* ************************************************************************** */
 

@@ -1,21 +1,23 @@
 /*!
- * Copyright (c) 2022 Emeric Grange - All Rights Reserved
+ * Copyright (c) 2023 Emeric Grange
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * \author    Emeric Grange <emeric.grange@gmail.com>
- * \date      2019
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 #ifndef UTILS_APP_H
@@ -68,13 +70,25 @@ public:
     static Q_INVOKABLE bool isColorLight(const int color);
     static Q_INVOKABLE bool isQColorLight(const QColor &color);
 
-    // mobile related
+    // permissions
+/*
+    static Q_INVOKABLE bool checkBluetoothPermission();
+    static Q_INVOKABLE bool getBluetoothPermission();
 
-    static Q_INVOKABLE void vibrate(int ms);
+    static Q_INVOKABLE bool checkLocationPermission();
+    static Q_INVOKABLE bool getLocationPermission();
+
+    static Q_INVOKABLE bool checkCameraPermission();
+    static Q_INVOKABLE bool getCameraPermission();
+*/
+    // mobile related
 
     static Q_INVOKABLE int getAndroidSdkVersion();
 
     static Q_INVOKABLE void openAndroidAppInfo(const QString &packageName);
+    static Q_INVOKABLE void openAndroidLocationSettings();
+
+    static Q_INVOKABLE void vibrate(int ms);
 
     static Q_INVOKABLE bool checkMobileStoragePermissions();
     static Q_INVOKABLE bool getMobileStoragePermissions();
@@ -95,7 +109,11 @@ public:
     static Q_INVOKABLE bool checkMobilePhoneStatePermission();
     static Q_INVOKABLE bool getMobilePhoneStatePermission();
 
+    static Q_INVOKABLE bool checkMobileCameraPermission();
+    static Q_INVOKABLE bool getMobileCameraPermission();
+
     static Q_INVOKABLE bool isMobileGpsEnabled();
+    static Q_INVOKABLE void forceMobileGpsEnabled();
 
     static Q_INVOKABLE QString getMobileDeviceModel();
     static Q_INVOKABLE QString getMobileDeviceSerial();

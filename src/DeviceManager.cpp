@@ -144,7 +144,6 @@ DeviceManager::~DeviceManager()
 {
     delete m_bluetoothAdapter;
     delete m_discoveryAgent;
-    delete m_ble_params;
 
     delete m_devices_nearby_filter;
     delete m_devices_nearby_model;

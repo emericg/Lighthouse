@@ -75,7 +75,7 @@ void DeviceMiPow::serviceScanDone()
             connect(serviceInfos, &QLowEnergyService::stateChanged, this, &DeviceMiPow::serviceDetailsDiscovered_infos);
 
             // Windows hack, see: QTBUG-80770 and QTBUG-78488
-            QTimer::singleShot(0, [=] () { serviceInfos->discoverDetails(QLowEnergyService::SkipValueDiscovery); });
+            QTimer::singleShot(0, this, [=] () { serviceInfos->discoverDetails(QLowEnergyService::SkipValueDiscovery); });
         }
     }
 
@@ -86,7 +86,7 @@ void DeviceMiPow::serviceScanDone()
             connect(serviceBattery, &QLowEnergyService::stateChanged, this, &DeviceMiPow::serviceDetailsDiscovered_battery);
 
             // Windows hack, see: QTBUG-80770 and QTBUG-78488
-            QTimer::singleShot(0, [=] () { serviceBattery->discoverDetails(QLowEnergyService::SkipValueDiscovery); });
+            QTimer::singleShot(0, this, [=] () { serviceBattery->discoverDetails(QLowEnergyService::SkipValueDiscovery); });
         }
     }
 
@@ -101,7 +101,7 @@ void DeviceMiPow::serviceScanDone()
             connect(serviceData, &QLowEnergyService::characteristicChanged, this, &DeviceMiPow::bleReadNotify);
 
             // Windows hack, see: QTBUG-80770 and QTBUG-78488
-            QTimer::singleShot(0, [=] () { serviceData->discoverDetails(QLowEnergyService::SkipValueDiscovery); });
+            QTimer::singleShot(0, this, [=] () { serviceData->discoverDetails(QLowEnergyService::SkipValueDiscovery); });
         }
     }
 }
@@ -153,7 +153,7 @@ void DeviceMiPow::serviceDetailsDiscovered_infos(QLowEnergyService::ServiceState
         if (serviceInfos)
         {
             // Characteristic "Firmware Revision String"
-            QBluetoothUuid f(QString("00002a26-0000-1000-8000-00805f9b34fb"));
+            QBluetoothUuid f(QStringLiteral("00002a26-0000-1000-8000-00805f9b34fb"));
             QLowEnergyCharacteristic chf = serviceInfos->characteristic(f);
             if (chf.value().size() > 0)
             {
@@ -175,7 +175,7 @@ void DeviceMiPow::serviceDetailsDiscovered_battery(QLowEnergyService::ServiceSta
         if (serviceBattery)
         {
             // Characteristic "Battery Level"
-            QBluetoothUuid bat(QString("00002a19-0000-1000-8000-00805f9b34fb"));
+            QBluetoothUuid bat(QStringLiteral("00002a19-0000-1000-8000-00805f9b34fb"));
             QLowEnergyCharacteristic cbat = serviceBattery->characteristic(bat);
             if (cbat.value().size() > 0)
             {
@@ -197,12 +197,12 @@ void DeviceMiPow::serviceDetailsDiscovered_data(QLowEnergyService::ServiceState 
         if (serviceData)
         {
             // read initial brightness and colors
-            QBluetoothUuid clr(QString("0000fffc-0000-1000-8000-00805f9b34fb"));
+            QBluetoothUuid clr(QStringLiteral("0000fffc-0000-1000-8000-00805f9b34fb"));
             QLowEnergyCharacteristic cclr = serviceData->characteristic(clr);
             serviceData->readCharacteristic(cclr);
 
             // effects
-            //QBluetoothUuid eff(QString("0000fffb-0000-1000-8000-00805f9b34fb"));
+            //QBluetoothUuid eff(QStringLiteral("0000fffb-0000-1000-8000-00805f9b34fb"));
             //QLowEnergyCharacteristic ceff = serviceData->characteristic(eff);
             //m_notificationDesc = chth.descriptor(QBluetoothUuid::ClientCharacteristicConfiguration);
             //serviceData->writeDescriptor(m_notificationDesc, QByteArray::fromHex("0100"));
@@ -244,7 +244,7 @@ void DeviceMiPow::setOff()
         v.push_back(char(0));
         v.push_back(char(0));
 
-        QBluetoothUuid ic(QString("0000fffc-0000-1000-8000-00805f9b34fb"));
+        QBluetoothUuid ic(QStringLiteral("0000fffc-0000-1000-8000-00805f9b34fb"));
         QLowEnergyCharacteristic cic = serviceData->characteristic(ic);
         serviceData->writeCharacteristic(cic, v, QLowEnergyService::WriteWithoutResponse);
     }
@@ -264,7 +264,7 @@ void DeviceMiPow::setLuminosity(unsigned brightness)
 
         m_brightness = brightness;
 
-        QBluetoothUuid ic(QString("0000fffc-0000-1000-8000-00805f9b34fb"));
+        QBluetoothUuid ic(QStringLiteral("0000fffc-0000-1000-8000-00805f9b34fb"));
         QLowEnergyCharacteristic cic = serviceData->characteristic(ic);
         serviceData->writeCharacteristic(cic, v, QLowEnergyService::WriteWithoutResponse);
     }
@@ -284,7 +284,7 @@ void DeviceMiPow::setColors(unsigned brightness, unsigned r, unsigned g, unsigne
 
         m_brightness = brightness;
 
-        QBluetoothUuid ic(QString("0000fffc-0000-1000-8000-00805f9b34fb"));
+        QBluetoothUuid ic(QStringLiteral("0000fffc-0000-1000-8000-00805f9b34fb"));
         QLowEnergyCharacteristic cic = serviceData->characteristic(ic);
         serviceData->writeCharacteristic(cic, v, QLowEnergyService::WriteWithoutResponse);
     }
