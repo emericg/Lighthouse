@@ -315,7 +315,7 @@ Item {
 
                     Connections {
                         target: boxDevice
-                        function onButtonPressed() { dotAnimation.start() }
+                        function buttonPressed() { dotAnimation.start() }
                     }
 
                     ColorAnimation on color {

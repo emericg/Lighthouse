@@ -40,6 +40,9 @@ public:
     Keyboard_xtest(QObject *parent = nullptr);
     virtual ~Keyboard_xtest();
 
+    virtual void setup();
+    virtual void destroy();
+
     virtual void action(int action_code);
 };
 

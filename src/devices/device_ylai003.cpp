@@ -29,8 +29,6 @@
 #include <QBluetoothServiceInfo>
 #include <QLowEnergyService>
 
-#include <QProcess>
-
 #include <QDebug>
 
 /* ************************************************************************** */
@@ -65,8 +63,6 @@ DeviceYLAI003::~DeviceYLAI003()
 void DeviceYLAI003::serviceScanDone()
 {
     //qDebug() << "DeviceYLAI003::serviceScanDone(" << m_deviceAddress << ")";
-
-    //QProcess::startDetached("lighthouse");
 
     if (serviceBattery)
     {

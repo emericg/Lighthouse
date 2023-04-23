@@ -45,6 +45,18 @@ Keyboard_xtest::~Keyboard_xtest()
 
 /* ************************************************************************** */
 
+void Keyboard_xtest::setup()
+{
+    //
+}
+
+void Keyboard_xtest::destroy()
+{
+    //
+}
+
+/* ************************************************************************** */
+
 void Keyboard_xtest::action(int action_code)
 {
     unsigned keymacro = 0;
@@ -82,10 +94,15 @@ void Keyboard_xtest::action(int action_code)
     if (keymacro)
     {
         Display *display = XOpenDisplay(NULL);
-        unsigned keycode = XKeysymToKeycode(display, keymacro);
-        XTestFakeKeyEvent(display, keycode, True, 0);
-        XTestFakeKeyEvent(display, keycode, False, 0);
-        XFlush(display);
+        if (display)
+        {
+            unsigned keycode = XKeysymToKeycode(display, keymacro);
+            XTestFakeKeyEvent(display, keycode, True, 0);
+            XTestFakeKeyEvent(display, keycode, False, 0);
+            XFlush(display);
+
+            XCloseDisplay(display);
+        }
     }
 }
 

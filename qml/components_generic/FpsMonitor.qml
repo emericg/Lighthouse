@@ -50,7 +50,6 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             asynchronous: true
             active: (typeof utilsFps !== "undefined" && utilsFps)
-
             sourceComponent: Text {
                 color: "#c0c0c0"
                 font.pixelSize: 18

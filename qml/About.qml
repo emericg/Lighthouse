@@ -27,8 +27,8 @@ Loader {
     ////////////////////////////////////////////////////////////////////////////
 
     active: false
-
     asynchronous: false
+
     sourceComponent: Flickable {
         anchors.fill: parent
         contentWidth: -1
@@ -354,7 +354,7 @@ Loader {
             }
 
             ////////
-
+/*
             Item {
                 id: tuto
                 height: 48
@@ -407,7 +407,7 @@ Loader {
                     onClicked: screenTutorial.loadScreenFrom("About")
                 }
             }
-
+*/
             ////////
 
             Item {

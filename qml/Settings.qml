@@ -7,8 +7,6 @@ import "qrc:/js/UtilsNumber.js" as UtilsNumber
 Loader {
     id: settingsScreen
 
-    ////////
-
     function loadScreen() {
         // load screen
         settingsScreen.active = true
@@ -16,8 +14,6 @@ Loader {
         // change screen
         appContent.state = "Settings"
     }
-
-    ////////
 
     function backAction() {
         if (settingsScreen.status === Loader.Ready)
@@ -27,10 +23,11 @@ Loader {
     ////////////////////////////////////////////////////////////////////////////
 
     active: false
-
     asynchronous: false
+
     sourceComponent: Flickable {
         anchors.fill: parent
+
         contentWidth: -1
         contentHeight: column.height
 

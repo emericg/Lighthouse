@@ -41,6 +41,9 @@ public:
     Keyboard(QObject *parent = nullptr);
     virtual ~Keyboard();
 
+    virtual void setup() = 0;
+    virtual void destroy() = 0;
+
     virtual void action(int key_code) = 0;
 };
 

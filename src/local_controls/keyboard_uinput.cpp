@@ -47,6 +47,16 @@ Keyboard_uinput::~Keyboard_uinput()
 
 /* ************************************************************************** */
 
+void Keyboard_uinput::setup()
+{
+    //
+}
+
+void Keyboard_uinput::destroy()
+{
+    //
+}
+
 void Keyboard_uinput::action(int action_code)
 {
     unsigned keymacro = 0;

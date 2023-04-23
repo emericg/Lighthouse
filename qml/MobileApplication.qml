@@ -14,7 +14,7 @@ ApplicationWindow {
     color: Theme.colorBackground
     visible: true
 
-    property bool isHdpi: (utilsScreen.screenDpi > 128)
+    property bool isHdpi: (utilsScreen.screenDpi >= 128 || utilsScreen.screenPar >= 2.0)
     property bool isDesktop: (Qt.platform.os !== "ios" && Qt.platform.os !== "android")
     property bool isMobile: (Qt.platform.os === "ios" || Qt.platform.os === "android")
     property bool isPhone: ((Qt.platform.os === "ios" || Qt.platform.os === "android") && (utilsScreen.screenSize < 7.0))
@@ -288,8 +288,7 @@ ApplicationWindow {
         focus: true
         Keys.onBackPressed: {
             if (appContent.state === "Tutorial" && screenTutorial.entryPoint === "DeviceList") {
-                // do nothing
-                return
+                return // do nothing
             }
 
             if (appHeader.rightMenuIsOpen()) {

@@ -210,7 +210,7 @@ Loader {
                     property int www: (parent.width * 1)
                     property int hhh: (parent.height * 0.4)
 
-                    //
+                    // nothing...
                 }
             }
         }
