@@ -109,8 +109,10 @@ function getDeviceIcon(device, devicePlanted) {
         src = "qrc:/assets/icons_material/baseline-sensors-24px.svg"
     } else if (device.isRemote) {
         src = "qrc:/assets/icons_material/baseline-remote_tv-24px.svg"
+    } else if (device.isPBP) {
+        src = "qrc:/assets/icons_custom/baseline-pbp-24px.svg"
     } else if (device.isPGP) {
-        src = "qrc:/assets/icons_material/baseline-pgp-24px.svg"
+        src = "qrc:/assets/icons_custom/baseline-pgp-24px.svg"
     } else {
         src = "qrc:/assets/icons_material/outline-settings_remote-24px.svg"
     }

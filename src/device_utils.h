@@ -73,6 +73,7 @@ public:
         DEVICE_LIGHT                 = 8,
         DEVICE_BEACON,
         DEVICE_REMOTE,
+        DEVICE_PBP,
         DEVICE_PGP,
     };
     Q_ENUM(DeviceType)

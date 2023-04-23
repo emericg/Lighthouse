@@ -176,8 +176,28 @@ protected:
     virtual bool hasLongPress() { return false; }
     virtual int getButtonCount() { return 0; }
 
+    /*!
+     * \brief getAction
+     * \param button
+     * \param mode
+     * \param action
+     * \param params
+     * \return
+     */
     bool getAction(int button, int mode, int &action, QString &params);
+
+    /*!
+     * \brief triggerAction
+     * \param button
+     * \param mode
+     */
     void triggerAction(int button, int mode);
+
+    /*!
+     * \brief triggerEvent
+     * \param button
+     * \param mode
+     */
     void triggerEvent(int button, int mode);
 
 public:

@@ -95,6 +95,9 @@
         <file>icons_material/duotone-update-24px.svg</file>
         <file>icons_material/duotone-wb_sunny-24px.svg</file>
 
+        <file>icons_custom/baseline-pbp-24px.svg</file>
+        <file>icons_custom/baseline-pgp-24px.svg</file>
+
         <file>icons_material/keyboard-variant.svg</file>
         <file>icons_material/desk-lamp.svg</file>
         <file>icons_material/light_FILL0_wght400_GRAD0_opsz48.svg</file>
@@ -104,7 +107,6 @@
         <file>icons_material/skip_next_FILL0_wght400_GRAD0_opsz48.svg</file>
         <file>icons_material/baseline-remote_tv-24px.svg</file>
         <file>icons_material/baseline-sensors-24px.svg</file>
-        <file>icons_material/baseline-pgp-24px.svg</file>
         <file>icons_material/duotone-volume_off-24px.svg</file>
         <file>icons_material/duotone-volume_up_1-24px.svg</file>
         <file>icons_material/duotone-volume_down-24px.svg</file>

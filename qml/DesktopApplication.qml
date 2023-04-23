@@ -379,6 +379,10 @@ ApplicationWindow {
             anchors.fill: parent
             id: screenDeviceBeacon
         }
+        DevicePBP {
+            anchors.fill: parent
+            id: screenDevicePBP
+        }
         DevicePGP {
             anchors.fill: parent
             id: screenDevicePGP
@@ -431,6 +435,7 @@ ApplicationWindow {
                 PropertyChanges { target: screenTutorial; visible: true; enabled: true; focus: true; }
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceBeacon; visible: false; enabled: false; }
+                PropertyChanges { target: screenDevicePBP; visible: false; enabled: false }
                 PropertyChanges { target: screenDevicePGP; visible: false; enabled: false }
                 PropertyChanges { target: screenDeviceRemote; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
@@ -443,6 +448,7 @@ ApplicationWindow {
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceList; visible: true; enabled: true; focus: true; }
                 PropertyChanges { target: screenDeviceBeacon; visible: false; enabled: false; }
+                PropertyChanges { target: screenDevicePBP; visible: false; enabled: false }
                 PropertyChanges { target: screenDevicePGP; visible: false; enabled: false }
                 PropertyChanges { target: screenDeviceRemote; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
@@ -455,8 +461,22 @@ ApplicationWindow {
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceBeacon; visible: true; enabled: true; }
+                PropertyChanges { target: screenDevicePBP; visible: false; enabled: false }
                 PropertyChanges { target: screenDevicePGP; visible: false; enabled: false }
                 PropertyChanges { target: screenDeviceRemote; visible: false; enabled: false }
+                PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
+                PropertyChanges { target: screenVirtualInputs; visible: false; enabled: false; }
+                PropertyChanges { target: screenSettings; visible: false; enabled: false; }
+                PropertyChanges { target: screenAbout; visible: false; enabled: false; }
+            },
+            State {
+                name: "DevicePBP"
+                PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
+                PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
+                PropertyChanges { target: screenDeviceBeacon; visible: false; enabled: false; }
+                PropertyChanges { target: screenDevicePBP; visible: true; enabled: true }
+                PropertyChanges { target: screenDevicePGP; visible: false; enabled: false; }
+                PropertyChanges { target: screenDeviceRemote; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
                 PropertyChanges { target: screenVirtualInputs; visible: false; enabled: false; }
                 PropertyChanges { target: screenSettings; visible: false; enabled: false; }
@@ -467,6 +487,7 @@ ApplicationWindow {
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceBeacon; visible: false; enabled: false; }
+                PropertyChanges { target: screenDevicePBP; visible: false; enabled: false }
                 PropertyChanges { target: screenDevicePGP; visible: true; enabled: true; }
                 PropertyChanges { target: screenDeviceRemote; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
@@ -479,6 +500,7 @@ ApplicationWindow {
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceBeacon; visible: false; enabled: false; }
+                PropertyChanges { target: screenDevicePBP; visible: false; enabled: false }
                 PropertyChanges { target: screenDevicePGP; visible: false; enabled: false }
                 PropertyChanges { target: screenDeviceRemote; visible: true; enabled: true; }
                 PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
@@ -491,6 +513,7 @@ ApplicationWindow {
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceBeacon; visible: false; enabled: false; }
+                PropertyChanges { target: screenDevicePBP; visible: false; enabled: false }
                 PropertyChanges { target: screenDevicePGP; visible: false; enabled: false }
                 PropertyChanges { target: screenDeviceRemote; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceLight; visible: true; enabled: true; }
@@ -503,6 +526,8 @@ ApplicationWindow {
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceBeacon; visible: false; enabled: false; }
+                PropertyChanges { target: screenDevicePBP; visible: false; enabled: false }
+                PropertyChanges { target: screenDevicePGP; visible: false; enabled: false }
                 PropertyChanges { target: screenDeviceRemote; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
                 PropertyChanges { target: screenVirtualInputs; visible: true; enabled: true; }
@@ -514,6 +539,7 @@ ApplicationWindow {
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceBeacon; visible: false; enabled: false; }
+                PropertyChanges { target: screenDevicePBP; visible: false; enabled: false }
                 PropertyChanges { target: screenDevicePGP; visible: false; enabled: false }
                 PropertyChanges { target: screenDeviceRemote; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
@@ -526,6 +552,7 @@ ApplicationWindow {
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceBeacon; visible: false; enabled: false; }
+                PropertyChanges { target: screenDevicePBP; visible: false; enabled: false }
                 PropertyChanges { target: screenDevicePGP; visible: false; enabled: false }
                 PropertyChanges { target: screenDeviceRemote; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }

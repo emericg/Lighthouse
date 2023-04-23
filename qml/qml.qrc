@@ -13,6 +13,7 @@
         <file>DeviceWidget.qml</file>
         <file>DeviceList.qml</file>
         <file>DeviceBeacon.qml</file>
+        <file>DevicePBP.qml</file>
         <file>DevicePGP.qml</file>
         <file>DeviceRemote.qml</file>
         <file>DeviceLight.qml</file>

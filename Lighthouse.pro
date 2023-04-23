@@ -50,17 +50,14 @@ SOURCES  += src/main.cpp \
             src/device_light.cpp \
             src/devices/device_mipow.cpp \
             src/devices/device_pokeballplus.cpp \
+            src/devices/device_pokemongoplus.cpp \
             src/devices/device_ylai003.cpp \
             src/devices/device_ylkg07yl.cpp \
             src/devices/device_ylyk01yl.cpp \
             src/network_controls/network_server.cpp \
             src/network_controls/network_client.cpp \
             src/local_controls/local_controls.cpp \
-            src/local_controls/keyboard.cpp \
-            src/crypto/RC4/rc4.cpp \
-            src/crypto/pgp/aes.c \
-            src/crypto/pgp/pgp-cert.c \
-            src/crypto/pgp/secrets.c
+            src/local_controls/keyboard.cpp
 
 HEADERS  += src/SettingsManager.h \
             src/DatabaseManager.h \
@@ -75,6 +72,7 @@ HEADERS  += src/SettingsManager.h \
             src/device_light.h \
             src/devices/device_mipow.h \
             src/devices/device_pokeballplus.h \
+            src/devices/device_pokemongoplus.h \
             src/devices/device_ylai003.h \
             src/devices/device_ylkg07yl.h \
             src/devices/device_ylyk01yl.h \
@@ -82,11 +80,7 @@ HEADERS  += src/SettingsManager.h \
             src/network_controls/network_client.h \
             src/local_controls/local_controls.h \
             src/local_controls/local_actions.h \
-            src/local_controls/keyboard.h \
-            src/crypto/RC4/rc4.cpp \
-            src/crypto/pgp/aes.c \
-            src/crypto/pgp/pgp-cert.c \
-            src/crypto/pgp/secrets.c
+            src/local_controls/keyboard.h
 
 INCLUDEPATH += src/ src/thirdparty/
 

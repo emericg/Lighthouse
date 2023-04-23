@@ -25,7 +25,8 @@
 
 #include "device.h"
 #include "devices/device_mipow.h"
-//#include "devices/device_pokeballplus.h"
+#include "devices/device_pokeballplus.h"
+#include "devices/device_pokemongoplus.h"
 #include "devices/device_ylai003.h"
 #include "devices/device_ylkg07yl.h"
 #include "devices/device_ylyk01yl.h"
@@ -114,9 +115,13 @@ DeviceManager::DeviceManager(bool daemon)
             {
                 d = new DeviceMiPow(deviceAddr, deviceName, this);
             }
-            else if (deviceName == "Pokemon PBP" || deviceName == "Pokemon GO Plus")
+            else if (deviceName == "Pokemon PBP")
             {
-                //d = new DevicePokeballPlus(deviceAddr, deviceName, this);
+                d = new DevicePokeballPlus(deviceAddr, deviceName, this);
+            }
+            else if (deviceName == "Pokemon GO Plus")
+            {
+                d = new DevicePokemonGoPlus(deviceAddr, deviceName, this);
             }
             else if (deviceName == "YLKG")
             {
@@ -812,9 +817,13 @@ void DeviceManager::addBleDevice(const QBluetoothDeviceInfo &info)
         {
             d = new DeviceMiPow(info, this);
         }
-        else if (info.name() == "Pokemon PBP" || info.name() == "Pokemon GO Plus")
+        else if (info.name() == "Pokemon PBP")
         {
-            //d = new DevicePokeballPlus(info, this);
+            d = new DevicePokeballPlus(info, this);
+        }
+        else if (info.name() == "Pokemon GO Plus")
+        {
+            d = new DevicePokemonGoPlus(info, this);
         }
         else if (info.name() == "YLKG")
         {

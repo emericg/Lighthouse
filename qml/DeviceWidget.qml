@@ -249,6 +249,8 @@ Item {
                             screenDeviceRemote.loadDevice(boxDevice)
                         } else if (boxDevice.isBeacon) {
                             screenDeviceBeacon.loadDevice(boxDevice)
+                        } else if (boxDevice.isPBP) {
+                            screenDevicePBP.loadDevice(boxDevice)
                         } else if (boxDevice.isPGP) {
                             screenDevicePGP.loadDevice(boxDevice)
                         }

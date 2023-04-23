@@ -18,7 +18,45 @@ Rectangle {
 
     Connections {
         target: currentDevice
-        function onButton1Pressed() { clickAnimation.start() }
+        function onButton1Pressed() { clickAnimation1.start() }
+        function onButton2Pressed() { clickAnimation2.start() }
+    }
+
+    ////////
+
+    Rectangle { // top button
+        anchors.top: parent.top
+        anchors.topMargin: -8
+        anchors.horizontalCenter: parent.horizontalCenter
+
+        width: parent.width * 0.33
+        height: parent.width * 0.16
+        radius: parent.width
+        z: -1
+
+        color: (itemDeviceRemote.btnClicked === 1) ? Theme.colorPrimary: Theme.colorForeground
+        //border.width: 16
+        //border.color: (itemDeviceRemote.btnClicked === 1) ? Theme.colorPrimary: Theme.colorSeparator
+
+        ColorAnimation on color {
+            id: clickAnimation1
+            loops: 1
+            running: false
+
+            duration: 333
+            from: Theme.colorPrimary
+            to: Theme.colorForeground
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                if (itemDeviceRemote.btnClicked === 1)
+                    itemDeviceRemote.btnClicked = 0
+                else
+                    itemDeviceRemote.btnClicked = 1
+            }
+        }
     }
 
     ////////
@@ -30,37 +68,43 @@ Rectangle {
         height: 16
 
         color: Theme.colorSeparator
+    }
 
-        Rectangle {
-            anchors.centerIn: parent
+    ////////
 
-            width: parent.width * 0.33
-            height: parent.width * 0.33
-            radius: parent.width
+    Rectangle { // joystick button
+        anchors.centerIn: parent
+        anchors.horizontalCenterOffset: currentDevice.axis_x * 100
+        anchors.verticalCenterOffset: currentDevice.axis_y * 100
 
-            color: Theme.colorForeground
-            border.width: 16
-            border.color: (itemDeviceRemote.btnClicked === 1) ? Theme.colorPrimary: Theme.colorSeparator
+        width: parent.width * 0.33
+        height: parent.width * 0.33
+        radius: parent.width
 
-            ColorAnimation on color {
-                id: clickAnimation
-                loops: 1
-                running: false
+        color: Theme.colorForeground
+        border.width: 16
+        border.color: (itemDeviceRemote.btnClicked === 2) ? Theme.colorPrimary: Theme.colorSeparator
 
-                duration: 333
-                from: Theme.colorPrimary
-                to: Theme.colorForeground
-            }
+        ColorAnimation on color {
+            id: clickAnimation2
+            loops: 1
+            running: false
 
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    if (itemDeviceRemote.btnClicked === 1)
-                        itemDeviceRemote.btnClicked = 0
-                    else
-                        itemDeviceRemote.btnClicked = 1
-                }
+            duration: 333
+            from: Theme.colorPrimary
+            to: Theme.colorForeground
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                if (itemDeviceRemote.btnClicked === 2)
+                    itemDeviceRemote.btnClicked = 0
+                else
+                    itemDeviceRemote.btnClicked = 2
             }
         }
     }
+
+    ////////
 }
