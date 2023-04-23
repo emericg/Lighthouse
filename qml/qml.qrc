@@ -16,6 +16,7 @@
         <file>DevicePGP.qml</file>
         <file>DeviceRemote.qml</file>
         <file>DeviceLight.qml</file>
+        <file>VirtualInputs.qml</file>
         <file>ThemeEngine.qml</file>
         <file>WindowGeometrySaver.qml</file>
 

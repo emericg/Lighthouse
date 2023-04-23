@@ -305,18 +305,14 @@ ApplicationWindow {
                     else
                         exitTimer.start()
                 }
-            } else if (appContent.state === "DeviceBeacon") {
-                screenDeviceBeacon.backAction()
-            } else if (appContent.state === "DeviceRemote") {
-                screenDeviceRemove.backAction()
             } else if (appContent.state === "DeviceLight") {
                 screenDeviceLight.backAction()
             } else if (appContent.state === "Permissions") {
                 appContent.state = screenPermissions.entryPoint
             } else if (appContent.state === "Tutorial") {
                 appContent.state = screenTutorial.entryPoint
-            } else if (appContent.state === "PlantBrowser") {
-                screenPlantBrowser.backAction()
+            } else if (appContent.state === "VirtualInputs") {
+                screenVirtualInputs.backAction()
             } else {
                 appContent.state = "DeviceList"
             }
@@ -332,13 +328,14 @@ ApplicationWindow {
             anchors.fill: parent
             anchors.bottomMargin: mobileMenu.hhv
         }
-        DeviceBeacon {
-            anchors.fill: parent
-            id: screenDeviceBeacon
-        }
         DeviceLight {
             anchors.fill: parent
             id: screenDeviceLight
+        }
+
+        VirtualInputs {
+            anchors.fill: parent
+            id: screenVirtualInputs
         }
 
         Settings {
@@ -346,13 +343,13 @@ ApplicationWindow {
             anchors.fill: parent
             anchors.bottomMargin: mobileMenu.hhv
         }
-        MobilePermissions {
-            id: screenPermissions
+        About {
+            id: screenAbout
             anchors.fill: parent
             anchors.bottomMargin: mobileMenu.hhv
         }
-        About {
-            id: screenAbout
+        MobilePermissions {
+            id: screenPermissions
             anchors.fill: parent
             anchors.bottomMargin: mobileMenu.hhv
         }
@@ -381,8 +378,19 @@ ApplicationWindow {
                 name: "Tutorial"
                 PropertyChanges { target: appHeader; title: qsTr("Welcome"); }
                 PropertyChanges { target: screenTutorial; visible: true; enabled: true; }
+                PropertyChanges { target: screenVirtualInputs; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
-                PropertyChanges { target: screenDeviceBeacon; visible: false; enabled: false }
+                PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
+                PropertyChanges { target: screenSettings; visible: false; enabled: false; }
+                PropertyChanges { target: screenPermissions; visible: false; enabled: false; }
+                PropertyChanges { target: screenAbout; visible: false; enabled: false; }
+            },
+            State {
+                name: "VirtualInputs"
+                PropertyChanges { target: appHeader; title: qsTr("Virtual inputs"); }
+                PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
+                PropertyChanges { target: screenVirtualInputs; visible: true; enabled: true; }
+                PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
                 PropertyChanges { target: screenSettings; visible: false; enabled: false; }
                 PropertyChanges { target: screenPermissions; visible: false; enabled: false; }
@@ -392,19 +400,8 @@ ApplicationWindow {
                 name: "DeviceList"
                 PropertyChanges { target: appHeader; title: "Lighthouse"; }
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
+                PropertyChanges { target: screenVirtualInputs; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceList; visible: true; enabled: true; }
-                PropertyChanges { target: screenDeviceBeacon; visible: false; enabled: false }
-                PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
-                PropertyChanges { target: screenSettings; visible: false; enabled: false; }
-                PropertyChanges { target: screenPermissions; visible: false; enabled: false; }
-                PropertyChanges { target: screenAbout; visible: false; enabled: false; }
-            },
-            State {
-                name: "DeviceBeacon"
-                PropertyChanges { target: appHeader; title: selectedDevice.deviceName; }
-                PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
-                PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
-                PropertyChanges { target: screenDeviceBeacon; visible: true; enabled: true }
                 PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
                 PropertyChanges { target: screenSettings; visible: false; enabled: false; }
                 PropertyChanges { target: screenPermissions; visible: false; enabled: false; }
@@ -414,8 +411,8 @@ ApplicationWindow {
                 name: "DeviceLight"
                 PropertyChanges { target: appHeader; title: selectedDevice.deviceName; }
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
+                PropertyChanges { target: screenVirtualInputs; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
-                PropertyChanges { target: screenDeviceBeacon; visible: false; enabled: false }
                 PropertyChanges { target: screenDeviceLight; visible: true; enabled: true; }
                 PropertyChanges { target: screenSettings; visible: false; enabled: false; }
                 PropertyChanges { target: screenPermissions; visible: false; enabled: false; }
@@ -426,8 +423,8 @@ ApplicationWindow {
                 name: "Settings"
                 PropertyChanges { target: appHeader; title: qsTr("Settings"); }
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
+                PropertyChanges { target: screenVirtualInputs; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
-                PropertyChanges { target: screenDeviceBeacon; visible: false; enabled: false }
                 PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
                 PropertyChanges { target: screenSettings; visible: true; enabled: true; }
                 PropertyChanges { target: screenPermissions; visible: false; enabled: false; }
@@ -437,8 +434,8 @@ ApplicationWindow {
                 name: "Permissions"
                 PropertyChanges { target: appHeader; title: qsTr("Permissions"); }
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
+                PropertyChanges { target: screenVirtualInputs; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
-                PropertyChanges { target: screenDeviceBeacon; visible: false; enabled: false }
                 PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
                 PropertyChanges { target: screenSettings; visible: false; enabled: false; }
                 PropertyChanges { target: screenPermissions; visible: true; enabled: true; }
@@ -448,8 +445,8 @@ ApplicationWindow {
                 name: "About"
                 PropertyChanges { target: appHeader; title: qsTr("About"); }
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
+                PropertyChanges { target: screenVirtualInputs; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
-                PropertyChanges { target: screenDeviceBeacon; visible: false; enabled: false }
                 PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
                 PropertyChanges { target: screenSettings; visible: false; enabled: false; }
                 PropertyChanges { target: screenPermissions; visible: false; enabled: false; }
