@@ -45,37 +45,10 @@ Loader {
 
             ////////////////
 
-            Rectangle { // title
-                height: 48
+            SectionTitle {
                 anchors.left: parent.left
-                anchors.right: parent.right
-
-                color: Theme.colorForeground
-
-                IconSvg {
-                    width: 24
-                    height: 24
-                    anchors.left: parent.left
-                    anchors.leftMargin: screenPaddingLeft + 16
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    color: Theme.colorIcon
-                    source: "qrc:/assets/icons_material/baseline-settings-20px.svg"
-                }
-
-                Text {
-                    anchors.left: parent.left
-                    anchors.leftMargin: screenPaddingLeft + 16 + 24 + 24
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    text: qsTr("Application")
-                    textFormat: Text.PlainText
-                    font.pixelSize: Theme.fontSizeContent
-                    font.bold: false
-                    color: Theme.colorText
-                    wrapMode: Text.WordWrap
-                    verticalAlignment: Text.AlignVCenter
-                }
+                text: qsTr("Application")
+                source: "qrc:/assets/icons_material/baseline-settings-20px.svg"
             }
 
             ////////////////
@@ -468,7 +441,175 @@ Loader {
                 font.pixelSize: Theme.fontSizeContentSmall
             }
 
-            //////
+            ////////
+
+            Item {
+                id: element_notifications
+                height: 48
+                anchors.left: parent.left
+                anchors.leftMargin: screenPaddingLeft
+                anchors.right: parent.right
+                anchors.rightMargin: screenPaddingRight
+
+                visible: isDesktop
+                enabled: false // settingsManager.systray
+                opacity: settingsManager.systray ? 1 : 0.4
+
+                IconSvg {
+                    id: image_notifications
+                    width: 24
+                    height: 24
+                    anchors.left: parent.left
+                    anchors.leftMargin: 16
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    color: Theme.colorIcon
+                    source: "qrc:/assets/icons_material/baseline-notifications_none-24px.svg"
+                }
+
+                Text {
+                    id: text_notifications
+                    height: 40
+                    anchors.left: image_notifications.right
+                    anchors.leftMargin: 24
+                    anchors.right: switch_notifications.left
+                    anchors.rightMargin: 16
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    text: qsTr("Enable notifications")
+                    textFormat: Text.PlainText
+                    wrapMode: Text.WordWrap
+                    font.pixelSize: Theme.fontSizeContent
+                    color: Theme.colorText
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                SwitchThemedDesktop {
+                    id: switch_notifications
+                    anchors.right: parent.right
+                    anchors.rightMargin: screenPaddingRight
+                    anchors.verticalCenter: parent.verticalCenter
+                    z: 1
+
+                    checked: settingsManager.notifications
+                    onClicked: settingsManager.notifications = checked
+                }
+            }
+            Text {
+                id: legend_notifications
+                anchors.left: parent.left
+                anchors.leftMargin: screenPaddingLeft + 64
+                anchors.right: parent.right
+                anchors.rightMargin: 12
+                topPadding: -12
+                bottomPadding: 12
+
+                visible: element_notifications.visible
+                opacity: settingsManager.systray ? 1 : 0.4
+
+                text: settingsManager.notifications ?
+                          qsTr("Notifications are enabled.") :
+                          qsTr("Notifications are disabled.")
+                textFormat: Text.PlainText
+                wrapMode: Text.WordWrap
+                color: Theme.colorSubText
+                font.pixelSize: Theme.fontSizeContentSmall
+            }
+
+            ////////////////
+
+            SectionTitle {
+                anchors.left: parent.left
+                text: qsTr("Bluetooth")
+                source: "qrc:/assets/icons_material/baseline-bluetooth-24px.svg"
+
+                // Android only
+                visible: (Qt.platform.os === "android")
+            }
+
+            ////////
+
+            Item {
+                id: element_bluetoothControl
+                height: 48
+                anchors.left: parent.left
+                anchors.leftMargin: screenPaddingLeft
+                anchors.right: parent.right
+                anchors.rightMargin: screenPaddingRight
+
+                // Android only
+                visible: (Qt.platform.os === "android")
+
+                IconSvg {
+                    id: image_bluetoothControl
+                    width: 24
+                    height: 24
+                    anchors.left: parent.left
+                    anchors.leftMargin: 16
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    color: Theme.colorIcon
+                    source: "qrc:/assets/icons_material/baseline-bluetooth_disabled-24px.svg"
+                }
+
+                Text {
+                    id: text_bluetoothControl
+                    height: 40
+                    anchors.left: image_bluetoothControl.right
+                    anchors.leftMargin: 24
+                    anchors.right: switch_bluetoothControl.left
+                    anchors.rightMargin: 16
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    text: qsTr("Bluetooth control")
+                    textFormat: Text.PlainText
+                    wrapMode: Text.WordWrap
+                    font.pixelSize: Theme.fontSizeContent
+                    color: Theme.colorText
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                SwitchThemedDesktop {
+                    id: switch_bluetoothControl
+                    anchors.right: parent.right
+                    anchors.rightMargin: 0
+                    anchors.verticalCenter: parent.verticalCenter
+                    z: 1
+
+                    checked: settingsManager.bluetoothControl
+                    onClicked: settingsManager.bluetoothControl = checked
+                }
+            }
+            Text {
+                id: legend_bluetoothControl
+                anchors.left: parent.left
+                anchors.leftMargin: screenPaddingLeft + 64
+                anchors.right: parent.right
+                anchors.rightMargin: 12
+
+                topPadding: -12
+                bottomPadding: 12
+                visible: element_bluetoothControl.visible
+
+                text: settingsManager.bluetoothControl ?
+                          qsTr("Lighthouse will only operate if your device's Bluetooth is already enabled.") :
+                          qsTr("Lighthouse will enable your device's Bluetooth in order to operate.")
+                textFormat: Text.PlainText
+                wrapMode: Text.WordWrap
+                color: Theme.colorSubText
+                font.pixelSize: Theme.fontSizeContentSmall
+            }
+
+            ////////////////
+
+            SectionTitle {
+                anchors.left: parent.left
+                visible: isDesktop
+                text: qsTr("Network server")
+                source: "qrc:/assets/icons_material/duotone-list-24px.svg"
+            }
+
+            ////////////////
 
             Item {
                 id: element_server
@@ -559,227 +700,13 @@ Loader {
                 font.pixelSize: Theme.fontSizeContentSmall
             }
 
-            ////////
-
-            Item {
-                id: element_notifications
-                height: 48
-                anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft
-                anchors.right: parent.right
-                anchors.rightMargin: screenPaddingRight
-
-                visible: isDesktop
-                enabled: false // settingsManager.systray
-                opacity: settingsManager.systray ? 1 : 0.4
-
-                IconSvg {
-                    id: image_notifications
-                    width: 24
-                    height: 24
-                    anchors.left: parent.left
-                    anchors.leftMargin: 16
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    color: Theme.colorIcon
-                    source: "qrc:/assets/icons_material/baseline-notifications_none-24px.svg"
-                }
-
-                Text {
-                    id: text_notifications
-                    height: 40
-                    anchors.left: image_notifications.right
-                    anchors.leftMargin: 24
-                    anchors.right: switch_notifications.left
-                    anchors.rightMargin: 16
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    text: qsTr("Enable notifications")
-                    textFormat: Text.PlainText
-                    wrapMode: Text.WordWrap
-                    font.pixelSize: Theme.fontSizeContent
-                    color: Theme.colorText
-                    verticalAlignment: Text.AlignVCenter
-                }
-
-                SwitchThemedDesktop {
-                    id: switch_notifications
-                    anchors.right: parent.right
-                    anchors.rightMargin: screenPaddingRight
-                    anchors.verticalCenter: parent.verticalCenter
-                    z: 1
-
-                    checked: settingsManager.notifications
-                    onClicked: settingsManager.notifications = checked
-                }
-            }
-            Text {
-                id: legend_notifications
-                anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft + 64
-                anchors.right: parent.right
-                anchors.rightMargin: 12
-                topPadding: -12
-                bottomPadding: 12
-
-                visible: element_notifications.visible
-                opacity: settingsManager.systray ? 1 : 0.4
-
-                text: settingsManager.notifications ?
-                          qsTr("Notifications are enabled.") :
-                          qsTr("Notifications are disabled.")
-                textFormat: Text.PlainText
-                wrapMode: Text.WordWrap
-                color: Theme.colorSubText
-                font.pixelSize: Theme.fontSizeContentSmall
-            }
-
             ////////////////
 
-            Rectangle { // title
-                height: 48
+            SectionTitle {
                 anchors.left: parent.left
-                anchors.right: parent.right
-
-                color: Theme.colorForeground
-
-                // Android only
-                visible: (Qt.platform.os === "android")
-
-                IconSvg {
-                    width: 24
-                    height: 24
-                    anchors.left: parent.left
-                    anchors.leftMargin: screenPaddingLeft + 16
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    color: Theme.colorIcon
-                    source: "qrc:/assets/icons_material/baseline-bluetooth-24px.svg"
-                }
-
-                Text {
-                    anchors.left: parent.left
-                    anchors.leftMargin: screenPaddingLeft + 16 + 24 + 24
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    text: qsTr("Bluetooth")
-                    textFormat: Text.PlainText
-                    font.pixelSize: Theme.fontSizeContent
-                    font.bold: false
-                    color: Theme.colorText
-                    wrapMode: Text.WordWrap
-                    verticalAlignment: Text.AlignVCenter
-                }
-            }
-
-            ////////
-
-            Item {
-                id: element_bluetoothControl
-                height: 48
-                anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft
-                anchors.right: parent.right
-                anchors.rightMargin: screenPaddingRight
-
-                // Android only
-                visible: (Qt.platform.os === "android")
-
-                IconSvg {
-                    id: image_bluetoothControl
-                    width: 24
-                    height: 24
-                    anchors.left: parent.left
-                    anchors.leftMargin: 16
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    color: Theme.colorIcon
-                    source: "qrc:/assets/icons_material/baseline-bluetooth_disabled-24px.svg"
-                }
-
-                Text {
-                    id: text_bluetoothControl
-                    height: 40
-                    anchors.left: image_bluetoothControl.right
-                    anchors.leftMargin: 24
-                    anchors.right: switch_bluetoothControl.left
-                    anchors.rightMargin: 16
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    text: qsTr("Bluetooth control")
-                    textFormat: Text.PlainText
-                    wrapMode: Text.WordWrap
-                    font.pixelSize: Theme.fontSizeContent
-                    color: Theme.colorText
-                    verticalAlignment: Text.AlignVCenter
-                }
-
-                SwitchThemedDesktop {
-                    id: switch_bluetoothControl
-                    anchors.right: parent.right
-                    anchors.rightMargin: 0
-                    anchors.verticalCenter: parent.verticalCenter
-                    z: 1
-
-                    checked: settingsManager.bluetoothControl
-                    onClicked: settingsManager.bluetoothControl = checked
-                }
-            }
-            Text {
-                id: legend_bluetoothControl
-                anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft + 64
-                anchors.right: parent.right
-                anchors.rightMargin: 12
-
-                topPadding: -12
-                bottomPadding: 12
-                visible: element_bluetoothControl.visible
-
-                text: settingsManager.bluetoothControl ?
-                          qsTr("Lighthouse will only operate if your device's Bluetooth is already enabled.") :
-                          qsTr("Lighthouse will enable your device's Bluetooth in order to operate.")
-                textFormat: Text.PlainText
-                wrapMode: Text.WordWrap
-                color: Theme.colorSubText
-                font.pixelSize: Theme.fontSizeContentSmall
-            }
-
-            ////////////////
-
-            Rectangle { // title
-                height: 48
-                anchors.left: parent.left
-                anchors.right: parent.right
-
-                color: Theme.colorForeground
-
                 visible: isMobile
-
-                IconSvg {
-                    width: 24
-                    height: 24
-                    anchors.left: parent.left
-                    anchors.leftMargin: screenPaddingLeft + 16
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    color: Theme.colorIcon
-                    source: "qrc:/assets/icons_material/duotone-devices-24px.svg"
-                }
-
-                Text {
-                    anchors.left: parent.left
-                    anchors.leftMargin: screenPaddingLeft + 16 + 24 + 24
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    text: qsTr("Desktop remote control")
-                    textFormat: Text.PlainText
-                    font.pixelSize: Theme.fontSizeContent
-                    font.bold: false
-                    color: Theme.colorText
-                    wrapMode: Text.WordWrap
-                    verticalAlignment: Text.AlignVCenter
-                }
+                text: qsTr("Desktop remote control")
+                source: "qrc:/assets/icons_material/duotone-devices-24px.svg"
             }
 
             ////////////////

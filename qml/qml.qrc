@@ -33,6 +33,7 @@
         <file alias="ButtonExperimental.qml">components/ButtonExperimental.qml</file>
         <file alias="ItemLoadData.qml">components/ItemLoadData.qml</file>
         <file alias="ItemNoBluetooth.qml">components/ItemNoBluetooth.qml</file>
+        <file alias="SectionTitle.qml">components/SectionTitle.qml</file>
         <file alias="SliderGradientLuminosity.qml">components/SliderGradientLuminosity.qml</file>
         <file alias="SliderGradientColor.qml">components/SliderGradientColor.qml</file>
     </qresource>
