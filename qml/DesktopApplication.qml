@@ -237,6 +237,10 @@ ApplicationWindow {
             }
         } else if (appContent.state === "DeviceBeacon") {
             screenDeviceBeacon.backAction()
+        } else if (appContent.state === "DevicePBP") {
+            screenDevicePBP.backAction()
+        } else if (appContent.state === "DevicePGP") {
+            screenDevicePGP.backAction()
         } else if (appContent.state === "DeviceRemote") {
             screenDeviceRemote.backAction()
         } else if (appContent.state === "DeviceLight") {

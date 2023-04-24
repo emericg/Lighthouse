@@ -58,14 +58,7 @@ Loader {
             function onStatusUpdated() { updateHeader() }
             function onDataUpdated() { updateData() }
         }
-    /*
-        Connections {
-            target: settingsManager
-            function onAppLanguageChanged() {
-                updateData()
-            }
-        }
-    */
+
         Connections {
             target: appHeader
             // desktop only
@@ -131,10 +124,10 @@ Loader {
         }
 
         function isHistoryMode() {
-            //return deviceScreenChart.isIndicator()
+            return false
         }
         function resetHistoryMode() {
-            //deviceScreenChart.resetIndicator()
+            //
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -158,14 +151,6 @@ Loader {
                     property int www: (parent.width * 1)
                     property int hhh: (parent.height * 0.4)
 
-                    ButtonWireframe {
-                        width: 160
-                        fullColor: true
-                        text: qsTr("connect")
-
-                        onClicked: currentDevice.actionConnect()
-                    }
-
                     RemoteButtonWidget { // id: btn1
                         currentButton: currentDevice.btn1
                     }
@@ -177,7 +162,18 @@ Loader {
                 anchors.bottom: parent.bottom
                 width: parent.width/3
 
-                SchematicPokeball {
+                ButtonWireframe {
+                    anchors.top: parent.top
+                    anchors.topMargin: 16
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+
+                    fullColor: currentDevice.connected
+                    text: currentDevice.connected ? qsTr("connected") : qsTr("connect")
+                    onClicked: currentDevice.actionConnect()
+                }
+
+                SchematicPokemonGoPlus {
                     id: pokeball
                     anchors.centerIn: parent
                 }

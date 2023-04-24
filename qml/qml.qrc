@@ -31,6 +31,7 @@
         <file alias="SchematicButton.qml">components/SchematicButton.qml</file>
         <file alias="SchematicDimmer.qml">components/SchematicDimmer.qml</file>
         <file alias="SchematicPokeball.qml">components/SchematicPokeball.qml</file>
+        <file alias="SchematicPokemonGoPlus.qml">components/SchematicPokemonGoPlus.qml</file>
         <file alias="SchematicRemote.qml">components/SchematicRemote.qml</file>
 
         <file alias="ActionMenuFixed.qml">components/ActionMenuFixed.qml</file>

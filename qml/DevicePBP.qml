@@ -58,14 +58,7 @@ Loader {
             function onStatusUpdated() { updateHeader() }
             function onDataUpdated() { updateData() }
         }
-    /*
-        Connections {
-            target: settingsManager
-            function onAppLanguageChanged() {
-                updateData()
-            }
-        }
-    */
+
         Connections {
             target: appHeader
             // desktop only
@@ -131,10 +124,10 @@ Loader {
         }
 
         function isHistoryMode() {
-            //return deviceScreenChart.isIndicator()
+            return false
         }
         function resetHistoryMode() {
-            //deviceScreenChart.resetIndicator()
+            //
         }
 
         ////////////////////////////////////////////////////////////////////////

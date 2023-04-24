@@ -35,6 +35,7 @@
 
 /*!
  * Nintendo "Pokeball Plus" (PBP)
+ * Advertising name is 'Pokemon PBP'
  *
  * Protocol infos:
  * - todo

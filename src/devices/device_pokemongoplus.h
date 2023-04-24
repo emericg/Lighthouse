@@ -35,6 +35,7 @@
 
 /*!
  * Nintendo "Pokemon Go Plus" (PGP)
+ * Advertising name is 'Pokemon GO Plus'
  *
  * Protocol infos:
  * - todo
