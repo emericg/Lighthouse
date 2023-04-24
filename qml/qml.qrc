@@ -22,9 +22,11 @@
         <file>WindowGeometrySaver.qml</file>
 
         <file alias="PopupActions.qml">popups/PopupActions.qml</file>
+        <file alias="PopupBeaconKey.qml">popups/PopupBeaconKey.qml</file>
         <file alias="PopupDeleteDevice.qml">popups/PopupDeleteDevice.qml</file>
 
         <file alias="FileInputArea.qml">components/FileInputArea.qml</file>
+        <file alias="RemoteButtonKey.qml">components/RemoteButtonKey.qml</file>
         <file alias="RemoteButtonWidget.qml">components/RemoteButtonWidget.qml</file>
         <file alias="SchematicButton.qml">components/SchematicButton.qml</file>
         <file alias="SchematicDimmer.qml">components/SchematicDimmer.qml</file>

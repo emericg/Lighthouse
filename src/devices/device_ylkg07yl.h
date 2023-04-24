@@ -39,6 +39,10 @@
  * Advertising name is 'yee-rc'
  * Support the following actions: rotate, press and rotate, press, double press
  *
+ * Get beacon key:
+ * - https://custom-components.github.io/ble_monitor/faq#how-to-get-the-mibeacon-v2v3-encryption-key
+ * - https://github.com/custom-components/ble_monitor/blob/master/custom_components/ble_monitor/ble_parser/get_beacon_key.py
+ *
  * Protocol infos:
  * - todo
  */
@@ -46,7 +50,13 @@ class DeviceYLKG07YL: public DeviceBeacon
 {
     Q_OBJECT
 
+    Q_PROPERTY(QString beaconkey READ getBeaconKey NOTIFY beaconkeyChanged)
+
+    QString m_beaconkey;
     QByteArray prev_data_dimmer;
+
+Q_SIGNALS:
+    void beaconkeyChanged();
 
 protected:
     int getButtonCount() { return 3; }
@@ -59,8 +69,10 @@ public:
     DeviceYLKG07YL(const QBluetoothDeviceInfo &d, QObject *parent = nullptr);
     ~DeviceYLKG07YL();
 
-    void parseAdvertisementData(const uint16_t type, const uint16_t identifier,
-                                const QByteArray &data);
+    void parseAdvertisementData(const uint16_t type, const uint16_t identifier, const QByteArray &data);
+
+    QString getBeaconKey() { return m_beaconkey; };
+    Q_INVOKABLE void setBeaconKey(const QString &key);
 };
 
 /* ************************************************************************** */

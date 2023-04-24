@@ -16,6 +16,8 @@ Remotes and beacons:
 * Yeelight Remote Control (YLYK01YL)
 * Yeelight Wireless Smart Dimmer (YLKG07YL and YLKG08YL)
 
+The YLKG07YL and YLKG08YL dimmers will NEED a beacon key. You can use the [get_beacon_key.py](https://github.com/custom-components/ble_monitor/blob/master/custom_components/ble_monitor/ble_parser/get_beacon_key.py) python script to extract yours, then set it directly in the app.
+
 Pokemon devices:
 * Pokeball Plus (PBP)
 * Pokemon Go Plus (PGP)

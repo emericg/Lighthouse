@@ -31,6 +31,7 @@
 #include <QBluetoothServiceInfo>
 #include <QLowEnergyService>
 
+#include <QByteArray>
 #include <QDebug>
 
 #include <cstdint>
@@ -46,6 +47,8 @@ DeviceYLKG07YL::DeviceYLKG07YL(QString &deviceAddr, QString &deviceName, QObject
 
     m_deviceModel = "YLKG07YL";
     m_deviceModelID = "YLKG07YL";
+
+    m_beaconkey = getSetting("beaconkey").toString();
 }
 
 DeviceYLKG07YL::DeviceYLKG07YL(const QBluetoothDeviceInfo &d, QObject *parent):
@@ -56,11 +59,28 @@ DeviceYLKG07YL::DeviceYLKG07YL(const QBluetoothDeviceInfo &d, QObject *parent):
 
     m_deviceModel = "YLKG07YL";
     m_deviceModelID = "YLKG07YL";
+
+    m_beaconkey = getSetting("beaconkey").toString();
 }
 
 DeviceYLKG07YL::~DeviceYLKG07YL()
 {
     //
+}
+
+/* ************************************************************************** */
+
+void DeviceYLKG07YL::setBeaconKey(const QString &key)
+{
+    //qDebug() << "DeviceYLKG07YL::setBeaconKey(" << key << ")";
+
+    if (m_beaconkey != key)
+    {
+        m_beaconkey = key;
+        Q_EMIT beaconkeyChanged();
+
+        setSetting("beaconkey", key);
+    }
 }
 
 /* ************************************************************************** */
@@ -116,10 +136,34 @@ void DeviceYLKG07YL::parseAdvertisementData(const uint16_t type,
             setAddressMAC(mac);
         }
 
-        uint8_t beaconkey[12] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0x10, 0x11};
+        // for instance, this is how the key works:
+        uint8_t beaconkey[12] = {0xA1, 0xB1, 0xC1, 0xD1, 0xE1, 0xF1, 0xA2, 0xB2, 0xC2, 0xD2, 0xE2, 0xF2};
         uint8_t beaconkey_padding[4] = {0x8D, 0x3D, 0x3C, 0x97};
-        uint8_t key[16] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x8D, 0x3D, 0x3C, 0x97, 0x66, 0x77, 0x88, 0x99, 0x10, 0x11};
+        uint8_t key[16] = {0xA1, 0xB1, 0xC1, 0xD1, 0xE1, 0xF1, 0x8D, 0x3D, 0x3C, 0x97, 0xA2, 0xB2, 0xC2, 0xD2, 0xE2, 0xF2};
         uint8_t add[1] = {0x11};
+
+        if (m_beaconkey.size() == 24)
+        {
+            const QByteArray keychars = QByteArray::fromHex(m_beaconkey.toLatin1());
+            // fill the actual key
+            key[0] = keychars.at(0);
+            key[1] = keychars.at(1);
+            key[2] = keychars.at(2);
+            key[3] = keychars.at(3);
+            key[4] = keychars.at(4);
+            key[5] = keychars.at(5);
+            // padding
+            key[10] = keychars.at(6);
+            key[11] = keychars.at(7);
+            key[12] = keychars.at(8);
+            key[13] = keychars.at(9);
+            key[14] = keychars.at(10);
+            key[15] = keychars.at(11);
+        }
+        else
+        {
+            return;
+        }
 
         uint8_t *data_uint8 = new uint8_t [ba.size()];
         memcpy(data_uint8, data, ba.size());

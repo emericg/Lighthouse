@@ -39,7 +39,6 @@ Loader {
 
     sourceComponent: Item {
         id: itemDeviceRemote
-        //anchors.fill: parent
 
         focus: parent.focus
 
@@ -200,12 +199,21 @@ Loader {
                     anchors.bottom: parent.bottom
                     width: parent.width/3
 
+                    property int www: (width * 0.8)
+                    property int hhh: (height * 0.4)
+
                     SchematicDimmer {
                         id: dimmerSchematics
                         anchors.centerIn: parent
 
-                        width: parent.width * 0.8
-                        height: parent.width * 0.8
+                        width: parent.www
+                        height: parent.www
+                    }
+
+                    RemoteButtonKey { // beacon key
+                        anchors.top: dimmerSchematics.bottom
+                        anchors.topMargin: 20
+                        anchors.horizontalCenter: parent.horizontalCenter
                     }
                 }
 
@@ -226,8 +234,7 @@ Loader {
                         property int www: (parent.width * 1)
                         property int hhh: (parent.height * 0.4)
 
-                        RemoteButtonWidget {
-                            //id: btn3
+                        RemoteButtonWidget { //id: btn3
                             anchors.right: parent.right
                             layoutDirection: Qt.RightToLeft
                             currentButton: currentDevice.btn3

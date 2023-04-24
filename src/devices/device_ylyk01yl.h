@@ -39,6 +39,10 @@
  * Advertising name is 'yee-rc'
  * Support the following actions: on, off, dim, plus/minus, M
  *
+ * Get beacon key:
+ * - https://custom-components.github.io/ble_monitor/faq#how-to-get-the-mibeacon-v2v3-encryption-key
+ * - https://github.com/custom-components/ble_monitor/blob/master/custom_components/ble_monitor/ble_parser/get_beacon_key.py
+ *
  * Protocol infos:
  * - todo
  */
@@ -46,6 +50,7 @@ class DeviceYLYK01YL: public DeviceBeacon
 {
     Q_OBJECT
 
+    QString m_beaconkey;
     QByteArray prev_data_remote;
 
 protected:
@@ -59,8 +64,7 @@ public:
     DeviceYLYK01YL(const QBluetoothDeviceInfo &d, QObject *parent = nullptr);
     ~DeviceYLYK01YL();
 
-    void parseAdvertisementData(const uint16_t type, const uint16_t identifier,
-                                const QByteArray &data);
+    void parseAdvertisementData(const uint16_t type, const uint16_t identifier, const QByteArray &data);
 };
 
 /* ************************************************************************** */
