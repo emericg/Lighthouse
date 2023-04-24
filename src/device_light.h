@@ -24,6 +24,8 @@
 /* ************************************************************************** */
 
 #include <QObject>
+#include <QString>
+#include <QColor>
 
 #include "device.h"
 
@@ -43,10 +45,13 @@ class DeviceLight: public Device
     Q_PROPERTY(unsigned brightness READ getLuminosity WRITE setLuminosity NOTIFY dataUpdated)
     Q_PROPERTY(unsigned color READ getColor WRITE setColor NOTIFY dataUpdated)
 
+    Q_PROPERTY(QString colorSaved READ getColorSaved WRITE setColorSaved NOTIFY colorSavedUpdated)
+
 Q_SIGNALS:
     void modeUpdated();
     void effectUpdated();
     void colorsUpdated();
+    void colorSavedUpdated();
 
 protected:
     // specific data
@@ -55,6 +60,8 @@ protected:
 
     unsigned m_brightness = 0;
     unsigned m_colors = 0;
+
+    QString m_colorSaved;
 
 public:
     DeviceLight(QString &deviceAddr, QString &deviceName, QObject *parent = nullptr);
@@ -73,6 +80,9 @@ public slots:
 
     unsigned getColor() const { return m_colors; }
     virtual void setColor(unsigned value);
+
+    QString getColorSaved() const { return m_colorSaved; }
+    virtual void setColorSaved(const QString &value);
 
     virtual void setColorAndBrightness(unsigned bright, unsigned r, unsigned g, unsigned b);
 

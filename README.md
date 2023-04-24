@@ -16,10 +16,14 @@ Remotes and beacons:
 * Yeelight Remote Control (YLYK01YL)
 * Yeelight Wireless Smart Dimmer (YLKG07YL and YLKG08YL)
 
+Pokemon devices:
+* Pokeball Plus (PBP)
+* Pokemon Go Plus (PGP)
+
 Lamps and lighbulbs:
 * MiPow SmartBulbs
 
-> Lighthouse is NOT associated with Xiaomi,Yeelight,  MiPow, or any other device manufacturer.
+> Lighthouse is NOT associated with Xiaomi, Yeelight, MiPow, or any other device manufacturer.
 
 
 ## Screenshots

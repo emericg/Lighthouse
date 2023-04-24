@@ -310,7 +310,7 @@ void DeviceMiPow::setColors_float(float bright, float r, float g, float b)
     setColors(br, rr, gg, bb);
 }
 
-void DeviceMiPow::setColors_rgb_hex(QString rgb_hex)
+void DeviceMiPow::setColors_rgb_hex(const QString &rgb_hex)
 {
     //qDebug() << "DeviceMiPow::setColors_rgb_hex(" << rgb_hex << ")";
 

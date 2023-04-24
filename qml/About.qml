@@ -263,7 +263,7 @@ Loader {
 
                     text: qsTr("Application by <a href=\"https://emeric.io\">Emeric Grange</a>")
                     textFormat: Text.StyledText
-                    onLinkActivated: Qt.openUrlExternally(link)
+                    onLinkActivated: (link) => { Qt.openUrlExternally(link) }
                     font.pixelSize: Theme.fontSizeContent
                     color: Theme.colorText
                     linkColor: Theme.colorText

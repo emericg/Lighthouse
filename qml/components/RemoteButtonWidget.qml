@@ -43,7 +43,7 @@ Rectangle {
                 text: "#" + currentButton.id
                 font.pixelSize: 32
                 font.bold: true
-                color: "white"
+                color: (itemDeviceRemote.btnClicked === currentButton.id) ? "white" : Theme.colorSubText
             }
 
             MouseArea {

@@ -59,7 +59,7 @@ public slots:
 
     void setColors(unsigned bright, unsigned r, unsigned g, unsigned b);
     void setColors_float(float bright, float r, float g, float b);
-    void setColors_rgb_hex(QString rgb_hex);
+    void setColors_rgb_hex(const QString &rgb_hex);
 
 private:
     // QLowEnergyController related

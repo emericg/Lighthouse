@@ -43,6 +43,7 @@ DeviceLight::DeviceLight(QString &deviceAddr, QString &deviceName, QObject *pare
     if (m_dbInternal || m_dbExternal)
     {
         getSqlDeviceInfos();
+        m_colorSaved = getSetting("colorSaved").toString();
     }
 }
 
@@ -61,6 +62,7 @@ DeviceLight::DeviceLight(const QBluetoothDeviceInfo &d, QObject *parent) :
     if (m_dbInternal || m_dbExternal)
     {
         getSqlDeviceInfos();
+        m_colorSaved = getSetting("colorSaved").toString();
     }
 }
 
@@ -92,9 +94,24 @@ void DeviceLight::setColor(unsigned value)
 {
     //
 }
+
 void DeviceLight::setColorAndBrightness(unsigned luminosity, unsigned r, unsigned g, unsigned b)
 {
     //
+}
+
+/* ************************************************************************** */
+
+void DeviceLight::setColorSaved(const QString &value)
+{
+    //qDebug() << "setColorSaved(" << value << ")";
+
+    if (m_colorSaved != value)
+    {
+        m_colorSaved = value;
+        Q_EMIT colorSavedUpdated();
+        setSetting("colorSaved", value);
+    }
 }
 
 /* ************************************************************************** */

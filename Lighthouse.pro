@@ -104,7 +104,6 @@ OBJECTS_DIR = build/$${QT_ARCH}/
 MOC_DIR     = build/$${QT_ARCH}/
 RCC_DIR     = build/$${QT_ARCH}/
 UI_DIR      = build/$${QT_ARCH}/
-QMLCACHE_DIR= build/$${QT_ARCH}/
 
 DESTDIR     = bin/
 
@@ -115,8 +114,8 @@ linux:!android {
     TARGET = $$lower($${TARGET})
 
     QT += dbus
-    LIBS += -lX11 -lXtst
-    LIBS += -lmbedtls -lmbedx509 -lmbedcrypto
+    LIBS += -lX11 -lXtst # needed for keyboard_xtest
+    LIBS += -lmbedtls -lmbedx509 -lmbedcrypto # needed for ylkg07yl device
 
     SOURCES += src/local_controls/keyboard_uinput.cpp \
                src/local_controls/keyboard_xtest.cpp \

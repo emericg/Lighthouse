@@ -128,58 +128,19 @@ QVariant DeviceModel::data(const QModelIndex &index, int role) const
         }
         if (role == DeviceModelRole)
         {
-            if (device->getName() == "Flower care" ||
-                device->getName() == "Flower mate" ||
-                device->getName() == "TY" ||
-                device->getName() == "Grow care garden") { // plant sensors
+            if (device->getName() == "MIPOW smart bulb") {
                 return "a";
-            } else if (device->getName() == "Flower power") {
-                return "b";
-            } else if (device->getName() == "ropot") {
-                return "c";
-            } else if (device->getName() == "Parrot pot") {
-                return "d";
-            } else if (device->getName() == "HiGrow") {
-                return "e";
-            } else if (device->getName() == "ThermoBeacon") { // thermometers
-                return "f";
-            } else if (device->getName() == "MJ_HT_V1") {
-                return "g";
-            } else if (device->getName() == "LYWSD02") {
+            } else if (device->getName() == "yee-rc") {
                 return "h";
-            } else if (device->getName() == "LYWSD03MMC") {
+            } else if (device->getName() == "YLKG") {
                 return "i";
-            } else if (device->getName() == "MHO-C303") {
-                return "j";
-            } else if (device->getName() == "MHO-C401") {
-                return "k";
-            } else if (device->getName() == "XMWSDJO4MMC") {
-                return "l";
-            } else if (device->getName() == "ClearGrass Temp & RH" ||
-                       device->getName().startsWith("Qingping Temp & RH")) {
-                return "m";
-            } else if (device->getName() == "Qingping Temp RH Lite" ) {
-                return "n";
-            } else if (device->getName() == "Qingping Alarm Clock") {
-                return "o";
-            } else if (device->getName() == "Qingping Temp RH Barometer") {
-                return "p";
-            } else if (device->getName().startsWith("6003#")) { // air quality
-                return "t";
-            } else if (device->getName() == "CGDN1") {
-                return "w";
-            } else if (device->getName() == "JQJCY01YM") {
+            } else if (device->getName() == "Pokemon GO Plus") {
                 return "x";
-            } else if (device->getName() == "AirQualityMonitor") {
+            } else if (device->getName() == "Pokemon PBP") {
                 return "y";
-            } else if (device->getName() == "GeigerCounter") {
-                return "z";
             } else {
                 return "zzz";
             }
-
-            //if (device->getName() == "yee-rc")
-            //    return "aa";
         }
         if (role == DeviceNameRole)
         {

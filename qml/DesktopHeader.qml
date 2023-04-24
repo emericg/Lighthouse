@@ -1,6 +1,8 @@
 import QtQuick
 
 import ThemeEngine 1.0
+import DeviceUtils 1.0
+import "qrc:/js/UtilsDeviceSensors.js" as UtilsDeviceSensors
 
 Rectangle {
     id: rectangleHeaderBar
@@ -259,13 +261,36 @@ Rectangle {
                 visible: (deviceManager.bluetooth && selectedDevice &&
                           (appContent.state === "DeviceLight"))
 
-                source: (selectedDevice && selectedDevice.connected) ?
-                            "qrc:/assets/icons_material/baseline-bluetooth_disabled-24px.svg" :
-                            "qrc:/assets/icons_material/duotone-bluetooth_connected-24px.svg"
-                tooltipText: (selectedDevice && selectedDevice.connected) ?
-                                 qsTr("Disconnect") : qsTr("Connect")
+                source: {
+                    if (!selectedDevice) return ""
+                    if (selectedDevice.status === DeviceUtils.DEVICE_OFFLINE)
+                        return "qrc:/assets/icons_material/baseline-bluetooth_disabled-24px.svg"
+                    if (selectedDevice.status === DeviceUtils.DEVICE_QUEUED ||
+                        selectedDevice.status === DeviceUtils.DEVICE_CONNECTING)
+                        return "qrc:/assets/icons_material/duotone-bluetooth_searching-24px.svg"
+                    if (selectedDevice.status === DeviceUtils.DEVICE_CONNECTED)
+                        return "qrc:/assets/icons_material/duotone-bluetooth_connected-24px.svg"
+                }
+                tooltipText: {
+                    if (!selectedDevice) return ""
+                    if (selectedDevice.status === DeviceUtils.DEVICE_OFFLINE) return qsTr("Connect")
+                    if (selectedDevice.status === DeviceUtils.DEVICE_QUEUED ||
+                        selectedDevice.status === DeviceUtils.DEVICE_CONNECTING) return qsTr("Connecting...")
+                    if (selectedDevice.status === DeviceUtils.DEVICE_CONNECTED) return qsTr("Disconnect")
+                }
 
-                onClicked: selectedDevice.connected ? deviceDisconnectButtonClicked() : deviceConnectButtonClicked()
+                onClicked: {
+                    if (!selectedDevice) return
+                    if (selectedDevice.status === DeviceUtils.DEVICE_OFFLINE) deviceConnectButtonClicked()
+                    if (selectedDevice.connected) deviceDisconnectButtonClicked()
+                }
+            }
+
+            Item { // spacer
+                anchors.verticalCenter: parent.verticalCenter
+                width: 16
+                height: 16
+                visible: !menuMain.visible
             }
         }
 

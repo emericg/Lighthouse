@@ -241,15 +241,12 @@ ApplicationWindow {
             screenDeviceRemote.backAction()
         } else if (appContent.state === "DeviceLight") {
             screenDeviceLight.backAction()
+        } else if (appContent.state === "VirtualInputs") {
+            screenVirtualInputs.backAction()
         } else if (appContent.state === "Tutorial") {
             appContent.state = screenTutorial.entryPoint
         } else { // default
-            if (appContent.previousStates.length) {
-                appContent.previousStates.pop()
-                appContent.state = appContent.previousStates[appContent.previousStates.length-1]
-            } else {
-                appContent.state = "DeviceList"
-            }
+            appContent.state = "DeviceList"
         }
     }
     function forwardAction() {

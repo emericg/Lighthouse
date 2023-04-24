@@ -35,7 +35,7 @@
 
 /*!
  * Yeelight square button (YLAI003)
- * Advertising name is "YLKG1"
+ * Advertising name is 'YLKG1'
  * Support the following actions: press, double press, long press
  *
  * Protocol infos:

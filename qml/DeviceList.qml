@@ -502,6 +502,55 @@ Item {
                         fillMode: Image.PreserveAspectCrop
                     }
                 }
+
+                Rectangle { // VIRTUAL INPUTS
+                    width: 420
+                    height: 128
+                    radius: 4
+
+                    visible: isDesktop
+                    color: Theme.colorDeviceWidget
+                    border.width: 2
+                    border.color: singleColumn ? "transparent" : Theme.colorSeparator
+
+                    Column {
+                        anchors.left: parent.left
+                        anchors.leftMargin: 16
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        Text {
+                            text: "Virtual Controls"
+                            textFormat: Text.PlainText
+                            color: Theme.colorText
+                            font.pixelSize: 22
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        Text {
+                            text: "click to open"
+                            textFormat: Text.PlainText
+                            color: Theme.colorSubText
+                            font.pixelSize: 20
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                    }
+
+                    IconSvg {
+                        width: 80
+                        height: 80
+                        anchors.right: parent.right
+                        anchors.rightMargin: 16
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        opacity: 0.66
+                        color: Theme.colorSeparator
+                        source: "qrc:/assets/icons_material/duotone-devices-24px.svg"
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: screenVirtualInputs.loadScreen()
+                    }
+                }
             }
 /*
             Text {
@@ -606,12 +655,66 @@ Item {
                     }
                 }
             }
-/*
-            Item {
-                width: 12; height: 12;
+
+            Rectangle { // VIRTUAL INPUTS
+                width: singleColumn ? parent.width : 480
+                height: singleColumn ? 96 : 96
+                radius: 4
+
                 visible: (isMobile && networkClient.connected)
+
+                color: Theme.colorForeground // Theme.colorDeviceWidget
+                border.width: 2
+                border.color: singleColumn ? "transparent" : Theme.colorSeparator
+
+                Column {
+                    anchors.left: parent.left
+                    anchors.leftMargin: 12
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    Text {
+                        text: "Virtual Controls"
+                        textFormat: Text.PlainText
+                        color: Theme.colorText
+                        font.pixelSize: 20
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    Text {
+                        text: "click to open"
+                        textFormat: Text.PlainText
+                        color: Theme.colorSubText
+                        font.pixelSize: 18
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                }
+
+                IconSvg {
+                    width: 48
+                    height: 48
+                    anchors.right: parent.right
+                    anchors.rightMargin: 48
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    color: Theme.colorHighContrast
+                    source: "qrc:/assets/icons_material/duotone-devices-24px.svg"
+                }
+                IconSvg {
+                    width: 32
+                    height: 32
+                    anchors.right: parent.right
+                    anchors.rightMargin: singleColumn ? 4 : 12
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    color: Theme.colorHighContrast
+                    source: "qrc:/assets/icons_material/baseline-chevron_right-24px.svg"
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: screenVirtualInputs.loadScreen()
+                }
             }
-*/
+
             Text {
                 height: 40
                 visible: isDesktop

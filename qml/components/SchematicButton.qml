@@ -32,6 +32,15 @@ Rectangle {
         to: Theme.colorForeground
     }
 
+    Text {
+        anchors.centerIn: parent
+        text: "Y"
+        textFormat: Text.PlainText
+        font.pixelSize: 80
+        font.bold: true
+        color: (itemDeviceRemote.btnClicked === 1) ? Theme.colorPrimary: Theme.colorSeparator
+    }
+
     MouseArea {
         anchors.fill: parent
         onClicked: {

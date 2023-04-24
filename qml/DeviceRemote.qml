@@ -144,10 +144,10 @@ Loader {
         }
 
         function isHistoryMode() {
-            //return deviceScreenChart.isIndicator()
+            return false
         }
         function resetHistoryMode() {
-            //deviceScreenChart.resetIndicator()
+            //
         }
 
         ////////////////////////////////////////////////////////////////////////

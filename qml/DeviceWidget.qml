@@ -24,36 +24,20 @@ Item {
         function onStatusUpdated() { updateSensorStatus() }
         function onSettingsUpdated() { updateSensorStatus(); updateSensorSettings(); }
         function onRssiUpdated() { updateSensorRSSI() }
-        function onDataUpdated() { updateSensorData() }
         function onRefreshUpdated() { updateSensorData() }
-    }/*
-    Connections {
-        target: ThemeEngine
-        function onCurrentThemeChanged() {
-            updateSensorSettings()
-            updateSensorStatus()
-            updateSensorData()
-        }
-    }*/
+    }
 
     Component.onCompleted: initBoxData()
 
     ////////////////////////////////////////////////////////////////////////////
 
     function initBoxData() {
-        // Set icon
-        imageDevice.source = UtilsDeviceSensors.getDeviceIcon(boxDevice, false)
-
         updateSensorSettings()
         updateSensorStatus()
-        updateSensorData()
     }
 
     function updateSensorStatus() {
-        // Text
-        //textStatus.text = UtilsDeviceSensors.getDeviceStatusText(boxDevice.status)
-        //textStatus.color = UtilsDeviceSensors.getDeviceStatusColor(boxDevice.status)
-
+        //
         if (!boxDevice.deviceEnabled) {
             textStatus.color = Theme.colorYellow
             textStatus.text = qsTr("Disabled")
@@ -122,20 +106,6 @@ Item {
     }
 
     function updateSensorSettings() {
-        // Title
-        if (boxDevice.isPlantSensor) {
-            if (boxDevice.deviceAssociatedName !== "")
-                textTitle.text = boxDevice.deviceAssociatedName
-            else
-                textTitle.text = boxDevice.deviceName
-        } else if (boxDevice.isThermometer) {
-            if (boxDevice.deviceName === "ThermoBeacon")
-                textTitle.text = boxDevice.deviceName
-            else
-                textTitle.text = qsTr("Thermometer")
-        } else {
-            textTitle.text = boxDevice.deviceName
-        }
         // Location
         textLocation.font.pixelSize = bigAssMode ? 20 : 18
         if (boxDevice.deviceLocationName) {
@@ -150,24 +120,6 @@ Item {
                 textLocation.text = boxDevice.deviceAddress
             }
         }
-    }
-
-    function updateSensorIcon() {
-        if (boxDevice.isPlantSensor) {
-            if (boxDevice.deviceName === "ropot" || boxDevice.deviceName === "Parrot pot")
-                imageDevice.source = "qrc:/assets/icons_custom/pot_empty-24px.svg"
-            else
-                imageDevice.source = "qrc:/assets/icons_material/outline-settings_remote-24px.svg"
-        }
-    }
-
-    function updateSensorWarnings() {
-        // Warnings icons (for sensors with available data)
-    }
-
-    function updateSensorData() {
-        updateSensorIcon()
-        updateSensorWarnings()
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -300,8 +252,9 @@ Item {
                 height: bigAssMode ? 32 : 28
                 anchors.verticalCenter: parent.verticalCenter
 
-                color: Theme.colorHighContrast
                 //visible: (wideAssMode || bigAssMode)
+                color: Theme.colorHighContrast
+                source: UtilsDeviceSensors.getDeviceIcon(boxDevice, false)
                 fillMode: Image.PreserveAspectFit
                 asynchronous: true
 
@@ -339,10 +292,10 @@ Item {
                     id: textTitle
                     width: rowLeft.width - imageDevice.width - rowLeft.spacing
 
+                    text: boxDevice.deviceName
                     textFormat: Text.PlainText
                     color: Theme.colorText
                     font.pixelSize: bigAssMode ? 22 : 20
-                    //font.capitalization: Font.Capitalize
                     verticalAlignment: Text.AlignVCenter
                     elide: Text.ElideRight
                 }
@@ -354,7 +307,6 @@ Item {
                     textFormat: Text.PlainText
                     color: Theme.colorSubText
                     font.pixelSize: bigAssMode ? 20 : 18
-                    //font.capitalization: Font.Capitalize
                     verticalAlignment: Text.AlignVCenter
                     elide: Text.ElideRight
                 }

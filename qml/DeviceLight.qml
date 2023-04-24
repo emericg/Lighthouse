@@ -145,19 +145,29 @@ Loader {
         }
 
         function isHistoryMode() {
-            //return deviceScreenChart.isIndicator()
+            return false
         }
         function resetHistoryMode() {
-            //deviceScreenChart.resetIndicator()
+            //
         }
 
         ////////////////////////////////////////////////////////////////////////
-/*
+
         ColorDialog {
             id: colorDialog
             title: "Please choose a color"
+
+            currentColor: selectedDevice.colorSaved
+            onAccepted: {
+                //console.log("colorDialog::onAccepted(" + color + ")")
+                selectedDevice.setColorSaved(color)
+
+                colorSaved.selection = 12
+                currentDevice.setColors_rgb_hex(color)
+                slider_color.value = Qt.rgba(color.r / 255, color.g / 255, color.b / 255, 1).hsvHue
+            }
         }
-*/
+
         ////////////////////////////////////////////////////////////////////////
 
         Flow {
@@ -488,259 +498,293 @@ Loader {
 
                     ////////
 
-                    Grid {
-                        id: colorSaved
-                        //anchors.left: parent.left
-                        //anchors.right: parent.right
+                    Row {
                         anchors.horizontalCenter: parent.horizontalCenter
-
-                        width: ww*columns + spacing*(columns-1)
-                        height: hh*rows + spacing*(rows-1)
-
-                        columns: 6
-                        rows: 2
                         spacing: 12
 
                         visible: (btnLightMode.currentSelection === 4)
 
-                        property int ww: isPhone ? 48 : 80
-                        property int hh: 48
-                        property int rr: 6
+                        Grid {
+                            id: colorSaved
 
-                        property int selection: -1
+                            width: ww*columns + spacing*(columns-1)
+                            height: hh*rows + spacing*(rows-1)
 
-                        Rectangle {
-                            width: colorSaved.ww; height: colorSaved.hh; radius: colorSaved.rr;
+                            columns: 6
+                            rows: 2
+                            spacing: 12
 
-                            property int cid: 0
-                            color: "#f2b101"
+                            property int ww: isPhone ? 48 : 80
+                            property int hh: 48
+                            property int rr: 6
 
-                            border.width: 2
-                            border.color: (colorSaved.selection === cid) ? Theme.colorHighContrast : Qt.darker(color, 1.05)
+                            property int selection: -1
 
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    colorSaved.selection = parent.cid
-                                    currentDevice.setColors_rgb_hex(parent.color)
-                                    slider_color.value = Qt.rgba(parent.color.r / 255, parent.color.g / 255, parent.color.b / 255, 1).hsvHue
+                            Rectangle {
+                                width: colorSaved.ww; height: colorSaved.hh; radius: colorSaved.rr;
+
+                                property int cid: 0
+                                color: "#f2b101"
+
+                                border.width: (colorSaved.selection === cid) ? 3 : 2
+                                border.color: (colorSaved.selection === cid) ? Theme.colorPrimary : Qt.darker(color, 1.05)
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        colorSaved.selection = parent.cid
+                                        currentDevice.setColors_rgb_hex(parent.color)
+                                        slider_color.value = Qt.rgba(parent.color.r / 255, parent.color.g / 255, parent.color.b / 255, 1).hsvHue
+                                    }
+                                }
+                            }
+
+                            Rectangle {
+                                width: colorSaved.ww; height: colorSaved.hh; radius: colorSaved.rr;
+
+                                property int cid: 1
+                                color: "#f32f09"
+
+                                border.width: (colorSaved.selection === cid) ? 3 : 2
+                                border.color: (colorSaved.selection === cid) ? Theme.colorPrimary : Qt.darker(color, 1.05)
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        colorSaved.selection = parent.cid
+                                        currentDevice.setColors_rgb_hex(parent.color)
+                                        slider_color.value = Qt.rgba(parent.color.r / 255, parent.color.g / 255, parent.color.b / 255, 1).hsvHue
+                                    }
+                                }
+                            }
+
+                            Rectangle {
+                                width: colorSaved.ww; height: colorSaved.hh; radius: colorSaved.rr;
+
+                                property int cid: 2
+                                color: "#f24175"
+
+                                border.width: (colorSaved.selection === cid) ? 3 : 2
+                                border.color: (colorSaved.selection === cid) ? Theme.colorPrimary : Qt.darker(color, 1.05)
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        colorSaved.selection = parent.cid
+                                        currentDevice.setColors_rgb_hex(parent.color)
+                                        slider_color.value = Qt.rgba(parent.color.r / 255, parent.color.g / 255, parent.color.b / 255, 1).hsvHue
+                                    }
+                                }
+                            }
+
+                            Rectangle {
+                                width: colorSaved.ww; height: colorSaved.hh; radius: colorSaved.rr;
+
+                                property int cid: 3
+                                color: "#02b6eb"
+
+                                border.width: (colorSaved.selection === cid) ? 3 : 2
+                                border.color: (colorSaved.selection === cid) ? Theme.colorPrimary : Qt.darker(color, 1.05)
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        colorSaved.selection = parent.cid
+                                        currentDevice.setColors_rgb_hex(parent.color)
+                                        slider_color.value = Qt.rgba(parent.color.r / 255, parent.color.g / 255, parent.color.b / 255, 1).hsvHue
+                                    }
+                                }
+                            }
+
+                            Rectangle {
+                                width: colorSaved.ww; height: colorSaved.hh; radius: colorSaved.rr;
+
+                                property int cid: 4
+                                color: "#01ec9d"
+
+                                border.width: (colorSaved.selection === cid) ? 3 : 2
+                                border.color: (colorSaved.selection === cid) ? Theme.colorPrimary : Qt.darker(color, 1.05)
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        colorSaved.selection = parent.cid
+                                        currentDevice.setColors_rgb_hex(parent.color)
+                                        slider_color.value = Qt.rgba(parent.color.r / 255, parent.color.g / 255, parent.color.b / 255, 1).hsvHue
+                                    }
+                                }
+                            }
+
+                            Rectangle {
+                                width: colorSaved.ww; height: colorSaved.hh; radius: colorSaved.rr;
+
+                                property int cid: 5
+                                color: "#01e802"
+
+                                border.width: (colorSaved.selection === cid) ? 3 : 2
+                                border.color: (colorSaved.selection === cid) ? Theme.colorPrimary : Qt.darker(color, 1.05)
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        colorSaved.selection = parent.cid
+                                        currentDevice.setColors_rgb_hex(parent.color)
+                                        slider_color.value = Qt.rgba(parent.color.r / 255, parent.color.g / 255, parent.color.b / 255, 1).hsvHue
+                                    }
+                                }
+                            }
+
+                            ////
+
+                            Rectangle {
+                                width: colorSaved.ww; height: colorSaved.hh; radius: colorSaved.rr;
+
+                                property int cid: 6
+                                color: "#f5df02"
+
+                                border.width: (colorSaved.selection === cid) ? 3 : 2
+                                border.color: (colorSaved.selection === cid) ? Theme.colorPrimary : Qt.darker(color, 1.05)
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        colorSaved.selection = parent.cid
+                                        currentDevice.setColors_rgb_hex(parent.color)
+                                        slider_color.value = Qt.rgba(parent.color.r / 255, parent.color.g / 255, parent.color.b / 255, 1).hsvHue
+                                    }
+                                }
+                            }
+
+                            Rectangle {
+                                width: colorSaved.ww; height: colorSaved.hh; radius: colorSaved.rr;
+
+                                property int cid: 7
+                                color: "#73c300"
+
+                                border.width: (colorSaved.selection === cid) ? 3 : 2
+                                border.color: (colorSaved.selection === cid) ? Theme.colorPrimary : Qt.darker(color, 1.05)
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        colorSaved.selection = parent.cid
+                                        currentDevice.setColors_rgb_hex(parent.color)
+                                        slider_color.value = Qt.rgba(parent.color.r / 255, parent.color.g / 255, parent.color.b / 255, 1).hsvHue
+                                    }
+                                }
+                            }
+
+                            Rectangle {
+                                width: colorSaved.ww; height: colorSaved.hh; radius: colorSaved.rr;
+
+                                property int cid: 8
+                                color: "#00c0bb"
+
+                                border.width: (colorSaved.selection === cid) ? 3 : 2
+                                border.color: (colorSaved.selection === cid) ? Theme.colorPrimary : Qt.darker(color, 1.05)
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        colorSaved.selection = parent.cid
+                                        currentDevice.setColors_rgb_hex(parent.color)
+                                        slider_color.value = Qt.rgba(parent.color.r / 255, parent.color.g / 255, parent.color.b / 255, 1).hsvHue
+                                    }
+                                }
+                            }
+
+                            Rectangle {
+                                width: colorSaved.ww; height: colorSaved.hh; radius: colorSaved.rr;
+
+                                property int cid: 9
+                                color: "#265799"
+
+                                border.width: (colorSaved.selection === cid) ? 3 : 2
+                                border.color: (colorSaved.selection === cid) ? Theme.colorPrimary : Qt.darker(color, 1.05)
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        colorSaved.selection = parent.cid
+                                        currentDevice.setColors_rgb_hex(parent.color)
+                                        slider_color.value = Qt.rgba(parent.color.r / 255, parent.color.g / 255, parent.color.b / 255, 1).hsvHue
+                                    }
+                                }
+                            }
+
+                            Rectangle {
+                                width: colorSaved.ww; height: colorSaved.hh; radius: colorSaved.rr;
+
+                                property int cid: 10
+                                color: "#af1e55"
+
+                                border.width: (colorSaved.selection === cid) ? 3 : 2
+                                border.color: (colorSaved.selection === cid) ? Theme.colorPrimary : Qt.darker(color, 1.05)
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        colorSaved.selection = parent.cid
+                                        currentDevice.setColors_rgb_hex(parent.color)
+                                        slider_color.value = Qt.rgba(parent.color.r / 255, parent.color.g / 255, parent.color.b / 255, 1).hsvHue
+                                    }
+                                }
+                            }
+
+                            Rectangle {
+                                width: colorSaved.ww; height: colorSaved.hh; radius: colorSaved.rr;
+
+                                property int cid: 11
+                                color: "#f47caa"
+
+                                border.width: (colorSaved.selection === cid) ? 3 : 2
+                                border.color: (colorSaved.selection === cid) ? Theme.colorPrimary : Qt.darker(color, 1.05)
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        colorSaved.selection = parent.cid
+                                        currentDevice.setColors_rgb_hex(parent.color)
+                                        slider_color.value = Qt.rgba(parent.color.r / 255, parent.color.g / 255, parent.color.b / 255, 1).hsvHue
+                                    }
                                 }
                             }
                         }
 
+                        ////////
+
                         Rectangle {
-                            width: colorSaved.ww; height: colorSaved.hh; radius: colorSaved.rr;
+                            id: colorPickerButton
+                            width: colorSaved.ww*1.6 + colorSaved.spacing
+                            height: colorSaved.hh*2 + colorSaved.spacing
+                            radius: colorSaved.rr
 
-                            property int cid: 1
-                            color: "#f32f09"
+                            color: selectedDevice && selectedDevice.colorSaved
+                            border.width: (colorSaved.selection === cid) ? 3 : 2
+                            border.color: (colorSaved.selection === cid) ? Theme.colorPrimary : Qt.darker(color, 1.05)
 
-                            border.width: 2
-                            border.color: (colorSaved.selection === cid) ? Theme.colorHighContrast : Qt.darker(color, 1.05)
+                            visible: isDesktop
+                            property int cid: 12
+
+                            IconSvg {
+                                anchors.centerIn: parent
+                                width: parent.width * 0.33
+                                height: width
+                                color: utilsApp.isQColorLight(parent.color) ? Theme.colorHighContrast : Theme.colorLowContrast
+                                opacity: 0.5
+                                source: "qrc:/assets/icons_material/duotone-style-24px.svg"
+                            }
 
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
-                                    colorSaved.selection = parent.cid
-                                    currentDevice.setColors_rgb_hex(parent.color)
-                                    slider_color.value = Qt.rgba(parent.color.r / 255, parent.color.g / 255, parent.color.b / 255, 1).hsvHue
+                                    colorDialog.open()
                                 }
                             }
                         }
 
-                        Rectangle {
-                            width: colorSaved.ww; height: colorSaved.hh; radius: colorSaved.rr;
-
-                            property int cid: 2
-                            color: "#f24175"
-
-                            border.width: 2
-                            border.color: (colorSaved.selection === cid) ? Theme.colorHighContrast : Qt.darker(color, 1.05)
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    colorSaved.selection = parent.cid
-                                    currentDevice.setColors_rgb_hex(parent.color)
-                                    slider_color.value = Qt.rgba(parent.color.r / 255, parent.color.g / 255, parent.color.b / 255, 1).hsvHue
-                                }
-                            }
-                        }
-
-                        Rectangle {
-                            width: colorSaved.ww; height: colorSaved.hh; radius: colorSaved.rr;
-
-                            property int cid: 3
-                            color: "#02b6eb"
-
-                            border.width: 2
-                            border.color: (colorSaved.selection === cid) ? Theme.colorHighContrast : Qt.darker(color, 1.05)
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    colorSaved.selection = parent.cid
-                                    currentDevice.setColors_rgb_hex(parent.color)
-                                    slider_color.value = Qt.rgba(parent.color.r / 255, parent.color.g / 255, parent.color.b / 255, 1).hsvHue
-                                }
-                            }
-                        }
-
-                        Rectangle {
-                            width: colorSaved.ww; height: colorSaved.hh; radius: colorSaved.rr;
-
-                            property int cid: 4
-                            color: "#01ec9d"
-
-                            border.width: 2
-                            border.color: (colorSaved.selection === cid) ? Theme.colorHighContrast : Qt.darker(color, 1.05)
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    colorSaved.selection = parent.cid
-                                    currentDevice.setColors_rgb_hex(parent.color)
-                                    slider_color.value = Qt.rgba(parent.color.r / 255, parent.color.g / 255, parent.color.b / 255, 1).hsvHue
-                                }
-                            }
-                        }
-
-                        Rectangle {
-                            width: colorSaved.ww; height: colorSaved.hh; radius: colorSaved.rr;
-
-                            property int cid: 5
-                            color: "#01e802"
-
-                            border.width: 2
-                            border.color: (colorSaved.selection === cid) ? Theme.colorHighContrast : Qt.darker(color, 1.05)
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    colorSaved.selection = parent.cid
-                                    currentDevice.setColors_rgb_hex(parent.color)
-                                    slider_color.value = Qt.rgba(parent.color.r / 255, parent.color.g / 255, parent.color.b / 255, 1).hsvHue
-                                }
-                            }
-                        }
-
-                        ////
-
-                        Rectangle {
-                            width: colorSaved.ww; height: colorSaved.hh; radius: colorSaved.rr;
-
-                            property int cid: 6
-                            color: "#f5df02"
-
-                            border.width: 2
-                            border.color: (colorSaved.selection === cid) ? Theme.colorHighContrast : Qt.darker(color, 1.05)
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    colorSaved.selection = parent.cid
-                                    currentDevice.setColors_rgb_hex(parent.color)
-                                    slider_color.value = Qt.rgba(parent.color.r / 255, parent.color.g / 255, parent.color.b / 255, 1).hsvHue
-                                }
-                            }
-                        }
-
-                        Rectangle {
-                            width: colorSaved.ww; height: colorSaved.hh; radius: colorSaved.rr;
-
-                            property int cid: 7
-                            color: "#73c300"
-
-                            border.width: 2
-                            border.color: (colorSaved.selection === cid) ? Theme.colorHighContrast : Qt.darker(color, 1.05)
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    colorSaved.selection = parent.cid
-                                    currentDevice.setColors_rgb_hex(parent.color)
-                                    slider_color.value = Qt.rgba(parent.color.r / 255, parent.color.g / 255, parent.color.b / 255, 1).hsvHue
-                                }
-                            }
-                        }
-
-                        Rectangle {
-                            width: colorSaved.ww; height: colorSaved.hh; radius: colorSaved.rr;
-
-                            property int cid: 8
-                            color: "#00c0bb"
-
-                            border.width: 2
-                            border.color: (colorSaved.selection === cid) ? Theme.colorHighContrast : Qt.darker(color, 1.05)
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    colorSaved.selection = parent.cid
-                                    currentDevice.setColors_rgb_hex(parent.color)
-                                    slider_color.value = Qt.rgba(parent.color.r / 255, parent.color.g / 255, parent.color.b / 255, 1).hsvHue
-                                }
-                            }
-                        }
-
-                        Rectangle {
-                            width: colorSaved.ww; height: colorSaved.hh; radius: colorSaved.rr;
-
-                            property int cid: 9
-                            color: "#265799"
-
-                            border.width: 2
-                            border.color: (colorSaved.selection === cid) ? Theme.colorHighContrast : Qt.darker(color, 1.05)
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    colorSaved.selection = parent.cid
-                                    currentDevice.setColors_rgb_hex(parent.color)
-                                    slider_color.value = Qt.rgba(parent.color.r / 255, parent.color.g / 255, parent.color.b / 255, 1).hsvHue
-                                }
-                            }
-                        }
-
-                        Rectangle {
-                            width: colorSaved.ww; height: colorSaved.hh; radius: colorSaved.rr;
-
-                            property int cid: 10
-                            color: "#af1e55"
-
-                            border.width: 2
-                            border.color: (colorSaved.selection === cid) ? Theme.colorHighContrast : Qt.darker(color, 1.05)
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    colorSaved.selection = parent.cid
-                                    currentDevice.setColors_rgb_hex(parent.color)
-                                    slider_color.value = Qt.rgba(parent.color.r / 255, parent.color.g / 255, parent.color.b / 255, 1).hsvHue
-                                }
-                            }
-                        }
-
-                        Rectangle {
-                            width: colorSaved.ww; height: colorSaved.hh; radius: colorSaved.rr;
-
-                            property int cid: 11
-                            color: "#f47caa"
-
-                            border.width: 2
-                            border.color: (colorSaved.selection === cid) ? Theme.colorHighContrast : Qt.darker(color, 1.05)
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    colorSaved.selection = parent.cid
-                                    currentDevice.setColors_rgb_hex(parent.color)
-                                    slider_color.value = Qt.rgba(parent.color.r / 255, parent.color.g / 255, parent.color.b / 255, 1).hsvHue
-                                }
-                            }
-                        }
+                        ////////
                     }
-
-                    ////////
                 }
             }
         }
