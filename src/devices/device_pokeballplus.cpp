@@ -22,6 +22,9 @@
 #include "device_pokeballplus.h"
 #include "utils_maths.h"
 
+#include "../local_controls/gamepad.h"
+#include "../local_controls/gamepad_uinput.h"
+
 #include <cstdint>
 #include <cmath>
 #include <algorithm>
@@ -57,6 +60,71 @@ DevicePokeballPlus::~DevicePokeballPlus()
 {
     delete m_serviceBattery;
     delete m_serviceGamepad;
+    delete m_gamepad;
+}
+
+/* ************************************************************************** */
+/* ************************************************************************** */
+
+// axis
+//    (y)
+// (x)   (x)
+//    (y)
+
+// ranges
+//    36
+// 32   193 (but 176 advisable?)
+//   180
+
+// deadzones
+//    109
+// 106 + 117
+//    112
+
+float mapAxisValue(float value,
+                   const float a1, const float a2,
+                   const float b1, const float b2)
+{
+    // clamp
+    if (value < a1) value = a1;
+    if (value > a2) value = a2;
+    // map
+    return (b1 + ((value - a1) * (b2 - b1)) / (a2 - a1));
+}
+
+float getAnalogX(uint8_t byte1, uint8_t byte2)
+{
+    // map value
+    uint8_t value = ((byte1 & 0x0F) << 4) | ((byte2 >> 4) & 0x0F);
+    float analog_value = mapAxisValue(value, 32.f, 192.f, -1.f, 1.f);
+
+    // handle deadzone
+    if (analog_value >= -0.075f && analog_value <= 0.075f)
+    {
+        analog_value = 0.f;
+    }
+
+    // debug
+    //qDebug() << "getAnalogX()" << QString::number(value).rightJustified(2, ' ') << " > " << analog_value;
+
+    return analog_value;
+}
+
+float getAnalogY(uint8_t value)
+{
+    // map value
+    float analog_value = mapAxisValue(value, 36.f, 180.f, -1.f, 1.f);
+
+    // handle deadzone
+    if (analog_value >= -0.075f && analog_value <= 0.075f)
+    {
+        analog_value = 0.f;
+    }
+
+    // debug
+    //qDebug() << "getAnalogY()" << QString::number(value).rightJustified(2, ' ') << " > " << analog_value;
+
+    return analog_value;
 }
 
 /* ************************************************************************** */
@@ -157,28 +225,14 @@ void DevicePokeballPlus::serviceDetailsDiscovered_gamepad(QLowEnergyService::Ser
 
 void DevicePokeballPlus::bleWriteDone(const QLowEnergyCharacteristic &c, const QByteArray &value)
 {
-    qDebug() << "DevicePokeballPlus::bleWriteDone(" << m_deviceAddress << ") on" << c.name() << " / uuid" << c.uuid() << value.size();
-
-    if (c.uuid().toString() == "{x}")
-    {
-        //
-    }
+    //qDebug() << "DevicePokeballPlus::bleWriteDone(" << m_deviceAddress << ") on" << c.name() << " / uuid" << c.uuid() << value.size();
+    //qDebug() << "DATA (" << value.size() << "bytes)   >  0x" << value.toHex();
 }
 
 void DevicePokeballPlus::bleReadDone(const QLowEnergyCharacteristic &c, const QByteArray &value)
 {
-    const quint8 *data = reinterpret_cast<const quint8 *>(value.constData());
-
-    qDebug() << "DevicePokeballPlus::bleReadDone(" << m_deviceAddress << ") on" << c.name() << " / uuid" << c.uuid() << value.size();
-    qDebug() << "DATA (" << value.size() << "bytes)   >  0x" << value.toHex();
-
-    if (c.uuid().toString() == "{x}")
-    {
-        if (value.size() > 0)
-        {
-            //
-        }
-    }
+    //qDebug() << "DevicePokeballPlus::bleReadDone(" << m_deviceAddress << ") on" << c.name() << " / uuid" << c.uuid() << value.size();
+    //qDebug() << "DATA (" << value.size() << "bytes)   >  0x" << value.toHex();
 }
 
 void DevicePokeballPlus::bleReadNotify(const QLowEnergyCharacteristic &c, const QByteArray &value)
@@ -193,21 +247,42 @@ void DevicePokeballPlus::bleReadNotify(const QLowEnergyCharacteristic &c, const 
         // gamepad buttons
 
         int btn = data[1];
-        if (btn == 1 || btn == 2)
-        {
-            triggerEvent(btn, 0);
-        }
-        else if (btn == 3)
-        {
-            triggerEvent(1, 0);
-            triggerEvent(2, 0);
-        }
+        int btn_a = (btn == 1 || btn == 3);
+        int btn_b = (btn == 2 || btn == 3);
+        Q_EMIT btnChanged();
 
         // gamepad axis
+
+        m_axis_x = getAnalogX(data[3], data[2]);
+        m_axis_y = getAnalogY(data[4]);
+        Q_EMIT axisChanged();
 
         // accl
 
         // gyro
+
+        ////////////////
+
+        {
+            if (btn_a) triggerEvent(1, 0);
+            if (btn_b) triggerEvent(2, 0);
+        }
+
+        ////////////////
+
+        {
+            if (!m_gamepad)
+            {
+                m_gamepad = new Gamepad_uinput();
+                dynamic_cast<Gamepad_uinput*>(m_gamepad)->setup_pbp();
+            }
+            if (m_gamepad)
+            {
+                dynamic_cast<Gamepad_uinput*>(m_gamepad)->action_pbp(m_axis_x*32000.f, m_axis_y*32000.f, btn_a, btn_b);
+            }
+        }
+
+        ////////////////
     }
 }
 

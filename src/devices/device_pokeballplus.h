@@ -31,6 +31,8 @@
 #include <QBluetoothDeviceInfo>
 #include <QLowEnergyController>
 
+class Gamepad;
+
 /* ************************************************************************** */
 
 /*!
@@ -66,7 +68,11 @@ class DevicePokeballPlus: public DeviceBeacon
     float getXf() { return m_axis_x; };
     float getYf() { return m_axis_y; };
 
+    // virtual gamepad
+    Gamepad *m_gamepad = nullptr;
+
 Q_SIGNALS:
+    void btnChanged();
     void axisChanged();
     void acclChanged();
     void gyroChanged();
