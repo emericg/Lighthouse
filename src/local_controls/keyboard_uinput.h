@@ -31,21 +31,22 @@
 #include <QObject>
 
 /*!
- * Keyboard (Linux uinput version)
+ * Virtual keyboard (Linux uinput version)
  */
 class Keyboard_uinput: public Keyboard
 {
     Q_OBJECT
 
-    int fd = -1;
-    struct uinput_user_dev uidev;
+    int m_fd = -1;
+    struct uinput_user_dev m_uidev;
+
+    void emitevent(int type, int code, int val);
 
 public:
     Keyboard_uinput(QObject *parent = nullptr);
     virtual ~Keyboard_uinput();
 
     virtual void setup();
-    virtual void destroy();
     virtual void action(int key_code);
 };
 

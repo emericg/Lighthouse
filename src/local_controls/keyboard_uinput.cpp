@@ -27,9 +27,9 @@
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <sys/time.h>
 #include <linux/input.h>
 #include <linux/uinput.h>
-#include <sys/time.h>
 
 #include <QDebug>
 
@@ -42,23 +42,91 @@ Keyboard_uinput::Keyboard_uinput(QObject *parent): Keyboard(parent)
 
 Keyboard_uinput::~Keyboard_uinput()
 {
-    //
+    if (m_fd >= 0)
+    {
+        // close virtual keyboard
+        if (ioctl(m_fd, UI_DEV_DESTROY) < 0)
+        {
+            qWarning() << "Cannot close /dev/uinput";
+        }
+        close(m_fd);
+    }
+}
+
+/* ************************************************************************** */
+
+void Keyboard_uinput::emitevent(int type, int code, int val)
+{
+    if (m_fd >= 0)
+    {
+        struct input_event event;
+        memset(&event, 0, sizeof(event));
+
+        event.type = type;
+        event.code = code;
+        event.value = val;
+
+        // set timestamps
+        gettimeofday(&event.time, nullptr);
+
+        // ignore timestamps?
+        //event.time.tv_sec = 0;
+        //event.time.tv_usec = 0;
+
+        write(m_fd, &event, sizeof(event));
+    }
 }
 
 /* ************************************************************************** */
 
 void Keyboard_uinput::setup()
 {
-    //
-}
+    int err = 0;
 
-void Keyboard_uinput::destroy()
-{
-    //
+    if (m_fd < 0)
+    {
+        m_fd = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
+        if (m_fd < 0)
+        {
+            qWarning() << "Cannot open /dev/uinput";
+            return;
+        }
+
+        // enable keys events
+        err = ioctl(m_fd, UI_SET_EVBIT, EV_KEY);
+        if (err < 0) { qWarning() << "ioctl(UI_SET_EVBIT, EV_KEY) error"; }
+
+        // enable syn events
+        err = ioctl(m_fd, UI_SET_EVBIT, EV_SYN);
+        if (err < 0) { qWarning() << "ioctl(UI_SET_EVBIT, EV_SYN) error"; }
+
+        // setup keys
+        for (int i = 0; i < 256; i++)
+        {
+            ioctl(m_fd, UI_SET_KEYBIT, i);
+        }
+
+        // init virtual keyboard
+        memset(&m_uidev, 0, sizeof(m_uidev));
+        snprintf(m_uidev.name, UINPUT_MAX_NAME_SIZE, "Lighthouse virtual keyboard");
+        m_uidev.id.bustype = BUS_VIRTUAL;
+        m_uidev.id.version = 1;
+        m_uidev.id.vendor = 0x1234;
+        m_uidev.id.product = 0x5678;
+
+        err = write(m_fd, &m_uidev, sizeof(m_uidev));
+        if (err < 0) { qWarning() << "Unable to write /dev/uinput device"; }
+
+        err = ioctl(m_fd, UI_DEV_CREATE);
+        if (err < 0) { qWarning() << "ioctl(UI_DEV_CREATE) error"; }
+    }
 }
 
 void Keyboard_uinput::action(int action_code)
 {
+    if (m_fd < 0) setup(); // setup?
+
+    // get key
     unsigned keymacro = 0;
 
     if (action_code == LocalActions::ACTION_KEYBOARD_computer_lock) keymacro = KEY_SCREENLOCK;
@@ -91,64 +159,15 @@ void Keyboard_uinput::action(int action_code)
     else if (action_code == LocalActions::ACTION_KEYBOARD_volume_up) keymacro = KEY_VOLUMEUP;
     else if (action_code == LocalActions::ACTION_KEYBOARD_volume_down) keymacro = KEY_VOLUMEDOWN;
 
-    if (fd < 0)
-    {
-        fd = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
-    }
-
-    if (fd >= 0)
-    {
-        // enable keys events
-        ioctl(fd, UI_SET_EVBIT, EV_KEY);
-        for (int i = 0; i < 256; i++)
-        {
-            ioctl(fd, UI_SET_KEYBIT, i);
-        }
-
-        // enable syn events
-        ioctl(fd, UI_SET_EVBIT, EV_SYN);
-
-        // init virtual keyboard
-        memset(&uidev, 0, sizeof(uidev));
-        snprintf(uidev.name, UINPUT_MAX_NAME_SIZE, "Lighthouse virtual keyboard");
-        uidev.id.version = 1;
-        uidev.id.vendor = 0x1234;
-        uidev.id.product = 0x5678;
-        uidev.id.bustype = BUS_VIRTUAL;
-
-        write(fd, &uidev, sizeof(uidev));
-        ioctl(fd, UI_DEV_CREATE);
-
-        usleep(111000); // 111 ms
-    }
-    else
-    {
-        qWarning() << "Cannot open /dev/uinput";
-    }
-
     // simulate keystroke
-    if (fd >= 0)
+    if (m_fd >= 0)
     {
-        struct input_event event;
-        memset(&event, 0, sizeof(event));
-
-        //gettimeofday(&event.time, NULL);
-        event.type = EV_KEY;
-        event.code = keymacro;
-        event.value = 1;
-        write(fd, &event, sizeof(event));
-
-        memset(&event, 0, sizeof(event));
-
-        event.type = EV_SYN;
-        event.code = SYN_REPORT;
-        event.value = 0;
-        write(fd, &event, sizeof(event));
+        emitevent(EV_KEY, keymacro, 1);
+        emitevent(EV_SYN, SYN_REPORT, 0);
+        //usleep(66000); // 66 ms
+        emitevent(EV_KEY, keymacro, 0);
+        emitevent(EV_SYN, SYN_REPORT, 0);
     }
-
-    // close virtual keyboard
-    ioctl(fd, UI_DEV_DESTROY);
-    close(fd);
 }
 
 /* ************************************************************************** */

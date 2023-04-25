@@ -15,34 +15,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * \date      2022
+ * \date      2023
  * \author    Emeric Grange <emeric.grange@gmail.com>
  */
 
-#ifndef KEYBOARD_XTEST_H
-#define KEYBOARD_XTEST_H
+#ifndef GAMEPAD_H
+#define GAMEPAD_H
 /* ************************************************************************** */
-
-#include "keyboard.h"
 
 #include <QObject>
 
+/* ************************************************************************** */
+
 /*!
- * Keyboard (Linux XTest version)
+ * Minimal API to create virtual gamepads.
  */
-class Keyboard_xtest: public Keyboard
+class Gamepad: public QObject
 {
     Q_OBJECT
 
-    void *m_display = nullptr;
-
 public:
-    Keyboard_xtest(QObject *parent = nullptr);
-    virtual ~Keyboard_xtest();
+    Gamepad(QObject *parent = nullptr);
+    virtual ~Gamepad() = default;
 
-    virtual void setup();
-    virtual void action(int action_code);
+    virtual void setup() = 0;
+    virtual void action(int x1, int y1, int x2, int y2,
+                        int a, int b, int x, int y) = 0;
 };
 
 /* ************************************************************************** */
-#endif // KEYBOARD_XTEST_H
+#endif // GAMEPAD_H

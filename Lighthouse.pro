@@ -57,7 +57,9 @@ SOURCES  += src/main.cpp \
             src/network_controls/network_server.cpp \
             src/network_controls/network_client.cpp \
             src/local_controls/local_controls.cpp \
-            src/local_controls/keyboard.cpp
+            src/local_controls/mouse.cpp \
+            src/local_controls/keyboard.cpp \
+            src/local_controls/gamepad.cpp
 
 HEADERS  += src/SettingsManager.h \
             src/DatabaseManager.h \
@@ -80,7 +82,9 @@ HEADERS  += src/SettingsManager.h \
             src/network_controls/network_client.h \
             src/local_controls/local_controls.h \
             src/local_controls/local_actions.h \
-            src/local_controls/keyboard.h
+            src/local_controls/mouse.h \
+            src/local_controls/keyboard.h \
+            src/local_controls/gamepad.h
 
 INCLUDEPATH += src/ src/thirdparty/
 
@@ -119,10 +123,12 @@ linux:!android {
 
     SOURCES += src/local_controls/keyboard_uinput.cpp \
                src/local_controls/keyboard_xtest.cpp \
+               src/local_controls/gamepad_uinput.cpp \
                src/local_controls/mpris_dbus.cpp
 
     HEADERS += src/local_controls/keyboard_uinput.h \
                src/local_controls/keyboard_xtest.h \
+               src/local_controls/gamepad_uinput.h \
                src/local_controls/mpris_dbus.h
 
     # Automatic application packaging # Needs linuxdeployqt installed

@@ -29,8 +29,10 @@
 #include <QMediaPlayer>
 #include <QAudioOutput>
 
-#include "keyboard.h"
 #include "mpris_dbus.h"
+#include "mouse.h"
+#include "keyboard.h"
+#include "gamepad.h"
 
 /* ************************************************************************** */
 
@@ -41,8 +43,10 @@ class LocalControls: public QObject
 {
     Q_OBJECT
 
-    Keyboard *keyboard = nullptr;
     MprisController *mpris = nullptr;
+    Mouse *mouse = nullptr;
+    Keyboard *keyboard = nullptr;
+    Gamepad *gamepad = nullptr;
 
     QMediaPlayer *player = nullptr;
     QAudioOutput *audioOutput = nullptr;
@@ -56,6 +60,10 @@ public:
     static LocalControls *getInstance();
 
     Q_INVOKABLE void action(int action_code, const QString &action_params = QString());
+
+    Q_INVOKABLE void mouse_action(int x, int y, int btn_left, int btn_right);
+
+    Q_INVOKABLE void joystick_action(float x, float y, int b);
 
     // shortcuts
     Q_INVOKABLE void keyboard_computer_lock();

@@ -15,34 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * \date      2022
+ * \date      2023
  * \author    Emeric Grange <emeric.grange@gmail.com>
  */
 
-#ifndef KEYBOARD_XTEST_H
-#define KEYBOARD_XTEST_H
+#include "mouse.h"
+
 /* ************************************************************************** */
 
-#include "keyboard.h"
-
-#include <QObject>
-
-/*!
- * Keyboard (Linux XTest version)
- */
-class Keyboard_xtest: public Keyboard
+Mouse::Mouse(QObject *parent) : QObject(parent)
 {
-    Q_OBJECT
-
-    void *m_display = nullptr;
-
-public:
-    Keyboard_xtest(QObject *parent = nullptr);
-    virtual ~Keyboard_xtest();
-
-    virtual void setup();
-    virtual void action(int action_code);
-};
+    //
+}
 
 /* ************************************************************************** */
-#endif // KEYBOARD_XTEST_H

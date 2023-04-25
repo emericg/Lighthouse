@@ -28,9 +28,4 @@ Keyboard::Keyboard(QObject *parent) : QObject(parent)
     //
 }
 
-Keyboard::~Keyboard()
-{
-    //
-}
-
 /* ************************************************************************** */

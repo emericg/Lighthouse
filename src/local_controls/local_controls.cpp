@@ -24,6 +24,7 @@
 
 #include "keyboard_xtest.h"
 #include "keyboard_uinput.h"
+#include "gamepad_uinput.h"
 #include "mpris_dbus.h"
 
 #include <QProcess>
@@ -45,11 +46,20 @@ LocalControls *LocalControls::getInstance()
 
 LocalControls::LocalControls()
 {
-#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
-    keyboard = new Keyboard_xtest();
-    //keyboard = new Keyboard_uinput();
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
 
+    // nothing to control there...
+
+#elif defined(Q_OS_LINUX)
+
+    //keyboard = new Keyboard_xtest(); // only works with X11
+    keyboard = new Keyboard_uinput();
     mpris = MprisController::getInstance();
+
+#else
+
+    qWarning() << "No backends available for LocalControls()";
+
 #endif
 }
 
@@ -129,6 +139,20 @@ void LocalControls::action(int action_code, const QString &action_params)
             qDebug() << "LocalControls::action() unknown action code '" << action_code << "' :(";
         }
     }
+}
+
+/* ************************************************************************** */
+
+void LocalControls::mouse_action(int x, int y, int btn_left, int btn_right)
+{
+    // TODO
+}
+
+/* ************************************************************************** */
+
+void LocalControls::joystick_action(float x, float y, int b)
+{
+    // TODO
 }
 
 /* ************************************************************************** */

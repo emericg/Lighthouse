@@ -28,7 +28,7 @@
 /* ************************************************************************** */
 
 /*!
- * Keyboard API
+ * Minimal API to create virtual keyboards.
  *
  * xinput | grep keyboard
  * libinput debug-events
@@ -39,11 +39,9 @@ class Keyboard: public QObject
 
 public:
     Keyboard(QObject *parent = nullptr);
-    virtual ~Keyboard();
+    virtual ~Keyboard() = default;
 
     virtual void setup() = 0;
-    virtual void destroy() = 0;
-
     virtual void action(int key_code) = 0;
 };
 

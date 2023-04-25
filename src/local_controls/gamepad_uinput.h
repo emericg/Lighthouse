@@ -15,34 +15,46 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * \date      2022
+ * \date      2023
  * \author    Emeric Grange <emeric.grange@gmail.com>
  */
 
-#ifndef KEYBOARD_XTEST_H
-#define KEYBOARD_XTEST_H
+#ifndef GAMEPAD_UINPUT_H
+#define GAMEPAD_UINPUT_H
 /* ************************************************************************** */
 
-#include "keyboard.h"
+#include "gamepad.h"
+
+#include <linux/input.h>
+#include <linux/uinput.h>
 
 #include <QObject>
 
+/* ************************************************************************** */
+
 /*!
- * Keyboard (Linux XTest version)
+ * Virtual gamepad (Linux uinput version).
  */
-class Keyboard_xtest: public Keyboard
+class Gamepad_uinput: public Gamepad
 {
     Q_OBJECT
 
-    void *m_display = nullptr;
+    int m_fd = -1;
+    struct uinput_user_dev m_uidev;
+
+    void emitevent(int type, int code, int val);
 
 public:
-    Keyboard_xtest(QObject *parent = nullptr);
-    virtual ~Keyboard_xtest();
+    Gamepad_uinput(QObject *parent = nullptr);
+    virtual ~Gamepad_uinput();
 
     virtual void setup();
-    virtual void action(int action_code);
+    virtual void action(int x1, int y1, int x2, int y2,
+                        int a, int b, int x, int y);
+
+    virtual void setup_pbp();
+    virtual void action_pbp(int x, int y, int a, int b);
 };
 
 /* ************************************************************************** */
-#endif // KEYBOARD_XTEST_H
+#endif // GAMEPAD_UINPUT_H

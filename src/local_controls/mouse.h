@@ -15,34 +15,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * \date      2022
+ * \date      2023
  * \author    Emeric Grange <emeric.grange@gmail.com>
  */
 
-#ifndef KEYBOARD_XTEST_H
-#define KEYBOARD_XTEST_H
+#ifndef MOUSE_H
+#define MOUSE_H
 /* ************************************************************************** */
-
-#include "keyboard.h"
 
 #include <QObject>
 
+/* ************************************************************************** */
+
 /*!
- * Keyboard (Linux XTest version)
+ * Minimal API to create virtual mouses.
  */
-class Keyboard_xtest: public Keyboard
+class Mouse: public QObject
 {
     Q_OBJECT
 
-    void *m_display = nullptr;
-
 public:
-    Keyboard_xtest(QObject *parent = nullptr);
-    virtual ~Keyboard_xtest();
+    Mouse(QObject *parent = nullptr);
+    virtual ~Mouse() = default;
 
-    virtual void setup();
-    virtual void action(int action_code);
+    virtual void setup() = 0;
+    virtual void action(int x, int y, int btn_left, int btn_right) = 0;
 };
 
 /* ************************************************************************** */
-#endif // KEYBOARD_XTEST_H
+#endif // MOUSE_H

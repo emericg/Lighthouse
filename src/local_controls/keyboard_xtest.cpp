@@ -40,19 +40,24 @@ Keyboard_xtest::Keyboard_xtest(QObject *parent): Keyboard(parent)
 
 Keyboard_xtest::~Keyboard_xtest()
 {
-    //
+    if (m_display)
+    {
+        if (XCloseDisplay((Display *)m_display) != 0)
+        {
+            qWarning() << "XCloseDisplay() error";
+        }
+    }
 }
 
 /* ************************************************************************** */
 
 void Keyboard_xtest::setup()
 {
-    //
-}
-
-void Keyboard_xtest::destroy()
-{
-    //
+    m_display = XOpenDisplay(nullptr);
+    if (!m_display)
+    {
+        qWarning() << "XOpenDisplay() error";
+    }
 }
 
 /* ************************************************************************** */
@@ -93,7 +98,7 @@ void Keyboard_xtest::action(int action_code)
 
     if (keymacro)
     {
-        Display *display = XOpenDisplay(NULL);
+        Display *display = XOpenDisplay(nullptr);
         if (display)
         {
             unsigned keycode = XKeysymToKeycode(display, keymacro);
