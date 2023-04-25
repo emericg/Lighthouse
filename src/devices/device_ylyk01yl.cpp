@@ -74,9 +74,9 @@ void DeviceYLYK01YL::parseAdvertisementData(const uint16_t type,
     {
         //setModel("YLYK01YL");
         //setModelID("YLYK01YL");
-
-        if (prev_data_remote.isEmpty()) { prev_data_remote = ba; return; } // init
-        if (prev_data_remote.compare(ba) == 0) return; // duplicate
+        
+        if (m_previousdata_remote.isEmpty()) { m_previousdata_remote = ba; return; } // init
+        if (m_previousdata_remote.compare(ba) == 0) return; // duplicate
 
         const quint8 *data = reinterpret_cast<const quint8 *>(ba.constData());
 
@@ -120,7 +120,7 @@ void DeviceYLYK01YL::parseAdvertisementData(const uint16_t type,
         triggerAction(btn, mode);
         triggerEvent(btn, mode);
 
-        prev_data_remote = ba;
+        m_previousdata_remote = ba;
     }
 }
 

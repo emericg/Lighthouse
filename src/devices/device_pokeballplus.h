@@ -53,8 +53,8 @@ class DevicePokeballPlus: public DeviceBeacon
     void serviceDetailsDiscovered_battery(QLowEnergyService::ServiceState newState);
     void serviceDetailsDiscovered_gamepad(QLowEnergyService::ServiceState newState);
 
-    QLowEnergyService *serviceBattery = nullptr;
-    QLowEnergyService *serviceGamepad = nullptr;
+    QLowEnergyService *m_serviceBattery = nullptr;
+    QLowEnergyService *m_serviceGamepad = nullptr;
     QLowEnergyDescriptor m_gamepadDesc;
 
     void bleWriteDone(const QLowEnergyCharacteristic &c, const QByteArray &value);

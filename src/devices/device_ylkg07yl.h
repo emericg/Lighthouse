@@ -37,6 +37,7 @@
 /*!
  * Yeelight Wireless Smart Dimmer (YLKG07YL and YLKG08YL)
  * Advertising name is 'yee-rc'
+ *
  * Support the following actions: rotate, press and rotate, press, double press
  *
  * Get beacon key:
@@ -53,7 +54,7 @@ class DeviceYLKG07YL: public DeviceBeacon
     Q_PROPERTY(QString beaconkey READ getBeaconKey NOTIFY beaconkeyChanged)
 
     QString m_beaconkey;
-    QByteArray prev_data_dimmer;
+    QByteArray m_previousdata_dimmer;
 
 Q_SIGNALS:
     void beaconkeyChanged();

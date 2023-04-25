@@ -51,10 +51,10 @@ class DevicePokemonGoPlus: public DeviceBeacon
     void serviceDetailsDiscovered_certificate(QLowEnergyService::ServiceState newState);
     void serviceDetailsDiscovered_control(QLowEnergyService::ServiceState newState);
 
-    QLowEnergyService *serviceBattery = nullptr;
-    QLowEnergyService *serviceCertificate = nullptr;
+    QLowEnergyService *m_serviceBattery = nullptr;
+    QLowEnergyService *m_serviceCertificate = nullptr;
     QLowEnergyDescriptor m_sifdaNotifDesc;
-    QLowEnergyService *serviceControl = nullptr;
+    QLowEnergyService *m_serviceControl = nullptr;
     QLowEnergyDescriptor m_buttonNotifDesc;
 
     void bleWriteDone(const QLowEnergyCharacteristic &c, const QByteArray &value);

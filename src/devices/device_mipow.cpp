@@ -179,10 +179,8 @@ void DeviceMiPow::serviceDetailsDiscovered_battery(QLowEnergyService::ServiceSta
             QLowEnergyCharacteristic cbat = serviceBattery->characteristic(bat);
             if (cbat.value().size() > 0)
             {
-                m_deviceBattery = static_cast<char>(cbat.value().constData()[0]);
-                Q_EMIT sensorUpdated();
-
-                //qDebug() << "battery: " << m_deviceBattery;
+               int lvl = static_cast<uint8_t>(cbat.value().constData()[0]);
+               setBattery(lvl);
             }
         }
     }

@@ -107,8 +107,8 @@ void DeviceYLKG07YL::parseAdvertisementData(const uint16_t type,
 
     if (type == DeviceUtils::BLE_ADV_SERVICEDATA && identifier == 0xFE95 && ba.size() == 21)
     {
-        if (prev_data_dimmer.isEmpty()) { prev_data_dimmer = ba; return; } // init
-        if (prev_data_dimmer.compare(ba) == 0) return; // duplicate
+        if (m_previousdata_dimmer.isEmpty()) { m_previousdata_dimmer = ba; return; } // init
+        if (m_previousdata_dimmer.compare(ba) == 0) return; // duplicate
 
         const quint8 *data = reinterpret_cast<const quint8 *>(ba.constData());
 
@@ -266,7 +266,7 @@ void DeviceYLKG07YL::parseAdvertisementData(const uint16_t type,
         qDebug() << "- btn:" << btn;
         qDebug() << "- mode:" << mode;
 */
-        prev_data_dimmer = ba;
+        m_previousdata_dimmer = ba;
     }
 }
 

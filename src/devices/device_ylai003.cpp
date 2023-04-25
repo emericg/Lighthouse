@@ -54,7 +54,7 @@ DeviceYLAI003::DeviceYLAI003(const QBluetoothDeviceInfo &d, QObject *parent):
 
 DeviceYLAI003::~DeviceYLAI003()
 {
-    delete serviceBattery;
+    delete m_serviceBattery;
 }
 
 /* ************************************************************************** */
@@ -63,15 +63,15 @@ DeviceYLAI003::~DeviceYLAI003()
 void DeviceYLAI003::serviceScanDone()
 {
     //qDebug() << "DeviceYLAI003::serviceScanDone(" << m_deviceAddress << ")";
-
-    if (serviceBattery)
+    
+    if (m_serviceBattery)
     {
-        if (serviceBattery->state() == QLowEnergyService::RemoteService)
+        if (m_serviceBattery->state() == QLowEnergyService::RemoteService)
         {
-            connect(serviceBattery, &QLowEnergyService::stateChanged, this, &DeviceYLAI003::serviceDetailsDiscovered_battery);
+            connect(m_serviceBattery, &QLowEnergyService::stateChanged, this, &DeviceYLAI003::serviceDetailsDiscovered_battery);
 
             // Windows hack, see: QTBUG-80770 and QTBUG-78488
-            QTimer::singleShot(0, this, [=] () { serviceBattery->discoverDetails(); });
+            QTimer::singleShot(0, this, [=] () { m_serviceBattery->discoverDetails(); });
         }
     }
 }
@@ -83,13 +83,13 @@ void DeviceYLAI003::addLowEnergyService(const QBluetoothUuid &uuid)
 
     if (uuid.toString() == "{0000180f-0000-1000-8000-00805f9b34fb}") // Battery service
     {
-        delete serviceBattery;
-        serviceBattery = nullptr;
+        delete m_serviceBattery;
+        m_serviceBattery = nullptr;
 
         //if (m_ble_action == ACTION_UPDATE)
         {
-            serviceBattery = m_bleController->createServiceObject(uuid);
-            if (!serviceBattery)
+            m_serviceBattery = m_bleController->createServiceObject(uuid);
+            if (!m_serviceBattery)
                 qWarning() << "Cannot create service (battery) for uuid:" << uuid.toString();
         }
     }
@@ -102,13 +102,11 @@ void DeviceYLAI003::serviceDetailsDiscovered_battery(QLowEnergyService::ServiceS
         qDebug() << "DeviceYLAI003::serviceDetailsDiscovered_battery(" << m_deviceAddress << ") > ServiceDiscovered";
 
         QBluetoothUuid bat(QString("00002a19-0000-1000-8000-00805f9b34fb"));
-        QLowEnergyCharacteristic cbat = serviceBattery->characteristic(bat);
+        QLowEnergyCharacteristic cbat = m_serviceBattery->characteristic(bat);
         if (cbat.value().size() > 0)
         {
-            m_deviceBattery = static_cast<uint8_t>(cbat.value().constData()[0]);
-            Q_EMIT sensorUpdated();
-
-            qDebug() << "BATTERY : " << m_deviceBattery;
+            int lvl = static_cast<uint8_t>(cbat.value().constData()[0]);
+            setBattery(lvl);
         }
     }
 }
@@ -180,8 +178,8 @@ void DeviceYLAI003::parseAdvertisementData(const uint16_t type,
         //setModel("YLAI003");
         //setModelID("YLAI003");
 
-        if (prev_data.isEmpty()) { prev_data = ba; return; } // init
-        if (prev_data.compare(ba) == 0) return; // duplicate
+        if (m_previousdata_button.isEmpty()) { m_previousdata_button = ba; return; } // init
+        if (m_previousdata_button.compare(ba) == 0) return; // duplicate
 /*
         qDebug() << "DeviceYLAI003::parseAdvertisementData(" << m_deviceAddress
                  << " - " << type << " - 0x" << identifier << ")";
@@ -200,7 +198,7 @@ void DeviceYLAI003::parseAdvertisementData(const uint16_t type,
             triggerEvent(1, 1);
         }
 
-        prev_data = ba;
+        m_previousdata_button = ba;
     }
 }
 

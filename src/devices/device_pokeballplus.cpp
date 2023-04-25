@@ -55,8 +55,8 @@ DevicePokeballPlus::DevicePokeballPlus(const QBluetoothDeviceInfo &d, QObject *p
 
 DevicePokeballPlus::~DevicePokeballPlus()
 {
-    delete serviceBattery;
-    delete serviceGamepad;
+    delete m_serviceBattery;
+    delete m_serviceGamepad;
 }
 
 /* ************************************************************************** */
@@ -66,59 +66,58 @@ void DevicePokeballPlus::serviceScanDone()
 {
     qDebug() << "DevicePokeballPlus::serviceScanDone(" << m_deviceAddress << ")";
 
-    if (serviceBattery)
+    if (m_serviceBattery)
     {
-        if (serviceBattery->state() == QLowEnergyService::RemoteService)
+        if (m_serviceBattery->state() == QLowEnergyService::RemoteService)
         {
-            connect(serviceBattery, &QLowEnergyService::stateChanged, this, &DevicePokeballPlus::serviceDetailsDiscovered_battery);
+            connect(m_serviceBattery, &QLowEnergyService::stateChanged, this, &DevicePokeballPlus::serviceDetailsDiscovered_battery);
 
             // Windows hack, see: QTBUG-80770 and QTBUG-78488
-            QTimer::singleShot(0, this, [=] () { serviceBattery->discoverDetails(); });
+            QTimer::singleShot(0, this, [=] () { m_serviceBattery->discoverDetails(); });
         }
     }
 
-    if (serviceGamepad)
+    if (m_serviceGamepad)
     {
-        if (serviceGamepad->state() == QLowEnergyService::RemoteService)
+        if (m_serviceGamepad->state() == QLowEnergyService::RemoteService)
         {
-            connect(serviceGamepad, &QLowEnergyService::stateChanged, this, &DevicePokeballPlus::serviceDetailsDiscovered_gamepad);
-            connect(serviceGamepad, &QLowEnergyService::characteristicWritten, this, &DevicePokeballPlus::bleWriteDone);
-            connect(serviceGamepad, &QLowEnergyService::characteristicRead, this, &DevicePokeballPlus::bleReadDone);
-            connect(serviceGamepad, &QLowEnergyService::characteristicChanged, this, &DevicePokeballPlus::bleReadNotify);
+            connect(m_serviceGamepad, &QLowEnergyService::stateChanged, this, &DevicePokeballPlus::serviceDetailsDiscovered_gamepad);
+            connect(m_serviceGamepad, &QLowEnergyService::characteristicWritten, this, &DevicePokeballPlus::bleWriteDone);
+            connect(m_serviceGamepad, &QLowEnergyService::characteristicRead, this, &DevicePokeballPlus::bleReadDone);
+            connect(m_serviceGamepad, &QLowEnergyService::characteristicChanged, this, &DevicePokeballPlus::bleReadNotify);
 
             // Windows hack, see: QTBUG-80770 and QTBUG-78488
-            QTimer::singleShot(0, this, [=] () { serviceGamepad->discoverDetails(); });
+            QTimer::singleShot(0, this, [=] () { m_serviceGamepad->discoverDetails(); });
         }
     }
 }
 
 void DevicePokeballPlus::addLowEnergyService(const QBluetoothUuid &uuid)
 {
-    qDebug() << "DevicePokeballPlus::addLowEnergyService(" << uuid.toString() << ")";
-    Q_UNUSED(uuid)
+    //qDebug() << "DevicePokeballPlus::addLowEnergyService(" << uuid.toString() << ")";
 
     if (uuid.toString() == "{0000180f-0000-1000-8000-00805f9b34fb}") // Battery service
     {
-        delete serviceBattery;
-        serviceBattery = nullptr;
+        delete m_serviceBattery;
+        m_serviceBattery = nullptr;
 
         //if (m_ble_action == ACTION_UPDATE)
         {
-            serviceBattery = m_bleController->createServiceObject(uuid);
-            if (!serviceBattery)
+            m_serviceBattery = m_bleController->createServiceObject(uuid);
+            if (!m_serviceBattery)
                 qWarning() << "Cannot create service (battery) for uuid:" << uuid.toString();
         }
     }
 
     if (uuid.toString() == "{6675e16c-f36d-4567-bb55-6b51e27a23e5}") // Gamepad
     {
-        delete serviceGamepad;
-        serviceGamepad = nullptr;
+        delete m_serviceGamepad;
+        m_serviceGamepad = nullptr;
 
         //if (m_ble_action == ACTION_UPDATE)
         {
-            serviceGamepad = m_bleController->createServiceObject(uuid);
-            if (!serviceGamepad)
+            m_serviceGamepad = m_bleController->createServiceObject(uuid);
+            if (!m_serviceGamepad)
                 qWarning() << "Cannot create service (gamepad) for uuid:" << uuid.toString();
         }
     }
@@ -131,13 +130,11 @@ void DevicePokeballPlus::serviceDetailsDiscovered_battery(QLowEnergyService::Ser
         qDebug() << "DevicePokeballPlus::serviceDetailsDiscovered_battery(" << m_deviceAddress << ") > ServiceDiscovered";
 
         QBluetoothUuid bat(QStringLiteral("00002a19-0000-1000-8000-00805f9b34fb"));
-        QLowEnergyCharacteristic cbat = serviceBattery->characteristic(bat);
+        QLowEnergyCharacteristic cbat = m_serviceBattery->characteristic(bat);
         if (cbat.value().size() > 0)
         {
-            m_deviceBattery = static_cast<uint8_t>(cbat.value().constData()[0]);
-            Q_EMIT sensorUpdated();
-
-            qDebug() << "BATTERY : " << m_deviceBattery;
+            int lvl = static_cast<uint8_t>(cbat.value().constData()[0]);
+            setBattery(lvl);
         }
     }
 }
@@ -150,9 +147,9 @@ void DevicePokeballPlus::serviceDetailsDiscovered_gamepad(QLowEnergyService::Ser
 
         // Enable notification
         QBluetoothUuid gp(QStringLiteral("6675e16c-f36d-4567-bb55-6b51e27a23e6"));
-        QLowEnergyCharacteristic cgp = serviceGamepad->characteristic(gp);
+        QLowEnergyCharacteristic cgp = m_serviceGamepad->characteristic(gp);
         m_gamepadDesc = cgp.clientCharacteristicConfiguration();
-        serviceGamepad->writeDescriptor(m_gamepadDesc, QByteArray::fromHex("0100"));
+        m_serviceGamepad->writeDescriptor(m_gamepadDesc, QByteArray::fromHex("0100"));
     }
 }
 
@@ -213,3 +210,5 @@ void DevicePokeballPlus::bleReadNotify(const QLowEnergyCharacteristic &c, const 
         // gyro
     }
 }
+
+/* ************************************************************************** */

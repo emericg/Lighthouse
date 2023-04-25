@@ -53,9 +53,9 @@ DevicePokemonGoPlus::DevicePokemonGoPlus(const QBluetoothDeviceInfo &d, QObject 
 
 DevicePokemonGoPlus::~DevicePokemonGoPlus()
 {
-    delete serviceBattery;
-    delete serviceCertificate;
-    delete serviceControl;
+    delete m_serviceBattery;
+    delete m_serviceCertificate;
+    delete m_serviceControl;
 }
 
 /* ************************************************************************** */
@@ -65,42 +65,42 @@ void DevicePokemonGoPlus::serviceScanDone()
 {
     qDebug() << "DevicePokemonGoPlus::serviceScanDone(" << m_deviceAddress << ")";
 
-    if (serviceBattery)
+    if (m_serviceBattery)
     {
-        if (serviceBattery->state() == QLowEnergyService::RemoteService)
+        if (m_serviceBattery->state() == QLowEnergyService::RemoteService)
         {
-            connect(serviceBattery, &QLowEnergyService::stateChanged, this, &DevicePokemonGoPlus::serviceDetailsDiscovered_battery);
+            connect(m_serviceBattery, &QLowEnergyService::stateChanged, this, &DevicePokemonGoPlus::serviceDetailsDiscovered_battery);
 
             // Windows hack, see: QTBUG-80770 and QTBUG-78488
-            QTimer::singleShot(0, this, [=] () { serviceBattery->discoverDetails(); });
+            QTimer::singleShot(0, this, [=] () { m_serviceBattery->discoverDetails(); });
         }
     }
 
-    if (serviceCertificate)
+    if (m_serviceCertificate)
     {
-        if (serviceCertificate->state() == QLowEnergyService::RemoteService)
+        if (m_serviceCertificate->state() == QLowEnergyService::RemoteService)
         {
-            connect(serviceCertificate, &QLowEnergyService::stateChanged, this, &DevicePokemonGoPlus::serviceDetailsDiscovered_certificate);
-            connect(serviceCertificate, &QLowEnergyService::characteristicWritten, this, &DevicePokemonGoPlus::bleWriteDone);
-            connect(serviceCertificate, &QLowEnergyService::characteristicRead, this, &DevicePokemonGoPlus::bleReadDone);
-            connect(serviceCertificate, &QLowEnergyService::characteristicChanged, this, &DevicePokemonGoPlus::bleReadNotify);
+            connect(m_serviceCertificate, &QLowEnergyService::stateChanged, this, &DevicePokemonGoPlus::serviceDetailsDiscovered_certificate);
+            connect(m_serviceCertificate, &QLowEnergyService::characteristicWritten, this, &DevicePokemonGoPlus::bleWriteDone);
+            connect(m_serviceCertificate, &QLowEnergyService::characteristicRead, this, &DevicePokemonGoPlus::bleReadDone);
+            connect(m_serviceCertificate, &QLowEnergyService::characteristicChanged, this, &DevicePokemonGoPlus::bleReadNotify);
 
             // Windows hack, see: QTBUG-80770 and QTBUG-78488
-            QTimer::singleShot(0, this, [=] () { serviceCertificate->discoverDetails(); });
+            QTimer::singleShot(0, this, [=] () { m_serviceCertificate->discoverDetails(); });
         }
     }
 
-    if (serviceControl)
+    if (m_serviceControl)
     {
-        if (serviceControl->state() == QLowEnergyService::RemoteService)
+        if (m_serviceControl->state() == QLowEnergyService::RemoteService)
         {
-            connect(serviceControl, &QLowEnergyService::stateChanged, this, &DevicePokemonGoPlus::serviceDetailsDiscovered_control);
-            connect(serviceControl, &QLowEnergyService::characteristicWritten, this, &DevicePokemonGoPlus::bleWriteDone);
-            connect(serviceControl, &QLowEnergyService::characteristicRead, this, &DevicePokemonGoPlus::bleReadDone);
-            connect(serviceControl, &QLowEnergyService::characteristicChanged, this, &DevicePokemonGoPlus::bleReadNotify);
+            connect(m_serviceControl, &QLowEnergyService::stateChanged, this, &DevicePokemonGoPlus::serviceDetailsDiscovered_control);
+            connect(m_serviceControl, &QLowEnergyService::characteristicWritten, this, &DevicePokemonGoPlus::bleWriteDone);
+            connect(m_serviceControl, &QLowEnergyService::characteristicRead, this, &DevicePokemonGoPlus::bleReadDone);
+            connect(m_serviceControl, &QLowEnergyService::characteristicChanged, this, &DevicePokemonGoPlus::bleReadNotify);
 
             // Windows hack, see: QTBUG-80770 and QTBUG-78488
-            QTimer::singleShot(0, this, [=] () { serviceControl->discoverDetails(); });
+            QTimer::singleShot(0, this, [=] () { m_serviceControl->discoverDetails(); });
         }
     }
 }
@@ -112,13 +112,13 @@ void DevicePokemonGoPlus::addLowEnergyService(const QBluetoothUuid &uuid)
 
     if (uuid.toString() == "{0000180f-0000-1000-8000-00805f9b34fb}") // Battery service
     {
-        delete serviceBattery;
-        serviceBattery = nullptr;
+        delete m_serviceBattery;
+        m_serviceBattery = nullptr;
 
         //if (m_ble_action == ACTION_UPDATE)
         {
-            serviceBattery = m_bleController->createServiceObject(uuid);
-            if (!serviceBattery)
+            m_serviceBattery = m_bleController->createServiceObject(uuid);
+            if (!m_serviceBattery)
                 qWarning() << "Cannot create service (battery) for uuid:" << uuid.toString();
         }
     }
@@ -155,13 +155,11 @@ void DevicePokemonGoPlus::serviceDetailsDiscovered_battery(QLowEnergyService::Se
         qDebug() << "DevicePokemonGoPlus::serviceDetailsDiscovered_battery(" << m_deviceAddress << ") > ServiceDiscovered";
 
         QBluetoothUuid bat(QString("00002a19-0000-1000-8000-00805f9b34fb"));
-        QLowEnergyCharacteristic cbat = serviceBattery->characteristic(bat);
+        QLowEnergyCharacteristic cbat = m_serviceBattery->characteristic(bat);
         if (cbat.value().size() > 0)
         {
-            m_deviceBattery = static_cast<uint8_t>(cbat.value().constData()[0]);
-            Q_EMIT sensorUpdated();
-
-            qDebug() << "BATTERY : " << m_deviceBattery;
+            int lvl = static_cast<uint8_t>(cbat.value().constData()[0]);
+            setBattery(lvl);
         }
     }
 }
@@ -177,7 +175,7 @@ void DevicePokemonGoPlus::serviceDetailsDiscovered_certificate(QLowEnergyService
         // SFIDA_TO_CENTRAL  bbe87709-5b89-4433-ab7f-8b8eef0d8e3a
 
         QBluetoothUuid sfida(QString("bbe87709-5b89-4433-ab7f-8b8eef0d8e39"));
-        QLowEnergyCharacteristic csfida = serviceCertificate->characteristic(sfida);
+        QLowEnergyCharacteristic csfida = m_serviceCertificate->characteristic(sfida);
 
         // QT6
         //m_sifdaNotifDesc = csfida.descriptor(QBluetoothUuid::ClientCharacteristicConfiguration);
@@ -196,12 +194,12 @@ void DevicePokemonGoPlus::serviceDetailsDiscovered_control(QLowEnergyService::Se
 
         // Set LED
         QBluetoothUuid l(QString("21c50462-67cb-63a3-5c4c-82b5b9939aec"));
-        QLowEnergyCharacteristic ll = serviceControl->characteristic(l);
-        serviceControl->writeCharacteristic(ll, QByteArray::fromHex("06000012"));
+        QLowEnergyCharacteristic ll = m_serviceControl->characteristic(l);
+        m_serviceControl->writeCharacteristic(ll, QByteArray::fromHex("06000012"));
 
         // Subscribe to button
         QBluetoothUuid b(QString("21c50462-67cb-63a3-5c4c-82b5b9939aed"));
-        QLowEnergyCharacteristic bb = serviceControl->characteristic(b);
+        QLowEnergyCharacteristic bb = m_serviceControl->characteristic(b);
 
         // QT6
         //m_buttonNotifDesc = bb.descriptor(QBluetoothUuid::ClientCharacteristicConfiguration);
@@ -262,7 +260,7 @@ void DevicePokemonGoPlus::bleReadNotify(const QLowEnergyCharacteristic &c, const
 
         // reads the sfida_to_central characteristic (bbe87709-5b89-4433-ab7f-8b8eef0d8e3a
         QBluetoothUuid cTOs(QString("bbe87709-5b89-4433-ab7f-8b8eef0d8e3a"));
-        QLowEnergyCharacteristic ccTOs = serviceCertificate->characteristic(cTOs);
-        serviceCertificate->readCharacteristic(ccTOs);
+        QLowEnergyCharacteristic ccTOs = m_serviceCertificate->characteristic(cTOs);
+        m_serviceCertificate->readCharacteristic(ccTOs);
     }
 }

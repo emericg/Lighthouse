@@ -36,6 +36,7 @@
 /*!
  * Yeelight square button (YLAI003)
  * Advertising name is 'YLKG1'
+ *
  * Support the following actions: press, double press, long press
  *
  * Protocol infos:
@@ -45,18 +46,18 @@ class DeviceYLAI003: public DeviceBeacon
 {
     Q_OBJECT
 
+    QByteArray m_previousdata_button;
+
     // QLowEnergyController related
     void serviceScanDone();
     void addLowEnergyService(const QBluetoothUuid &uuid);
     void serviceDetailsDiscovered_battery(QLowEnergyService::ServiceState newState);
 
-    QLowEnergyService *serviceBattery = nullptr;
+    QLowEnergyService *m_serviceBattery = nullptr;
 
     void bleWriteDone(const QLowEnergyCharacteristic &c, const QByteArray &value);
     void bleReadDone(const QLowEnergyCharacteristic &c, const QByteArray &value);
     void bleReadNotify(const QLowEnergyCharacteristic &c, const QByteArray &value);
-
-    QByteArray prev_data;
 
 protected:
     int getButtonCount() { return 1; }

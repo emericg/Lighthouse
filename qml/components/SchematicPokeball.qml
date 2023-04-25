@@ -10,7 +10,7 @@ Rectangle {
     height: parent.width * 0.66
     radius: parent.width
 
-    color: Theme.colorForeground
+    color: Theme.colorBackground
     border.width: 16
     border.color: Theme.colorSeparator
 

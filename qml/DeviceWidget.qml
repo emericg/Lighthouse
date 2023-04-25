@@ -24,7 +24,7 @@ Item {
         function onStatusUpdated() { updateSensorStatus() }
         function onSettingsUpdated() { updateSensorStatus(); updateSensorSettings(); }
         function onRssiUpdated() { updateSensorRSSI() }
-        function onRefreshUpdated() { updateSensorData() }
+        function onButtonPressed() { dotAnimation.start() }
     }
 
     Component.onCompleted: initBoxData()
@@ -267,11 +267,6 @@ Item {
                     height: 6
                     radius: 6
                     color: Theme.colorBackground
-
-                    Connections {
-                        target: boxDevice
-                        function buttonPressed() { dotAnimation.start() }
-                    }
 
                     ColorAnimation on color {
                         id: dotAnimation

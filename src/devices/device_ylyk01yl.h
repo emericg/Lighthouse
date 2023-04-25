@@ -37,6 +37,7 @@
 /*!
  * Yeelight Remote Control (YLYK01YL)
  * Advertising name is 'yee-rc'
+ *
  * Support the following actions: on, off, dim, plus/minus, M
  *
  * Get beacon key:
@@ -51,7 +52,7 @@ class DeviceYLYK01YL: public DeviceBeacon
     Q_OBJECT
 
     QString m_beaconkey;
-    QByteArray prev_data_remote;
+    QByteArray m_previousdata_remote;
 
 protected:
     int getButtonCount() { return 6; }
