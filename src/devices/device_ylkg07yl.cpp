@@ -21,7 +21,7 @@
 
 #include "device_ylkg07yl.h"
 
-#if !defined(Q_OS_ANDROID)
+#if defined(ENABLE_MBEDTLS) && !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
 #include "mbedtls/aes.h"
 #include "mbedtls/ccm.h"
 #endif
@@ -197,7 +197,7 @@ void DeviceYLKG07YL::parseAdvertisementData(const uint16_t type,
         memcpy(nonce + offset, mac_reversed, 5);
         offset += 5;
 
-#if !defined(Q_OS_ANDROID)
+#if defined(ENABLE_MBEDTLS) && !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
         // USING MBED
         mbedtls_ccm_context mtctx;
         mbedtls_ccm_init(&mtctx);

@@ -19,6 +19,8 @@
  * \author    Emeric Grange <emeric.grange@gmail.com>
  */
 
+#if defined(ENABLED_XTEST)
+
 #include "keyboard_xtest.h"
 #include "local_actions.h"
 
@@ -112,3 +114,4 @@ void Keyboard_xtest::action(int action_code)
 }
 
 /* ************************************************************************** */
+#endif // defined(ENABLED_XTEST)

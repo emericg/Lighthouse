@@ -23,6 +23,8 @@
 #define KEYBOARD_XTEST_H
 /* ************************************************************************** */
 
+#if defined(ENABLED_XTEST)
+
 #include "keyboard.h"
 
 #include <QObject>
@@ -43,6 +45,8 @@ public:
     virtual void setup();
     virtual void action(int action_code);
 };
+
+#endif // defined(ENABLED_XTEST)
 
 /* ************************************************************************** */
 #endif // KEYBOARD_XTEST_H

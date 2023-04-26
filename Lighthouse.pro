@@ -20,6 +20,9 @@ ios | android { CONFIG += qtquickcompiler }
 
 win32 { DEFINES += _USE_MATH_DEFINES }
 
+DEFINES += ENABLE_MBEDTLS
+#DEFINES += ENABLE_XTEST
+
 # MobileUI for mobile OS
 include(src/thirdparty/MobileUI/MobileUI.pri)
 
@@ -118,16 +121,26 @@ linux:!android {
     TARGET = $$lower($${TARGET})
 
     QT += dbus
-    LIBS += -lX11 -lXtst # only needed for keyboard_xtest
-    LIBS += -lmbedtls -lmbedx509 -lmbedcrypto # needed for ylkg07yl device
 
-    SOURCES += src/local_controls/keyboard_uinput.cpp \
-               src/local_controls/keyboard_xtest.cpp \
+    # needed for ylkg07yl device
+    contains(DEFINES, ENABLE_MBEDTLS) {
+        LIBS += -lmbedtls -lmbedx509 -lmbedcrypto
+    }
+
+    # needed for keyboard_xtest
+    contains(DEFINES, ENABLE_XTEST) {
+        SOURCES += src/local_controls/keyboard_xtest.cpp
+        HEADERS += src/local_controls/keyboard_xtest.h
+        LIBS += -lX11 -lXtst
+    }
+
+    SOURCES += src/local_controls/mouse_uinput.cpp \
+               src/local_controls/keyboard_uinput.cpp \
                src/local_controls/gamepad_uinput.cpp \
                src/local_controls/mpris_dbus.cpp
 
-    HEADERS += src/local_controls/keyboard_uinput.h \
-               src/local_controls/keyboard_xtest.h \
+    HEADERS += src/local_controls/mouse_uinput.h \
+               src/local_controls/keyboard_uinput.h \
                src/local_controls/gamepad_uinput.h \
                src/local_controls/mpris_dbus.h
 
