@@ -37,7 +37,9 @@
 /* ************************************************************************** */
 
 /*!
- * LocalControls is the action dispatcher
+ * LocalControls is the action dispatcher.
+ * It holds virtual mouse, keyboard and gamepad to perform actions.
+ * It also connects to an mpris server, if available on the platform and dynamically found.
  */
 class LocalControls: public QObject
 {
@@ -61,9 +63,10 @@ public:
 
     Q_INVOKABLE void action(int action_code, const QString &action_params = QString());
 
-    Q_INVOKABLE void mouse_action(int x, int y, int btn_left, int btn_right);
+    Q_INVOKABLE void mouse_action(int x, int y, int btn_left, int btn_right, int btn_middle);
 
-    Q_INVOKABLE void joystick_action(float x, float y, int b);
+    Q_INVOKABLE void gamepad_action(float x1, float y1, float x2, float y2,
+                                    int a, int b, int x, int y);
 
     // shortcuts
     Q_INVOKABLE void keyboard_computer_lock();

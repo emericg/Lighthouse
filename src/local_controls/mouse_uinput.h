@@ -19,29 +19,37 @@
  * \author    Emeric Grange <emeric.grange@gmail.com>
  */
 
-#ifndef MOUSE_H
-#define MOUSE_H
+#ifndef MOUSE_UINPUT_H
+#define MOUSE_UINPUT_H
 /* ************************************************************************** */
+
+#include "mouse.h"
+
+#include <linux/input.h>
+#include <linux/uinput.h>
 
 #include <QObject>
 
-/* ************************************************************************** */
-
 /*!
- * Minimal API to create virtual mouses.
+ * Virtual mouse (Linux uinput version)
  */
-class Mouse: public QObject
+class Mouse_uinput: public Mouse
 {
     Q_OBJECT
 
-public:
-    Mouse(QObject *parent = nullptr);
-    virtual ~Mouse() = default;
+    int m_fd = -1;
+    struct uinput_user_dev m_uidev;
 
-    virtual void setup() = 0;
-    virtual void action(int action_code) = 0;
-    virtual void action(int x, int y, int btn_left, int btn_right, int btn_middle) = 0;
+    void emitevent(int type, int code, int val);
+
+public:
+    Mouse_uinput(QObject *parent = nullptr);
+    virtual ~Mouse_uinput();
+
+    virtual void setup();
+    virtual void action(int action_code);
+    virtual void action(int x, int y, int btn_left, int btn_right, int btn_middle);
 };
 
 /* ************************************************************************** */
-#endif // MOUSE_H
+#endif // MOUSE_UINPUT_H

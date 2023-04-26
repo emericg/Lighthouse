@@ -70,7 +70,7 @@ Rectangle {
 
     ////////
 
-    Rectangle { // joystick button
+    Rectangle { // gamepad button
         anchors.centerIn: parent
         anchors.horizontalCenterOffset: currentDevice.axis_x * 100
         anchors.verticalCenterOffset: currentDevice.axis_y * 100

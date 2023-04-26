@@ -104,6 +104,7 @@ Popup {
 
     contentItem: Item {
         Column {
+            id: columnContent
             anchors.left: parent.left
             anchors.right: parent.right
             spacing: 0
@@ -409,11 +410,12 @@ Popup {
 
                     ComboBoxThemed {
                         width: 96
-                        model: ["ctrl", "alt", "opt", "maj"]
+                        model: ["", "ctrl", "alt", "opt", "maj"]
                     }
 
                     TextFieldThemed {
                         width: 96
+                        text: "a"
                     }
                 }
             }

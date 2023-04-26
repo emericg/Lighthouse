@@ -92,7 +92,7 @@ void Keyboard_uinput::setup()
             return;
         }
 
-        // enable keys events
+        // enable key events
         err = ioctl(m_fd, UI_SET_EVBIT, EV_KEY);
         if (err < 0) { qWarning() << "ioctl(UI_SET_EVBIT, EV_KEY) error"; }
 
@@ -112,7 +112,7 @@ void Keyboard_uinput::setup()
         m_uidev.id.bustype = BUS_VIRTUAL;
         m_uidev.id.version = 1;
         m_uidev.id.vendor = 0x1234;
-        m_uidev.id.product = 0x5678;
+        m_uidev.id.product = 0x2222;
 
         err = write(m_fd, &m_uidev, sizeof(m_uidev));
         if (err < 0) { qWarning() << "Unable to write /dev/uinput device"; }
@@ -129,7 +129,12 @@ void Keyboard_uinput::action(int action_code)
     // get key
     unsigned keymacro = 0;
 
-    if (action_code == LocalActions::ACTION_KEYBOARD_computer_lock) keymacro = KEY_SCREENLOCK;
+    if (action_code == LocalActions::ACTION_KEYBOARD_up) keymacro = KEY_UP;
+    else if (action_code == LocalActions::ACTION_KEYBOARD_down) keymacro = KEY_DOWN;
+    else if (action_code == LocalActions::ACTION_KEYBOARD_left) keymacro = KEY_LEFT;
+    else if (action_code == LocalActions::ACTION_KEYBOARD_right) keymacro = KEY_RIGHT;
+
+    else if (action_code == LocalActions::ACTION_KEYBOARD_computer_lock) keymacro = KEY_SCREENLOCK;
     else if (action_code == LocalActions::ACTION_KEYBOARD_computer_sleep) keymacro = KEY_SLEEP;
     else if (action_code == LocalActions::ACTION_KEYBOARD_computer_poweroff) keymacro = KEY_POWER;
 
@@ -164,9 +169,10 @@ void Keyboard_uinput::action(int action_code)
     {
         emitevent(EV_KEY, keymacro, 1);
         emitevent(EV_SYN, SYN_REPORT, 0);
-        //usleep(66000); // 66 ms
+        //usleep(33000); // 33 ms
         emitevent(EV_KEY, keymacro, 0);
         emitevent(EV_SYN, SYN_REPORT, 0);
+        //usleep(33000); // 33 ms
     }
 }
 

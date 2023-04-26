@@ -118,7 +118,7 @@ void Gamepad_uinput::setup()
         m_uidev.id.bustype = BUS_VIRTUAL;
         m_uidev.id.version = 1;
         m_uidev.id.vendor = 0x1234;
-        m_uidev.id.product = 0x5678;
+        m_uidev.id.product = 0x3333;
 
         err = write(m_fd, &m_uidev, sizeof(m_uidev));
         if (err < 0) { qWarning() << "Unable to write /dev/uinput device"; }
@@ -137,7 +137,7 @@ void Gamepad_uinput::action(int x1, int y1, int x2, int y2,
     {
         emitevent(EV_ABS, ABS_X, x1);
         emitevent(EV_ABS, ABS_Y, y1);
-
+        // TODO second axis
         emitevent(EV_KEY, BTN_A, a);
         emitevent(EV_KEY, BTN_B, b);
         emitevent(EV_KEY, BTN_X, x);
@@ -166,7 +166,7 @@ void Gamepad_uinput::setup_pbp()
         err = ioctl(m_fd, UI_SET_EVBIT, EV_ABS);
         if (err < 0) { qWarning() << "ioctl(UI_SET_EVBIT, EV_ABS) error"; }
 
-        // enable keys events
+        // enable key events
         err = ioctl(m_fd, UI_SET_EVBIT, EV_KEY);
         if (err < 0) { qWarning() << "ioctl(UI_SET_EVBIT, EV_KEY) error"; }
 
@@ -206,6 +206,7 @@ void Gamepad_uinput::action_pbp(int x, int y, int a, int b)
         emitevent(EV_ABS, ABS_Y, y);
         emitevent(EV_KEY, BTN_A, a);
         emitevent(EV_KEY, BTN_B, b);
+
         emitevent(EV_SYN, SYN_REPORT, 0);
     }
 }

@@ -46,7 +46,7 @@ Loader {
 
         ////////////////
 
-        Rectangle {
+        Rectangle { // touchpad
             anchors.left: parent.left
             anchors.right: parent.right
             height: width
@@ -82,7 +82,7 @@ Loader {
 
         ////////////////
 
-        ButtonWireframeIcon {
+        ButtonWireframeIcon { // open OS keyboard
             anchors.left: parent.left
             anchors.right: parent.right
 
@@ -107,7 +107,7 @@ Loader {
             anchors.left: parent.left
             anchors.right: parent.right
 
-            visible: false
+            visible: false // < it is invisible
             cursorVisible: false
             echoMode: TextInput.NoEcho
 

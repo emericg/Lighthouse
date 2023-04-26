@@ -199,20 +199,23 @@ Loader {
                     model: ListModel {
                         ListElement { idx: 1; txt: qsTr("gamepad"); src: ""; sz: 16; }
                         ListElement { idx: 2; txt: qsTr("keyboard"); src: ""; sz: 16; }
-                        ListElement { idx: 3; txt: qsTr("button"); src: ""; sz: 16; }
+                        ListElement { idx: 3; txt: qsTr("mouse"); src: ""; sz: 16; }
+                        ListElement { idx: 4; txt: qsTr("button"); src: ""; sz: 16; }
                     }
 
                     currentSelection: {
                         if (currentDevice.deviceMode === "gamepad") return 1
                         if (currentDevice.deviceMode === "keyboard") return 2
-                        if (currentDevice.deviceMode === "button") return 3
+                        if (currentDevice.deviceMode === "mouse") return 3
+                        if (currentDevice.deviceMode === "button") return 4
                         return 1
                     }
                     onMenuSelected: (index) => {
                         currentSelection = index
                         if (index === 1) currentDevice.deviceMode = "gamepad"
                         if (index === 2) currentDevice.deviceMode = "keyboard"
-                        if (index === 3) currentDevice.deviceMode = "button"
+                        if (index === 3) currentDevice.deviceMode = "mouse"
+                        if (index === 4) currentDevice.deviceMode = "button"
                     }
                 }
             }

@@ -21,7 +21,9 @@
 
 #include "device_pokeballplus.h"
 
+#include "../local_controls/local_controls.h"
 #include "../local_controls/local_actions.h"
+
 #include "../local_controls/gamepad.h"
 #include "../local_controls/gamepad_uinput.h"
 
@@ -317,10 +319,26 @@ void DevicePokeballPlus::bleReadNotify(const QLowEnergyCharacteristic &c, const 
 
         ////////////////
 
+        if (m_deviceMode == "mouse")
+        {
+            LocalControls *ctrls = LocalControls::getInstance();
+            ctrls->mouse_action(static_cast<int>(m_axis_x*15.f),
+                                static_cast<int>(m_axis_y*15.f),
+                                btn_a, btn_b, false);
+        }
+
+        ////////////////
+
         if (m_deviceMode == "keyboard")
         {
             if (btn_a) triggerDirectAction(LocalActions::ACTION_MOUSE_click_left);
             if (btn_b) triggerDirectAction(LocalActions::ACTION_MOUSE_click_right);
+
+            if (m_axis_x > 0.5) triggerDirectAction(LocalActions::ACTION_KEYBOARD_right);
+            else if (m_axis_x < -0.5) triggerDirectAction(LocalActions::ACTION_KEYBOARD_left);
+
+            if (m_axis_y > 0.5) triggerDirectAction(LocalActions::ACTION_KEYBOARD_down);
+            else if (m_axis_y < -0.5) triggerDirectAction(LocalActions::ACTION_KEYBOARD_up);
         }
 
         ////////////////

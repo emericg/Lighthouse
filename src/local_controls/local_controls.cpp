@@ -23,6 +23,7 @@
 #include "local_actions.h"
 
 #include "keyboard_xtest.h"
+#include "mouse_uinput.h"
 #include "keyboard_uinput.h"
 #include "gamepad_uinput.h"
 #include "mpris_dbus.h"
@@ -53,7 +54,9 @@ LocalControls::LocalControls()
 #elif defined(Q_OS_LINUX)
 
     //keyboard = new Keyboard_xtest(); // only works with X11
+    mouse = new Mouse_uinput();
     keyboard = new Keyboard_uinput();
+    gamepad = new Gamepad_uinput();
     mpris = MprisController::getInstance();
 
 #else
@@ -94,6 +97,14 @@ void LocalControls::action(int action_code, const QString &action_params)
 
         QProcess::startDetached(cmd, args);
     }
+    else if (action_code > LocalActions::ACTION_MOUSE_START &&
+             action_code < LocalActions::ACTION_MOUSE_STOP)
+    {
+        if (mouse)
+        {
+            mouse->action(action_code);
+        }
+    }
     else if (action_code > LocalActions::ACTION_KEYBOARD_START &&
              action_code < LocalActions::ACTION_KEYBOARD_STOP)
     {
@@ -125,12 +136,10 @@ void LocalControls::action(int action_code, const QString &action_params)
     else if (action_code > LocalActions::ACTION_MPRIS_START &&
              action_code < LocalActions::ACTION_MPRIS_STOP)
     {
-#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
         if (mpris)
         {
             mpris->action(action_code);
         }
-#endif
     }
     else
     {
@@ -143,16 +152,17 @@ void LocalControls::action(int action_code, const QString &action_params)
 
 /* ************************************************************************** */
 
-void LocalControls::mouse_action(int x, int y, int btn_left, int btn_right)
+void LocalControls::mouse_action(int x, int y, int btn_left, int btn_right, int btn_middle)
 {
-    // TODO
+    mouse->action(x, y, btn_left, btn_right, btn_middle);
 }
 
 /* ************************************************************************** */
 
-void LocalControls::joystick_action(float x, float y, int b)
+void LocalControls::gamepad_action(float x1, float y1, float x2, float y2,
+                                   int a, int b, int x, int y)
 {
-    // TODO
+    gamepad->action(x1, y1, x2, y2, a, b, x, y);
 }
 
 /* ************************************************************************** */

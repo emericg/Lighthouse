@@ -22,7 +22,7 @@ Rectangle {
     property int ph: parent.hhh/3
     property int layoutDirection: Qt.LeftToRight
 
-    property bool isValid: (selectedDevice.beaconkey.length === 24)
+    property bool isValid: (selectedDevice && selectedDevice.beaconkey.length === 24)
 
     ////////////////////////////////////////////////////////////////////////////
 
