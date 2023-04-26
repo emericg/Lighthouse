@@ -46,6 +46,9 @@ class DevicePokeballPlus: public DeviceBeacon
 {
     Q_OBJECT
 
+    Q_PROPERTY(bool autoConnect READ getAutoConnect WRITE setAutoConnect NOTIFY autoconnectChanged)
+    Q_PROPERTY(QString deviceMode READ getDeviceMode WRITE setDeviceMode NOTIFY devicemodeChanged)
+
     Q_PROPERTY(float axis_x READ getXf NOTIFY axisChanged)
     Q_PROPERTY(float axis_y READ getYf NOTIFY axisChanged)
 
@@ -63,15 +66,20 @@ class DevicePokeballPlus: public DeviceBeacon
     void bleReadDone(const QLowEnergyCharacteristic &c, const QByteArray &value);
     void bleReadNotify(const QLowEnergyCharacteristic &c, const QByteArray &value);
 
+    bool m_autoConnect = true;
+
+    QString m_deviceMode = "gamepad";
+
+    // virtual gamepad
     float m_axis_x = 0.f;
     float m_axis_y = 0.f;
     float getXf() { return m_axis_x; };
     float getYf() { return m_axis_y; };
-
-    // virtual gamepad
     Gamepad *m_gamepad = nullptr;
 
 Q_SIGNALS:
+    void autoconnectChanged();
+    void devicemodeChanged();
     void btnChanged();
     void axisChanged();
     void acclChanged();
@@ -87,6 +95,12 @@ public:
     DevicePokeballPlus(QString &deviceAddr, QString &deviceName, QObject *parent = nullptr);
     DevicePokeballPlus(const QBluetoothDeviceInfo &d, QObject *parent = nullptr);
     ~DevicePokeballPlus();
+
+    bool getAutoConnect() { return m_autoConnect; }
+    void setAutoConnect(const bool value);
+
+    QString getDeviceMode() { return m_deviceMode; }
+    void setDeviceMode(const QString &value);
 };
 
 /* ************************************************************************** */

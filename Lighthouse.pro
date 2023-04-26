@@ -118,7 +118,7 @@ linux:!android {
     TARGET = $$lower($${TARGET})
 
     QT += dbus
-    LIBS += -lX11 -lXtst # needed for keyboard_xtest
+    LIBS += -lX11 -lXtst # only needed for keyboard_xtest
     LIBS += -lmbedtls -lmbedx509 -lmbedcrypto # needed for ylkg07yl device
 
     SOURCES += src/local_controls/keyboard_uinput.cpp \

@@ -177,14 +177,11 @@ protected:
     virtual int getButtonCount() { return 0; }
 
     /*!
-     * \brief getAction
+     * \brief triggerEvent
      * \param button
      * \param mode
-     * \param action
-     * \param params
-     * \return
      */
-    bool getAction(int button, int mode, int &action, QString &params);
+    void triggerEvent(int button, int mode);
 
     /*!
      * \brief triggerAction
@@ -194,11 +191,21 @@ protected:
     void triggerAction(int button, int mode);
 
     /*!
-     * \brief triggerEvent
-     * \param button
-     * \param mode
+     * \brief Load saved action for a given button
+     * \param button[in] button to load action from
+     * \param mode[in] button mode to load action from
+     * \param action[out] action loaded from db
+     * \param params[out] action parameter(s) loaded from db
+     * \return true if successfull
      */
-    void triggerEvent(int button, int mode);
+    bool getAction(int button, int mode, int &action, QString &params);
+
+    /*!
+     * \brief triggerDirectAction
+     * \param action
+     * \param action_parameters
+     */
+    void triggerDirectAction(int action, const QString &action_parameters = QString());
 
 public:
     DeviceBeacon(QString &deviceAddr, QString &deviceName, QObject *parent = nullptr);

@@ -21,6 +21,9 @@
 
 #include "DeviceManager.h"
 
+#include "devices/device_pokeballplus.h"
+#include "devices/device_pokemongoplus.h"
+
 #include <QBluetoothDeviceInfo>
 #include <QList>
 #include <QDebug>
@@ -35,16 +38,16 @@ void DeviceManager::updateBleDevice_simple(const QBluetoothDeviceInfo &info)
 void DeviceManager::updateBleDevice(const QBluetoothDeviceInfo &info,
                                     QBluetoothDeviceInfo::Fields updatedFields)
 {
-    //qDebug() << "updateBleDevice() " << info.name() << info.address(); // << info.deviceUuid() // << " updatedFields: " << updatedFields
+    //qDebug() << "updateBleDevice() " << info.name() << info.address(); // << info.deviceUuid(); // << " updatedFields: " << updatedFields;
 
-    // We don't use QBluetoothDeviceInfo::Fields, it's unreliable
-    Q_UNUSED(updatedFields)
-/*
-    if (info.isCached()) return; // skip cached devices
-    if (!info.isValid()) return; // skip invalid devices
+    Q_UNUSED(updatedFields) // We don't use QBluetoothDeviceInfo::Fields, it's unreliable
+
+    //if (!info.isValid()) return; // skip invalid devices
+    //if (info.isCached()) return; // we probably just hit the device cache
+    if (info.rssi() >= 0) return; // we probably just hit the device cache
     if (info.name().isEmpty()) return; // skip beacons
     if (info.name().replace('-', ':') == info.address().toString()) return; // skip beacons
-*/
+
     // Supported devices ///////////////////////////////////////////////////////
 
     for (auto d: qAsConst(m_devices_model->m_devices))
@@ -61,6 +64,19 @@ void DeviceManager::updateBleDevice(const QBluetoothDeviceInfo &info,
 
             dd->setName(info.name());
             dd->setRssi(info.rssi());
+
+            // Auto connection //
+
+            if (dd->getName() == "Pokemon PBP") {
+                if (qobject_cast<DevicePokeballPlus*>(dd)->getAutoConnect()) {
+                    dd->actionConnect();
+                }
+            }
+            if (dd->getName() == "Pokemon GO Plus") {
+                if (qobject_cast<DevicePokemonGoPlus*>(dd)->getAutoConnect()) {
+                    dd->actionConnect();
+                }
+            }
 
             // Handle advertisement //
 
@@ -100,7 +116,7 @@ void DeviceManager::updateBleDevice(const QBluetoothDeviceInfo &info,
 
     // Dynamic scanning ////////////////////////////////////////////////////////
     {
-        //qDebug() << "addBleDevice() FROM DYNAMIC SCANNING";
+        //qDebug() << "addBleDevice(" << info.name() << ") FROM DYNAMIC SCANNING";
         addBleDevice(info);
     }
 }

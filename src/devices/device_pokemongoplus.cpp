@@ -40,6 +40,11 @@ DevicePokemonGoPlus::DevicePokemonGoPlus(QString &deviceAddr, QString &deviceNam
     m_deviceCapabilities += DeviceUtils::DEVICE_BATTERY;
     m_deviceCapabilities += DeviceUtils::DEVICE_BUTTONS;
     m_deviceCapabilities += DeviceUtils::DEVICE_LED_RGB;
+
+    if (hasSetting("autoConnect"))
+    {
+        m_autoConnect = (getSetting("autoConnect").toString() == "true");
+    }
 }
 
 DevicePokemonGoPlus::DevicePokemonGoPlus(const QBluetoothDeviceInfo &d, QObject *parent):
@@ -49,6 +54,11 @@ DevicePokemonGoPlus::DevicePokemonGoPlus(const QBluetoothDeviceInfo &d, QObject 
     m_deviceCapabilities += DeviceUtils::DEVICE_BATTERY;
     m_deviceCapabilities += DeviceUtils::DEVICE_BUTTONS;
     m_deviceCapabilities += DeviceUtils::DEVICE_LED_RGB;
+
+    if (hasSetting("autoConnect"))
+    {
+        m_autoConnect = (getSetting("autoConnect").toString() == "true");
+    }
 }
 
 DevicePokemonGoPlus::~DevicePokemonGoPlus()
@@ -56,6 +66,20 @@ DevicePokemonGoPlus::~DevicePokemonGoPlus()
     delete m_serviceBattery;
     delete m_serviceCertificate;
     delete m_serviceControl;
+}
+
+/* ************************************************************************** */
+/* ************************************************************************** */
+
+void DevicePokemonGoPlus::setAutoConnect(const bool value)
+{
+    if (m_autoConnect != value)
+    {
+        m_autoConnect = value;
+        Q_EMIT autoconnectChanged();
+
+        setSetting("autoConnect", m_autoConnect);
+    }
 }
 
 /* ************************************************************************** */
@@ -253,7 +277,7 @@ void DevicePokemonGoPlus::bleReadNotify(const QLowEnergyCharacteristic &c, const
     }
     if (c.uuid().toString() == "{bbe87709-5b89-4433-ab7f-8b8eef0d8e39}")
     {
-        // responce from PGP
+        // response from PGP
 
         // response to initial sifda notify?
         qDebug() << "initial sifda notify: 0x" << Qt::hex << data[0]  << Qt::hex << data[1]  << Qt::hex << data[2] << Qt::hex << data[3] ;

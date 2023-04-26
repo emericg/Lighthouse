@@ -25,7 +25,7 @@ Item {
         ShapePath {
             strokeColor: Theme.colorSeparator
             strokeWidth: 16
-            //fillColor: Theme.colorSeparator
+            fillColor: Theme.colorBackground
             scale: Qt.size(pogoSchematics.width/175, pogoSchematics.width/175)
 
             PathSvg {

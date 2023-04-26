@@ -221,10 +221,37 @@ bool ButtonParameters::setSqlButton()
 
 /* ************************************************************************** */
 
-bool DeviceBeacon::getAction(int button, int mode,
-                             int &action, QString &params)
+void DeviceBeacon::triggerEvent(int button, int mode)
 {
-    return false;
+    Q_EMIT buttonPressed();
+
+    if (mode == 0)
+    {
+        if (button == 1) Q_EMIT button1Pressed();
+        else if (button == 2) Q_EMIT button2Pressed();
+        else if (button == 3) Q_EMIT button3Pressed();
+        else if (button == 4) Q_EMIT button4Pressed();
+        else if (button == 5) Q_EMIT button5Pressed();
+        else if (button == 6) Q_EMIT button6Pressed();
+    }
+    else if (mode == 1)
+    {
+        if (button == 1) Q_EMIT button1DoublePressed();
+        else if (button == 2) Q_EMIT button2DoublePressed();
+        else if (button == 3) Q_EMIT button3DoublePressed();
+        else if (button == 4) Q_EMIT button4DoublePressed();
+        else if (button == 5) Q_EMIT button5DoublePressed();
+        else if (button == 6) Q_EMIT button6DoublePressed();
+    }
+    else if (mode == 2)
+    {
+        if (button == 1) Q_EMIT button1LongPressed();
+        else if (button == 2) Q_EMIT button2LongPressed();
+        else if (button == 3) Q_EMIT button3LongPressed();
+        else if (button == 4) Q_EMIT button4LongPressed();
+        else if (button == 5) Q_EMIT button5LongPressed();
+        else if (button == 6) Q_EMIT button6LongPressed();
+    }
 }
 
 void DeviceBeacon::triggerAction(int button, int mode)
@@ -266,36 +293,19 @@ void DeviceBeacon::triggerAction(int button, int mode)
     }
 }
 
-void DeviceBeacon::triggerEvent(int button, int mode)
+bool DeviceBeacon::getAction(int button, int mode,
+                             int &action, QString &params)
 {
-    Q_EMIT buttonPressed();
+    return false;
+}
 
-    if (mode == 0)
+void DeviceBeacon::triggerDirectAction(int action,
+                                       const QString &action_parameters)
+{
+    LocalControls *ctrls = LocalControls::getInstance();
+    if (ctrls)
     {
-        if (button == 1) Q_EMIT button1Pressed();
-        else if (button == 2) Q_EMIT button2Pressed();
-        else if (button == 3) Q_EMIT button3Pressed();
-        else if (button == 4) Q_EMIT button4Pressed();
-        else if (button == 5) Q_EMIT button5Pressed();
-        else if (button == 6) Q_EMIT button6Pressed();
-    }
-    else if (mode == 1)
-    {
-        if (button == 1) Q_EMIT button1DoublePressed();
-        else if (button == 2) Q_EMIT button2DoublePressed();
-        else if (button == 3) Q_EMIT button3DoublePressed();
-        else if (button == 4) Q_EMIT button4DoublePressed();
-        else if (button == 5) Q_EMIT button5DoublePressed();
-        else if (button == 6) Q_EMIT button6DoublePressed();
-    }
-    else if (mode == 2)
-    {
-        if (button == 1) Q_EMIT button1LongPressed();
-        else if (button == 2) Q_EMIT button2LongPressed();
-        else if (button == 3) Q_EMIT button3LongPressed();
-        else if (button == 4) Q_EMIT button4LongPressed();
-        else if (button == 5) Q_EMIT button5LongPressed();
-        else if (button == 6) Q_EMIT button6LongPressed();
+        ctrls->action(action, action_parameters);
     }
 }
 

@@ -20,13 +20,13 @@
  */
 
 #include "device_pokeballplus.h"
-#include "utils_maths.h"
 
+#include "../local_controls/local_actions.h"
 #include "../local_controls/gamepad.h"
 #include "../local_controls/gamepad_uinput.h"
 
-#include <cstdint>
 #include <cmath>
+#include <cstdint>
 #include <algorithm>
 
 #include <QBluetoothUuid>
@@ -45,6 +45,15 @@ DevicePokeballPlus::DevicePokeballPlus(QString &deviceAddr, QString &deviceName,
     m_deviceCapabilities += DeviceUtils::DEVICE_BATTERY;
     m_deviceCapabilities += DeviceUtils::DEVICE_BUTTONS;
     m_deviceCapabilities += DeviceUtils::DEVICE_LED_RGB;
+
+    if (hasSetting("autoConnect"))
+    {
+        m_autoConnect = (getSetting("autoConnect").toString() == "true");
+    }
+    if (hasSetting("deviceMode"))
+    {
+        m_deviceMode = getSetting("deviceMode").toString();
+    }
 }
 
 DevicePokeballPlus::DevicePokeballPlus(const QBluetoothDeviceInfo &d, QObject *parent):
@@ -54,6 +63,15 @@ DevicePokeballPlus::DevicePokeballPlus(const QBluetoothDeviceInfo &d, QObject *p
     m_deviceCapabilities += DeviceUtils::DEVICE_BATTERY;
     m_deviceCapabilities += DeviceUtils::DEVICE_BUTTONS;
     m_deviceCapabilities += DeviceUtils::DEVICE_LED_RGB;
+
+    if (hasSetting("autoConnect"))
+    {
+        m_autoConnect = (getSetting("autoConnect").toString() == "true");
+    }
+    if (hasSetting("deviceMode"))
+    {
+        m_deviceMode = getSetting("deviceMode").toString();
+    }
 }
 
 DevicePokeballPlus::~DevicePokeballPlus()
@@ -61,6 +79,31 @@ DevicePokeballPlus::~DevicePokeballPlus()
     delete m_serviceBattery;
     delete m_serviceGamepad;
     delete m_gamepad;
+}
+
+/* ************************************************************************** */
+/* ************************************************************************** */
+
+void DevicePokeballPlus::setAutoConnect(const bool value)
+{
+    if (m_autoConnect != value)
+    {
+        m_autoConnect = value;
+        Q_EMIT autoconnectChanged();
+
+        setSetting("autoConnect", m_autoConnect);
+    }
+}
+
+void DevicePokeballPlus::setDeviceMode(const QString &value)
+{
+    if (m_deviceMode != value)
+    {
+        m_deviceMode = value;
+        Q_EMIT devicemodeChanged();
+
+        setSetting("deviceMode", m_deviceMode);
+    }
 }
 
 /* ************************************************************************** */
@@ -150,8 +193,8 @@ void DevicePokeballPlus::serviceScanDone()
         if (m_serviceGamepad->state() == QLowEnergyService::RemoteService)
         {
             connect(m_serviceGamepad, &QLowEnergyService::stateChanged, this, &DevicePokeballPlus::serviceDetailsDiscovered_gamepad);
-            connect(m_serviceGamepad, &QLowEnergyService::characteristicWritten, this, &DevicePokeballPlus::bleWriteDone);
-            connect(m_serviceGamepad, &QLowEnergyService::characteristicRead, this, &DevicePokeballPlus::bleReadDone);
+            //connect(m_serviceGamepad, &QLowEnergyService::characteristicWritten, this, &DevicePokeballPlus::bleWriteDone);
+            //connect(m_serviceGamepad, &QLowEnergyService::characteristicRead, this, &DevicePokeballPlus::bleReadDone);
             connect(m_serviceGamepad, &QLowEnergyService::characteristicChanged, this, &DevicePokeballPlus::bleReadNotify);
 
             // Windows hack, see: QTBUG-80770 and QTBUG-78488
@@ -195,7 +238,7 @@ void DevicePokeballPlus::serviceDetailsDiscovered_battery(QLowEnergyService::Ser
 {
     if (newState == QLowEnergyService::RemoteServiceDiscovered)
     {
-        qDebug() << "DevicePokeballPlus::serviceDetailsDiscovered_battery(" << m_deviceAddress << ") > ServiceDiscovered";
+        //qDebug() << "DevicePokeballPlus::serviceDetailsDiscovered_battery(" << m_deviceAddress << ") > ServiceDiscovered";
 
         QBluetoothUuid bat(QStringLiteral("00002a19-0000-1000-8000-00805f9b34fb"));
         QLowEnergyCharacteristic cbat = m_serviceBattery->characteristic(bat);
@@ -211,7 +254,7 @@ void DevicePokeballPlus::serviceDetailsDiscovered_gamepad(QLowEnergyService::Ser
 {
     if (newState == QLowEnergyService::RemoteServiceDiscovered)
     {
-        qDebug() << "DevicePokeballPlus::serviceDetailsDiscovered_gamepad(" << m_deviceAddress << ") > ServiceDiscovered";
+        //qDebug() << "DevicePokeballPlus::serviceDetailsDiscovered_gamepad(" << m_deviceAddress << ") > ServiceDiscovered";
 
         // Enable notification
         QBluetoothUuid gp(QStringLiteral("6675e16c-f36d-4567-bb55-6b51e27a23e6"));
@@ -263,13 +306,26 @@ void DevicePokeballPlus::bleReadNotify(const QLowEnergyCharacteristic &c, const 
 
         ////////////////
 
+        if (btn_a) triggerEvent(1, 0);
+        if (btn_b) triggerEvent(2, 0);
+
+        if (m_deviceMode == "button")
         {
-            if (btn_a) triggerEvent(1, 0);
-            if (btn_b) triggerEvent(2, 0);
+            if (btn_a) triggerAction(1, 0);
+            if (btn_b) triggerAction(2, 0);
         }
 
         ////////////////
 
+        if (m_deviceMode == "keyboard")
+        {
+            if (btn_a) triggerDirectAction(LocalActions::ACTION_MOUSE_click_left);
+            if (btn_b) triggerDirectAction(LocalActions::ACTION_MOUSE_click_right);
+        }
+
+        ////////////////
+
+        if (m_deviceMode == "gamepad")
         {
             if (!m_gamepad)
             {
@@ -278,12 +334,18 @@ void DevicePokeballPlus::bleReadNotify(const QLowEnergyCharacteristic &c, const 
             }
             if (m_gamepad)
             {
-                dynamic_cast<Gamepad_uinput*>(m_gamepad)->action_pbp(m_axis_x*32000.f, m_axis_y*32000.f, btn_a, btn_b);
+                dynamic_cast<Gamepad_uinput*>(m_gamepad)->action_pbp(m_axis_x*32767.f, m_axis_y*32767.f, btn_a, btn_b);
             }
+        }
+        else
+        {
+            delete m_gamepad;
+            m_gamepad = nullptr;
         }
 
         ////////////////
     }
 }
 
+/* ************************************************************************** */
 /* ************************************************************************** */

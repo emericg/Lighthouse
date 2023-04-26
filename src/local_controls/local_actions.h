@@ -52,6 +52,12 @@ public:
         ACTION_keys,
         ACTION_commands,
 
+        ACTION_MOUSE_START = 24,
+            ACTION_MOUSE_click_right,
+            ACTION_MOUSE_click_left,
+            ACTION_MOUSE_click_middle,
+        ACTION_MOUSE_STOP,
+
         ACTION_KEYBOARD_START = 32,
             ACTION_KEYBOARD_computer_lock,
             ACTION_KEYBOARD_computer_sleep,

@@ -18,14 +18,14 @@ Remotes and beacons:
 
 The YLKG07YL and YLKG08YL dimmers will NEED a beacon key. You can use the [get_beacon_key.py](https://github.com/custom-components/ble_monitor/blob/master/custom_components/ble_monitor/ble_parser/get_beacon_key.py) python script to extract yours, then set it directly in the app.
 
-Pokemon devices:
+Nintendo devices:
 * Pokeball Plus (PBP)
 * Pokemon Go Plus (PGP)
 
 Lamps and lighbulbs:
 * MiPow SmartBulbs
 
-> Lighthouse is NOT associated with Xiaomi, Yeelight, MiPow, or any other device manufacturer.
+> Lighthouse is NOT associated with Xiaomi, Yeelight, MiPow, Nintendo, or any other device manufacturer.
 
 
 ## Screenshots
@@ -47,9 +47,10 @@ You will need a C++17 compiler and Qt 6.3+ with the following 'additional librai
 - Qt Connectivity
 - Qt Multimedia
 
-On Linux you'll also need the `mbedtls` librairie installed.  
+You will also need the `mbedtls` librairie installed in order to handle YLKG07YL and YLKG08YL devices.  
+On linux you'll need an `uinput` enabled kernel.  
 
-For Android builds, you'll need the appropriates JDK (11) SDK (23+) and NDK (21+). You can customize Android build environment using the `assets/android/gradle.properties` file.  
+For Android builds, you'll need the appropriates JDK (11) SDK (24+) and NDK (23+). You can customize Android build environment using the `assets/android/gradle.properties` file.  
 For Windows builds, you'll need the MSVC 2019+ compiler. Bluetooth won't work with MinGW.  
 For macOS and iOS builds, you'll need Xcode 12+ installed.  
 

@@ -142,6 +142,8 @@ void Gamepad_uinput::action(int x1, int y1, int x2, int y2,
         emitevent(EV_KEY, BTN_B, b);
         emitevent(EV_KEY, BTN_X, x);
         emitevent(EV_KEY, BTN_Y, y);
+
+        emitevent(EV_SYN, SYN_REPORT, 0);
     }
 }
 
@@ -177,8 +179,6 @@ void Gamepad_uinput::setup_pbp()
         ioctl(m_fd, UI_SET_ABSBIT, ABS_Y);
         ioctl(m_fd, UI_SET_KEYBIT, BTN_A);
         ioctl(m_fd, UI_SET_KEYBIT, BTN_B);
-        ioctl(m_fd, UI_SET_KEYBIT, KEY_X);
-        ioctl(m_fd, UI_SET_KEYBIT, KEY_SPACE);
 
         // init virtual keyboard
         memset(&m_uidev, 0, sizeof(m_uidev));
@@ -206,6 +206,7 @@ void Gamepad_uinput::action_pbp(int x, int y, int a, int b)
         emitevent(EV_ABS, ABS_Y, y);
         emitevent(EV_KEY, BTN_A, a);
         emitevent(EV_KEY, BTN_B, b);
+        emitevent(EV_SYN, SYN_REPORT, 0);
     }
 }
 

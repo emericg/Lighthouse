@@ -245,9 +245,7 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 0
 
-            visible: (appContent.state === "DeviceBeacon" ||
-                      appContent.state === "DeviceRemote" ||
-                      appContent.state === "DeviceLight")
+            visible: (deviceManager.bluetooth && selectedDevice)
 
             ButtonCompactable {
                 id: buttonDisConnect
@@ -258,8 +256,9 @@ Rectangle {
                 textColor: Theme.colorHeaderContent
                 iconColor: Theme.colorHeaderContent
 
-                visible: (deviceManager.bluetooth && selectedDevice &&
-                          (appContent.state === "DeviceLight"))
+                visible: (appContent.state === "DeviceLight" ||
+                          appContent.state === "DevicePGP" ||
+                          appContent.state === "DevicePBP")
 
                 source: {
                     if (!selectedDevice) return ""

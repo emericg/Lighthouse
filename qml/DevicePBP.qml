@@ -73,12 +73,7 @@ Loader {
                 //
             }
         }
-    /*
-        Timer {
-            interval: 60000; running: true; repeat: true;
-            onTriggered: updateStatusText()
-        }
-    */
+
         Keys.onPressed: (event) => {
             if (event.key === Qt.Key_Backspace) {
                 event.accepted = true
@@ -132,8 +127,102 @@ Loader {
 
         ////////////////////////////////////////////////////////////////////////
 
+        PopupActions {
+            id: popupActionsChooser
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+
+        Rectangle {
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: 72
+            color: Theme.colorForeground
+
+            Row { // left
+                anchors.left: parent.left
+                anchors.leftMargin: 16
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: 16
+
+                ButtonWireframe {
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: 160
+
+                    fullColor: currentDevice.connected
+                    primaryColor: (currentDevice.available || currentDevice.connected) ?
+                                      Theme.colorSuccess : Theme.colorWarning
+                    text: {
+                        if (currentDevice.status === DeviceUtils.DEVICE_OFFLINE) return qsTr("Offline")
+                        if (currentDevice.status === DeviceUtils.DEVICE_OFFLINE) return qsTr("Available")
+                        if (currentDevice.status === DeviceUtils.DEVICE_QUEUED) return qsTr("Connecting...")
+                        if (currentDevice.status === DeviceUtils.DEVICE_CONNECTING) return qsTr("Connecting...")
+                        if (currentDevice.status === DeviceUtils.DEVICE_CONNECTED) return qsTr("Connected")
+                    }
+                }
+                ButtonWireframe {
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: 128
+
+                    fullColor: currentDevice.connected
+                    text: {
+                        if (currentDevice.status === DeviceUtils.DEVICE_OFFLINE) return qsTr("Connect")
+                        return qsTr("Disconnect")
+                    }
+                    onClicked: {
+                        if (currentDevice.status === DeviceUtils.DEVICE_OFFLINE) currentDevice.actionConnect()
+                        currentDevice.actionDisconnect()
+                    }
+                }
+
+                CheckBoxThemed {
+                    id: cbAutoConnect
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: qsTr("auto-connect device")
+
+                    checked: currentDevice.autoConnect
+                    onClicked: currentDevice.autoConnect = checked
+                }
+            }
+
+            Row { // right
+                anchors.right: parent.right
+                anchors.rightMargin: 16
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: 16
+
+                SelectorMenu {
+                    anchors.verticalCenter: parent.verticalCenter
+                    height: 40
+
+                    model: ListModel {
+                        ListElement { idx: 1; txt: qsTr("gamepad"); src: ""; sz: 16; }
+                        ListElement { idx: 2; txt: qsTr("keyboard"); src: ""; sz: 16; }
+                        ListElement { idx: 3; txt: qsTr("button"); src: ""; sz: 16; }
+                    }
+
+                    currentSelection: {
+                        if (currentDevice.deviceMode === "gamepad") return 1
+                        if (currentDevice.deviceMode === "keyboard") return 2
+                        if (currentDevice.deviceMode === "button") return 3
+                        return 1
+                    }
+                    onMenuSelected: (index) => {
+                        currentSelection = index
+                        if (index === 1) currentDevice.deviceMode = "gamepad"
+                        if (index === 2) currentDevice.deviceMode = "keyboard"
+                        if (index === 3) currentDevice.deviceMode = "button"
+                    }
+                }
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+
         Row {
             anchors.fill: parent
+            anchors.topMargin: 80
 
             Item {
                 anchors.top: parent.top
@@ -166,17 +255,6 @@ Loader {
                 anchors.bottom: parent.bottom
                 width: parent.width/3
 
-                ButtonWireframe {
-                    anchors.top: parent.top
-                    anchors.topMargin: 16
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-
-                    fullColor: currentDevice.connected
-                    text: currentDevice.connected ? qsTr("connected") : qsTr("connect")
-                    onClicked: currentDevice.actionConnect()
-                }
-
                 SchematicPokeball {
                     id: pokeball
                     anchors.centerIn: parent
@@ -203,5 +281,7 @@ Loader {
                 }
             }
         }
+
+        ////////////////////////////////////////////////////////////////////////
     }
 }

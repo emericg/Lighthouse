@@ -44,6 +44,10 @@ class DevicePokemonGoPlus: public DeviceBeacon
 {
     Q_OBJECT
 
+    Q_PROPERTY(bool autoConnect READ getAutoConnect WRITE setAutoConnect NOTIFY autoconnectChanged)
+
+    bool m_autoConnect = true;
+
     // QLowEnergyController related
     void serviceScanDone();
     void addLowEnergyService(const QBluetoothUuid &uuid);
@@ -61,6 +65,9 @@ class DevicePokemonGoPlus: public DeviceBeacon
     void bleReadDone(const QLowEnergyCharacteristic &c, const QByteArray &value);
     void bleReadNotify(const QLowEnergyCharacteristic &c, const QByteArray &value);
 
+Q_SIGNALS:
+    void autoconnectChanged();
+
 protected:
     int getButtonCount() { return 1; }
     bool hasPress() { return true; }
@@ -71,6 +78,9 @@ public:
     DevicePokemonGoPlus(QString &deviceAddr, QString &deviceName, QObject *parent = nullptr);
     DevicePokemonGoPlus(const QBluetoothDeviceInfo &d, QObject *parent = nullptr);
     ~DevicePokemonGoPlus();
+
+    bool getAutoConnect() { return m_autoConnect; }
+    void setAutoConnect(const bool value);
 };
 
 /* ************************************************************************** */
