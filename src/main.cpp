@@ -113,16 +113,18 @@ int main(int argc, char *argv[])
     NetworkServer *networkServer = nullptr;
     NetworkClient *networkClient = nullptr;
     LocalControls *localControls = LocalControls::getInstance();
+
+#if defined(ENABLE_MPRIS)
     MprisController *mprisControls = nullptr;
+    mprisControls = MprisController::getInstance();
+    mprisControls->select_player();
+#endif
 
 #if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
     networkClient = new NetworkClient();
     networkClient->connectToServer();
 #else
     networkServer = new NetworkServer();
-
-    mprisControls = MprisController::getInstance();
-    mprisControls->select_player();
 
     dm->listenDevices_start();
 #endif
@@ -164,7 +166,9 @@ int main(int argc, char *argv[])
     engine_context->setContextProperty("networkServer", networkServer);
     engine_context->setContextProperty("networkClient", networkClient);
     engine_context->setContextProperty("localControls", localControls);
+#if defined(ENABLE_MPRIS)
     engine_context->setContextProperty("mprisControls", mprisControls);
+#endif
 
     engine_context->setContextProperty("startMinimized", (start_minimized || sm->getMinimized()));
 

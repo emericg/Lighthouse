@@ -395,7 +395,7 @@ Item {
                     height: 128
                     radius: 4
 
-                    visible: mprisControls.available
+                    visible: mprisControls && mprisControls.available
 
                     color: Theme.colorDeviceWidget
                     border.width: 2

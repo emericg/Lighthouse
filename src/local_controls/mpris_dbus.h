@@ -19,6 +19,7 @@
  * \author    Emeric Grange <emeric.grange@gmail.com>
  */
 
+#ifdef ENABLE_MPRIS
 #ifndef MPRIS_DBUS_H
 #define MPRIS_DBUS_H
 /* ************************************************************************** */
@@ -137,3 +138,4 @@ public:
 
 /* ************************************************************************** */
 #endif // MPRIS_DBUS_H
+#endif // ENABLE_MPRIS

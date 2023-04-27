@@ -95,7 +95,9 @@ void LocalControls::action(int action_code, const QString &action_params)
             args.clear();
         }
 
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACOS) || defined(Q_OS_WINDOWS)
         QProcess::startDetached(cmd, args);
+#endif
     }
     else if (action_code > LocalActions::ACTION_MOUSE_START &&
              action_code < LocalActions::ACTION_MOUSE_STOP)
@@ -136,10 +138,12 @@ void LocalControls::action(int action_code, const QString &action_params)
     else if (action_code > LocalActions::ACTION_MPRIS_START &&
              action_code < LocalActions::ACTION_MPRIS_STOP)
     {
+#if defined(ENABLE_MPRIS)
         if (mpris)
         {
             mpris->action(action_code);
         }
+#endif
     }
     else
     {

@@ -19,6 +19,7 @@
  * \author    Emeric Grange <emeric.grange@gmail.com>
  */
 
+#ifdef ENABLE_UINPUT
 #ifndef MOUSE_UINPUT_H
 #define MOUSE_UINPUT_H
 /* ************************************************************************** */
@@ -53,3 +54,4 @@ public:
 
 /* ************************************************************************** */
 #endif // MOUSE_UINPUT_H
+#endif // ENABLE_UINPUT

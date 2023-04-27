@@ -45,10 +45,13 @@ class LocalControls: public QObject
 {
     Q_OBJECT
 
-    MprisController *mpris = nullptr;
     Mouse *mouse = nullptr;
     Keyboard *keyboard = nullptr;
     Gamepad *gamepad = nullptr;
+
+#if defined(ENABLE_MPRIS)
+    MprisController *mpris = nullptr;
+#endif
 
     QMediaPlayer *player = nullptr;
     QAudioOutput *audioOutput = nullptr;

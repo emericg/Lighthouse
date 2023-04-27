@@ -345,6 +345,7 @@ void DevicePokeballPlus::bleReadNotify(const QLowEnergyCharacteristic &c, const 
 
         if (m_deviceMode == "gamepad")
         {
+#if defined(ENABLE_UINPUT)
             if (!m_gamepad)
             {
                 m_gamepad = new Gamepad_uinput();
@@ -354,6 +355,7 @@ void DevicePokeballPlus::bleReadNotify(const QLowEnergyCharacteristic &c, const 
             {
                 dynamic_cast<Gamepad_uinput*>(m_gamepad)->action_pbp(m_axis_x*32767.f, m_axis_y*32767.f, btn_a, btn_b);
             }
+#endif // defined(ENABLE_UINPUT)
         }
         else
         {

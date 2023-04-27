@@ -21,7 +21,9 @@ ios | android { CONFIG += qtquickcompiler }
 win32 { DEFINES += _USE_MATH_DEFINES }
 
 DEFINES += ENABLE_MBEDTLS
-#DEFINES += ENABLE_XTEST
+#linux { DEFINES += ENABLE_XTEST }
+linux { DEFINES += ENABLE_UINPUT }
+linux { DEFINES += ENABLE_MPRIS }
 
 # MobileUI for mobile OS
 include(src/thirdparty/MobileUI/MobileUI.pri)
@@ -177,9 +179,7 @@ macx {
     QMAKE_BUNDLE = lighthouse
 
     # OS icons
-    ICON = $${PWD}/assets/macos/$$lower($${TARGET}).icns
-    #QMAKE_ASSET_CATALOGS_APP_ICON = "AppIcon"
-    #QMAKE_ASSET_CATALOGS = $${PWD}/assets/macos/Images.xcassets
+    #ICON = $${PWD}/assets/macos/$$lower($${TARGET}).icns
 
     # OS infos
     QMAKE_INFO_PLIST = $${PWD}/assets/macos/Info.plist
@@ -214,7 +214,7 @@ macx {
 
 win32 {
     # OS icon
-    RC_ICONS = $${PWD}/assets/windows/$$lower($${TARGET}).ico
+    #RC_ICONS = $${PWD}/assets/windows/$$lower($${TARGET}).ico
 
     # Deploy step
     deploy.commands = $$quote(windeployqt $${OUT_PWD}/$${DESTDIR}/ --qmldir qml/)
@@ -258,12 +258,12 @@ ios {
     QMAKE_APPLE_TARGETED_DEVICE_FAMILY = 1,2 # 1: iPhone / 2: iPad / 1,2: Universal
 
     # OS icons
-    QMAKE_ASSET_CATALOGS_APP_ICON = "AppIcon"
-    QMAKE_ASSET_CATALOGS = $${PWD}/assets/ios/Images.xcassets
+    #QMAKE_ASSET_CATALOGS_APP_ICON = "AppIcon"
+    #QMAKE_ASSET_CATALOGS = $${PWD}/assets/ios/Images.xcassets
 
     # iOS launch screen
-    AppLaunchScreen.files += $${PWD}/assets/ios/AppLaunchScreen.storyboard
-    QMAKE_BUNDLE_DATA += AppLaunchScreen
+    #AppLaunchScreen.files += $${PWD}/assets/ios/AppLaunchScreen.storyboard
+    #QMAKE_BUNDLE_DATA += AppLaunchScreen
 
     # iOS developer settings
     exists($${PWD}/assets/ios/ios_signature.pri) {

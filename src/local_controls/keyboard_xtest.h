@@ -19,11 +19,10 @@
  * \author    Emeric Grange <emeric.grange@gmail.com>
  */
 
+#ifdef ENABLE_XTEST
 #ifndef KEYBOARD_XTEST_H
 #define KEYBOARD_XTEST_H
 /* ************************************************************************** */
-
-#if defined(ENABLED_XTEST)
 
 #include "keyboard.h"
 
@@ -46,7 +45,6 @@ public:
     virtual void action(int action_code);
 };
 
-#endif // defined(ENABLED_XTEST)
-
 /* ************************************************************************** */
 #endif // KEYBOARD_XTEST_H
+#endif // ENABLE_XTEST
