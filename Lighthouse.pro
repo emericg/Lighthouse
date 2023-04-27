@@ -1,6 +1,6 @@
 TARGET  = Lighthouse
 
-VERSION = 0.4
+VERSION = 0.5
 DEFINES+= APP_NAME=\\\"$$TARGET\\\"
 DEFINES+= APP_VERSION=\\\"$$VERSION\\\"
 
