@@ -6,10 +6,10 @@ import ThemeEngine 1.0
 Item {
     id: pogoSchematics
     anchors.centerIn: parent
-    anchors.verticalCenterOffset: -width*0.166
+    anchors.verticalCenterOffset: -width*0.20
 
     width: parent.width * 0.66
-    height: parent.width * 0.66
+    height: width
 
     Connections {
         target: currentDevice
@@ -19,8 +19,8 @@ Item {
     ////////
 
     Shape {
-        id: shape
         anchors.fill: parent
+        antialiasing: true
 
         ShapePath {
             strokeColor: Theme.colorSeparator

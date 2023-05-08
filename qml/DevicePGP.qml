@@ -203,7 +203,13 @@ Loader {
             Item {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                width: parent.width/3
+                width: parent.width*0.05
+            }
+
+            Item {
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                width: parent.width*0.4
 
                 Column {
                     anchors.left: parent.left
@@ -216,7 +222,7 @@ Loader {
                     property int www: (parent.width * 1)
                     property int hhh: (parent.height * 0.4)
 
-                    RemoteButtonWidget { // id: btn1
+                    RemoteButtonWidget { // btn1
                         currentButton: currentDevice.btn1
                     }
                 }
@@ -225,31 +231,17 @@ Loader {
             Item {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                width: parent.width/3
-
-                SchematicPokemonGoPlus {
-                    id: pokeball
-                    anchors.centerIn: parent
-                }
+                width: parent.width*0.05
             }
 
             Item {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                width: parent.width/3
+                width: parent.width*0.4
 
-                Column {
-                    anchors.left: parent.left
-                    anchors.leftMargin: 32
-                    anchors.right: parent.right
-                    anchors.rightMargin: 32
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: 24
-
-                    property int www: (parent.width * 1)
-                    property int hhh: (parent.height * 0.4)
-
-                    // nothing...
+                SchematicPokemonGoPlus {
+                    id: pokeball
+                    width: parent.width * 0.6
                 }
             }
         }

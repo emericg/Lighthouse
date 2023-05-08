@@ -227,47 +227,25 @@ Loader {
             anchors.fill: parent
             anchors.topMargin: 80
 
-            Item {
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                width: parent.width/3
-
-                Column {
-                    anchors.left: parent.left
-                    anchors.leftMargin: 32
-                    anchors.right: parent.right
-                    anchors.rightMargin: 32
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: 24
-
-                    property int www: (parent.width * 1)
-                    property int hhh: (parent.height * 0.4)
-
-                    RemoteButtonWidget { // id: btn1
-                        currentButton: currentDevice.btn1
-                    }
-
-                    RemoteButtonWidget { // id: btn2
-                        currentButton: currentDevice.btn2
-                    }
-                }
-            }
+            ////
 
             Item {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                width: parent.width/3
+                width: parent.width*0.5
 
                 SchematicPokeball {
                     id: pokeball
-                    anchors.centerIn: parent
+                    width: parent.width * 0.5
                 }
             }
+
+            ////
 
             Item {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                width: parent.width/3
+                width: parent.width*0.4
 
                 Column {
                     anchors.left: parent.left
@@ -277,12 +255,57 @@ Loader {
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: 24
 
+                    visible: (currentDevice.deviceMode === "button")
+
                     property int www: (parent.width * 1)
                     property int hhh: (parent.height * 0.4)
 
-                    // nothing...
+                    RemoteButtonWidget { // btn1
+                        currentButton: currentDevice.btn1
+                    }
+
+                    RemoteButtonWidget { // btn2
+                        currentButton: currentDevice.btn2
+                    }
+                }
+
+                ////
+
+                Grid {
+                    anchors.centerIn: parent
+                    spacing: 8
+                    columns: 3
+                    rows: 3
+
+                    visible: (currentDevice.deviceMode === "keyboard")
+
+                    ItemKey {
+                        key: "left click"
+                    }
+                    Item { width: 80; height: 80; }
+                    ItemKey {
+                        key: "right click"
+                    }
+
+                    Item { width: 80; height: 80; }
+                    ItemKey {
+                        key: "↑"
+                    }
+                    Item { width: 80; height: 80; }
+
+                    ItemKey {
+                        key: "←"
+                    }
+                    ItemKey {
+                        key: "↓"
+                    }
+                    ItemKey {
+                        key: "→"
+                    }
                 }
             }
+
+            ////
         }
 
         ////////////////////////////////////////////////////////////////////////

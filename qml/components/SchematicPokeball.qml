@@ -7,8 +7,8 @@ Rectangle {
     anchors.centerIn: parent
 
     width: parent.width * 0.66
-    height: parent.width * 0.66
-    radius: parent.width
+    height: width
+    radius: width
 
     color: Theme.colorBackground
     border.width: 16

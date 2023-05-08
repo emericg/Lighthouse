@@ -25,6 +25,7 @@
         <file alias="PopupBeaconKey.qml">popups/PopupBeaconKey.qml</file>
         <file alias="PopupDeleteDevice.qml">popups/PopupDeleteDevice.qml</file>
 
+        <file alias="ItemKey.qml">components/ItemKey.qml</file>
         <file alias="FileInputArea.qml">components/FileInputArea.qml</file>
         <file alias="RemoteButtonKey.qml">components/RemoteButtonKey.qml</file>
         <file alias="RemoteButtonWidget.qml">components/RemoteButtonWidget.qml</file>
