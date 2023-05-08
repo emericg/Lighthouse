@@ -21,9 +21,9 @@ ios | android { CONFIG += qtquickcompiler }
 win32 { DEFINES += _USE_MATH_DEFINES }
 
 DEFINES += ENABLE_MBEDTLS
-#linux { DEFINES += ENABLE_XTEST }
-linux { DEFINES += ENABLE_UINPUT }
-linux { DEFINES += ENABLE_MPRIS }
+#linux:!android { DEFINES += ENABLE_XTEST }
+linux:!android { DEFINES += ENABLE_UINPUT }
+linux:!android { DEFINES += ENABLE_MPRIS }
 
 # MobileUI for mobile OS
 include(src/thirdparty/MobileUI/MobileUI.pri)
