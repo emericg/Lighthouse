@@ -46,12 +46,19 @@ Loader {
 
         ////////////////
 
+        Item { // gamepad
+            //
+        }
+
+        ////////////////
+
         Rectangle { // touchpad
             anchors.left: parent.left
             anchors.right: parent.right
+
             height: width
             radius: 8
-
+            clip: true
             color: Theme.colorForeground
             border.width: 2
             border.color: Theme.colorSeparator

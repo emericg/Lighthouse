@@ -234,7 +234,7 @@ Loader {
                 anchors.bottom: parent.bottom
                 width: parent.width*0.5
 
-                SchematicPokeball {
+                SchematicPokeball { // pokeball 2d
                     id: pokeball
                     width: parent.width * 0.5
                 }

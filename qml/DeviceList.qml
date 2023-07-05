@@ -20,7 +20,7 @@ Item {
 
     function checkStatus() {
         if (!utilsApp.checkMobileBleLocationPermission()) {
-            //utilsApp.getMobileBleLocationPermission()
+            utilsApp.getMobileBleLocationPermission()
         }
 
         if (deviceManager.hasDevices) {

@@ -11,7 +11,7 @@ Popup {
                     : ((appWindow.height / 2) - (height / 2))
 
     width: singleColumn ? parent.width : 640
-    height: columnContent.height + padding*2 + screenPaddingBottom
+    height: columnContent.height + padding*2 + screenPaddingNavbar + screenPaddingBottom
     padding: Theme.componentMarginXL
 
     modal: true
