@@ -1,4 +1,4 @@
-/*
+/*!
  * Copyright (c) 2016 J-P Nurmi
  * Copyright (c) 2022 Emeric Grange
  *
@@ -32,6 +32,18 @@
 class MobileUIPrivate
 {
 public:
+    static bool areRefreshSlotsConnected;
+
+    static MobileUI::Theme deviceTheme;
+
+    static QColor statusbarColor;
+    static MobileUI::Theme statusbarTheme;
+
+    static QColor navbarColor;
+    static MobileUI::Theme navbarTheme;
+
+    static bool isScreenKeepOn;
+
     static bool isAvailable_sys();
 
     static int getDeviceTheme_sys();
@@ -42,17 +54,19 @@ public:
     static void setColor_navbar(const QColor &color);
     static void setTheme_navbar(MobileUI::Theme theme);
 
-    static bool areIosSlotsConnected;
+    static int getStatusbarHeight();
+    static int getNavbarHeight();
 
-    static MobileUI::Theme deviceTheme;
+    static int getSafeAreaTop();
+    static int getSafeAreaLeft();
+    static int getSafeAreaRight();
+    static int getSafeAreaBottom();
 
-    static QColor statusbarColor;
-    static MobileUI::Theme statusbarTheme;
+    static void setScreenKeepOn(bool on);
 
-    static QColor navbarColor;
-    static MobileUI::Theme navbarTheme;
+    static void lockScreenOrientation(int orientation, bool autoRotate);
 
-    static void keepScreenOn(bool on);
+    static void vibrate();
 };
 
 /* ************************************************************************** */

@@ -1,19 +1,23 @@
 import QtQuick
 
-import ThemeEngine 1.0
+import ThemeEngine
 
 Rectangle {
-    id: rectangleHeaderBar
-    width: parent.width
-    height: screenPaddingStatusbar + screenPaddingNotch + headerHeight
-    z: 10
-    color: Theme.colorHeader
+    id: appHeader
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
 
-    // prevent clicks below this area
-    MouseArea { anchors.fill: parent; acceptedButtons: Qt.AllButtons; }
+    height: screenPaddingStatusbar + headerHeight
+    color: Theme.colorHeader
+    clip: false
+    z: 10
 
     property int headerHeight: 52
-    property string title: "Lighthouse"
+
+    property int headerPosition: 56
+
+    property string headerTitle: "Lighthouse"
 
     ////////////////////////////////////////////////////////////////////////////
 
@@ -60,11 +64,14 @@ Rectangle {
 
     ////////////////////////////////////////////////////////////////////////////
 
+    // prevent clicks below this area
+    MouseArea { anchors.fill: parent; acceptedButtons: Qt.AllButtons; }
+
     ActionMenuFixed {
         id: actionMenu
 
         x: parent.width - actionMenu.width - 12
-        y: screenPaddingStatusbar + screenPaddingNotch + 16
+        y: screenPaddingStatusbar + 16
 
         onMenuSelected: (index) => {
             //console.log("ActionMenu clicked #" + index)
@@ -75,7 +82,7 @@ Rectangle {
 
     Item {
         anchors.fill: parent
-        anchors.topMargin: screenPaddingStatusbar + screenPaddingNotch
+        anchors.topMargin: screenPaddingStatusbar
 
         MouseArea { // left button
             id: leftArea
@@ -106,7 +113,7 @@ Rectangle {
             anchors.leftMargin: 64
             anchors.verticalCenter: parent.verticalCenter
 
-            text: title
+            text: headerTitle
             color: Theme.colorHeaderContent
             font.bold: true
             font.pixelSize: Theme.fontSizeHeader

@@ -392,7 +392,7 @@ Loader {
                                 text: qsTr("Loading...")
                                 textFormat: Text.PlainText
                                 color: Theme.colorText
-                                font.pixelSize: Theme.fontSizeComponent
+                                font.pixelSize: Theme.componentFontSize
                             }
                         }
 

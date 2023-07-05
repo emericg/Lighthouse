@@ -50,6 +50,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             asynchronous: true
             active: (typeof utilsFps !== "undefined" && utilsFps)
+
             sourceComponent: Text {
                 color: "#c0c0c0"
                 font.pixelSize: 18
@@ -65,11 +66,11 @@ Item {
         running: true
         onTriggered: {
             frameCounterAvg += frameCounter
-            control.fps = frameCounter/2
+            control.fps = frameCounter / 2
             counter++
             frameCounter = 0
             if (counter >= 3) {
-                control.fpsAvg = frameCounterAvg/(2*counter)
+                control.fpsAvg = frameCounterAvg / (2*counter)
                 frameCounterAvg = 0
                 counter = 0
             }
