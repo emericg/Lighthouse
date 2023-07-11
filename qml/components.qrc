@@ -12,6 +12,13 @@
         <file alias="DesktopHeaderItem.qml">components_generic/DesktopHeaderItem.qml</file>
         <file alias="IconSvg.qml">components_generic/IconSvg.qml</file>
         <file alias="ItemTag.qml">components_generic/ItemTag.qml</file>
+        <file alias="DrawerItem.qml">components_generic/DrawerItem.qml</file>
+        <file alias="DrawerButton.qml">components_generic/DrawerButton.qml</file>
+        <file alias="ListTitle.qml">components_generic/ListTitle.qml</file>
+        <file alias="ListItem.qml">components_generic/ListItem.qml</file>
+        <file alias="ListItemClickable.qml">components_generic/ListItemClickable.qml</file>
+        <file alias="ListSeparator.qml">components_generic/ListSeparator.qml</file>
+        <file alias="ListSeparatorPadded.qml">components_generic/ListSeparatorPadded.qml</file>
         <file alias="MobileMenuItem_horizontal.qml">components_generic/MobileMenuItem_horizontal.qml</file>
         <file alias="ProgressArc.qml">components_generic/ProgressArc.qml</file>
         <file alias="ProgressCircle.qml">components_generic/ProgressCircle.qml</file>
@@ -26,6 +33,7 @@
         <file alias="ComboBoxThemed.qml">components_themed/ComboBoxThemed.qml</file>
         <file alias="PageIndicatorThemed.qml">components_themed/PageIndicatorThemed.qml</file>
         <file alias="RadioButtonThemed.qml">components_themed/RadioButtonThemed.qml</file>
+        <file alias="RippleThemed.qml">components_themed/RippleThemed.qml</file>
         <file alias="SpinBoxThemedDesktop.qml">components_themed/SpinBoxThemed_desktop.qml</file>
         <file alias="SwitchThemedDesktop.qml">components_themed/SwitchThemed_desktop.qml</file>
         <file alias="SliderThemed.qml">components_themed/SliderThemed.qml</file>

@@ -330,7 +330,7 @@ Item {
                         RoundButtonIcon {
                             anchors.verticalCenter: parent.verticalCenter
 
-                            background: true
+                            backgroundVisible: true
                             highlightMode: "color"
                             source: "qrc:/assets/icons_material/skip_previous_FILL0_wght400_GRAD0_opsz48.svg"
                             onClicked: localControls.keyboard_media_prev()
@@ -338,7 +338,7 @@ Item {
                         RoundButtonIcon {
                             anchors.verticalCenter: parent.verticalCenter
 
-                            background: true
+                            backgroundVisible: true
                             highlightMode: "color"
                             source: "qrc:/assets/icons_material/play_pause_FILL0_wght400_GRAD0_opsz48.svg"
                             onClicked: localControls.keyboard_media_playpause()
@@ -346,7 +346,7 @@ Item {
                         RoundButtonIcon {
                             anchors.verticalCenter: parent.verticalCenter
 
-                            background: true
+                            backgroundVisible: true
                             highlightMode: "color"
                             source: "qrc:/assets/icons_material/skip_next_FILL0_wght400_GRAD0_opsz48.svg"
                             onClicked: localControls.keyboard_media_next()
@@ -366,7 +366,7 @@ Item {
                         RoundButtonIcon {
                             anchors.verticalCenter: parent.verticalCenter
 
-                            background: true
+                            backgroundVisible: true
                             highlightMode: "color"
                             source: "qrc:/assets/icons_material/duotone-volume_off-24px.svg"
                             onClicked: localControls.keyboard_volume_mute()
@@ -374,7 +374,7 @@ Item {
                         RoundButtonIcon {
                             anchors.verticalCenter: parent.verticalCenter
 
-                            background: true
+                            backgroundVisible: true
                             highlightMode: "color"
                             source: "qrc:/assets/icons_material/duotone-volume_down-24px.svg"
                             onClicked: localControls.keyboard_volume_down()
@@ -382,7 +382,7 @@ Item {
                         RoundButtonIcon {
                             anchors.verticalCenter: parent.verticalCenter
 
-                            background: true
+                            backgroundVisible: true
                             highlightMode: "color"
                             source: "qrc:/assets/icons_material/duotone-volume_up_1-24px.svg"
                             onClicked: localControls.keyboard_volume_up()
@@ -436,21 +436,21 @@ Item {
 
                             RoundButtonIcon {
                                 //visible: mprisControls.canGoPrevious
-                                background: true
+                                backgroundVisible: true
                                 highlightMode: "color"
                                 source: "qrc:/assets/icons_material/skip_previous_FILL0_wght400_GRAD0_opsz48.svg"
                                 onClicked: mprisControls.media_prev()
                             }
                             RoundButtonIcon {
                                 //visible: mprisControls.canControl
-                                background: true
+                                backgroundVisible: true
                                 highlightMode: "color"
                                 source: "qrc:/assets/icons_material/play_pause_FILL0_wght400_GRAD0_opsz48.svg"
                                 onClicked: mprisControls.media_playpause()
                             }
                             RoundButtonIcon {
                                 //visible: mprisControls.canGoNext
-                                background: true
+                                backgroundVisible: true
                                 highlightMode: "color"
                                 source: "qrc:/assets/icons_material/skip_next_FILL0_wght400_GRAD0_opsz48.svg"
                                 onClicked: mprisControls.media_next()
@@ -588,8 +588,8 @@ Item {
                     RoundButtonIcon {
                         width: isMobile ? 48 : Theme.componentHeight
                         height: isMobile ? 48 : Theme.componentHeight
-                        border: true
-                        background: true
+                        borderVisible: true
+                        backgroundVisible: true
                         backgroundColor: Theme.colorBackground
                         highlightMode: "color"
 
@@ -599,8 +599,8 @@ Item {
                     RoundButtonIcon {
                         width: isMobile ? 48 : Theme.componentHeight
                         height: isMobile ? 48 : Theme.componentHeight
-                        border: true
-                        background: true
+                        borderVisible: true
+                        backgroundVisible: true
                         backgroundColor: Theme.colorBackground
                         highlightMode: "color"
 
@@ -610,8 +610,8 @@ Item {
                     RoundButtonIcon {
                         width: isMobile ? 48 : Theme.componentHeight
                         height: isMobile ? 48 : Theme.componentHeight
-                        border: true
-                        background: true
+                        borderVisible: true
+                        backgroundVisible: true
                         backgroundColor: Theme.colorBackground
                         highlightMode: "color"
 
@@ -624,8 +624,8 @@ Item {
                     RoundButtonIcon {
                         width: isMobile ? 48 : Theme.componentHeight
                         height: isMobile ? 48 : Theme.componentHeight
-                        border: true
-                        background: true
+                        borderVisible: true
+                        backgroundVisible: true
                         backgroundColor: Theme.colorBackground
                         highlightMode: "color"
 
@@ -635,8 +635,8 @@ Item {
                     RoundButtonIcon {
                         width: isMobile ? 48 : Theme.componentHeight
                         height: isMobile ? 48 : Theme.componentHeight
-                        border: true
-                        background: true
+                        borderVisible: true
+                        backgroundVisible: true
                         backgroundColor: Theme.colorBackground
                         highlightMode: "color"
 
@@ -646,8 +646,8 @@ Item {
                     RoundButtonIcon {
                         width: isMobile ? 48 : Theme.componentHeight
                         height: isMobile ? 48 : Theme.componentHeight
-                        border: true
-                        background: true
+                        borderVisible: true
+                        backgroundVisible: true
                         backgroundColor: Theme.colorBackground
                         highlightMode: "color"
                         source: "qrc:/assets/icons_material/duotone-volume_up_1-24px.svg"

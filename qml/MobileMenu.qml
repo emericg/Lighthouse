@@ -95,7 +95,7 @@ Rectangle {
             colorContent: Theme.colorTabletmenuContent
             colorHighlight: Theme.colorTabletmenuHighlight
 
-            selected: (appContent.state === "DeviceList")
+            highlighted: (appContent.state === "DeviceList")
             onClicked: appContent.state = "DeviceList"
         }
         MobileMenuItem_horizontal {
@@ -108,7 +108,7 @@ Rectangle {
             colorContent: Theme.colorTabletmenuContent
             colorHighlight: Theme.colorTabletmenuHighlight
 
-            selected: (appContent.state === "Settings")
+            highlighted: (appContent.state === "Settings")
             onClicked: screenSettings.loadScreen()
         }
         MobileMenuItem_horizontal {
@@ -121,7 +121,7 @@ Rectangle {
             colorContent: Theme.colorTabletmenuContent
             colorHighlight: Theme.colorTabletmenuHighlight
 
-            selected: (appContent.state === "About" || appContent.state === "Permissions")
+            highlighted: (appContent.state === "About" || appContent.state === "Permissions")
             onClicked: screenAbout.loadScreen()
         }
     }

@@ -15,7 +15,7 @@ Rectangle {
 
     property int headerHeight: 52
 
-    property int headerPosition: 56
+    property int headerPosition: 64
 
     property string headerTitle: "Lighthouse"
 
@@ -24,19 +24,10 @@ Rectangle {
     property string leftMenuMode: "drawer" // drawer / back / close
     signal leftMenuClicked()
 
-    onLeftMenuModeChanged: {
-        if (leftMenuMode === "drawer")
-            leftMenuImg.source = "qrc:/assets/icons_material/baseline-menu-24px.svg"
-        else if (leftMenuMode === "close")
-            leftMenuImg.source = "qrc:/assets/icons_material/baseline-close-24px.svg"
-        else // back
-            leftMenuImg.source = "qrc:/assets/icons_material/baseline-arrow_back-24px.svg"
-    }
-
-    ////////////////////////////////////////////////////////////////////////////
-
     property string rightMenuMode: "off" // on / off
     signal rightMenuClicked()
+
+    ////////////////////////////////////////////////////////////////////////////
 
     function rightMenuIsOpen() { return actionMenu.visible; }
     function rightMenuClose() { actionMenu.close(); }
@@ -80,37 +71,66 @@ Rectangle {
 
     ////////////////////////////////////////////////////////////////////////////
 
+    Rectangle { // OS statusbar area
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+
+        height: screenPaddingStatusbar
+        color: Theme.colorStatusbar
+    }
+
     Item {
         anchors.fill: parent
         anchors.topMargin: screenPaddingStatusbar
 
-        MouseArea { // left button
+        Row { // left area
             id: leftArea
-            width: headerHeight
-            height: headerHeight
             anchors.top: parent.top
             anchors.left: parent.left
+            anchors.leftMargin: 4
             anchors.bottom: parent.bottom
 
-            visible: true
-            onClicked: leftMenuClicked()
+            MouseArea { // left button
+                width: headerHeight
+                height: headerHeight
 
-            IconSvg {
-                id: leftMenuImg
-                width: (headerHeight / 2)
-                height: (headerHeight / 2)
-                anchors.left: parent.left
-                anchors.leftMargin: 16
-                anchors.verticalCenter: parent.verticalCenter
-                source: "qrc:/assets/icons_material/baseline-menu-24px.svg"
-                color: Theme.colorHeaderContent
+                visible: true
+                onClicked: leftMenuClicked()
+
+                RippleThemed {
+                    anchor: parent
+                    width: headerHeight
+                    height: headerHeight
+
+                    pressed: parent.pressed
+                    //active: enabled && parent.containsPress
+                    color: Qt.rgba(Theme.colorForeground.r, Theme.colorForeground.g, Theme.colorForeground.b, 0.33)
+                }
+
+                IconSvg {
+                    anchors.centerIn: parent
+                    width: (headerHeight / 2)
+                    height: (headerHeight / 2)
+
+                    source: {
+                        if (leftMenuMode === "drawer") return "qrc:/assets/icons_material/baseline-menu-24px.svg"
+                        else if (leftMenuMode === "close") return "qrc:/assets/icons_material/baseline-close-24px.svg"
+                        return "qrc:/assets/icons_material/baseline-arrow_back-24px.svg"
+                    }
+                    color: Theme.colorHeaderContent
+                }
             }
         }
 
-        Text { // title
+        ////////////
+
+        Text { // header title
             height: parent.height
             anchors.left: parent.left
-            anchors.leftMargin: 64
+            anchors.leftMargin: headerPosition
+            anchors.right: rightArea.left
+            anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
 
             text: headerTitle
@@ -124,7 +144,7 @@ Rectangle {
         ////////////
 
         Row { // right area
-            id: menu
+            id: rightArea
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.rightMargin: 4
@@ -159,8 +179,6 @@ Rectangle {
                 }
             }
 
-            ////////////
-
             MouseArea { // right button
                 width: headerHeight
                 height: headerHeight
@@ -173,6 +191,15 @@ Rectangle {
                     actionMenu.open()
                 }
 
+                RippleThemed {
+                    width: headerHeight
+                    height: headerHeight
+
+                    pressed: parent.pressed
+                    //active: enabled && parent.containsPress
+                    color: Qt.rgba(Theme.colorForeground.r, Theme.colorForeground.g, Theme.colorForeground.b, 0.33)
+                }
+
                 IconSvg {
                     width: (headerHeight / 2)
                     height: (headerHeight / 2)
@@ -183,6 +210,8 @@ Rectangle {
                 }
             }
         }
+
+        ////////////
     }
 
     ////////////////////////////////////////////////////////////////////////////
