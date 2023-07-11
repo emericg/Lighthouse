@@ -187,11 +187,10 @@ int main(int argc, char *argv[])
     // For i18n retranslate
     utilsLanguage->setQmlEngine(&engine);
 
-    // Notch handling // QQuickWindow must be valid at this point
-    QQuickWindow *window = qobject_cast<QQuickWindow *>(engine.rootObjects().value(0));
-    engine_context->setContextProperty("quickWindow", window);
-
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS) // desktop section
+
+    // QQuickWindow must be valid at this point
+    QQuickWindow *window = qobject_cast<QQuickWindow *>(engine.rootObjects().value(0));
 
     // React to secondary instances
     QObject::connect(&app, &SingleApplication::instanceStarted, window, &QQuickWindow::show);
