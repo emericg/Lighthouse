@@ -2,8 +2,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Window
 
-import ThemeEngine 1.0
-import MobileUI 1.0
+import ThemeEngine
+import MobileUI
 
 ApplicationWindow {
     id: appWindow
@@ -111,7 +111,7 @@ ApplicationWindow {
                  else if (appContent.state === "PlantBrowser")
                     appContent.state = screenPlantBrowser.entryPoint
                 else if (appContent.state === "Permissions")
-                    appContent.state = screenPermissions.entryPoint
+                    appContent.state = screenAboutPermissions.entryPoint
                 else
                     appContent.state = "DeviceList"
             }
@@ -239,7 +239,7 @@ ApplicationWindow {
             } else if (appContent.state === "DeviceLight") {
                 screenDeviceLight.backAction()
             } else if (appContent.state === "Permissions") {
-                appContent.state = screenPermissions.entryPoint
+                appContent.state = screenAboutPermissions.entryPoint
             } else if (appContent.state === "Tutorial") {
                 appContent.state = screenTutorial.entryPoint
             } else if (appContent.state === "VirtualInputs") {
@@ -280,7 +280,7 @@ ApplicationWindow {
             anchors.bottomMargin: mobileMenu.hhv
         }
         MobilePermissions {
-            id: screenPermissions
+            id: screenAboutPermissions
             anchors.fill: parent
             anchors.bottomMargin: mobileMenu.hhv
         }
@@ -313,8 +313,8 @@ ApplicationWindow {
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
                 PropertyChanges { target: screenSettings; visible: false; enabled: false; }
-                PropertyChanges { target: screenPermissions; visible: false; enabled: false; }
                 PropertyChanges { target: screenAbout; visible: false; enabled: false; }
+                PropertyChanges { target: screenAboutPermissions; visible: false; enabled: false; }
             },
             State {
                 name: "VirtualInputs"
@@ -324,7 +324,7 @@ ApplicationWindow {
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
                 PropertyChanges { target: screenSettings; visible: false; enabled: false; }
-                PropertyChanges { target: screenPermissions; visible: false; enabled: false; }
+                PropertyChanges { target: screenAboutPermissions; visible: false; enabled: false; }
                 PropertyChanges { target: screenAbout; visible: false; enabled: false; }
             },
             State {
@@ -335,8 +335,8 @@ ApplicationWindow {
                 PropertyChanges { target: screenDeviceList; visible: true; enabled: true; }
                 PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
                 PropertyChanges { target: screenSettings; visible: false; enabled: false; }
-                PropertyChanges { target: screenPermissions; visible: false; enabled: false; }
                 PropertyChanges { target: screenAbout; visible: false; enabled: false; }
+                PropertyChanges { target: screenAboutPermissions; visible: false; enabled: false; }
             },
             State {
                 name: "DeviceLight"
@@ -346,8 +346,8 @@ ApplicationWindow {
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceLight; visible: true; enabled: true; }
                 PropertyChanges { target: screenSettings; visible: false; enabled: false; }
-                PropertyChanges { target: screenPermissions; visible: false; enabled: false; }
                 PropertyChanges { target: screenAbout; visible: false; enabled: false; }
+                PropertyChanges { target: screenAboutPermissions; visible: false; enabled: false; }
             },
 
             State {
@@ -358,19 +358,8 @@ ApplicationWindow {
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
                 PropertyChanges { target: screenSettings; visible: true; enabled: true; }
-                PropertyChanges { target: screenPermissions; visible: false; enabled: false; }
                 PropertyChanges { target: screenAbout; visible: false; enabled: false; }
-            },
-            State {
-                name: "Permissions"
-                PropertyChanges { target: appHeader; headerTitle: qsTr("Permissions"); }
-                PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
-                PropertyChanges { target: screenVirtualInputs; visible: false; enabled: false; }
-                PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
-                PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
-                PropertyChanges { target: screenSettings; visible: false; enabled: false; }
-                PropertyChanges { target: screenPermissions; visible: true; enabled: true; }
-                PropertyChanges { target: screenAbout; visible: false; enabled: false; }
+                PropertyChanges { target: screenAboutPermissions; visible: false; enabled: false; }
             },
             State {
                 name: "About"
@@ -380,8 +369,19 @@ ApplicationWindow {
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
                 PropertyChanges { target: screenSettings; visible: false; enabled: false; }
-                PropertyChanges { target: screenPermissions; visible: false; enabled: false; }
                 PropertyChanges { target: screenAbout; visible: true; enabled: true; }
+                PropertyChanges { target: screenAboutPermissions; visible: false; enabled: false; }
+            },
+            State {
+                name: "Permissions"
+                PropertyChanges { target: appHeader; headerTitle: qsTr("Permissions"); }
+                PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
+                PropertyChanges { target: screenVirtualInputs; visible: false; enabled: false; }
+                PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
+                PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
+                PropertyChanges { target: screenSettings; visible: false; enabled: false; }
+                PropertyChanges { target: screenAbout; visible: false; enabled: false; }
+                PropertyChanges { target: screenAboutPermissions; visible: true; enabled: true; }
             }
         ]
     }
@@ -410,7 +410,7 @@ ApplicationWindow {
 
     Timer {
         id: exitTimer
-        interval: 3333
+        interval: 2222
         running: false
         repeat: false
     }
@@ -418,11 +418,13 @@ ApplicationWindow {
         id: exitWarning
 
         anchors.left: parent.left
+        anchors.leftMargin: Theme.componentMargin
         anchors.right: parent.right
+        anchors.rightMargin: Theme.componentMargin
         anchors.bottom: parent.bottom
-        anchors.margins: Theme.componentMargin + screenPaddingBottom
+        anchors.bottomMargin: Theme.componentMargin + screenPaddingNavbar + screenPaddingBottom
 
-        height: Theme.componentHeight
+        height: Theme.componentHeightL
         radius: Theme.componentRadius
 
         color: Theme.colorComponentBackground

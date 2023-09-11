@@ -8,6 +8,9 @@ Drawer {
             ? 0.8 * appWindow.width : 0.5 * appWindow.width
     height: appWindow.height
 
+    topPadding: 0
+    bottomPadding: 0
+
     ////////////////////////////////////////////////////////////////////////////
 
     background: Rectangle {
@@ -26,7 +29,7 @@ Drawer {
     contentItem: Item {
 
         Column {
-            id: rectangleHeader
+            id: headerColumn
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
@@ -34,10 +37,10 @@ Drawer {
 
             ////////
 
-            Rectangle {
-                id: rectangleStatusbar
+            Rectangle { // statusbar area
                 anchors.left: parent.left
                 anchors.right: parent.right
+                anchors.rightMargin: -1
 
                 height: Math.max(screenPaddingTop, screenPaddingStatusbar)
                 color: Theme.colorBackground // to hide flickable content
@@ -45,8 +48,7 @@ Drawer {
 
             ////////
 
-            Rectangle {
-                id: rectangleLogo
+            Rectangle { // logo area
                 anchors.left: parent.left
                 anchors.right: parent.right
 
@@ -78,12 +80,14 @@ Drawer {
                     font.pixelSize: 22
                 }
             }
+
+            ////////
         }
 
         ////////////////////////////////////////////////////////////////////////////
 
         Flickable {
-            anchors.top: rectangleHeader.bottom
+            anchors.top: headerColumn.bottom
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom

@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Shapes
 
-import ThemeEngine 1.0
+import ThemeEngine
 
 Item {
     id: pogoSchematics

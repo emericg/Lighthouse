@@ -2,8 +2,8 @@ import QtQuick
 import QtQuick.Controls
 import Qt5Compat.GraphicalEffects
 
-import ThemeEngine 1.0
-import LocalActions 1.0
+import ThemeEngine
+import LocalActions
 import "qrc:/js/UtilsActions.js" as UtilsActions
 
 Rectangle {

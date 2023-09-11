@@ -1,17 +1,26 @@
 import QtQuick
 
-import ThemeEngine 1.0
-import DeviceUtils 1.0
+import ThemeEngine
+import DeviceUtils
 import "qrc:/js/UtilsDeviceSensors.js" as UtilsDeviceSensors
 
 Rectangle {
-    id: rectangleHeaderBar
-    width: parent.width
+    id: appHeader
+
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+
     height: headerHeight
-    z: 10
     color: Theme.colorHeader
+    clip: false
+    z: 10
 
     property int headerHeight: isHdpi ? 60 : 64
+
+    property int headerPosition: 64
+
+    property string headerTitle: "Lighthouse"
 
     ////////////////////////////////////////////////////////////////////////////
 

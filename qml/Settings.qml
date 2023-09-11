@@ -1,23 +1,25 @@
 import QtQuick
 import QtQuick.Controls
 
-import ThemeEngine 1.0
+import ThemeEngine
 import "qrc:/js/UtilsNumber.js" as UtilsNumber
 
 Loader {
-    id: settingsScreen
+    id: screenSettings
+
+    ////////////////////////////////////////////////////////////////////////////
 
     function loadScreen() {
         // load screen
-        settingsScreen.active = true
+        screenSettings.active = true
 
         // change screen
         appContent.state = "Settings"
     }
 
     function backAction() {
-        if (settingsScreen.status === Loader.Ready)
-            settingsScreen.item.backAction()
+        if (screenSettings.status === Loader.Ready)
+            screenSettings.item.backAction()
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -29,18 +31,22 @@ Loader {
         anchors.fill: parent
 
         contentWidth: -1
-        contentHeight: column.height
+        contentHeight: contentColumn.height
 
         boundsBehavior: isDesktop ? Flickable.OvershootBounds : Flickable.DragAndOvershootBounds
         ScrollBar.vertical: ScrollBar { visible: false }
 
+        function backAction() {
+            screenDeviceList.loadScreen()
+        }
+
         Column {
-            id: column
+            id: contentColumn
             anchors.left: parent.left
             anchors.right: parent.right
 
-            topPadding: 12
-            bottomPadding: 12
+            topPadding: 16
+            bottomPadding: 16
             spacing: 8
 
             ////////////////

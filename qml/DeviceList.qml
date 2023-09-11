@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 
-import ThemeEngine 1.0
+import ThemeEngine
 
 Item {
     id: screenDeviceList
@@ -176,7 +176,7 @@ Item {
                         //deviceManager.checkBluetoothPermissions()
 
                         // someone clicked 'never ask again'?
-                        screenPermissions.loadScreenFrom("DeviceList")
+                        screenAboutPermissions.loadScreenFrom("DeviceList")
                     } else {
                         deviceManager.enableBluetooth(settingsManager.bluetoothControl)
                     }

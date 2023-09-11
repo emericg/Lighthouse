@@ -40,12 +40,12 @@ class SettingsManager: public QObject
 
     Q_PROPERTY(QSize initialSize READ getInitialSize NOTIFY initialSizeChanged)
     Q_PROPERTY(QSize initialPosition READ getInitialPosition NOTIFY initialSizeChanged)
-    Q_PROPERTY(uint initialVisibility READ getInitialVisibility NOTIFY initialSizeChanged)
+    Q_PROPERTY(int initialVisibility READ getInitialVisibility NOTIFY initialSizeChanged)
 
     Q_PROPERTY(QString appTheme READ getAppTheme WRITE setAppTheme NOTIFY appThemeChanged)
     Q_PROPERTY(bool appThemeAuto READ getAppThemeAuto WRITE setAppThemeAuto NOTIFY appThemeAutoChanged)
     Q_PROPERTY(bool appThemeCSD READ getAppThemeCSD WRITE setAppThemeCSD NOTIFY appThemeCSDChanged)
-    Q_PROPERTY(uint appUnits READ getAppUnits WRITE setAppUnits NOTIFY appUnitsChanged)
+    Q_PROPERTY(int appUnits READ getAppUnits WRITE setAppUnits NOTIFY appUnitsChanged)
     Q_PROPERTY(QString appLanguage READ getAppLanguage WRITE setAppLanguage NOTIFY appLanguageChanged)
 
     Q_PROPERTY(bool systray READ getSysTray WRITE setSysTray NOTIFY systrayChanged)
@@ -89,13 +89,13 @@ class SettingsManager: public QObject
     // Application window
     QSize m_appSize;
     QSize m_appPosition;
-    unsigned m_appVisibility = 1;               //!< QWindow::Visibility
+    int m_appVisibility = 1;                //!< QWindow::Visibility
 
     // Application generic
-    QString m_appTheme = "THEME_PLANT";
+    QString m_appTheme = "THEME_DAY";
     bool m_appThemeAuto = false;
     bool m_appThemeCSD = false;
-    unsigned m_appUnits = 0;                    //!< QLocale::MeasurementSystem
+    int m_appUnits = 0;                     //!< QLocale::MeasurementSystem
     QString m_appLanguage = "auto";
 
     // Application specific
@@ -194,7 +194,7 @@ public:
 
     QSize getInitialSize() { return m_appSize; }
     QSize getInitialPosition() { return m_appPosition; }
-    unsigned getInitialVisibility() { return m_appVisibility; }
+    int getInitialVisibility() { return m_appVisibility; }
 
     QString getAppTheme() const { return m_appTheme; }
     void setAppTheme(const QString &value);
@@ -205,8 +205,8 @@ public:
     bool getAppThemeCSD() const { return m_appThemeCSD; }
     void setAppThemeCSD(const bool value);
 
-    unsigned getAppUnits() const { return m_appUnits; }
-    void setAppUnits(unsigned value);
+    int getAppUnits() const { return m_appUnits; }
+    void setAppUnits(const int value);
 
     QString getAppLanguage() const { return m_appLanguage; }
     void setAppLanguage(const QString &value);

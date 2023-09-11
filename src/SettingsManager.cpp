@@ -430,7 +430,7 @@ void SettingsManager::setAppThemeCSD(const bool value)
     }
 }
 
-void SettingsManager::setAppUnits(const unsigned value)
+void SettingsManager::setAppUnits(const int value)
 {
     if (m_appUnits != value)
     {
