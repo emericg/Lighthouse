@@ -5,7 +5,8 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.2'
+        classpath 'com.android.tools.build:gradle:7.4.2' // works with Qt 6.5
+        //classpath 'com.android.tools.build:gradle:7.2.1' // works with Qt 6.4    }
     }
 }
 
@@ -18,8 +19,8 @@ apply plugin: 'com.android.application'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
-    implementation 'androidx.appcompat:appcompat:1.4.0'
-    implementation 'androidx.core:core:1.4.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.core:core:1.6.1'
 }
 
 android {
@@ -36,6 +37,8 @@ android {
      * Changing them manually might break the compilation!
      *******************************************************/
 
+    namespace 'io.emeric.lighthouse'
+
     compileSdkVersion androidCompileSdkVersion.toInteger()
     buildToolsVersion androidBuildToolsVersion
     ndkVersion androidNdkVersion
@@ -50,7 +53,7 @@ android {
             renderscript.srcDirs = ['src']
             assets.srcDirs = ['assets']
             jniLibs.srcDirs = ['libs']
-       }
+        }
     }
 
     tasks.withType(JavaCompile) {
