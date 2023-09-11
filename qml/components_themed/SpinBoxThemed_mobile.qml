@@ -70,7 +70,7 @@ T.SpinBox {
     contentItem: Item {
         Row {
             anchors.centerIn: parent
-            spacing: 2
+            spacing: 4
 
             TextInput {
                 height: control.height
@@ -111,7 +111,7 @@ T.SpinBox {
 
                 visible: control.legend
                 color: Theme.colorComponentText
-                opacity: 0.8
+                opacity: 0.66
 
                 text: control.legend
                 textFormat: Text.PlainText

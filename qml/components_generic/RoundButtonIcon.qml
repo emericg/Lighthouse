@@ -11,6 +11,8 @@ T.Button {
     implicitWidth: Theme.componentHeight
     implicitHeight: Theme.componentHeight
 
+    focusPolicy: Qt.NoFocus
+
     property url source
     property int sourceSize: UtilsNumber.alignTo(height * 0.666, 2)
     property int sourceRotation: 0
@@ -41,18 +43,18 @@ T.Button {
         implicitHeight: Theme.componentHeight
         radius: Theme.componentHeight
 
-        visible: (control.highlightMode === "circle" || control.highlightMode === "both" || control.background)
+        visible: (control.highlightMode === "circle" || control.highlightMode === "both" || control.backgroundVisible)
         color: control.backgroundColor
 
         opacity: {
             if (control.hovered) {
                return (control.highlightMode === "circle" ||
                        control.highlightMode === "both" ||
-                       control.background) ? 1 : 0.75
+                       control.backgroundVisible) ? 1 : 0.75
             } else if (control.highlightMode === "off") {
-                return control.background ? 1 : 0
+                return control.backgroundVisible ? 1 : 0
             } else {
-                return control.background ? 0.75 : 0
+                return control.backgroundVisible ? 0.75 : 0
             }
         }
         Behavior on opacity { NumberAnimation { duration: 333 } }

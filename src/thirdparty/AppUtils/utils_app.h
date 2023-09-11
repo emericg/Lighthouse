@@ -57,6 +57,8 @@ public:
     static Q_INVOKABLE QString appBuildModeFull();
     static Q_INVOKABLE bool isDebugBuild();
 
+    static Q_INVOKABLE QString qtVersion();
+
     // tools
     QString getAppPath() const { return m_appPath; }
     void setAppPath(const QString &value);
@@ -70,17 +72,6 @@ public:
     static Q_INVOKABLE bool isColorLight(const int color);
     static Q_INVOKABLE bool isQColorLight(const QColor &color);
 
-    // permissions
-/*
-    static Q_INVOKABLE bool checkBluetoothPermission();
-    static Q_INVOKABLE bool getBluetoothPermission();
-
-    static Q_INVOKABLE bool checkLocationPermission();
-    static Q_INVOKABLE bool getLocationPermission();
-
-    static Q_INVOKABLE bool checkCameraPermission();
-    static Q_INVOKABLE bool getCameraPermission();
-*/
     // mobile related
 
     static Q_INVOKABLE int getAndroidSdkVersion();
@@ -96,6 +87,9 @@ public:
     static Q_INVOKABLE bool getMobileStorageReadPermission();
     static Q_INVOKABLE bool checkMobileStorageWritePermission();
     static Q_INVOKABLE bool getMobileStorageWritePermission();
+
+    static Q_INVOKABLE bool checkMobileStorageFileSystemPermission();
+    static Q_INVOKABLE bool getMobileStorageFileSystemPermission(const QString &packageName);
 
     static Q_INVOKABLE bool checkMobileLocationPermission();
     static Q_INVOKABLE bool getMobileLocationPermission();
