@@ -9,16 +9,29 @@ Item {
 
     ////////////////////////////////////////////////////////////////////////////
 
+    function loadScreen() {
+        // check BLE status
+        checkBluetoothStatus()
+
+        // change screen
+        appContent.state = "DeviceList"
+    }
+
+    function backAction() {
+        if (isSelected()) exitSelectionMode()
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+
     property bool deviceAvailable: deviceManager.hasDevices
-    property bool bluetoothAvailable: deviceManager.bluetooth
-    property bool bluetoothPermissionsAvailable: deviceManager.bluetoothPermissions
+    onDeviceAvailableChanged: exitSelectionMode()
 
-    Component.onCompleted: checkStatus()
-    onBluetoothAvailableChanged: checkStatus()
-    onBluetoothPermissionsAvailableChanged: checkStatus()
-    onDeviceAvailableChanged: { checkStatus(); exitSelectionMode(); }
+    Connections {
+        target: deviceManager
+        function onBluetoothChanged() { checkBluetoothStatus() }
+    }
 
-    function checkStatus() {
+    function checkBluetoothStatus() {
         if (!utilsApp.checkMobileBleLocationPermission()) {
             utilsApp.getMobileBleLocationPermission()
         }
@@ -289,8 +302,6 @@ Item {
         ////////////////
 
         header: Column {
-            id: listLocal
-
             anchors.left: parent.left
             anchors.right: parent.right
 

@@ -245,21 +245,14 @@ void DevicePokemonGoPlus::bleWriteDone(const QLowEnergyCharacteristic &c, const 
 
 void DevicePokemonGoPlus::bleReadDone(const QLowEnergyCharacteristic &c, const QByteArray &value)
 {
-    const quint8 *data = reinterpret_cast<const quint8 *>(value.constData());
-
     qDebug() << "DevicePokemonGoPlus::bleReadDone(" << m_deviceAddress << ") on" << c.name() << " / uuid" << c.uuid() << value.size();
     qDebug() << "DATA (" << value.size() << "bytes)   >  0x" << value.toHex();
 
     if (c.uuid().toString() == "{x}")
     {
-        //
-    }
-
-    if (c.uuid().toString() == "{x}")
-    {
         if (value.size() > 0)
         {
-            //
+            //const quint8 *data = reinterpret_cast<const quint8 *>(value.constData());
         }
     }
 }

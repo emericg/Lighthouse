@@ -22,6 +22,7 @@
 #include "device.h"
 #include "DeviceManager.h"
 #include "SettingsManager.h"
+#include "DatabaseManager.h"
 #include "utils_screen.h"
 
 #include <cstdlib>
@@ -31,6 +32,7 @@
 #include <QBluetoothAddress>
 #include <QBluetoothServiceInfo>
 #include <QLowEnergyService>
+#include <QLowEnergyConnectionParameters>
 
 #include <QJsonDocument>
 #include <QSqlQuery>
@@ -66,11 +68,17 @@ Device::Device(const QString &deviceAddr, const QString &deviceName, QObject *pa
         qWarning() << "Device() '" << m_deviceAddress << "' is an invalid QBluetoothDeviceInfo...";
     }
 
-    // Device name hack // Remove MAC address from device name
+    // Device name hacks // Remove MAC address from device names
     {
         if (m_deviceName.startsWith("Flower power")) m_deviceName = "Flower power";
         else if (m_deviceName.startsWith("Parrot pot")) m_deviceName = "Parrot pot";
-        else if (m_deviceName.startsWith("6003#")) m_deviceName = "WP6003";
+        else if (m_deviceName.startsWith("ATC_")) m_deviceName = "ATC";
+
+        if (m_deviceName.startsWith("6003#")) { // ex: 6003#060030393FBB1
+            m_deviceAddressMAC = m_deviceName.last(12);
+            for (int i = 2; i < m_deviceAddressMAC.size(); i+=3) m_deviceAddressMAC.insert(i, ':');
+            m_deviceName = "WP6003";
+        }
     }
 
     // Configure timeout timer
@@ -100,11 +108,17 @@ Device::Device(const QBluetoothDeviceInfo &d, QObject *parent) : QObject(parent)
         qWarning() << "Device() '" << m_deviceAddress << "' is an invalid QBluetoothDeviceInfo...";
     }
 
-    // Device name hack // Remove MAC address from device name
+    // Device name hacks // Remove MAC address from device names
     {
         if (m_deviceName.startsWith("Flower power")) m_deviceName = "Flower power";
         else if (m_deviceName.startsWith("Parrot pot")) m_deviceName = "Parrot pot";
-        else if (m_deviceName.startsWith("6003#")) m_deviceName = "WP6003";
+        else if (m_deviceName.startsWith("ATC_")) m_deviceName = "ATC";
+
+        if (m_deviceName.startsWith("6003#")) { // ex: 6003#060030393FBB1
+            m_deviceAddressMAC = m_deviceName.last(12);
+            for (int i = 2; i < m_deviceAddressMAC.size(); i+=3) m_deviceAddressMAC.insert(i, ':');
+            m_deviceName = "WP6003";
+        }
     }
 
     // Configure timeout timer
@@ -553,12 +567,20 @@ void Device::refreshRealtimeFinished()
     Q_EMIT statusUpdated();
 }
 
+void Device::refreshAdvertisement()
+{
+    //qDebug() << "Device::refreshAdvertisement()" << getAddress() << getName();
+
+    Q_EMIT dataUpdated();
+    Q_EMIT realtimeUpdated();
+}
+
 /* ************************************************************************** */
 /* ************************************************************************** */
 
-void Device::setTimeoutTimer()
+void Device::setTimeoutTimer(int time_s)
 {
-    m_timeoutTimer.setInterval(m_timeoutInterval*1000);
+    m_timeoutTimer.setInterval(time_s*1000);
     m_timeoutTimer.start();
 }
 
@@ -889,10 +911,7 @@ bool Device::hasAddressMAC() const
     return true;
 #endif
 
-    if (m_deviceAddressMAC.isEmpty())
-        return false;
-
-    return true;
+    return !m_deviceAddressMAC.isEmpty();
 }
 
 QString Device::getAddressMAC() const
@@ -1269,7 +1288,8 @@ void Device::deviceConnected()
         m_ble_status = DeviceUtils::DEVICE_UPDATING_HISTORY;
     }
     else if (m_ble_action == DeviceUtils::ACTION_SCAN ||
-             m_ble_action == DeviceUtils::ACTION_SCAN_WITH_VALUES)
+             m_ble_action == DeviceUtils::ACTION_SCAN_WITH_VALUES ||
+             m_ble_action == DeviceUtils::ACTION_SCAN_WITHOUT_VALUES)
     {
         m_ble_status = DeviceUtils::DEVICE_WORKING;
     }
@@ -1324,8 +1344,20 @@ void Device::deviceDisconnected()
 
 void Device::deviceErrored(QLowEnergyController::Error error)
 {
+    if (error <= QLowEnergyController::NoError) return;
     qWarning() << "Device::deviceErrored(" << m_deviceAddress << ") error:" << error;
-
+/*
+    QLowEnergyController::NoError	0	No error has occurred.
+    QLowEnergyController::UnknownError	1	An unknown error has occurred.
+    QLowEnergyController::UnknownRemoteDeviceError	2	The remote Bluetooth Low Energy device with the address passed to the constructor of this class cannot be found.
+    QLowEnergyController::NetworkError	3	The attempt to read from or write to the remote device failed.
+    QLowEnergyController::InvalidBluetoothAdapterError	4	The local Bluetooth device with the address passed to the constructor of this class cannot be found or there is no local Bluetooth device.
+    QLowEnergyController::ConnectionError (since Qt 5.5)	5	The attempt to connect to the remote device failed.
+    QLowEnergyController::AdvertisingError (since Qt 5.7)	6	The attempt to start advertising failed.
+    QLowEnergyController::RemoteHostClosedError (since Qt 5.10)	7	The remote device closed the connection.
+    QLowEnergyController::AuthorizationError (since Qt 5.14)	8	The local Bluetooth device closed the connection due to insufficient authorization.
+    QLowEnergyController::MissingPermissionsError (since Qt 6.4)	9	The operating system requests permissions which were not granted by the user.
+*/
     m_lastError = QDateTime::currentDateTime();
     refreshDataFinished(false);
 }
@@ -1373,7 +1405,7 @@ void Device::bleReadNotify(const QLowEnergyCharacteristic &, const QByteArray &)
 
 void Device::parseAdvertisementData(const uint16_t, const uint16_t, const QByteArray &)
 {
-    //qDebug() << "Device::parseAdvertisementData(" << m_deviceAddress << ")";
+    //qDebug() << "Device::parseAdvertisementData(" << m_deviceName << m_deviceAddress << ")";
 }
 
 /* ************************************************************************** */

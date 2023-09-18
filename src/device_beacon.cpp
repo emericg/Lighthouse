@@ -296,6 +296,11 @@ void DeviceBeacon::triggerAction(int button, int mode)
 bool DeviceBeacon::getAction(int button, int mode,
                              int &action, QString &params)
 {
+    Q_UNUSED(button)
+    Q_UNUSED(mode)
+    Q_UNUSED(action)
+    Q_UNUSED(params)
+
     return false;
 }
 

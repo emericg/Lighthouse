@@ -113,7 +113,7 @@ ApplicationWindow {
                 else if (appContent.state === "Permissions")
                     appContent.state = screenAboutPermissions.entryPoint
                 else
-                    appContent.state = "DeviceList"
+                    screenDeviceList.loadScreen()
             }
         }
         function onRightMenuClicked() {
@@ -245,7 +245,7 @@ ApplicationWindow {
             } else if (appContent.state === "VirtualInputs") {
                 screenVirtualInputs.backAction()
             } else {
-                appContent.state = "DeviceList"
+                screenDeviceList.loadScreen()
             }
         }
 

@@ -115,7 +115,7 @@ Loader {
         ////////
 
         function backAction() {
-            appContent.state = "DeviceList"
+            screenDeviceList.loadScreen()
         }
 
         function isHistoryMode() {

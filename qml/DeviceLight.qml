@@ -141,7 +141,7 @@ Loader {
 
             currentDevice.deviceDisconnect()
 
-            appContent.state = "DeviceList"
+            screenDeviceList.loadScreen()
         }
 
         function isHistoryMode() {

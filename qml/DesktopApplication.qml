@@ -87,7 +87,7 @@ ApplicationWindow {
             if (appContent.state === "Tutorial") {
                 appContent.state = screenTutorial.entryPoint
             } else if (appContent.state !== "DeviceList") {
-                appContent.state = "DeviceList"
+                screenDeviceList.loadScreen()
             }
         }
 
@@ -149,20 +149,20 @@ ApplicationWindow {
             }
         }
 
-        function onDevicesButtonClicked() { appContent.state = "DeviceList" }
+        function onDevicesButtonClicked() { screenDeviceList.loadScreen() }
         function onSettingsButtonClicked() { screenSettings.loadScreen() }
         function onAboutButtonClicked() { screenAbout.loadScreen() }
     }
 
     Connections {
         target: systrayManager
-        function onSensorsClicked() { appContent.state = "DeviceList" }
+        function onSensorsClicked() { screenDeviceList.loadScreen() }
         function onSettingsClicked() { screenSettings.loadScreen() }
     }
 
     Connections {
         target: menubarManager
-        function onSensorsClicked() { appContent.state = "DeviceList" }
+        function onSensorsClicked() { screenDeviceList.loadScreen() }
         function onSettingsClicked() { screenSettings.loadScreen() }
         function onAboutClicked() { screenAbout.loadScreen() }
         function onTutorialClicked() { screenTutorial.loadScreenFrom(appContent.state) }
@@ -251,7 +251,7 @@ ApplicationWindow {
         } else if (appContent.state === "Tutorial") {
             appContent.state = screenTutorial.entryPoint
         } else { // default
-            appContent.state = "DeviceList"
+            screenDeviceList.loadScreen()
         }
     }
     function forwardAction() {

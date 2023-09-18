@@ -43,7 +43,7 @@ Drawer {
                 anchors.rightMargin: -1
 
                 height: Math.max(screenPaddingTop, screenPaddingStatusbar)
-                color: Theme.colorBackground // to hide flickable content
+                color: Theme.colorStatusbar // to be able to read statusbar content
             }
 
             ////////
@@ -93,12 +93,16 @@ Drawer {
             anchors.bottom: parent.bottom
 
             contentWidth: -1
-            contentHeight: column.height
+            contentHeight: contentColumn.height
 
             Column {
-                id: column
+                id: contentColumn
                 anchors.left: parent.left
                 anchors.right: parent.right
+
+                ////////
+
+                ListSeparatorPadded { }
 
                 ////////
 
@@ -108,8 +112,7 @@ Drawer {
                     iconSource: "qrc:/assets/logos/logo_tray_symbolic.svg"
 
                     onClicked: {
-                        //screenDeviceList.loadScreen()
-                        appContent.state = "DeviceList"
+                        screenDeviceList.loadScreen()
                         appDrawer.close()
                     }
                 }

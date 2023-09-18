@@ -99,11 +99,11 @@ class Device: public QObject
     Q_PROPERTY(int serviceClass READ getServiceClass NOTIFY advertisementUpdated)
     Q_PROPERTY(int bluetoothConfiguration READ getBluetoothConfiguration NOTIFY advertisementUpdated)
 
-    Q_PROPERTY(bool enabled READ isEnabled NOTIFY statusUpdated)
     Q_PROPERTY(int status READ getStatus NOTIFY statusUpdated)
     Q_PROPERTY(int action READ getAction NOTIFY statusUpdated)
-    Q_PROPERTY(bool busy READ isBusy NOTIFY statusUpdated)
+    Q_PROPERTY(bool enabled READ isEnabled NOTIFY statusUpdated)
     Q_PROPERTY(bool connected READ isConnected NOTIFY statusUpdated)
+    Q_PROPERTY(bool busy READ isBusy NOTIFY statusUpdated)
     Q_PROPERTY(bool working READ isWorking NOTIFY statusUpdated)
     Q_PROPERTY(bool updating READ isUpdating NOTIFY statusUpdated)
     Q_PROPERTY(bool errored READ isErrored NOTIFY statusUpdated)
@@ -180,9 +180,12 @@ protected:
     QDateTime m_lastError;
     bool m_firmware_uptodate = false;
 
-    int m_timeoutInterval = 12;
+    const static int s_timeout = 12;
+    const static int s_timeoutConnection = 12;
+    const static int s_timeoutError = 12;
+
     QTimer m_timeoutTimer;
-    void setTimeoutTimer();
+    void setTimeoutTimer(int time_s = s_timeout);
 
     // Device time
     int64_t m_device_time = -1;
@@ -225,6 +228,7 @@ protected:
     virtual void refreshHistoryFinished(bool status);
     virtual void refreshRealtime();
     virtual void refreshRealtimeFinished();
+    virtual void refreshAdvertisement();
 
     virtual bool getSqlDeviceInfos();
 
@@ -242,7 +246,7 @@ public:
     virtual ~Device();
 
     void setName(const QString &name);
-    void setDeviceClass(const int major, const int minor, const int service);
+    virtual void setDeviceClass(const int major, const int minor, const int service);
     virtual void setCoreConfiguration(const int bleconf);
 
     // Device infos

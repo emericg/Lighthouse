@@ -41,7 +41,7 @@ Loader {
                 return
             }
 
-            appContent.state = "DeviceList"
+            screenDeviceList.loadScreen()
         }
 
         ////////////////

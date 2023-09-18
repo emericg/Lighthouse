@@ -96,7 +96,7 @@ Rectangle {
             colorHighlight: Theme.colorTabletmenuHighlight
 
             highlighted: (appContent.state === "DeviceList")
-            onClicked: appContent.state = "DeviceList"
+            onClicked: screenDeviceList.loadScreen()
         }
         MobileMenuItem_horizontal {
             id: menuSettings

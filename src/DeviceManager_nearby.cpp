@@ -40,12 +40,12 @@ void DeviceManager::scanNearby_stop()
 
 /* ************************************************************************** */
 
-void DeviceManager::addNearbyBleDevice(const QBluetoothDeviceInfo &info)
+void DeviceManager::addNearbyBleDevice(const QBluetoothDeviceInfo &)
 {
     //
 }
 
-void DeviceManager::updateNearbyBleDevice(const QBluetoothDeviceInfo &info, QBluetoothDeviceInfo::Fields updatedFields)
+void DeviceManager::updateNearbyBleDevice(const QBluetoothDeviceInfo &, QBluetoothDeviceInfo::Fields)
 {
     //
 }
