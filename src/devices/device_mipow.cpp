@@ -212,7 +212,7 @@ void DeviceMiPow::serviceDetailsDiscovered_data(QLowEnergyService::ServiceState 
 
 void DeviceMiPow::serviceError(QLowEnergyService::ServiceError error)
 {
-    //qDebug() << "DeviceMiPow::serviceError(err:" << error;
+    qDebug() << "DeviceMiPow::serviceError(err:" << error;
 }
 
 /* ************************************************************************** */

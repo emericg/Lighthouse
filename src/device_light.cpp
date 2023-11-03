@@ -73,29 +73,29 @@ DeviceLight::~DeviceLight()
 
 /* ************************************************************************** */
 
-void DeviceLight::setMode(unsigned value)
+void DeviceLight::setMode(unsigned)
 {
     //
 }
 
-void DeviceLight::setEffect(unsigned value)
+void DeviceLight::setEffect(unsigned)
 {
     //
 }
 
 /* ************************************************************************** */
 
-void DeviceLight::setLuminosity(unsigned value)
+void DeviceLight::setLuminosity(unsigned)
 {
     //
 }
 
-void DeviceLight::setColor(unsigned value)
+void DeviceLight::setColor(unsigned)
 {
     //
 }
 
-void DeviceLight::setColorAndBrightness(unsigned luminosity, unsigned r, unsigned g, unsigned b)
+void DeviceLight::setColorAndBrightness(unsigned, unsigned, unsigned, unsigned)
 {
     //
 }

@@ -53,11 +53,11 @@ class DeviceManager: public QObject
 
     ////////
 
+    Q_PROPERTY(bool advertising READ isAdvertising NOTIFY advertisingChanged)
     Q_PROPERTY(bool listening READ isListening NOTIFY listeningChanged)
     Q_PROPERTY(bool scanning READ isScanning NOTIFY scanningChanged)
     Q_PROPERTY(bool updating READ isUpdating NOTIFY updatingChanged)
     Q_PROPERTY(bool syncing READ isSyncing NOTIFY syncingChanged)
-    Q_PROPERTY(bool advertising READ isAdvertising NOTIFY advertisingChanged)
 
     Q_PROPERTY(bool bluetooth READ hasBluetooth NOTIFY bluetoothChanged)
     Q_PROPERTY(bool bluetoothAdapter READ hasBluetoothAdapter NOTIFY bluetoothChanged)
@@ -157,11 +157,11 @@ Q_SIGNALS:
     void devicesNearbyUpdated();
     void devicesBlacklistUpdated();
 
+    void advertisingChanged();
     void listeningChanged();
     void scanningChanged();
     void updatingChanged();
     void syncingChanged();
-    void advertisingChanged();
     void hostModeChanged();
 
 private slots:
