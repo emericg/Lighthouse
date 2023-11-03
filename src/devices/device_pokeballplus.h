@@ -51,6 +51,12 @@ class DevicePokeballPlus: public DeviceBeacon
 
     Q_PROPERTY(float axis_x READ getXf NOTIFY axisChanged)
     Q_PROPERTY(float axis_y READ getYf NOTIFY axisChanged)
+    Q_PROPERTY(float gyroX READ getGyroXf NOTIFY gyroChanged)
+    Q_PROPERTY(float gyroY READ getGyroYf NOTIFY gyroChanged)
+    Q_PROPERTY(float gyroZ READ getGyroZf NOTIFY gyroChanged)
+    Q_PROPERTY(float acclX READ getAcclXf NOTIFY acclChanged)
+    Q_PROPERTY(float acclY READ getAcclYf NOTIFY acclChanged)
+    Q_PROPERTY(float acclZ READ getAcclZf NOTIFY acclChanged)
 
     // QLowEnergyController related
     void serviceScanDone();
@@ -71,19 +77,34 @@ class DevicePokeballPlus: public DeviceBeacon
     QString m_deviceMode = "gamepad";
 
     // virtual gamepad
+    Gamepad *m_gamepad = nullptr;
+
     float m_axis_x = 0.f;
     float m_axis_y = 0.f;
     float getXf() { return m_axis_x; };
     float getYf() { return m_axis_y; };
-    Gamepad *m_gamepad = nullptr;
+
+    float m_gyro_x = 0.f;
+    float m_gyro_y = 0.f;
+    float m_gyro_z = 0.f;
+    float getGyroXf() { return m_gyro_x; };
+    float getGyroYf() { return m_gyro_y; };
+    float getGyroZf() { return m_gyro_z; };
+
+    float m_accl_x = 0.f;
+    float m_accl_y = 0.f;
+    float m_accl_z = 0.f;
+    float getAcclXf() { return m_accl_x; };
+    float getAcclYf() { return m_accl_y; };
+    float getAcclZf() { return m_accl_z; };
 
 Q_SIGNALS:
     void autoconnectChanged();
     void devicemodeChanged();
     void btnChanged();
     void axisChanged();
-    void acclChanged();
     void gyroChanged();
+    void acclChanged();
 
 protected:
     int getButtonCount() { return 2; }
