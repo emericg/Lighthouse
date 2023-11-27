@@ -548,8 +548,8 @@ Loader {
                 visible: element_bluetoothControl.visible
 
                 text: settingsManager.bluetoothControl ?
-                          qsTr("Lighthouse will only operate if your device's Bluetooth is already enabled.") :
-                          qsTr("Lighthouse will enable your device's Bluetooth in order to operate.")
+                          qsTr("Lighthouse will enable your device's Bluetooth in order to operate.") :
+                          qsTr("Lighthouse will only operate if your device's Bluetooth is already enabled.")
                 textFormat: Text.PlainText
                 wrapMode: Text.WordWrap
                 color: Theme.colorSubText

@@ -264,9 +264,9 @@ Loader {
                 onClicked: screenAboutPermissions.loadScreenFrom("About")
             }
 
-            ListSeparator { }
-
             ////////
+
+            ListSeparator { }
 
             Item { // list dependencies
                 anchors.left: parent.left
@@ -330,6 +330,43 @@ Loader {
                             wrapMode: Text.WordWrap
                         }
                     }
+                }
+            }
+
+            ////////
+
+            ListSeparator { }
+
+            Column { // list debug stuff
+                anchors.left: parent.left
+                anchors.leftMargin: screenPaddingLeft + appHeader.headerPosition
+                anchors.right: parent.right
+                anchors.rightMargin: screenPaddingRight + Theme.componentMargin
+
+                visible: settingsManager.showDebug
+                spacing: Theme.componentMargin * 0.4
+
+                Item { width: 8; height: 8; } // padding
+
+                Text {
+                    color: Theme.colorSubText
+                    text: "build mode: %1".arg(utilsApp.appBuildModeFull())
+                    font.pixelSize: Theme.fontSizeContent
+                }
+                Text {
+                    color: Theme.colorSubText
+                    text: "build date: %1".arg(utilsApp.appBuildDateTime())
+                    font.pixelSize: Theme.fontSizeContent
+                }
+                Text {
+                    color: Theme.colorSubText
+                    text: "build mode: %1".arg(utilsApp.appBuildModeFull())
+                    font.pixelSize: Theme.fontSizeContent
+                }
+                Text {
+                    color: Theme.colorSubText
+                    text: "Qt version: %1".arg(utilsApp.qtVersion())
+                    font.pixelSize: Theme.fontSizeContent
                 }
             }
 

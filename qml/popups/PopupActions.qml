@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import Qt5Compat.GraphicalEffects
 
 import ThemeEngine
 import LocalActions
@@ -86,17 +87,29 @@ Popup {
 
     ////////////////////////////////////////////////////////////////////////////
 
-    background: Rectangle {
-        color: Theme.colorBackground
-        border.color: Theme.colorSeparator
-        border.width: singleColumn ? 0 : Theme.componentBorderWidth
-        radius: singleColumn ? 0 : Theme.componentRadius
-
+    background: Item {
         Rectangle {
-            width: parent.width
-            height: Theme.componentBorderWidth
-            visible: singleColumn
-            color: Theme.colorSeparator
+            id: bgrect
+            anchors.fill: parent
+
+            radius: singleColumn ? 0 : Theme.componentRadius
+            color: Theme.colorBackground
+            border.color: Theme.colorSeparator
+            border.width: singleColumn ? 0 : Theme.componentBorderWidth
+
+            Rectangle {
+                width: parent.width
+                height: Theme.componentBorderWidth
+                visible: singleColumn
+                color: Theme.colorSeparator
+            }
+        }
+        DropShadow {
+            anchors.fill: parent
+            source: bgrect
+            color: "#60000000"
+            samples: 24
+            cached: true
         }
     }
 
