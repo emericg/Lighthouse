@@ -30,7 +30,7 @@
 #include "utils_screen.h"
 #include "utils_language.h"
 #if defined(Q_OS_MACOS)
-#include "utils_os_macosdock.h"
+#include "utils_os_macos_dock.h"
 #endif
 
 #include "network_controls/network_server.h"
@@ -39,9 +39,9 @@
 #include "local_controls/local_actions.h"
 #include "local_controls/mpris_dbus.h"
 
-#include <MobileUI/MobileUI.h>
-#include <SingleApplication/SingleApplication.h>
-#include <QmlRadialBar/QmlRadialBar.h>
+#include <MobileUI>
+#include <SingleApplication>
+#include <QmlRadialBar>
 
 #include <QtGlobal>
 #include <QLibraryInfo>
@@ -178,6 +178,7 @@ int main(int argc, char *argv[])
 #else
     engine.load(QUrl(QStringLiteral("qrc:/qml/DesktopApplication.qml")));
 #endif
+
     if (engine.rootObjects().isEmpty())
     {
         qWarning() << "Cannot init QmlApplicationEngine!";
@@ -197,7 +198,7 @@ int main(int argc, char *argv[])
     QObject::connect(&app, &SingleApplication::instanceStarted, window, &QQuickWindow::raise);
 
     // Systray?
-    st->setupSystray(&app, window);
+    st->setupSystray(window);
     if (sm->getSysTray()) st->installSystray();
 
     // Menu bar

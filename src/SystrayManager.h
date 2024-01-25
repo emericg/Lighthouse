@@ -41,8 +41,8 @@ class SystrayManager: public QObject
 {
     Q_OBJECT
 
-    QQuickWindow *m_saved_view = nullptr;
     QApplication *m_saved_app = nullptr;
+    QQuickWindow *m_saved_window = nullptr;
 
     QSystemTrayIcon *m_sysTray = nullptr;
     QIcon *m_sysTrayIcon = nullptr;
@@ -71,16 +71,16 @@ signals:
 
 public:
     static SystrayManager *getInstance();
-    void setupSystray(QApplication *app, QQuickWindow *view);
+    void setupSystray(QQuickWindow *window);
 
 public slots:
     bool installSystray();
     void REinstallSystray();
     void removeSystray();
-    void sendNotification(QString &text);
+    void sendNotification(const QString &text);
 
 private slots:
-    void trayClicked(QSystemTrayIcon::ActivationReason r);
+    void trayClicked(const QSystemTrayIcon::ActivationReason r);
     void showHideButton();
     void sensorsButton();
     void settingsButton();
