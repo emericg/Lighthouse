@@ -26,6 +26,10 @@
 #include <QObject>
 #include <QString>
 
+#if defined(Q_OS_IOS)
+#include "utils_os_ios_notif.h"
+#endif
+
 /* ************************************************************************** */
 
 /*!
@@ -35,32 +39,44 @@ class NotificationManager : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString notification READ getNotification WRITE setNotification NOTIFY notificationChanged)
+    Q_PROPERTY(QString notification READ getNotification WRITE setNotificationShort NOTIFY notificationChanged)
+
+    Q_PROPERTY(bool permissionOS READ hasPermissionOS NOTIFY permissionsChanged)
 
     static NotificationManager *instance;
 
     NotificationManager();
     ~NotificationManager();
 
-public:
-    static NotificationManager *getInstance();
-
-    void setNotification(const QString &message, int channel = 0);
-    void setNotification2(const QString &title, const QString &message, int channel = 0);
-    QString getNotification() const;
-
-signals:
-    void notificationChanged();
-
-private slots:
-    void updateNotificationAndroid();
-    void updateNotificationIos();
-    void updateNotificationDesktop();
-
-private:
     QString m_title;
     QString m_message;
     int m_channel = 0;
+
+    bool m_permOS = false;
+    bool hasPermissionOS() const { return m_permOS; }
+
+#if defined(Q_OS_IOS)
+    UtilsIOSNotifications m_iosnotifier;
+#endif
+
+private slots:
+    void updateNotificationAndroid();
+    void updateNotificationIOS();
+    void updateNotificationDesktop();
+
+signals:
+    void notificationChanged();
+    void permissionsChanged();
+
+public:
+    static NotificationManager *getInstance();
+
+    Q_INVOKABLE bool checkNotificationPermissions();
+    Q_INVOKABLE bool requestNotificationPermissions();
+
+    QString getNotification() const { return m_message; }
+    void setNotification(const QString &title, const QString &message, int channel = 0);
+    void setNotificationShort(const QString &message);
 };
 
 /* ************************************************************************** */

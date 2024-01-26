@@ -72,11 +72,6 @@ int main(int argc, char *argv[])
 
     // GUI application /////////////////////////////////////////////////////////
 
-#if defined(Q_OS_ANDROID)
-    // Set navbar color, same as the loading screen
-    MobileUI::setNavbarColor("white");
-#endif
-
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
     // NVIDIA suspend&resume hack
     auto format = QSurfaceFormat::defaultFormat();
@@ -88,23 +83,15 @@ int main(int argc, char *argv[])
 
     // Application name
     app.setApplicationName("Lighthouse");
-    app.setApplicationDisplayName("Lighthouse");
     app.setOrganizationName("Lighthouse");
     app.setOrganizationDomain("Lighthouse");
 
-#if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
-    QIcon appIcon(":/assets/logos/logo.svg");
-    app.setWindowIcon(appIcon);
-#endif
-
-    // Init components
+    // Init app components
     SettingsManager *sm = SettingsManager::getInstance();
     DatabaseManager *db = DatabaseManager::getInstance();
-    SystrayManager *st = SystrayManager::getInstance();
-    MenubarManager *mb = MenubarManager::getInstance();
     NotificationManager *nm = NotificationManager::getInstance();
     DeviceManager *dm = new DeviceManager;
-    if (!sm || !db || !st || !mb || !nm || !dm)
+    if (!sm || !db || !nm || !dm)
     {
         qWarning() << "Cannot init Lighthouse components!";
         return EXIT_FAILURE;
@@ -112,15 +99,22 @@ int main(int argc, char *argv[])
 
     NetworkServer *networkServer = nullptr;
     NetworkClient *networkClient = nullptr;
+
+#if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS) // desktop section
+    app.setApplicationDisplayName("Lighthouse");
+    app.setWindowIcon(QIcon(":/assets/logos/logo.svg"));
+
+    SystrayManager *st = SystrayManager::getInstance();
+    MenubarManager *mb = MenubarManager::getInstance();    
     LocalControls *localControls = LocalControls::getInstance();
 
 #if defined(ENABLE_MPRIS)
-    MprisController *mprisControls = nullptr;
-    mprisControls = MprisController::getInstance();
+    MprisController *mprisControls = MprisController::getInstance();
     mprisControls->select_player();
 #endif
+#endif
 
-#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS) // mobile section
     networkClient = new NetworkClient();
     networkClient->connectToServer();
 #else
@@ -156,26 +150,27 @@ int main(int argc, char *argv[])
 
     engine_context->setContextProperty("deviceManager", dm);
     engine_context->setContextProperty("settingsManager", sm);
-    engine_context->setContextProperty("systrayManager", st);
-    engine_context->setContextProperty("menubarManager", mb);
 
     engine_context->setContextProperty("utilsApp", utilsApp);
-    engine_context->setContextProperty("utilsLanguage", utilsLanguage);
     engine_context->setContextProperty("utilsScreen", utilsScreen);
+    engine_context->setContextProperty("utilsLanguage", utilsLanguage);
 
     engine_context->setContextProperty("networkServer", networkServer);
     engine_context->setContextProperty("networkClient", networkClient);
-    engine_context->setContextProperty("localControls", localControls);
-#if defined(ENABLE_MPRIS)
-    engine_context->setContextProperty("mprisControls", mprisControls);
-#endif
 
-    engine_context->setContextProperty("startMinimized", (start_minimized || sm->getMinimized()));
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS) || defined(FORCE_MOBILE_UI)
 
     // Load the main view
-#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS) || defined(FORCE_MOBILE_UI)
     engine.load(QUrl(QStringLiteral("qrc:/qml/MobileApplication.qml")));
 #else
+    // desktop specific stuff
+    engine_context->setContextProperty("startMinimized", (start_minimized || sm->getMinimized()));
+    engine_context->setContextProperty("systrayManager", st);
+    engine_context->setContextProperty("menubarManager", mb);
+    engine_context->setContextProperty("localControls", localControls);
+    engine_context->setContextProperty("mprisControls", mprisControls);
+
+    // Load the main view
     engine.load(QUrl(QStringLiteral("qrc:/qml/DesktopApplication.qml")));
 #endif
 

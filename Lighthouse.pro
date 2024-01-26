@@ -6,9 +6,12 @@ DEFINES+= APP_VERSION=\\\"$$VERSION\\\"
 
 CONFIG += c++17
 QT     += core bluetooth network sql
-QT     += multimedia # to play sound effects on actions
 QT     += qml quick quickcontrols2 svg
-QT     += widgets # for proper systray support
+
+!android:!ios {
+    QT += multimedia # to play sound effects on actions
+    QT += widgets # for proper systray support
+}
 
 # Validate Qt version
 !versionAtLeast(QT_VERSION, 6.5) : error("You need at least Qt version 6.5 for $${TARGET}")
@@ -30,7 +33,11 @@ include(src/thirdparty/MobileUI/MobileUI.pri)
 
 # SingleApplication for desktop OS
 include(src/thirdparty/SingleApplication/SingleApplication.pri)
-DEFINES += QAPPLICATION_CLASS=QApplication
+android | ios {
+    DEFINES += QAPPLICATION_CLASS=QGuiApplication
+} else {
+    DEFINES += QAPPLICATION_CLASS=QApplication
+}
 
 # Various utils
 include(src/thirdparty/AppUtils/AppUtils.pri)
@@ -43,8 +50,6 @@ include(src/thirdparty/QmlRadialBar/QmlRadialBar.pri)
 SOURCES  += src/main.cpp \
             src/SettingsManager.cpp \
             src/DatabaseManager.cpp \
-            src/SystrayManager.cpp \
-            src/MenubarManager.cpp \
             src/NotificationManager.cpp \
             src/DeviceManager.cpp \
             src/DeviceManager_advertisement.cpp \
@@ -59,17 +64,16 @@ SOURCES  += src/main.cpp \
             src/devices/device_ylai003.cpp \
             src/devices/device_ylkg07yl.cpp \
             src/devices/device_ylyk01yl.cpp \
+            src/local_controls/local_controls.cpp \
             src/network_controls/network_server.cpp \
             src/network_controls/network_client.cpp \
-            src/local_controls/local_controls.cpp \
-            src/local_controls/mouse.cpp \
-            src/local_controls/keyboard.cpp \
-            src/local_controls/gamepad.cpp
+            src/crypto/RC4/rc4.cpp \
+            src/crypto/pgp/aes.c \
+            src/crypto/pgp/pgp-cert.c \
+            src/crypto/pgp/secrets.c
 
 HEADERS  += src/SettingsManager.h \
             src/DatabaseManager.h \
-            src/MenubarManager.h \
-            src/SystrayManager.h \
             src/NotificationManager.h \
             src/DeviceManager.h \
             src/DeviceFilter.h \
@@ -83,13 +87,28 @@ HEADERS  += src/SettingsManager.h \
             src/devices/device_ylai003.h \
             src/devices/device_ylkg07yl.h \
             src/devices/device_ylyk01yl.h \
+            src/local_controls/local_actions.h \
+            src/local_controls/local_controls.h \
             src/network_controls/network_server.h \
             src/network_controls/network_client.h \
-            src/local_controls/local_controls.h \
-            src/local_controls/local_actions.h \
+            src/crypto/RC4/rc4.cpp \
+            src/crypto/pgp/aes.c \
+            src/crypto/pgp/pgp-cert.c \
+            src/crypto/pgp/secrets.c
+
+!android:!ios {
+SOURCES  += src/MenubarManager.cpp \
+            src/SystrayManager.cpp \
+            src/local_controls/mouse.cpp \
+            src/local_controls/keyboard.cpp \
+            src/local_controls/gamepad.cpp \
+
+HEADERS  += src/MenubarManager.h \
+            src/SystrayManager.h \
             src/local_controls/mouse.h \
             src/local_controls/keyboard.h \
             src/local_controls/gamepad.h
+}
 
 INCLUDEPATH += src/ src/thirdparty/
 

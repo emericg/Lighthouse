@@ -28,6 +28,10 @@
 #include "gamepad_uinput.h"
 #include "mpris_dbus.h"
 
+#if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
+#include <QMediaPlayer>
+#include <QAudioOutput>
+#endif
 #include <QProcess>
 #include <QDebug>
 
@@ -112,8 +116,8 @@ void LocalControls::action(int action_code, const QString &action_params)
     {
         if (action_code == LocalActions::ACTION_KEYBOARD_computer_lock)
         {
+#if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
             // sound effect?
-
             if (!player)
             {
                 audioOutput = new QAudioOutput;
@@ -122,12 +126,12 @@ void LocalControls::action(int action_code, const QString &action_params)
                 player = new QMediaPlayer;
                 player->setAudioOutput(audioOutput);
             }
-
             if (player)
             {
                 player->setSource(QUrl("qrc:/assets/sounds/car-lock-sound-effect.ogg"));
                 player->play();
             }
+#endif
         }
 
         if (keyboard)

@@ -8,6 +8,7 @@ import "qrc:/js/UtilsDeviceSensors.js" as UtilsDeviceSensors
 
 Loader {
     id: deviceLight
+    anchors.fill: parent
 
     property var currentDevice: null
 

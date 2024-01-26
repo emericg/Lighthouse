@@ -15,10 +15,10 @@ ApplicationWindow {
     visible: true
 
     property bool isHdpi: (utilsScreen.screenDpi >= 128 || utilsScreen.screenPar >= 2.0)
-    property bool isDesktop: (Qt.platform.os !== "ios" && Qt.platform.os !== "android")
-    property bool isMobile: (Qt.platform.os === "ios" || Qt.platform.os === "android")
-    property bool isPhone: ((Qt.platform.os === "ios" || Qt.platform.os === "android") && (utilsScreen.screenSize < 7.0))
-    property bool isTablet: ((Qt.platform.os === "ios" || Qt.platform.os === "android") && (utilsScreen.screenSize >= 7.0))
+    property bool isDesktop: (Qt.platform.os !== "android" && Qt.platform.os !== "ios")
+    property bool isMobile: (Qt.platform.os === "android" || Qt.platform.os === "ios")
+    property bool isPhone: ((Qt.platform.os === "android" || Qt.platform.os === "ios") && (utilsScreen.screenSize < 7.0))
+    property bool isTablet: ((Qt.platform.os === "android" || Qt.platform.os === "ios") && (utilsScreen.screenSize >= 7.0))
 
     // Mobile stuff ////////////////////////////////////////////////////////////
 
@@ -26,7 +26,6 @@ ApplicationWindow {
     // 4 = Qt.InvertedPortraitOrientation, 8 = Qt.InvertedLandscapeOrientation
     property int screenOrientation: Screen.primaryOrientation
     property int screenOrientationFull: Screen.orientation
-    onScreenOrientationChanged: handleSafeAreas()
 
     property int screenPaddingStatusbar: 0
     property int screenPaddingNavbar: 0
@@ -36,9 +35,14 @@ ApplicationWindow {
     property int screenPaddingRight: 0
     property int screenPaddingBottom: 0
 
+    onScreenOrientationChanged: handleSafeAreas()
+    onVisibilityChanged: handleSafeAreas()
+
     function handleSafeAreas() {
-        // safe areas are only taken into account if using full screen mode
-        if (flags & Qt.MaximizeUsingFullscreenGeometryHint) {
+        // safe areas are only taken into account when using maximized geometry / full screen mode
+        if (appWindow.visibility === Window.FullScreen ||
+            appWindow.flags & Qt.MaximizeUsingFullscreenGeometryHint) {
+
             screenPaddingStatusbar = mobileUI.statusbarHeight
             screenPaddingNavbar = mobileUI.navbarHeight
 
@@ -47,25 +51,37 @@ ApplicationWindow {
             screenPaddingRight = mobileUI.safeAreaRight
             screenPaddingBottom = mobileUI.safeAreaBottom
 
+            // hacks
             if (Qt.platform.os === "android") {
-                if (Screen.primaryOrientation === Qt.PortraitOrientation) {
-                    screenPaddingStatusbar = screenPaddingTop // hack
-                    //screenPaddingBottom = screenPaddingNavbar // hack
-                } else {
+                if (appWindow.visibility === Window.FullScreen) {
+                    screenPaddingStatusbar = 0
                     screenPaddingNavbar = 0
                 }
             }
+            // hacks
             if (Qt.platform.os === "ios") {
-                //
+                if (appWindow.visibility === Window.FullScreen) {
+                    screenPaddingStatusbar = 0
+                }
             }
+        } else {
+            screenPaddingStatusbar = 0
+            screenPaddingNavbar = 0
+            screenPaddingTop = 0
+            screenPaddingLeft = 0
+            screenPaddingRight = 0
+            screenPaddingBottom = 0
         }
 /*
         console.log("> handleSafeAreas()")
+        console.log("- window mode:         " + appWindow.visibility)
+        console.log("- window flags:        " + appWindow.flags)
+        console.log("- screen dpi:          " + Screen.devicePixelRatio)
         console.log("- screen width:        " + Screen.width)
         console.log("- screen width avail:  " + Screen.desktopAvailableWidth)
         console.log("- screen height:       " + Screen.height)
         console.log("- screen height avail: " + Screen.desktopAvailableHeight)
-        console.log("- screen orientation:  " + Screen.orientation)
+        console.log("- screen orientation (full): " + Screen.orientation)
         console.log("- screen orientation (primary): " + Screen.primaryOrientation)
         console.log("- screenSizeStatusbar: " + screenPaddingStatusbar)
         console.log("- screenSizeNavbar:    " + screenPaddingNavbar)
@@ -78,8 +94,8 @@ ApplicationWindow {
 
     MobileUI {
         id: mobileUI
+
         statusbarTheme: Theme.themeStatusbar
-        statusbarColor: Theme.colorStatusbar
         navbarColor: {
             if (appContent.state === "Tutorial") return Theme.colorHeader
             return Theme.colorBackground
@@ -110,7 +126,7 @@ ApplicationWindow {
                     appContent.state = screenTutorial.entryPoint
                  else if (appContent.state === "PlantBrowser")
                     appContent.state = screenPlantBrowser.entryPoint
-                else if (appContent.state === "Permissions")
+                else if (appContent.state === "AboutPermissions")
                     appContent.state = screenAboutPermissions.entryPoint
                 else
                     screenDeviceList.loadScreen()
@@ -215,6 +231,7 @@ ApplicationWindow {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
+        anchors.bottomMargin: screenPaddingNavbar + screenPaddingBottom
 
         focus: true
         Keys.onBackPressed: {
@@ -238,7 +255,7 @@ ApplicationWindow {
                 }
             } else if (appContent.state === "DeviceLight") {
                 screenDeviceLight.backAction()
-            } else if (appContent.state === "Permissions") {
+            } else if (appContent.state === "AboutPermissions") {
                 appContent.state = screenAboutPermissions.entryPoint
             } else if (appContent.state === "Tutorial") {
                 appContent.state = screenTutorial.entryPoint
@@ -250,38 +267,34 @@ ApplicationWindow {
         }
 
         Tutorial {
-            anchors.fill: parent
             id: screenTutorial
+            anchors.bottomMargin: mobileMenu.hhv
         }
 
         DeviceList {
             id: screenDeviceList
-            anchors.fill: parent
             anchors.bottomMargin: mobileMenu.hhv
         }
         DeviceLight {
-            anchors.fill: parent
             id: screenDeviceLight
+            anchors.bottomMargin: mobileMenu.hhv
         }
 
         VirtualInputs {
-            anchors.fill: parent
             id: screenVirtualInputs
+            anchors.bottomMargin: mobileMenu.hhv
         }
 
         Settings {
             id: screenSettings
-            anchors.fill: parent
             anchors.bottomMargin: mobileMenu.hhv
         }
         About {
             id: screenAbout
-            anchors.fill: parent
             anchors.bottomMargin: mobileMenu.hhv
         }
         MobilePermissions {
             id: screenAboutPermissions
-            anchors.fill: parent
             anchors.bottomMargin: mobileMenu.hhv
         }
 
@@ -373,8 +386,8 @@ ApplicationWindow {
                 PropertyChanges { target: screenAboutPermissions; visible: false; enabled: false; }
             },
             State {
-                name: "Permissions"
-                PropertyChanges { target: appHeader; headerTitle: qsTr("Permissions"); }
+                name: "AboutPermissions"
+                PropertyChanges { target: appHeader; headerTitle: qsTr("About permissions"); }
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
                 PropertyChanges { target: screenVirtualInputs; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }

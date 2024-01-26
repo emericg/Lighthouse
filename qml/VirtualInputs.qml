@@ -5,6 +5,7 @@ import ThemeEngine
 
 Loader {
     id: virtualInputs
+    anchors.fill: parent
 
     ////////
 

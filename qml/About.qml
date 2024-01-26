@@ -6,6 +6,7 @@ import "qrc:/js/UtilsNumber.js" as UtilsNumber
 
 Loader {
     id: screenAbout
+    anchors.fill: parent
 
     ////////////////////////////////////////////////////////////////////////////
 
@@ -277,10 +278,10 @@ Loader {
                 height: 40 + dependenciesText.height + dependenciesColumn.height
 
                 IconSvg {
-                    width: 28
-                    height: 28
+                    width: 24
+                    height: 24
                     anchors.left: parent.left
-                    anchors.leftMargin: 2
+                    anchors.leftMargin: 4
                     anchors.verticalCenter: dependenciesText.verticalCenter
 
                     source: "qrc:/assets/icons_material/baseline-settings-20px.svg"
@@ -335,40 +336,66 @@ Loader {
 
             ////////
 
-            ListSeparator { }
+            ListSeparatorPadded { }
 
-            Column { // list debug stuff
+            Item { // list debug stuff
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft + appHeader.headerPosition
+                anchors.leftMargin: screenPaddingLeft + Theme.componentMargin
                 anchors.right: parent.right
                 anchors.rightMargin: screenPaddingRight + Theme.componentMargin
 
-                visible: settingsManager.showDebug
-                spacing: Theme.componentMargin * 0.4
+                height: 16 + debugColumn.height
 
-                Item { width: 8; height: 8; } // padding
+                IconSvg {
+                    width: 24
+                    height: 24
+                    anchors.top: debugColumn.top
+                    anchors.topMargin: 4
+                    anchors.left: parent.left
+                    anchors.leftMargin: 4
 
-                Text {
+                    source: "qrc:/assets/icons_material/duotone-info-24px.svg"
                     color: Theme.colorSubText
-                    text: "build mode: %1".arg(utilsApp.appBuildModeFull())
-                    font.pixelSize: Theme.fontSizeContent
                 }
-                Text {
-                    color: Theme.colorSubText
-                    text: "build date: %1".arg(utilsApp.appBuildDateTime())
-                    font.pixelSize: Theme.fontSizeContent
-                }
-                Text {
-                    color: Theme.colorSubText
-                    text: "build mode: %1".arg(utilsApp.appBuildModeFull())
-                    font.pixelSize: Theme.fontSizeContent
-                }
-                Text {
-                    color: Theme.colorSubText
-                    text: "Qt version: %1".arg(utilsApp.qtVersion())
-                    font.pixelSize: Theme.fontSizeContent
+
+                Column {
+                    id: debugColumn
+                    anchors.left: parent.left
+                    anchors.leftMargin: appHeader.headerPosition - parent.anchors.leftMargin
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    spacing: Theme.componentMargin * 0.4
+
+                    Text {
+                        color: Theme.colorSubText
+                        text: "App name: %1".arg(utilsApp.appName())
+                        font.pixelSize: Theme.fontSizeContent
+                    }
+                    Text {
+                        color: Theme.colorSubText
+                        text: "App version: %1".arg(utilsApp.appVersion())
+                        font.pixelSize: Theme.fontSizeContent
+                    }
+                    Text {
+                        color: Theme.colorSubText
+                        text: "Build mode: %1".arg(utilsApp.appBuildModeFull())
+                        font.pixelSize: Theme.fontSizeContent
+                    }
+                    Text {
+                        color: Theme.colorSubText
+                        text: "Build date: %1".arg(utilsApp.appBuildDateTime())
+                        font.pixelSize: Theme.fontSizeContent
+                    }
+                    Text {
+                        color: Theme.colorSubText
+                        text: "Qt version: %1".arg(utilsApp.qtVersion())
+                        font.pixelSize: Theme.fontSizeContent
+                    }
                 }
             }
+
+            ListSeparatorPadded { }
 
             ////////
         }

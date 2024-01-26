@@ -6,6 +6,7 @@ import "qrc:/js/UtilsNumber.js" as UtilsNumber
 
 Loader {
     id: screenSettings
+    anchors.fill: parent
 
     ////////////////////////////////////////////////////////////////////////////
 

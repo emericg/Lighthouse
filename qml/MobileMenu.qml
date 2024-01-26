@@ -2,7 +2,7 @@ import QtQuick
 
 import ThemeEngine
 
-Rectangle {
+Item {
     id: mobileMenu
     anchors.left: parent.left
     anchors.right: parent.right
@@ -12,8 +12,7 @@ Rectangle {
     property int hhi: (hhh * 0.666)
     property int hhv: visible ? hhh : 0
 
-    height: hhh + screenPaddingBottom
-    color: appWindow.isTablet ? Theme.colorTabletmenu : Theme.colorBackground
+    height: hhh + screenPaddingNavbar + screenPaddingBottom
 
     visible: (isTablet && (appContent.state === "DeviceList" ||
                            appContent.state === "DeviceBeacon" ||
@@ -21,20 +20,27 @@ Rectangle {
                            appContent.state === "DeviceLight" ||
                            appContent.state === "Settings" ||
                            appContent.state === "About" ||
-                           appContent.state === "Permissions")) ||
+                           appContent.state === "AboutPermissions")) ||
              (isPhone && screenOrientation === Qt.PortraitOrientation &&
                           (appContent.state === "DeviceLight"))
 
     ////////////////////////////////////////////////////////////////////////////
 
-    Rectangle {
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        height: 1
-        opacity: 0.5
-        visible: !appWindow.isPhone
-        color: Theme.colorTabletmenuContent
+    Rectangle { // background
+        anchors.fill: parent
+
+        opacity: appWindow.isTablet ? 0.95 : 1
+        color: appWindow.isTablet ? Theme.colorTabletmenu : Theme.colorBackground
+
+        Rectangle {
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: 2
+            opacity: 0.33
+            visible: !appWindow.isPhone
+            color: Theme.colorTabletmenuContent
+        }
     }
 
     // prevent clicks below this area
@@ -74,56 +80,66 @@ Rectangle {
 
     ////////////////////////////////////////////////////////////////////////////
 
-    Row { // main menu
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: -screenPaddingBottom
-        spacing: (!appWindow.wideMode || (appWindow.isPhone && utilsScreen.screenSize < 5.0)) ? -10 : 20
+    Item { // menu area
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
 
-        visible: (appContent.state === "DeviceList" ||
-                  appContent.state === "Settings" ||
-                  appContent.state === "About" ||
-                  appContent.state === "Permissions")
+        height: mobileMenu.hhh
 
-        MobileMenuItem_horizontal {
-            id: menuMainView
-            height: mobileMenu.hhh
+        ////////////////////////
 
-            text: qsTr("Device list")
-            source: "qrc:/assets/icons_material/lightbulb_FILL0_wght400_GRAD0_opsz48.svg"
-            sourceSize: mobileMenu.hhi
-            colorContent: Theme.colorTabletmenuContent
-            colorHighlight: Theme.colorTabletmenuHighlight
+        Row { // main menu
+            anchors.centerIn: parent
+            spacing: (!appWindow.wideMode || (isPhone && utilsScreen.screenSize < 5.0)) ? -10 : 20
 
-            highlighted: (appContent.state === "DeviceList")
-            onClicked: screenDeviceList.loadScreen()
+            visible: (appContent.state === "DeviceList" ||
+                      appContent.state === "Settings" ||
+                      appContent.state === "About" ||
+                      appContent.state === "AboutPermissions")
+
+            MobileMenuItem_horizontal {
+                id: menuMainView
+                height: mobileMenu.hhh
+
+                text: qsTr("Device list")
+                source: "qrc:/assets/icons_material/lightbulb_FILL0_wght400_GRAD0_opsz48.svg"
+                sourceSize: mobileMenu.hhi
+                colorContent: Theme.colorTabletmenuContent
+                colorHighlight: Theme.colorTabletmenuHighlight
+
+                highlighted: (appContent.state === "DeviceList")
+                onClicked: screenDeviceList.loadScreen()
+            }
+            MobileMenuItem_horizontal {
+                id: menuSettings
+                height: mobileMenu.hhh
+
+                text: qsTr("Settings")
+                source: "qrc:/assets/icons_material/baseline-settings-20px.svg"
+                sourceSize: mobileMenu.hhi
+                colorContent: Theme.colorTabletmenuContent
+                colorHighlight: Theme.colorTabletmenuHighlight
+
+                highlighted: (appContent.state === "Settings")
+                onClicked: screenSettings.loadScreen()
+            }
+            MobileMenuItem_horizontal {
+                id: menuAbout
+                height: mobileMenu.hhh
+
+                text: qsTr("About")
+                source: "qrc:/assets/icons_material/outline-info-24px.svg"
+                sourceSize: mobileMenu.hhi
+                colorContent: Theme.colorTabletmenuContent
+                colorHighlight: Theme.colorTabletmenuHighlight
+
+                highlighted: (appContent.state === "About" || appContent.state === "AboutPermissions")
+                onClicked: screenAbout.loadScreen()
+            }
         }
-        MobileMenuItem_horizontal {
-            id: menuSettings
-            height: mobileMenu.hhh
 
-            text: qsTr("Settings")
-            source: "qrc:/assets/icons_material/baseline-settings-20px.svg"
-            sourceSize: mobileMenu.hhi
-            colorContent: Theme.colorTabletmenuContent
-            colorHighlight: Theme.colorTabletmenuHighlight
-
-            highlighted: (appContent.state === "Settings")
-            onClicked: screenSettings.loadScreen()
-        }
-        MobileMenuItem_horizontal {
-            id: menuAbout
-            height: mobileMenu.hhh
-
-            text: qsTr("About")
-            source: "qrc:/assets/icons_material/outline-info-24px.svg"
-            sourceSize: mobileMenu.hhi
-            colorContent: Theme.colorTabletmenuContent
-            colorHighlight: Theme.colorTabletmenuHighlight
-
-            highlighted: (appContent.state === "About" || appContent.state === "Permissions")
-            onClicked: screenAbout.loadScreen()
-        }
+        ////////////////////////
     }
 
     ////////////////////////////////////////////////////////////////////////////

@@ -4,8 +4,6 @@ import QtQuick.Controls
 import ThemeEngine
 
 Rectangle {
-    width: 480
-    height: 720
     anchors.fill: parent
 
     color: Theme.colorHeader

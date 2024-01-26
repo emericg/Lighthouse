@@ -383,6 +383,7 @@ void SettingsManager::setSysTray(const bool value)
         m_systrayEnabled = value;
         writeSettings();
 
+#if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
         SystrayManager *st = SystrayManager::getInstance();
         if (st)
         {
@@ -397,6 +398,7 @@ void SettingsManager::setSysTray(const bool value)
                 Q_EMIT systrayChanged();
             }
         }
+#endif
     }
 }
 

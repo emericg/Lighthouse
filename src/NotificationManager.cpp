@@ -23,8 +23,11 @@
 #include "SystrayManager.h"
 
 #if defined(Q_OS_ANDROID)
+#include "utils_os_android.h"
 #include <QJniObject>
 #include <QCoreApplication>
+#elif defined(Q_OS_IOS)
+#include "utils_os_ios.h"
 #endif
 
 /* ************************************************************************** */
@@ -43,10 +46,12 @@ NotificationManager *NotificationManager::getInstance()
 
 NotificationManager::NotificationManager()
 {
+    //checkNotificationPermissions();
+
 #if defined(Q_OS_ANDROID)
     connect(this, SIGNAL(notificationChanged()), this, SLOT(updateNotificationAndroid()));
 #elif defined(Q_OS_IOS)
-    connect(this, SIGNAL(notificationChanged()), this, SLOT(updateNotificationIos()));
+    connect(this, SIGNAL(notificationChanged()), this, SLOT(updateNotificationIOS()));
 #else
     connect(this, SIGNAL(notificationChanged()), this, SLOT(updateNotificationDesktop()));
 #endif
@@ -58,20 +63,8 @@ NotificationManager::~NotificationManager()
 }
 
 /* ************************************************************************** */
-/* ************************************************************************** */
 
-void NotificationManager::setNotification(const QString &message, int channel)
-{
-    //if (m_notification == notification) return;
-
-    m_message = message;
-    m_title = "";
-    m_channel = channel;
-
-    Q_EMIT notificationChanged();
-}
-
-void NotificationManager::setNotification2(const QString &title, const QString &message, int channel)
+void NotificationManager::setNotification(const QString &title, const QString &message, int channel)
 {
     //if (m_title == title && m_notification == notification) return;
 
@@ -82,24 +75,31 @@ void NotificationManager::setNotification2(const QString &title, const QString &
     Q_EMIT notificationChanged();
 }
 
-QString NotificationManager::getNotification() const
+void NotificationManager::setNotificationShort(const QString &message)
 {
-    return m_message;
+    //if (m_notification == notification) return;
+
+    m_message = message;
+    m_title = "";
+    m_channel = 0;
+
+    Q_EMIT notificationChanged();
 }
 
-/* ************************************************************************** */
 /* ************************************************************************** */
 
 void NotificationManager::updateNotificationDesktop()
 {
+#if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
     SystrayManager *st = SystrayManager::getInstance();
     if (st)
     {
         st->sendNotification(m_message);
     }
+#endif
 }
 
-void NotificationManager::updateNotificationIos()
+void NotificationManager::updateNotificationIOS()
 {
 #if defined(Q_OS_IOS)
     //
@@ -112,3 +112,45 @@ void NotificationManager::updateNotificationAndroid()
     //
 #endif
 }
+
+/* ************************************************************************** */
+
+bool NotificationManager::checkNotificationPermissions()
+{
+    //qDebug() << "NotificationManager::checkNotificationPermissions()";
+    bool permOS_was = m_permOS;
+
+#if defined(Q_OS_ANDROID)
+    m_permOS = UtilsAndroid::checkPermission_notification();
+#elif defined(Q_OS_IOS)
+    //m_permOS = UtilsIOS::checkPermission_notification();
+#endif
+
+    if (permOS_was != m_permOS)
+    {
+        Q_EMIT permissionsChanged();
+    }
+
+    return m_permOS;
+}
+
+bool NotificationManager::requestNotificationPermissions()
+{
+    //qDebug() << "NotificationManager::requestNotificationPermissions()";
+    bool permOS_was = m_permOS;
+
+#if defined(Q_OS_ANDROID)
+    m_permOS = UtilsAndroid::getPermission_notification();
+#elif defined(Q_OS_IOS)
+    //m_permOS = UtilsIOS::getPermission_notification();
+#endif
+
+    if (permOS_was != m_permOS)
+    {
+        Q_EMIT permissionsChanged();
+    }
+
+    return m_permOS;
+}
+
+/* ************************************************************************** */

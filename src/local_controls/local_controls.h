@@ -23,16 +23,16 @@
 #define DEVICE_LOCAL_CONTROLS_H
 /* ************************************************************************** */
 
-#include <QObject>
-#include <QString>
-
-#include <QMediaPlayer>
-#include <QAudioOutput>
-
 #include "mpris_dbus.h"
 #include "mouse.h"
 #include "keyboard.h"
 #include "gamepad.h"
+
+#include <QObject>
+#include <QString>
+
+class QMediaPlayer;
+class QAudioOutput;
 
 /* ************************************************************************** */
 

@@ -9,7 +9,7 @@ Rectangle {
     anchors.left: parent.left
     anchors.right: parent.right
 
-    height: screenPaddingStatusbar + headerHeight
+    height: headerHeight + Math.max(screenPaddingStatusbar, screenPaddingTop)
     color: Theme.colorHeader
     clip: true
     z: 10

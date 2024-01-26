@@ -82,9 +82,9 @@ class DeviceManager: public QObject
 
     bool m_bleAdapter = false;      //!< do we have a BLE adapter?
     bool m_bleEnabled = false;      //!< is the BLE adapter enabled?
-    bool m_blePermissions = false;  //!< do we have necessary BLE permissions? (OS independent)
+    bool m_blePermissions = false;  //!< do we have necessary BLE permissions? (brings together all other permsissions)
 
-    bool m_permOS = false;          //!< do we have OS permissions for BLE? (macOS, iOS)
+    bool m_permOS = false;          //!< do we have OS permissions for BLE? (macOS, iOS, Android)
     bool m_permLocationBLE = false; //!< do we location permission? (Android)
     bool m_permLocationBKG = false; //!< do we background location permission? (Android)
     bool m_permGPS = false;         //!< is the GPS enabled? (Android)
@@ -149,6 +149,7 @@ class DeviceManager: public QObject
 
 Q_SIGNALS:
     void bluetoothChanged();
+    void hostModeChanged();
     void permissionsChanged();
 
     void adaptersListUpdated();
@@ -162,12 +163,12 @@ Q_SIGNALS:
     void scanningChanged();
     void updatingChanged();
     void syncingChanged();
-    void hostModeChanged();
 
 private slots:
     // QBluetoothLocalDevice related
     void bluetoothHostModeStateChanged(QBluetoothLocalDevice::HostMode);
     void bluetoothStatusChanged();
+    void bluetoothPermissionsChanged();
 
     // QBluetoothDeviceDiscoveryAgent related
     void addNearbyBleDevice(const QBluetoothDeviceInfo &info);
@@ -194,7 +195,9 @@ public:
     // Bluetooth management
     Q_INVOKABLE bool checkBluetooth();
     Q_INVOKABLE bool checkBluetoothPermissions();
-    Q_INVOKABLE void enableBluetooth(bool enforceUserPermissionCheck = false);
+    Q_INVOKABLE bool enableBluetooth(bool enforceUserPermissionCheck = false);
+    Q_INVOKABLE bool requestBluetoothPermissions();
+    void requestBluetoothPermissions_results();
 
     // Scanning management
     static int getLastRun();
