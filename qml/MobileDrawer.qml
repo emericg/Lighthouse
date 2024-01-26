@@ -109,7 +109,7 @@ Drawer {
                 DrawerItem {
                     highlighted: (appContent.state === "DeviceList")
                     text: qsTr("Sensors")
-                    iconSource: "qrc:/assets/logos/logo_tray_symbolic.svg"
+                    source: "qrc:/assets/logos/logo_tray_symbolic.svg"
 
                     onClicked: {
                         screenDeviceList.loadScreen()
@@ -120,7 +120,7 @@ Drawer {
                 DrawerItem {
                     highlighted: (appContent.state === "Settings")
                     text: qsTr("Settings")
-                    iconSource: "qrc:/assets/icons_material/outline-settings-24px.svg"
+                    source: "qrc:/assets/icons_material/outline-settings-24px.svg"
 
                     onClicked: {
                         screenSettings.loadScreen()
@@ -131,7 +131,7 @@ Drawer {
                 DrawerItem {
                     highlighted: (appContent.state === "About" || appContent.state === "AboutPermissions")
                     text: qsTr("About")
-                    iconSource: "qrc:/assets/icons_material/outline-info-24px.svg"
+                    source: "qrc:/assets/icons_material/outline-info-24px.svg"
 
                     onClicked: {
                         screenAbout.loadScreen()
@@ -146,7 +146,7 @@ Drawer {
                 ////////
 
                 DrawerItem {
-                    iconSource: "qrc:/assets/icons_material/baseline-sort-24px.svg"
+                    source: "qrc:/assets/icons_material/baseline-sort-24px.svg"
                     text: {
                         var txt = qsTr("Order by:") + " "
                         if (settingsManager.orderBy === "model") {

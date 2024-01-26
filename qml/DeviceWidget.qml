@@ -56,12 +56,11 @@ Item {
     }
 
     function updateSensorRSSI() {
-
+        //
         rssiValue.visible = (boxDevice.rssi < 0)
         rssiValue.text = boxDevice.rssi
 
         if (boxDevice.deviceEnabled) {
-
             // Image
             if (boxDevice.status === DeviceUtils.DEVICE_CONNECTING) {
                 textStatus.text = UtilsDeviceSensors.getDeviceStatusText(boxDevice.status)

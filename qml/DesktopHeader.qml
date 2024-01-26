@@ -52,28 +52,28 @@ Rectangle {
     signal aboutButtonClicked()
 
     function setActiveDeviceData() {
-        menuDeviceData.selected = true
-        menuDeviceHistory.selected = false
-        menuDevicePlant.selected = false
-        menuDeviceSettings.selected = false
+        menuDeviceData.highlighted = true
+        menuDeviceHistory.highlighted = false
+        menuDevicePlant.highlighted = false
+        menuDeviceSettings.highlighted = false
     }
     function setActiveDeviceHistory() {
-        menuDeviceData.selected = false
-        menuDeviceHistory.selected = true
-        menuDevicePlant.selected = false
-        menuDeviceSettings.selected = false
+        menuDeviceData.highlighted = false
+        menuDeviceHistory.highlighted = true
+        menuDevicePlant.highlighted = false
+        menuDeviceSettings.highlighted = false
     }
     function setActiveDevicePlant() {
-        menuDeviceData.selected = false
-        menuDeviceHistory.selected = false
-        menuDevicePlant.selected = true
-        menuDeviceSettings.selected = false
+        menuDeviceData.highlighted = false
+        menuDeviceHistory.highlighted = false
+        menuDevicePlant.highlighted = true
+        menuDeviceSettings.highlighted = false
     }
     function setActiveDeviceSettings() {
-        menuDeviceData.selected = false
-        menuDeviceHistory.selected = false
-        menuDevicePlant.selected = false
-        menuDeviceSettings.selected = true
+        menuDeviceData.highlighted = false
+        menuDeviceHistory.highlighted = false
+        menuDevicePlant.highlighted = false
+        menuDeviceSettings.highlighted = true
     }
 
     function setActiveMenu() {
@@ -321,7 +321,7 @@ Rectangle {
                 colorContent: Theme.colorHeaderContent
                 colorHighlight: Theme.colorHeaderHighlight
 
-                selected: (appContent.state === "DeviceList")
+                highlighted: (appContent.state === "DeviceList")
                 onClicked: devicesButtonClicked()
             }
             DesktopHeaderItem {
@@ -333,7 +333,7 @@ Rectangle {
                 colorContent: Theme.colorHeaderContent
                 colorHighlight: Theme.colorHeaderHighlight
 
-                selected: (appContent.state === "Settings")
+                highlighted: (appContent.state === "Settings")
                 onClicked: settingsButtonClicked()
             }
             DesktopHeaderItem {
@@ -345,7 +345,7 @@ Rectangle {
                 colorContent: Theme.colorHeaderContent
                 colorHighlight: Theme.colorHeaderHighlight
 
-                selected: (appContent.state === "About")
+                highlighted: (appContent.state === "About")
                 onClicked: aboutButtonClicked()
             }
         }

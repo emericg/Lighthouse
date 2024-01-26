@@ -195,7 +195,7 @@ Popup {
 
                         text: qsTr("actions")
 
-                        selected: (menuArea.mode === qsTr("actions"))
+                        highlighted: (menuArea.mode === qsTr("actions"))
                         onClicked: menuArea.mode = qsTr("actions")
                     }
                     DesktopHeaderItem {
@@ -207,7 +207,7 @@ Popup {
 
                         text: qsTr("media")
 
-                        selected: (menuArea.mode === qsTr("media"))
+                        highlighted: (menuArea.mode === qsTr("media"))
                         onClicked: menuArea.mode = qsTr("media")
                     }
                     DesktopHeaderItem {
@@ -219,7 +219,7 @@ Popup {
 
                         text: qsTr("keyboard")
 
-                        selected: (menuArea.mode === qsTr("keyboard"))
+                        highlighted: (menuArea.mode === qsTr("keyboard"))
                         onClicked: menuArea.mode = qsTr("keyboard")
                     }
                     DesktopHeaderItem {
@@ -231,7 +231,7 @@ Popup {
 
                         text: qsTr("command")
 
-                        selected: (menuArea.mode === qsTr("command"))
+                        highlighted: (menuArea.mode === qsTr("command"))
                         onClicked: menuArea.mode = qsTr("command")
                     }
                 }

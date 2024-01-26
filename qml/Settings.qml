@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Controls
 
 import ThemeEngine
-import "qrc:/js/UtilsNumber.js" as UtilsNumber
 
 Loader {
     id: screenSettings
@@ -50,43 +49,41 @@ Loader {
             bottomPadding: 16
             spacing: 8
 
+            property int padIcon: singleColumn ? Theme.componentMarginL : Theme.componentMarginL
+            property int padText: appHeader.headerPosition
+
             ////////////////
 
             SectionTitle {
-                anchors.left: parent.left
                 text: qsTr("Application")
                 source: "qrc:/assets/icons_material/baseline-settings-20px.svg"
             }
 
             ////////////////
 
-            Item {
-                id: element_appTheme
-                height: 48
+            Item { // element_appTheme
                 anchors.left: parent.left
                 anchors.leftMargin: screenPaddingLeft
                 anchors.right: parent.right
                 anchors.rightMargin: screenPaddingRight
+                height: Theme.componentHeightXL
 
                 IconSvg {
-                    id: image_appTheme
-                    width: 24
-                    height: 24
                     anchors.left: parent.left
-                    anchors.leftMargin: 16
+                    anchors.leftMargin: contentColumn.padIcon
                     anchors.verticalCenter: parent.verticalCenter
 
+                    width: 24
+                    height: 24
                     color: Theme.colorIcon
                     source: "qrc:/assets/icons_material/duotone-style-24px.svg"
                 }
 
                 Text {
-                    id: text_appTheme
-                    height: 40
-                    anchors.left: image_appTheme.right
-                    anchors.leftMargin: 24
+                    anchors.left: parent.left
+                    anchors.leftMargin: contentColumn.padText
                     anchors.right: appTheme_selector.left
-                    anchors.rightMargin: 16
+                    anchors.rightMargin: Theme.componentMargin
                     anchors.verticalCenter: parent.verticalCenter
 
                     text: qsTr("Theme")
@@ -100,7 +97,7 @@ Loader {
                 Row {
                     id: appTheme_selector
                     anchors.right: parent.right
-                    anchors.rightMargin: 16
+                    anchors.rightMargin: Theme.componentMargin
                     anchors.verticalCenter: parent.verticalCenter
 
                     z: 1
@@ -186,33 +183,29 @@ Loader {
 
             ////////
 
-            Item {
-                id: element_appThemeAuto
-                height: 48
+            Item { // element_appThemeAuto
                 anchors.left: parent.left
                 anchors.leftMargin: screenPaddingLeft
                 anchors.right: parent.right
                 anchors.rightMargin: screenPaddingRight
+                height: Theme.componentHeightXL
 
                 IconSvg {
-                    id: image_appThemeAuto
-                    width: 24
-                    height: 24
                     anchors.left: parent.left
-                    anchors.leftMargin: 16
+                    anchors.leftMargin: contentColumn.padIcon
                     anchors.verticalCenter: parent.verticalCenter
 
+                    width: 24
+                    height: 24
                     color: Theme.colorIcon
                     source: "qrc:/assets/icons_material/duotone-brightness_4-24px.svg"
                 }
 
                 Text {
-                    id: text_appThemeAuto
-                    height: 40
-                    anchors.left: image_appThemeAuto.right
-                    anchors.leftMargin: 24
+                    anchors.left: parent.left
+                    anchors.leftMargin: contentColumn.padText
                     anchors.right: switch_appThemeAuto.left
-                    anchors.rightMargin: 16
+                    anchors.rightMargin: Theme.componentMargin
                     anchors.verticalCenter: parent.verticalCenter
 
                     text: qsTr("Automatic dark mode")
@@ -226,7 +219,7 @@ Loader {
                 SwitchThemedDesktop {
                     id: switch_appThemeAuto
                     anchors.right: parent.right
-                    anchors.rightMargin: 0
+                    anchors.rightMargin: 4
                     anchors.verticalCenter: parent.verticalCenter
                     z: 1
 
@@ -237,16 +230,14 @@ Loader {
                     }
                 }
             }
-            Text {
-                id: legend_appThemeAuto
+            Text { // legend_appThemeAuto
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft + 64
+                anchors.leftMargin: screenPaddingLeft + contentColumn.padText
                 anchors.right: parent.right
-                anchors.rightMargin: 12
+                anchors.rightMargin: screenPaddingRight + Theme.componentMargin
 
                 topPadding: -12
-                bottomPadding: isDesktop ? 12 : 12
-                visible: element_appThemeAuto.visible
+                bottomPadding: 12
 
                 text: settingsManager.appThemeAuto ?
                           qsTr("Dark mode will switch on automatically between 9 PM and 9 AM.") :
@@ -269,35 +260,31 @@ Loader {
 
             ////////
 
-            Item {
-                id: element_minimized
-                height: 48
+            Item { // element_minimized
                 anchors.left: parent.left
                 anchors.leftMargin: screenPaddingLeft
                 anchors.right: parent.right
                 anchors.rightMargin: screenPaddingRight
+                height: Theme.componentHeightXL
 
                 visible: isDesktop
 
                 IconSvg {
-                    id: image_minimized
-                    width: 24
-                    height: 24
                     anchors.left: parent.left
-                    anchors.leftMargin: 16
+                    anchors.leftMargin: contentColumn.padIcon
                     anchors.verticalCenter: parent.verticalCenter
 
+                    width: 24
+                    height: 24
                     color: Theme.colorIcon
                     source: "qrc:/assets/icons_material/duotone-minimize-24px.svg"
                 }
 
                 Text {
-                    id: text_minimized
-                    height: 40
-                    anchors.left: image_minimized.right
-                    anchors.leftMargin: 24
+                    anchors.left: parent.left
+                    anchors.leftMargin: contentColumn.padText
                     anchors.right: switch_minimized.left
-                    anchors.rightMargin: 16
+                    anchors.rightMargin: Theme.componentMargin
                     anchors.verticalCenter: parent.verticalCenter
 
                     text: qsTr("Start application minimized")
@@ -311,7 +298,7 @@ Loader {
                 SwitchThemedDesktop {
                     id: switch_minimized
                     anchors.right: parent.right
-                    anchors.rightMargin: 0
+                    anchors.rightMargin: 4
                     anchors.verticalCenter: parent.verticalCenter
                     z: 1
 
@@ -322,33 +309,29 @@ Loader {
 
             ////////////////
 
-            Item {
-                id: element_service
-                height: 48
+            Item { // element_service
                 anchors.left: parent.left
                 anchors.leftMargin: screenPaddingLeft
                 anchors.right: parent.right
                 anchors.rightMargin: screenPaddingRight
+                height: Theme.componentHeightXL
 
                 visible: isDesktop
 
                 IconSvg {
-                    id: image_service
-                    width: 24
-                    height: 24
                     anchors.left: parent.left
-                    anchors.leftMargin: screenPaddingLeft + 16
+                    anchors.leftMargin: contentColumn.padIcon
                     anchors.verticalCenter: parent.verticalCenter
 
+                    width: 24
+                    height: 24
                     color: Theme.colorIcon
                     source: "qrc:/assets/icons_material/baseline-autorenew-24px.svg"
                 }
 
                 Text {
-                    id: text_service
-                    height: 40
-                    anchors.left: image_service.right
-                    anchors.leftMargin: 24
+                    anchors.left: parent.left
+                    anchors.leftMargin: contentColumn.padText
                     anchors.right: switch_service.left
                     anchors.rightMargin: 0
                     anchors.verticalCenter: parent.verticalCenter
@@ -364,7 +347,7 @@ Loader {
                 SwitchThemedDesktop {
                     id: switch_service
                     anchors.right: parent.right
-                    anchors.rightMargin: 0
+                    anchors.rightMargin: 4
                     anchors.verticalCenter: parent.verticalCenter
                     z: 1
 
@@ -378,16 +361,15 @@ Loader {
                     }
                 }
             }
-            Text {
-                id: legend_service_desktop
+            Text { // legend_service_desktop
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft + 64
+                anchors.leftMargin: screenPaddingLeft + contentColumn.padText
                 anchors.right: parent.right
-                anchors.rightMargin: 12
-                topPadding: -12
-                bottomPadding: element_notifications.visible ? 0 : 12
+                anchors.rightMargin: screenPaddingRight + Theme.componentMargin
 
-                visible: (element_service.visible && isDesktop)
+                topPadding: -12
+                bottomPadding: 0
+                visible: isDesktop
 
                 text: settingsManager.systray ?
                           qsTr("Lighthouse will remain active in the background after the window is closed, and show in the notification area.") :
@@ -400,37 +382,33 @@ Loader {
 
             ////////
 
-            Item {
-                id: element_notifications
-                height: 48
+            Item { // element_notifications
                 anchors.left: parent.left
                 anchors.leftMargin: screenPaddingLeft
                 anchors.right: parent.right
                 anchors.rightMargin: screenPaddingRight
+                height: Theme.componentHeightXL
 
                 visible: isDesktop
                 enabled: false // settingsManager.systray
                 opacity: settingsManager.systray ? 1 : 0.4
 
                 IconSvg {
-                    id: image_notifications
-                    width: 24
-                    height: 24
                     anchors.left: parent.left
-                    anchors.leftMargin: 16
+                    anchors.leftMargin: contentColumn.padIcon
                     anchors.verticalCenter: parent.verticalCenter
 
+                    width: 24
+                    height: 24
                     color: Theme.colorIcon
                     source: "qrc:/assets/icons_material/baseline-notifications_none-24px.svg"
                 }
 
                 Text {
-                    id: text_notifications
-                    height: 40
-                    anchors.left: image_notifications.right
-                    anchors.leftMargin: 24
+                    anchors.left: parent.left
+                    anchors.leftMargin: contentColumn.padText
                     anchors.right: switch_notifications.left
-                    anchors.rightMargin: 16
+                    anchors.rightMargin: Theme.componentMargin
                     anchors.verticalCenter: parent.verticalCenter
 
                     text: qsTr("Enable notifications")
@@ -444,7 +422,7 @@ Loader {
                 SwitchThemedDesktop {
                     id: switch_notifications
                     anchors.right: parent.right
-                    anchors.rightMargin: screenPaddingRight
+                    anchors.rightMargin: 4
                     anchors.verticalCenter: parent.verticalCenter
                     z: 1
 
@@ -452,16 +430,15 @@ Loader {
                     onClicked: settingsManager.notifications = checked
                 }
             }
-            Text {
-                id: legend_notifications
+            Text { // legend_notifications
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft + 64
+                anchors.leftMargin: screenPaddingLeft + contentColumn.padText
                 anchors.right: parent.right
-                anchors.rightMargin: 12
+                anchors.rightMargin: screenPaddingRight + Theme.componentMargin
+
                 topPadding: -12
                 bottomPadding: 12
-
-                visible: element_notifications.visible
+                visible: isDesktop
                 opacity: settingsManager.systray ? 1 : 0.4
 
                 text: settingsManager.notifications ?
@@ -476,7 +453,6 @@ Loader {
             ////////////////
 
             SectionTitle {
-                anchors.left: parent.left
                 text: qsTr("Bluetooth")
                 source: "qrc:/assets/icons_material/baseline-bluetooth-24px.svg"
 
@@ -486,36 +462,31 @@ Loader {
 
             ////////
 
-            Item {
-                id: element_bluetoothControl
-                height: 48
+            Item { // element_bluetoothControl
                 anchors.left: parent.left
                 anchors.leftMargin: screenPaddingLeft
                 anchors.right: parent.right
                 anchors.rightMargin: screenPaddingRight
+                height: Theme.componentHeightXL
 
-                // Android only
                 visible: (Qt.platform.os === "android")
 
                 IconSvg {
-                    id: image_bluetoothControl
-                    width: 24
-                    height: 24
                     anchors.left: parent.left
-                    anchors.leftMargin: 16
+                    anchors.leftMargin: contentColumn.padIcon
                     anchors.verticalCenter: parent.verticalCenter
 
+                    width: 24
+                    height: 24
                     color: Theme.colorIcon
                     source: "qrc:/assets/icons_material/baseline-bluetooth_disabled-24px.svg"
                 }
 
                 Text {
-                    id: text_bluetoothControl
-                    height: 40
-                    anchors.left: image_bluetoothControl.right
-                    anchors.leftMargin: 24
+                    anchors.left: parent.left
+                    anchors.leftMargin: contentColumn.padText
                     anchors.right: switch_bluetoothControl.left
-                    anchors.rightMargin: 16
+                    anchors.rightMargin: Theme.componentMargin
                     anchors.verticalCenter: parent.verticalCenter
 
                     text: qsTr("Bluetooth control")
@@ -529,7 +500,7 @@ Loader {
                 SwitchThemedDesktop {
                     id: switch_bluetoothControl
                     anchors.right: parent.right
-                    anchors.rightMargin: 0
+                    anchors.rightMargin: 4
                     anchors.verticalCenter: parent.verticalCenter
                     z: 1
 
@@ -537,16 +508,15 @@ Loader {
                     onClicked: settingsManager.bluetoothControl = checked
                 }
             }
-            Text {
-                id: legend_bluetoothControl
+            Text { // legend_bluetoothControl
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft + 64
+                anchors.leftMargin: screenPaddingLeft + contentColumn.padText
                 anchors.right: parent.right
-                anchors.rightMargin: 12
+                anchors.rightMargin: screenPaddingRight + Theme.componentMargin
 
                 topPadding: -12
                 bottomPadding: 12
-                visible: element_bluetoothControl.visible
+                visible: (Qt.platform.os === "android")
 
                 text: settingsManager.bluetoothControl ?
                           qsTr("Lighthouse will enable your device's Bluetooth in order to operate.") :
@@ -560,7 +530,6 @@ Loader {
             ////////////////
 
             SectionTitle {
-                anchors.left: parent.left
                 visible: isDesktop
                 text: qsTr("Network server")
                 source: "qrc:/assets/icons_material/duotone-list-24px.svg"
@@ -568,33 +537,29 @@ Loader {
 
             ////////////////
 
-            Item {
-                id: element_server
-                height: 48
+            Item { // element_server
                 anchors.left: parent.left
                 anchors.leftMargin: screenPaddingLeft
                 anchors.right: parent.right
                 anchors.rightMargin: screenPaddingRight
+                height: Theme.componentHeightXL
 
                 visible: isDesktop
 
                 IconSvg {
-                    id: image_server
-                    width: 24
-                    height: 24
                     anchors.left: parent.left
-                    anchors.leftMargin: screenPaddingLeft + 16
+                    anchors.leftMargin: contentColumn.padIcon
                     anchors.verticalCenter: parent.verticalCenter
 
+                    width: 24
+                    height: 24
                     color: Theme.colorIcon
                     source: "qrc:/assets/icons_material/duotone-devices-24px.svg"
                 }
 
                 Text {
-                    id: text_server
-                    height: 40
-                    anchors.left: image_server.right
-                    anchors.leftMargin: 24
+                    anchors.left: parent.left
+                    anchors.leftMargin: contentColumn.padText
                     anchors.right: switch_server.left
                     anchors.rightMargin: 0
                     anchors.verticalCenter: parent.verticalCenter
@@ -610,7 +575,7 @@ Loader {
                 SwitchThemedDesktop {
                     id: switch_server
                     anchors.right: parent.right
-                    anchors.rightMargin: 0
+                    anchors.rightMargin: 4
                     anchors.verticalCenter: parent.verticalCenter
                     z: 1
 
@@ -623,15 +588,14 @@ Loader {
                     }
                 }
             }
-            Text {
-                id: legend_server_desktop
+            Text { // legend_server_desktop
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft + 64
+                anchors.leftMargin: screenPaddingLeft + contentColumn.padText
                 anchors.right: parent.right
-                anchors.rightMargin: 12
-                topPadding: -12
-                bottomPadding: element_notifications.visible ? 0 : 12
+                anchors.rightMargin: screenPaddingRight + Theme.componentMargin
 
+                topPadding: -12
+                bottomPadding: 0
                 visible: isDesktop
 
                 text: settingsManager.netctrl ?
@@ -644,11 +608,11 @@ Loader {
             }
             Text {
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft + 64
+                anchors.leftMargin: screenPaddingLeft + contentColumn.padText
                 anchors.right: parent.right
-                anchors.rightMargin: 12
+                anchors.rightMargin: Theme.componentMargin
 
-                visible: networkServer && networkServer.running
+                visible: isDesktop && networkServer && networkServer.running
 
                 text: qsTr("Running on %1 @ %2").arg(networkServer.serverAddress).arg(networkServer.serverPort)
                 textFormat: Text.PlainText
@@ -668,34 +632,31 @@ Loader {
 
             ////////////////
 
-            Item {
-                id: element_remoteServer_ip
-                height: 48
+            Item { // element_remoteServer_ip
                 anchors.left: parent.left
                 anchors.leftMargin: screenPaddingLeft
                 anchors.right: parent.right
                 anchors.rightMargin: screenPaddingRight
+                height: Theme.componentHeightXL
 
                 visible: isMobile
 
                 IconSvg {
-                    id: image_remoteServer_host
-                    width: 24
-                    height: 24
                     anchors.left: parent.left
-                    anchors.leftMargin: 16
+                    anchors.leftMargin: contentColumn.padIcon
                     anchors.verticalCenter: parent.verticalCenter
 
+                    width: 24
+                    height: 24
                     color: Theme.colorIcon
                     source: "qrc:/assets/icons_material/baseline-storage-24px.svg"
                 }
 
                 TextFieldThemed {
-                    id: textfield_remoteServer_host
-                    anchors.left: image_remoteServer_host.right
-                    anchors.leftMargin: 16
+                    anchors.left: parent.left
+                    anchors.leftMargin: contentColumn.padText
                     anchors.right: parent.right
-                    anchors.rightMargin: 16
+                    anchors.rightMargin: Theme.componentMargin
                     anchors.verticalCenter: parent.verticalCenter
                     height: 36
 
@@ -703,50 +664,36 @@ Loader {
                     text: settingsManager.netctrlHost
                     onEditingFinished: settingsManager.netctrlHost = text
                     selectByMouse: true
-/*
-                    IconSvg {
-                        width: 20; height: 20;
-                        anchors.right: parent.right
-                        anchors.rightMargin: 12
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        color: Theme.colorSubText
-                        source: "qrc:/assets/icons_material/baseline-storage-24px.svg"
-                    }
-*/
                 }
             }
 
             ////////
 
-            Item {
-                id: element_remoteServer_port
-                height: 48
+            Item { // element_remoteServer_port
                 anchors.left: parent.left
                 anchors.leftMargin: screenPaddingLeft
                 anchors.right: parent.right
                 anchors.rightMargin: screenPaddingRight
+                height: Theme.componentHeightXL
 
                 visible: isMobile
 
                 IconSvg {
-                    id: image_remoteServer_port
-                    width: 24
-                    height: 24
                     anchors.left: parent.left
-                    anchors.leftMargin: 16
+                    anchors.leftMargin: contentColumn.padIcon
                     anchors.verticalCenter: parent.verticalCenter
 
+                    width: 24
+                    height: 24
                     color: Theme.colorIcon
                     source: "qrc:/assets/icons_material/baseline-pin-24px.svg"
                 }
 
                 TextFieldThemed {
-                    id: textfield_remoteServer_port
-                    anchors.left: image_remoteServer_port.right
-                    anchors.leftMargin: 16
+                    anchors.left: parent.left
+                    anchors.leftMargin: contentColumn.padText
                     anchors.right: parent.right
-                    anchors.rightMargin: 16
+                    anchors.rightMargin: Theme.componentMargin
                     anchors.verticalCenter: parent.verticalCenter
                     height: 36
 
@@ -755,17 +702,6 @@ Loader {
                     onEditingFinished: settingsManager.netctrlPort = parseInt(text, 10)
                     validator: IntValidator { bottom: 1; top: 65535; }
                     selectByMouse: true
-/*
-                    IconSvg {
-                        width: 20; height: 20;
-                        anchors.right: parent.right
-                        anchors.rightMargin: 12
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        color: Theme.colorSubText
-                        source: "qrc:/assets/icons_material/baseline-pin-24px.svg"
-                    }
-*/
                 }
             }
 

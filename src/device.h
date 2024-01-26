@@ -141,6 +141,8 @@ Q_SIGNALS:
     void historyUpdated();  // sent when history sync is successful
     void realtimeUpdated(); // sent when a realtime update is received
 
+    void buttonPressed();
+
 protected:
     int m_deviceType = 0;           //!< See DeviceUtils::DeviceType enum
     int m_deviceCapabilities = 0;   //!< See DeviceUtils::DeviceCapabilities enum
