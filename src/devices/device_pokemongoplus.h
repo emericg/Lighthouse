@@ -38,7 +38,9 @@
  * Advertising name is 'Pokemon GO Plus'
  *
  * Protocol infos:
- * - todo
+ * - docs/porygon.md (reconstructed from https://github.com/fbrzlarosa/porygon)
+ * - https://tinyhack.com/2018/11/21/reverse-engineering-pokemon-go-plus/
+ * - https://www.reddit.com/r/pokemongodev/comments/7cba9t/controlling_the_pokemon_go_plus_led_and_button/
  */
 class DevicePokemonGoPlus: public DeviceBeacon
 {

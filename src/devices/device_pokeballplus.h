@@ -40,7 +40,7 @@ class Gamepad;
  * Advertising name is 'Pokemon PBP'
  *
  * Protocol infos:
- * - todo
+ * - https://www.reddit.com/r/Unity3D/comments/10pjw91/update_poke_ball_plus_in_unity/
  */
 class DevicePokeballPlus: public DeviceBeacon
 {

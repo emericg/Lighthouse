@@ -173,6 +173,64 @@ float getAnalogY(uint8_t value)
 }
 
 /* ************************************************************************** */
+
+float getGyroData(uint8_t firstByte, uint8_t secondByte)
+{
+    uint8_t bits[2];
+    bits[0] = firstByte;
+    bits[1] = secondByte;
+    uint8_t firstNibble = static_cast<uint8_t>(bits[0] >> 4 & 0x0F);
+
+    float PosNeg = firstNibble;
+    PosNeg = ((PosNeg < 8)) ? -1 : 1;
+
+    uint8_t difference;
+    float subDeg = bits[1] / 100.f;
+    float gyroValue;
+
+    if (PosNeg > 0)
+    {
+        difference = static_cast<uint8_t>(0xFF - firstByte);
+        gyroValue = (difference == 0x00) ? 0 : (static_cast<float>(difference) + subDeg);
+    }
+    else
+    {
+        gyroValue = (firstByte == 0xFF) ? 0 : (static_cast<float>(firstByte) + subDeg);
+    }
+
+    return gyroValue * PosNeg;
+}
+
+/* ************************************************************************** */
+
+float getAcclData(uint8_t firstByte, uint8_t secondByte)
+{
+    uint8_t bits[2];
+    bits[0] = firstByte;
+    bits[1] = secondByte;
+    uint8_t firstNibble = static_cast<uint8_t>(bits[0] >> 4 & 0x0F);
+
+    float PosNeg = firstNibble;
+    PosNeg = ((PosNeg < 8)) ? -1 : 1;
+
+    uint8_t difference;
+    float subG = bits[1] / 100.f;
+    float accelValue;
+
+    if (PosNeg > 0)
+    {
+        difference = static_cast<uint8_t>(0xFF - firstByte);
+        accelValue = (difference == 0x00) ? 0 : (static_cast<float>(difference) + subG) / 16.f;
+    }
+    else
+    {
+        accelValue = (firstByte == 0xFF) ? 0 : (static_cast<float>(firstByte) + subG) / 16.f;
+    }
+
+    return accelValue * PosNeg;
+}
+
+/* ************************************************************************** */
 /* ************************************************************************** */
 
 void DevicePokeballPlus::serviceScanDone()
@@ -301,11 +359,11 @@ void DevicePokeballPlus::bleReadNotify(const QLowEnergyCharacteristic &c, const 
         m_axis_x = getAnalogX(data[3], data[2]);
         m_axis_y = getAnalogY(data[4]);
         Q_EMIT axisChanged();
-/*
+
         // gyro
 
         m_gyro_x = getGyroData(data[6], data[5]) * 1.f;
-        m_gyro_y = getGyroData(data[8], data[7]) *  1.f;
+        m_gyro_y = getGyroData(data[8], data[7]) * 1.f;
         m_gyro_z = getGyroData(data[10], data[9]) * 1.f;
         Q_EMIT gyroChanged();
 
@@ -318,7 +376,7 @@ void DevicePokeballPlus::bleReadNotify(const QLowEnergyCharacteristic &c, const 
 
         //qDebug() << "ACCL X  > " << m_accl_x << " Y  > " << m_accl_y << " Z  > " << m_accl_z;
         //qDebug() << "GYRO X  > " << m_gyro_x << " Y  > " << m_gyro_y << " Z  > " << m_gyro_z;
-*/
+
         ////////////////
 
         if (btn_a) triggerEvent(1, 0);
