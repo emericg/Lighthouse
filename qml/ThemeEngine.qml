@@ -26,6 +26,9 @@ Item {
 
     ////////////////
 
+    property bool isLight
+    property bool isDark
+
     // Status bar (mobile)
     property int themeStatusbar
     property color colorStatusbar
@@ -202,6 +205,9 @@ Item {
             colorOrange = "#ffa635"
             colorRed = "#ff7657"
 
+            isLight = true
+            isDark = false
+
             themeStatusbar = Material.Light
             colorStatusbar = "white"
 
@@ -255,6 +261,9 @@ Item {
             colorYellow = "#ffba5a"
             colorOrange = "#ffa635"
             colorRed = "#ff7657"
+
+            isLight = true
+            isDark = false
 
             themeStatusbar = Material.Dark
             colorStatusbar = "#009688"
@@ -310,6 +319,9 @@ Item {
             colorOrange = "#ffa635"
             colorRed = "#ff7657"
 
+            isLight = true
+            isDark = false
+
             themeStatusbar = Material.Dark
             colorStatusbar = "#1e3c77"
 
@@ -364,6 +376,9 @@ Item {
             colorOrange = "#ffa635"
             colorRed = "#ff7657"
 
+            isLight = true
+            isDark = false
+
             themeStatusbar = Material.Dark
             colorStatusbar = colorNeutralNight
 
@@ -417,6 +432,9 @@ Item {
             colorYellow = "#fcc632"
             colorOrange = "#ff8f35"
             colorRed = "#e8635a"
+
+            isLight = false
+            isDark = true
 
             themeStatusbar = Material.Dark
             colorStatusbar = "#725595"

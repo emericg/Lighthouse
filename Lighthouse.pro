@@ -10,8 +10,12 @@ QT     += qml quick quickcontrols2 svg
 
 !android:!ios {
     QT += multimedia # to play sound effects on actions
-    QT += widgets # for proper systray support
+    QT += widgets # for proper systray and menubar support
 }
+
+# Bundle name
+QMAKE_TARGET_BUNDLE_PREFIX = io.emeric
+QMAKE_BUNDLE = lighthouse
 
 # Validate Qt version
 !versionAtLeast(QT_VERSION, 6.5) : error("You need at least Qt version 6.5 for $${TARGET}")
@@ -193,10 +197,6 @@ linux:!android {
 }
 
 macx {
-    # Bundle name
-    QMAKE_TARGET_BUNDLE_PREFIX = io.emeric
-    QMAKE_BUNDLE = lighthouse
-
     # OS icons
     #ICON = $${PWD}/assets/macos/$$lower($${TARGET}).icns
 
@@ -251,10 +251,6 @@ android {
     # ANDROID_TARGET_ARCH: [x86_64, armeabi-v7a, arm64-v8a]
     #message("ANDROID_TARGET_ARCH: $$ANDROID_TARGET_ARCH")
 
-    # Bundle name
-    QMAKE_TARGET_BUNDLE_PREFIX = io.emeric
-    QMAKE_BUNDLE = lighthouse
-
     DISTFILES += $${PWD}/assets/android/AndroidManifest.xml \
                  $${PWD}/assets/android/gradle.properties \
                  $${PWD}/assets/android/build.gradle
@@ -267,10 +263,6 @@ ios {
     #message("QMAKE_IOS_DEPLOYMENT_TARGET: $$QMAKE_IOS_DEPLOYMENT_TARGET")
 
     CONFIG += no_autoqmake
-
-    # Bundle name
-    QMAKE_TARGET_BUNDLE_PREFIX = io.emeric
-    QMAKE_BUNDLE = lighthouse
 
     # OS infos
     QMAKE_INFO_PLIST = $${PWD}/assets/ios/Info.plist

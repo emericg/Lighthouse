@@ -1,9 +1,9 @@
 import QtQuick
+import QtQuick.Effects
+import QtQuick.Dialogs
+
 import QtQuick.Controls.impl
 import QtQuick.Templates as T
-
-import QtQuick.Dialogs
-import Qt5Compat.GraphicalEffects
 
 import ThemeEngine
 import "qrc:/js/UtilsPath.js" as UtilsPath
@@ -120,13 +120,20 @@ T.TextField {
         }
 
         layer.enabled: true
-        layer.effect: OpacityMask {
-            maskSource: Rectangle {
-                x: background.x
-                y: background.y
-                width: background.width
-                height: background.height
-                radius: background.radius
+        layer.effect: MultiEffect {
+            maskEnabled: true
+            maskInverted: false
+            maskThresholdMin: 0.5
+            maskSpreadAtMin: 1.0
+            maskSpreadAtMax: 0.0
+            maskSource: ShaderEffectSource {
+                sourceItem: Rectangle {
+                    x: background.x
+                    y: background.y
+                    width: background.width
+                    height: background.height
+                    radius: background.radius
+                }
             }
         }
     }

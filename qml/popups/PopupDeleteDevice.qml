@@ -1,6 +1,6 @@
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Controls
-import Qt5Compat.GraphicalEffects
 
 import ThemeEngine
 
@@ -23,29 +23,25 @@ Popup {
 
     ////////////////////////////////////////////////////////////////////////////
 
-    background: Item {
+    background: Rectangle {
+        radius: singleColumn ? 0 : Theme.componentRadius
+        color: Theme.colorBackground
+        border.color: Theme.colorSeparator
+        border.width: singleColumn ? 0 : Theme.componentBorderWidth
+
         Rectangle {
-            id: bgrect
-            anchors.fill: parent
-
-            radius: singleColumn ? 0 : Theme.componentRadius
-            color: Theme.colorBackground
-            border.color: Theme.colorSeparator
-            border.width: singleColumn ? 0 : Theme.componentBorderWidth
-
-            Rectangle {
-                width: parent.width
-                height: Theme.componentBorderWidth
-                visible: singleColumn
-                color: Theme.colorSeparator
-            }
+            width: parent.width
+            height: Theme.componentBorderWidth
+            visible: singleColumn
+            color: Theme.colorSeparator
         }
-        DropShadow {
+
+        layer.enabled: true
+        layer.effect:  MultiEffect {
             anchors.fill: parent
-            source: bgrect
-            color: "#60000000"
-            samples: 24
-            cached: true
+            autoPaddingEnabled: true
+            shadowEnabled: true
+            shadowColor: ThemeEngine.isLight ? "#88000000" : "#88ffffff"
         }
     }
 

@@ -1,6 +1,6 @@
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Controls
-import Qt5Compat.GraphicalEffects
 
 import ThemeEngine
 import LocalActions
@@ -87,29 +87,24 @@ Popup {
 
     ////////////////////////////////////////////////////////////////////////////
 
-    background: Item {
+    background: Rectangle {
+        radius: singleColumn ? 0 : Theme.componentRadius
+        color: Theme.colorBackground
+        border.color: Theme.colorSeparator
+        border.width: singleColumn ? 0 : Theme.componentBorderWidth
+
         Rectangle {
-            id: bgrect
-            anchors.fill: parent
-
-            radius: singleColumn ? 0 : Theme.componentRadius
-            color: Theme.colorBackground
-            border.color: Theme.colorSeparator
-            border.width: singleColumn ? 0 : Theme.componentBorderWidth
-
-            Rectangle {
-                width: parent.width
-                height: Theme.componentBorderWidth
-                visible: singleColumn
-                color: Theme.colorSeparator
-            }
+            width: parent.width
+            height: Theme.componentBorderWidth
+            visible: singleColumn
+            color: Theme.colorSeparator
         }
-        DropShadow {
-            anchors.fill: parent
-            source: bgrect
-            color: "#60000000"
-            samples: 24
-            cached: true
+
+        layer.enabled: true
+        layer.effect:  MultiEffect {
+            autoPaddingEnabled: true
+            shadowEnabled: true
+            shadowColor: ThemeEngine.isLight ? "#88000000" : "#88ffffff"
         }
     }
 
@@ -124,9 +119,9 @@ Popup {
 
             Rectangle { // titleArea
                 anchors.left: parent.left
-                anchors.leftMargin: 1
+                anchors.leftMargin: 0
                 anchors.right: parent.right
-                anchors.rightMargin: 1
+                anchors.rightMargin: 0
 
                 height: 64
                 radius: Theme.componentRadius
@@ -176,9 +171,9 @@ Popup {
             Rectangle { // menuArea
                 id: menuArea
                 anchors.left: parent.left
-                anchors.leftMargin: 1
+                anchors.leftMargin: 0
                 anchors.right: parent.right
-                anchors.rightMargin: 1
+                anchors.rightMargin: 0
 
                 height: 48
                 color: Theme.colorSecondary

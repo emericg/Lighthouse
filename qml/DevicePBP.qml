@@ -4,6 +4,7 @@ import QtQuick.Controls
 import ThemeEngine
 import DeviceUtils
 import "qrc:/js/UtilsDeviceSensors.js" as UtilsDeviceSensors
+import "qrc:/js/UtilsNumber.js" as UtilsNumber
 
 Loader {
     id: devicePBP
@@ -281,16 +282,22 @@ Loader {
                     ItemKey {
                         key: "left click"
                     }
-                    Item { width: 80; height: 80; }
+                    Item {
+                        width: 80; height: 80;
+                    }
                     ItemKey {
                         key: "right click"
                     }
 
-                    Item { width: 80; height: 80; }
+                    Item {
+                        width: 80; height: 80;
+                    }
                     ItemKey {
                         key: "↑"
                     }
-                    Item { width: 80; height: 80; }
+                    Item {
+                        width: 80; height: 80;
+                    }
 
                     ItemKey {
                         key: "←"
