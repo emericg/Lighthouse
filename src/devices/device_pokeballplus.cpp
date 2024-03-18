@@ -301,11 +301,24 @@ void DevicePokeballPlus::bleReadNotify(const QLowEnergyCharacteristic &c, const 
         m_axis_x = getAnalogX(data[3], data[2]);
         m_axis_y = getAnalogY(data[4]);
         Q_EMIT axisChanged();
+/*
+        // gyro
+
+        m_gyro_x = getGyroData(data[6], data[5]) * 1.f;
+        m_gyro_y = getGyroData(data[8], data[7]) *  1.f;
+        m_gyro_z = getGyroData(data[10], data[9]) * 1.f;
+        Q_EMIT gyroChanged();
 
         // accl
 
-        // gyro
+        m_accl_x = getAcclData(data[12], data[11]) * 1.f;
+        m_accl_y = getAcclData(data[14], data[13]) * 1.f;
+        m_accl_z = getAcclData(data[16], data[15]) * 1.f;
+        Q_EMIT acclChanged();
 
+        //qDebug() << "ACCL X  > " << m_accl_x << " Y  > " << m_accl_y << " Z  > " << m_accl_z;
+        //qDebug() << "GYRO X  > " << m_gyro_x << " Y  > " << m_gyro_y << " Z  > " << m_gyro_z;
+*/
         ////////////////
 
         if (btn_a) triggerEvent(1, 0);

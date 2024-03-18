@@ -8,6 +8,13 @@
         <file>menus/menu_close.svg</file>
         <file>menus/menu_infos.svg</file>
 
+        <file>models/pokeball_meshes/bottom_.mesh</file>
+        <file>models/pokeball_meshes/bottom_black.mesh</file>
+        <file>models/pokeball_meshes/button.mesh</file>
+        <file>models/pokeball_meshes/button_holder.mesh</file>
+        <file>models/pokeball_meshes/top_black.mesh</file>
+        <file>models/pokeball_meshes/top_red.mesh</file>
+
         <file>sounds/car-lock-sound-effect.ogg</file>
 
         <file>icons_material/baseline-add-24px.svg</file>

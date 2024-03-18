@@ -4,9 +4,8 @@ import ThemeEngine
 
 Rectangle {
     id: pokeballSchematics
-    anchors.centerIn: parent
 
-    width: parent.width * 0.66
+    width: parent.width
     height: width
     radius: width
 

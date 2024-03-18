@@ -35,11 +35,10 @@ Loader {
     }
 
     active: false
-
     asynchronous: false
-    sourceComponent: Item {
-        id: itemDeviceRemote // itemdevicePBP
-        //anchors.fill: parent
+
+    sourceComponent: Item { // itemdevicePBP // Pokeball Plus
+        id: itemDeviceRemote
 
         focus: parent.focus
 
@@ -235,7 +234,7 @@ Loader {
                 width: parent.width*0.5
 
                 SchematicPokeball { // pokeball 2d
-                    id: pokeball
+                    id: pokeball_2d
                     width: parent.width * 0.5
                 }
             }

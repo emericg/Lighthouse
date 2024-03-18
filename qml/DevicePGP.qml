@@ -35,11 +35,10 @@ Loader {
     }
 
     active: false
-
     asynchronous: false
-    sourceComponent: Item {
-        id: itemDeviceRemote // itemDevicePGP
-        //anchors.fill: parent
+
+    sourceComponent: Item { // itemDevicePGP // Pokemon Go Plus
+        id: itemDeviceRemote
 
         focus: parent.focus
 

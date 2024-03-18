@@ -35,6 +35,9 @@
         <file alias="SchematicPokemonGoPlus.qml">components/SchematicPokemonGoPlus.qml</file>
         <file alias="SchematicRemote.qml">components/SchematicRemote.qml</file>
 
+        <file alias="Pokeball3dView.qml">components/Pokeball3dView.qml</file>
+        <file alias="Pokeball3dModel.qml">components/Pokeball3dModel.qml</file>
+
         <file alias="ActionMenuFixed.qml">components/ActionMenuFixed.qml</file>
         <file alias="ButtonExperimental.qml">components/ButtonExperimental.qml</file>
         <file alias="ItemLoadData.qml">components/ItemLoadData.qml</file>
