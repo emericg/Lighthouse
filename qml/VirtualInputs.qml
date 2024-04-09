@@ -96,7 +96,7 @@ Loader {
 
             text: qsTr("keyboard")
             fullColor: virtualtextfield.focus
-            source: "qrc:/assets/icons_material/keyboard-variant.svg"
+            source: "qrc:/assets/gfx/icons/keyboard-variant.svg"
 
             onClicked: {
                 if (virtualtextfield.focus) {

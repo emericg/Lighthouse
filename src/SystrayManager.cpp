@@ -123,9 +123,9 @@ void SystrayManager::initSystray()
         }
 
 #if defined(Q_OS_MACOS)
-        m_sysTrayIcon = new QIcon(":/assets/logos/logo_tray_symbolic.svg");
+        m_sysTrayIcon = new QIcon(":/assets/gfx/logos/logo_tray_symbolic.svg");
 #else
-        m_sysTrayIcon = new QIcon(":/assets/logos/logo_tray_symbolic.svg");
+        m_sysTrayIcon = new QIcon(":/assets/gfx/logos/logo_tray_symbolic.svg");
 #endif
     }
 }

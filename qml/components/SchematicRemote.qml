@@ -138,7 +138,7 @@ Rectangle {
                     anchors.centerIn: parent
                     width: parent.width*0.5
                     height: parent.width*0.5
-                    source: "qrc:/assets/icons_material/duotone-wb_sunny-24px.svg"
+                    source: "qrc:/assets/icons/material-icons/duotone/wb_sunny.svg"
                     color: (itemDeviceRemote.btnClicked === 3) ? Theme.colorPrimary: Theme.colorSeparator
                 }
 

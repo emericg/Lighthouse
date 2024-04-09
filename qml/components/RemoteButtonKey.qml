@@ -46,7 +46,7 @@ Rectangle {
 
             IconSvg {
                 anchors.centerIn: parent
-                source: "qrc:/assets/icons_material/outline-lock-24px.svg"
+                source: "qrc:/assets/icons/material-symbols/lock.svg"
             }
         }
 
@@ -57,8 +57,8 @@ Rectangle {
 
             color: remoteButtonKey.isValid ? Theme.colorSuccess : Theme.colorWarning
             source: remoteButtonKey.isValid ?
-                        "qrc:/assets/icons_material/baseline-check-24px.svg" :
-                        "qrc:/assets/icons_material/baseline-warning-24px.svg"
+                        "qrc:/assets/icons/material-symbols/check.svg" :
+                        "qrc:/assets/icons/material-symbols/warning.svg"
         }
 
         Text {

@@ -103,7 +103,7 @@ Item {
                 height: mobileMenu.hhh
 
                 text: qsTr("Device list")
-                source: "qrc:/assets/icons_material/lightbulb_FILL0_wght400_GRAD0_opsz48.svg"
+                source: "qrc:/assets/icons/material-symbols/sensors/lightbulb.svg"
                 sourceSize: mobileMenu.hhi
                 colorContent: Theme.colorTabletmenuContent
                 colorHighlight: Theme.colorTabletmenuHighlight
@@ -116,7 +116,7 @@ Item {
                 height: mobileMenu.hhh
 
                 text: qsTr("Settings")
-                source: "qrc:/assets/icons_material/baseline-settings-20px.svg"
+                source: "qrc:/assets/icons/material-symbols/settings.svg"
                 sourceSize: mobileMenu.hhi
                 colorContent: Theme.colorTabletmenuContent
                 colorHighlight: Theme.colorTabletmenuHighlight
@@ -129,7 +129,7 @@ Item {
                 height: mobileMenu.hhh
 
                 text: qsTr("About")
-                source: "qrc:/assets/icons_material/outline-info-24px.svg"
+                source: "qrc:/assets/icons/material-symbols/info.svg"
                 sourceSize: mobileMenu.hhi
                 colorContent: Theme.colorTabletmenuContent
                 colorHighlight: Theme.colorTabletmenuHighlight

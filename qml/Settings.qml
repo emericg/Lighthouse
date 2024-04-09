@@ -56,7 +56,7 @@ Loader {
 
             SectionTitle {
                 text: qsTr("Application")
-                source: "qrc:/assets/icons_material/baseline-settings-20px.svg"
+                source: "qrc:/assets/icons/material-symbols/settings.svg"
             }
 
             ////////////////
@@ -76,7 +76,7 @@ Loader {
                     width: 24
                     height: 24
                     color: Theme.colorIcon
-                    source: "qrc:/assets/icons_material/duotone-style-24px.svg"
+                    source: "qrc:/assets/icons/material-icons/duotone/style.svg"
                 }
 
                 Text {
@@ -198,7 +198,7 @@ Loader {
                     width: 24
                     height: 24
                     color: Theme.colorIcon
-                    source: "qrc:/assets/icons_material/duotone-brightness_4-24px.svg"
+                    source: "qrc:/assets/icons/material-icons/duotone/brightness_4.svg"
                 }
 
                 Text {
@@ -277,7 +277,7 @@ Loader {
                     width: 24
                     height: 24
                     color: Theme.colorIcon
-                    source: "qrc:/assets/icons_material/duotone-minimize-24px.svg"
+                    source: "qrc:/assets/icons/material-icons/duotone/minimize.svg"
                 }
 
                 Text {
@@ -326,7 +326,7 @@ Loader {
                     width: 24
                     height: 24
                     color: Theme.colorIcon
-                    source: "qrc:/assets/icons_material/baseline-autorenew-24px.svg"
+                    source: "qrc:/assets/icons/material-symbols/autorenew.svg"
                 }
 
                 Text {
@@ -401,7 +401,7 @@ Loader {
                     width: 24
                     height: 24
                     color: Theme.colorIcon
-                    source: "qrc:/assets/icons_material/baseline-notifications_none-24px.svg"
+                    source: "qrc:/assets/icons/material-symbols/notifications.svg"
                 }
 
                 Text {
@@ -454,7 +454,7 @@ Loader {
 
             SectionTitle {
                 text: qsTr("Bluetooth")
-                source: "qrc:/assets/icons_material/baseline-bluetooth-24px.svg"
+                source: "qrc:/assets/icons/material-symbols/sensors/bluetooth.svg"
 
                 // Android only
                 visible: (Qt.platform.os === "android")
@@ -479,7 +479,7 @@ Loader {
                     width: 24
                     height: 24
                     color: Theme.colorIcon
-                    source: "qrc:/assets/icons_material/baseline-bluetooth_disabled-24px.svg"
+                    source: "qrc:/assets/icons/material-icons/outlined/bluetooth_disabled.svg"
                 }
 
                 Text {
@@ -532,7 +532,7 @@ Loader {
             SectionTitle {
                 visible: isDesktop
                 text: qsTr("Network server")
-                source: "qrc:/assets/icons_material/duotone-list-24px.svg"
+                source: "qrc:/assets/icons/material-icons/duotone/list.svg"
             }
 
             ////////////////
@@ -554,7 +554,7 @@ Loader {
                     width: 24
                     height: 24
                     color: Theme.colorIcon
-                    source: "qrc:/assets/icons_material/duotone-devices-24px.svg"
+                    source: "qrc:/assets/icons/material-icons/duotone/devices.svg"
                 }
 
                 Text {
@@ -627,7 +627,7 @@ Loader {
                 anchors.left: parent.left
                 visible: isMobile
                 text: qsTr("Desktop remote control")
-                source: "qrc:/assets/icons_material/duotone-devices-24px.svg"
+                source: "qrc:/assets/icons/material-icons/duotone/devices.svg"
             }
 
             ////////////////
@@ -649,7 +649,7 @@ Loader {
                     width: 24
                     height: 24
                     color: Theme.colorIcon
-                    source: "qrc:/assets/icons_material/baseline-storage-24px.svg"
+                    source: "qrc:/assets/icons/material-symbols/storage.svg"
                 }
 
                 TextFieldThemed {
@@ -686,7 +686,7 @@ Loader {
                     width: 24
                     height: 24
                     color: Theme.colorIcon
-                    source: "qrc:/assets/icons_material/baseline-pin-24px.svg"
+                    source: "qrc:/assets/icons/material-symbols/pin.svg"
                 }
 
                 TextFieldThemed {

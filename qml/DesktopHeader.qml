@@ -81,15 +81,15 @@ Rectangle {
             title.text = qsTr("Welcome")
             menus.visible = false
 
-            buttonBack.source = "qrc:/assets/menus/menu_close.svg"
+            buttonBack.source = "qrc:/assets/gfx/icons/menu_close.svg"
         } else {
             title.text = "Lighthouse"
             menus.visible = true
 
             if (appContent.state === "DeviceList") {
-                buttonBack.source = "qrc:/assets/logos/logo.svg"
+                buttonBack.source = "qrc:/assets/gfx/logos/logo.svg"
             } else {
-                buttonBack.source = "qrc:/assets/menus/menu_back.svg"
+                buttonBack.source = "qrc:/assets/gfx/icons/menu_back.svg"
             }
         }
     }
@@ -110,7 +110,7 @@ Rectangle {
         anchors.leftMargin: 12
         anchors.verticalCenter: parent.verticalCenter
 
-        hoverEnabled: (buttonBack.source !== "qrc:/assets/logos/logo.svg")
+        hoverEnabled: (buttonBack.source !== "qrc:/assets/gfx/logos/logo.svg")
         onEntered: { buttonBackBg.opacity = 0.5; }
         onExited: { buttonBackBg.opacity = 0; buttonBack.width = 24; }
 
@@ -118,7 +118,7 @@ Rectangle {
         onReleased: buttonBack.width = 24
         onClicked: backButtonClicked()
 
-        enabled: (buttonBack.source !== "qrc:/assets/logos/logo.svg" || wideMode)
+        enabled: (buttonBack.source !== "qrc:/assets/gfx/logos/logo.svg" || wideMode)
         visible: enabled
 
         Rectangle {
@@ -137,7 +137,7 @@ Rectangle {
             height: width
             anchors.centerIn: parent
 
-            source: "qrc:/assets/menus/menu_logo_large.svg"
+            source: "qrc:/assets/gfx/icons/menu_back.svg"
             color: Theme.colorHeaderContent
         }
     }
@@ -195,7 +195,7 @@ Rectangle {
             visible: (appContent.state === "DeviceList")
             enabled: visible
 
-            source: "qrc:/assets/icons_material/baseline-filter_list-24px.svg"
+            source: "qrc:/assets/icons/material-symbols/filter_list.svg"
             iconColor: Theme.colorHeaderContent
             textColor: Theme.colorHeaderContent
             backgroundColor: Theme.colorHeaderHighlight
@@ -272,12 +272,12 @@ Rectangle {
                 source: {
                     if (!selectedDevice) return ""
                     if (selectedDevice.status === DeviceUtils.DEVICE_OFFLINE)
-                        return "qrc:/assets/icons_material/baseline-bluetooth_disabled-24px.svg"
+                        return "qrc:/assets/icons/material-icons/outlined/bluetooth_disabled.svg"
                     if (selectedDevice.status === DeviceUtils.DEVICE_QUEUED ||
                         selectedDevice.status === DeviceUtils.DEVICE_CONNECTING)
-                        return "qrc:/assets/icons_material/duotone-bluetooth_searching-24px.svg"
+                        return "qrc:/assets/icons/material-icons/duotone/bluetooth_searching.svg"
                     if (selectedDevice.status === DeviceUtils.DEVICE_CONNECTED)
-                        return "qrc:/assets/icons_material/duotone-bluetooth_connected-24px.svg"
+                        return "qrc:/assets/icons/material-icons/duotone/bluetooth_connected.svg"
                 }
                 tooltipText: {
                     if (!selectedDevice) return ""
@@ -317,7 +317,7 @@ Rectangle {
                 width: headerHeight
                 height: headerHeight
 
-                source: "qrc:/assets/icons_material/duotone-devices-24px.svg"
+                source: "qrc:/assets/icons/material-icons/duotone/devices.svg"
                 colorContent: Theme.colorHeaderContent
                 colorHighlight: Theme.colorHeaderHighlight
 
@@ -329,7 +329,7 @@ Rectangle {
                 width: headerHeight
                 height: headerHeight
 
-                source: "qrc:/assets/icons_material/baseline-settings-20px.svg"
+                source: "qrc:/assets/icons/material-icons/duotone/tune.svg"
                 colorContent: Theme.colorHeaderContent
                 colorHighlight: Theme.colorHeaderHighlight
 
@@ -341,7 +341,7 @@ Rectangle {
                 width: headerHeight
                 height: headerHeight
 
-                source: "qrc:/assets/menus/menu_infos.svg"
+                source: "qrc:/assets/icons/material-icons/duotone/info.svg"
                 colorContent: Theme.colorHeaderContent
                 colorHighlight: Theme.colorHeaderHighlight
 

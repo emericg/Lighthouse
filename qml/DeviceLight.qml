@@ -199,7 +199,7 @@ Loader {
                         id: imageLightbulb
                         width: 180; height: 180;
                         anchors.horizontalCenter: parent.horizontalCenter
-                        source: "qrc:/assets/icons_material/light_FILL0_wght400_GRAD0_opsz48.svg"
+                        source: "qrc:/assets/icons/material-symbols/sensors/light.svg"
                         color: Theme.colorHeaderContent
                     }
 
@@ -237,7 +237,7 @@ Loader {
                         height: 24
                         anchors.verticalCenter: parent.verticalCenter
 
-                        source: "qrc:/assets/icons_material/duotone-schedule-24px.svg"
+                        source: "qrc:/assets/icons/material-icons/duotone/schedule.svg"
                         color: cccc
                     }
                     Text {
@@ -271,7 +271,7 @@ Loader {
                         height: 20
                         anchors.verticalCenter: parent.verticalCenter
 
-                        source: "qrc:/assets/icons_material/duotone-edit-24px.svg"
+                        source: "qrc:/assets/icons/material-icons/duotone/edit.svg"
                         color: cccc
 
                         opacity: (isMobile || !textInputLocation.text || textInputLocation.focus || textInputLocationArea.containsMouse) ? 0.9 : 0
@@ -315,7 +315,7 @@ Loader {
                         height: 24
                         anchors.verticalCenter: parent.verticalCenter
 
-                        source: "qrc:/assets/icons_material/duotone-pin_drop-24px.svg"
+                        source: "qrc:/assets/icons/material-icons/duotone/pin_drop.svg"
                         color: cccc
                     }
                 }
@@ -773,7 +773,7 @@ Loader {
                                 height: width
                                 color: utilsApp.isQColorLight(parent.color) ? Theme.colorHighContrast : Theme.colorLowContrast
                                 opacity: 0.5
-                                source: "qrc:/assets/icons_material/duotone-style-24px.svg"
+                                source: "qrc:/assets/icons/material-icons/duotone/style.svg"
                             }
 
                             MouseArea {

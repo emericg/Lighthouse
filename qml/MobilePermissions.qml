@@ -74,7 +74,7 @@ Item {
 
                     property bool validperm: true
 
-                    source: (validperm) ? "qrc:/assets/icons_material/baseline-check-24px.svg" : "qrc:/assets/icons_material/baseline-close-24px.svg"
+                    source: (validperm) ? "qrc:/assets/icons/material-symbols/check.svg" : "qrc:/assets/icons/material-symbols/close.svg"
                     iconColor: (validperm) ? "white" : "white"
                     backgroundColor: (validperm) ? Theme.colorSuccess : Theme.colorSubText
                     backgroundVisible: true
@@ -133,7 +133,7 @@ Item {
 
                     property bool validperm: false
 
-                    source: (validperm) ? "qrc:/assets/icons_material/baseline-check-24px.svg" : "qrc:/assets/icons_material/baseline-close-24px.svg"
+                    source: (validperm) ? "qrc:/assets/icons/material-symbols/check.svg" : "qrc:/assets/icons/material-symbols/close.svg"
                     iconColor: (validperm) ? "white" : "white"
                     backgroundColor: (validperm) ? Theme.colorSuccess : Theme.colorSubText
                     backgroundVisible: true
@@ -185,7 +185,7 @@ Item {
                 secondaryColor: Theme.colorBackground
 
                 text: qsTr("Official information")
-                source: "qrc:/assets/icons_material/duotone-launch-24px.svg"
+                source: "qrc:/assets/icons/material-icons/duotone/launch.svg"
                 sourceSize: 20
 
                 onClicked: Qt.openUrlExternally("https://developer.android.com/guide/topics/connectivity/bluetooth/permissions#declare-android11-or-lower")
@@ -213,7 +213,7 @@ Item {
 
                     property bool validperm: false
 
-                    source: (validperm) ? "qrc:/assets/icons_material/baseline-check-24px.svg" : "qrc:/assets/icons_material/baseline-close-24px.svg"
+                    source: (validperm) ? "qrc:/assets/icons/material-symbols/check.svg" : "qrc:/assets/icons/material-symbols/close.svg"
                     iconColor: (validperm) ? "white" : "white"
                     backgroundColor: (validperm) ? Theme.colorSuccess : Theme.colorSubText
                     backgroundVisible: true
@@ -279,7 +279,7 @@ Item {
 
                     property bool validperm: true
 
-                    source: (validperm) ? "qrc:/assets/icons_material/baseline-check-24px.svg" : "qrc:/assets/icons_material/baseline-close-24px.svg"
+                    source: (validperm) ? "qrc:/assets/icons/material-symbols/check.svg" : "qrc:/assets/icons/material-symbols/close.svg"
                     iconColor: (validperm) ? "white" : "white"
                     backgroundColor: (validperm) ? Theme.colorSuccess : Theme.colorSubText
                     backgroundVisible: true
@@ -336,7 +336,7 @@ Item {
 
                     opacity: 0.66
                     color: Theme.colorSubText
-                    source: "qrc:/assets/icons_material/duotone-info-24px.svg"
+                    source: "qrc:/assets/icons/material-icons/duotone/info.svg"
                 }
 
                 Text {
@@ -381,7 +381,7 @@ Item {
                 secondaryColor: Theme.colorBackground
 
                 text: qsTr("Application info")
-                source: "qrc:/assets/icons_material/duotone-tune-24px.svg"
+                source: "qrc:/assets/icons/material-icons/duotone/tune.svg"
                 sourceSize: 20
 
                 onClicked: utilsApp.openAndroidAppInfo("io.emeric.lighthouse")

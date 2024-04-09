@@ -238,7 +238,7 @@ Item {
                     height: 36
                     anchors.verticalCenter: parent.verticalCenter
 
-                    source: "qrc:/assets/icons_material/baseline-backspace-24px.svg"
+                    source: "qrc:/assets/icons/material-symbols/backspace-fill.svg"
                     rotation: 180
                     iconColor: Theme.colorActionbarContent
                     backgroundColor: Theme.colorActionbarHighlight
@@ -273,7 +273,7 @@ Item {
                     onClicked: confirmDeleteDevice.open()
 
                     text: qsTr("Delete")
-                    source: "qrc:/assets/icons_material/baseline-delete-24px.svg"
+                    source: "qrc:/assets/icons/material-symbols/delete.svg"
                 }
             }
         }
@@ -343,7 +343,7 @@ Item {
 
                             backgroundVisible: true
                             highlightMode: "color"
-                            source: "qrc:/assets/icons_material/skip_previous_FILL0_wght400_GRAD0_opsz48.svg"
+                            source: "qrc:/assets/icons/material-symbols/skip_previous.svg"
                             onClicked: localControls.keyboard_media_prev()
                         }
                         RoundButtonIcon {
@@ -351,7 +351,7 @@ Item {
 
                             backgroundVisible: true
                             highlightMode: "color"
-                            source: "qrc:/assets/icons_material/play_pause_FILL0_wght400_GRAD0_opsz48.svg"
+                            source: "qrc:/assets/icons/material-symbols/play_pause.svg"
                             onClicked: localControls.keyboard_media_playpause()
                         }
                         RoundButtonIcon {
@@ -359,7 +359,7 @@ Item {
 
                             backgroundVisible: true
                             highlightMode: "color"
-                            source: "qrc:/assets/icons_material/skip_next_FILL0_wght400_GRAD0_opsz48.svg"
+                            source: "qrc:/assets/icons/material-symbols/skip_next.svg"
                             onClicked: localControls.keyboard_media_next()
                         }
 
@@ -371,7 +371,7 @@ Item {
 
                             color: Theme.colorSeparator
                             opacity: 0.5
-                            source: "qrc:/assets/icons_material/keyboard-variant.svg"
+                            source: "qrc:/assets/gfx/icons/keyboard-variant.svg"
                         }
 
                         RoundButtonIcon {
@@ -379,7 +379,7 @@ Item {
 
                             backgroundVisible: true
                             highlightMode: "color"
-                            source: "qrc:/assets/icons_material/duotone-volume_off-24px.svg"
+                            source: "qrc:/assets/icons/material-icons/duotone/volume_off.svg"
                             onClicked: localControls.keyboard_volume_mute()
                         }
                         RoundButtonIcon {
@@ -387,7 +387,7 @@ Item {
 
                             backgroundVisible: true
                             highlightMode: "color"
-                            source: "qrc:/assets/icons_material/duotone-volume_down-24px.svg"
+                            source: "qrc:/assets/icons/material-icons/duotone/volume_down.svg"
                             onClicked: localControls.keyboard_volume_down()
                         }
                         RoundButtonIcon {
@@ -395,7 +395,7 @@ Item {
 
                             backgroundVisible: true
                             highlightMode: "color"
-                            source: "qrc:/assets/icons_material/duotone-volume_up_1-24px.svg"
+                            source: "qrc:/assets/icons/material-icons/duotone/volume_up_1.svg"
                             onClicked: localControls.keyboard_volume_up()
                         }
                     }
@@ -449,21 +449,21 @@ Item {
                                 //visible: mprisControls.canGoPrevious
                                 backgroundVisible: true
                                 highlightMode: "color"
-                                source: "qrc:/assets/icons_material/skip_previous_FILL0_wght400_GRAD0_opsz48.svg"
+                                source: "qrc:/assets/icons/material-symbols/skip_previous.svg"
                                 onClicked: mprisControls.media_prev()
                             }
                             RoundButtonIcon {
                                 //visible: mprisControls.canControl
                                 backgroundVisible: true
                                 highlightMode: "color"
-                                source: "qrc:/assets/icons_material/play_pause_FILL0_wght400_GRAD0_opsz48.svg"
+                                source: "qrc:/assets/icons/material-symbols/play_pause.svg"
                                 onClicked: mprisControls.media_playpause()
                             }
                             RoundButtonIcon {
                                 //visible: mprisControls.canGoNext
                                 backgroundVisible: true
                                 highlightMode: "color"
-                                source: "qrc:/assets/icons_material/skip_next_FILL0_wght400_GRAD0_opsz48.svg"
+                                source: "qrc:/assets/icons/material-symbols/skip_next.svg"
                                 onClicked: mprisControls.media_next()
                             }
                         }
@@ -490,9 +490,9 @@ Item {
 
                         source: {
                             if (mprisControls.playbackStatus == "paused")
-                                return "qrc:/assets/icons_material/outline-slideshow-24px.svg"
+                                return "qrc:/assets/icons/material-symbols/media/slideshow.svg"
                             else
-                                return "qrc:/assets/icons_material/outline-slideshow-24px.svg"
+                                return "qrc:/assets/icons/material-symbols/media/slideshow.svg"
                         }
                         color: Theme.colorSeparator
                         opacity: 0.5
@@ -554,7 +554,7 @@ Item {
 
                         opacity: 0.66
                         color: Theme.colorSeparator
-                        source: "qrc:/assets/icons_material/duotone-devices-24px.svg"
+                        source: "qrc:/assets/icons/material-icons/duotone/devices.svg"
                     }
 
                     MouseArea {
@@ -604,7 +604,7 @@ Item {
                         backgroundColor: Theme.colorBackground
                         highlightMode: "color"
 
-                        source: "qrc:/assets/icons_material/skip_previous_FILL0_wght400_GRAD0_opsz48.svg"
+                        source: "qrc:/assets/icons/material-symbols/skip_previous.svg"
                         onClicked: networkClient.sendPress(4)
                     }
                     RoundButtonIcon {
@@ -615,7 +615,7 @@ Item {
                         backgroundColor: Theme.colorBackground
                         highlightMode: "color"
 
-                        source: "qrc:/assets/icons_material/play_pause_FILL0_wght400_GRAD0_opsz48.svg"
+                        source: "qrc:/assets/icons/material-symbols/play_pause.svg"
                         onClicked: networkClient.sendPress(1)
                     }
                     RoundButtonIcon {
@@ -626,7 +626,7 @@ Item {
                         backgroundColor: Theme.colorBackground
                         highlightMode: "color"
 
-                        source: "qrc:/assets/icons_material/skip_next_FILL0_wght400_GRAD0_opsz48.svg"
+                        source: "qrc:/assets/icons/material-symbols/skip_next.svg"
                         onClicked: networkClient.sendPress(3)
                     }
 
@@ -640,7 +640,7 @@ Item {
                         backgroundColor: Theme.colorBackground
                         highlightMode: "color"
 
-                        source: "qrc:/assets/icons_material/duotone-volume_off-24px.svg"
+                        source: "qrc:/assets/icons/material-icons/duotone/volume_off.svg"
                         onClicked: networkClient.sendPress(5)
                     }
                     RoundButtonIcon {
@@ -651,7 +651,7 @@ Item {
                         backgroundColor: Theme.colorBackground
                         highlightMode: "color"
 
-                        source: "qrc:/assets/icons_material/duotone-volume_down-24px.svg"
+                        source: "qrc:/assets/icons/material-icons/duotone/volume_down.svg"
                         onClicked: networkClient.sendPress(7)
                     }
                     RoundButtonIcon {
@@ -661,7 +661,7 @@ Item {
                         backgroundVisible: true
                         backgroundColor: Theme.colorBackground
                         highlightMode: "color"
-                        source: "qrc:/assets/icons_material/duotone-volume_up_1-24px.svg"
+                        source: "qrc:/assets/icons/material-icons/duotone/volume_up_1.svg"
                         onClicked: networkClient.sendPress(6)
                     }
                 }
@@ -707,7 +707,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
 
                     color: Theme.colorHighContrast
-                    source: "qrc:/assets/icons_material/duotone-devices-24px.svg"
+                    source: "qrc:/assets/icons/material-icons/duotone/devices.svg"
                 }
                 IconSvg {
                     width: 32
@@ -717,7 +717,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
 
                     color: Theme.colorHighContrast
-                    source: "qrc:/assets/icons_material/baseline-chevron_right-24px.svg"
+                    source: "qrc:/assets/icons/material-symbols/chevron_right.svg"
                 }
 
                 MouseArea {

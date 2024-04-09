@@ -45,11 +45,11 @@ Item {
 
         // Image
         if (boxDevice.status === DeviceUtils.DEVICE_CONNECTING) {
-            imageStatus.source = "qrc:/assets/icons_material/duotone-bluetooth_searching-24px.svg"
+            imageStatus.source = "qrc:/assets/icons/material-icons/duotone/bluetooth_searching.svg"
         } else if (boxDevice.status === DeviceUtils.DEVICE_CONNECTED) {
-            imageStatus.source = "qrc:/assets/icons_material/duotone-bluetooth_connected-24px.svg"
+            imageStatus.source = "qrc:/assets/icons/material-icons/duotone/bluetooth_connected.svg"
         } else if (boxDevice.status >= DeviceUtils.DEVICE_WORKING) {
-            imageStatus.source = "qrc:/assets/icons_material/duotone-bluetooth_connected-24px.svg"
+            imageStatus.source = "qrc:/assets/icons/material-icons/duotone/bluetooth_connected.svg"
         } else {
             updateSensorRSSI()
         }
@@ -65,15 +65,15 @@ Item {
             if (boxDevice.status === DeviceUtils.DEVICE_CONNECTING) {
                 textStatus.text = UtilsDeviceSensors.getDeviceStatusText(boxDevice.status)
                 textStatus.color = UtilsDeviceSensors.getDeviceStatusColor(boxDevice.status)
-                imageStatus.source = "qrc:/assets/icons_material/duotone-bluetooth_searching-24px.svg"
+                imageStatus.source = "qrc:/assets/icons/material-icons/duotone/bluetooth_searching.svg"
             } else if (boxDevice.status === DeviceUtils.DEVICE_CONNECTED) {
                 textStatus.text = UtilsDeviceSensors.getDeviceStatusText(boxDevice.status)
                 textStatus.color = UtilsDeviceSensors.getDeviceStatusColor(boxDevice.status)
-                imageStatus.source = "qrc:/assets/icons_material/duotone-bluetooth_connected-24px.svg"
+                imageStatus.source = "qrc:/assets/icons/material-icons/duotone/bluetooth_connected.svg"
             } else if (boxDevice.status >= DeviceUtils.DEVICE_WORKING) {
                 textStatus.text = UtilsDeviceSensors.getDeviceStatusText(boxDevice.status)
                 textStatus.color = UtilsDeviceSensors.getDeviceStatusColor(boxDevice.status)
-                imageStatus.source = "qrc:/assets/icons_material/duotone-bluetooth_connected-24px.svg"
+                imageStatus.source = "qrc:/assets/icons/material-icons/duotone/bluetooth_connected.svg"
             } else {
 
                 if (boxDevice.rssi < 0) {
@@ -88,13 +88,17 @@ Item {
                 rssiValue.text = boxDevice.rssi
 
                 if (boxDevice.rssi >= 0) {
-                    imageStatus.source = "" // "qrc:/assets/icons_material/signal_cellular_off-24px.svg"
+                    imageStatus.source = "" // "qrc:/assets/icons/material-symbols/signal_cellular_off.svg"
                 } else if (boxDevice.rssi > -40) {
-                    imageStatus.source = "qrc:/assets/icons_material/signal_cellular_full-24px.svg"
-                } else if (boxDevice.rssi > -60) {
-                    imageStatus.source = "qrc:/assets/icons_material/signal_cellular_mid-24px.svg"
+                    imageStatus.source = "qrc:/assets/icons/material-symbols/signal_cellular_full.svg"
+                } else if (boxDevice.rssi > -55) {
+                    imageStatus.source = "qrc:/assets/icons/material-symbols/signal_cellular_3_bar.svg"
+                } else if (boxDevice.rssi > -65) {
+                    imageStatus.source = "qrc:/assets/icons/material-symbols/signal_cellular_2_bar.svg"
+                } else if (boxDevice.rssi > -75) {
+                    imageStatus.source = "qrc:/assets/icons/material-symbols/signal_cellular_1_bar.svg"
                 } else { // if (boxDevice.rssi > -90) {
-                    imageStatus.source = "qrc:/assets/icons_material/signal_cellular_low-24px.svg"
+                    imageStatus.source = "qrc:/assets/icons/material-symbols/signal_cellular_0_bar.svg"
                 }
             }
 
@@ -372,7 +376,7 @@ Item {
 
                 visible: singleColumn && boxDevice.available
                 color: boxDevice.hasData ? Theme.colorHighContrast : Theme.colorSubText
-                source: "qrc:/assets/icons_material/baseline-chevron_right-24px.svg"
+                source: "qrc:/assets/icons/material-symbols/chevron_right.svg"
             }
         }
 

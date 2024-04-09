@@ -1,7 +1,4 @@
 
-# Google Material Design icons:
-- assets/icons_material/*                   // Google // CC BY-SA 4.0
-
 # Sounds:
 - assets/sounds/car-lock-sound-effect.ogg   // https://www.freesoundslibrary.com // CC BY 4.0
 
@@ -9,7 +6,7 @@
 - assets/models/pokeball_meshes/*           // https://www.cgtrader.com/free-3d-models/sports/toy/pokeball-c3ad59319be15d1c1a5d8e99d9df9cf9 // Editorial No Ai License
 
 # Others:
-- assets/menus/menu_back.svg                // Emeric Grange // CC BY-SA 4.0
-- assets/menus/menu_close.svg               // Emeric Grange // CC BY-SA 4.0
-- assets/logos/github.svg                   // https://github.com/logos // proprietary
-- assets/logos/gitlab.png                   // https://about.gitlab.com/press // proprietary
+- assets/gfx/menus/menu_back.svg                // Emeric Grange // CC BY-SA 4.0
+- assets/gfx/menus/menu_close.svg               // Emeric Grange // CC BY-SA 4.0
+- assets/gfx/logos/github.svg                   // https://github.com/logos // proprietary
+- assets/gfx/logos/gitlab.png                   // https://about.gitlab.com/press // proprietary

@@ -25,26 +25,25 @@ QMAKE_BUNDLE = lighthouse
 # Use Qt Quick compiler
 ios | android { CONFIG += qtquickcompiler }
 
-win32 { DEFINES += _USE_MATH_DEFINES }
-
 DEFINES += ENABLE_MBEDTLS
 #linux:!android { DEFINES += ENABLE_XTEST }
 linux:!android { DEFINES += ENABLE_UINPUT }
 linux:!android { DEFINES += ENABLE_MPRIS }
 
-# MobileUI for mobile OS
+# App utils
+include(src/thirdparty/AppUtils/AppUtils.pri)
+
+# MobileUI
 include(src/thirdparty/MobileUI/MobileUI.pri)
 
 # SingleApplication for desktop OS
-include(src/thirdparty/SingleApplication/SingleApplication.pri)
 android | ios {
     DEFINES += QAPPLICATION_CLASS=QGuiApplication
 } else {
     DEFINES += QAPPLICATION_CLASS=QApplication
 }
+include(src/thirdparty/SingleApplication/SingleApplication.pri)
 
-# Various utils
-include(src/thirdparty/AppUtils/AppUtils.pri)
 
 # QmlRadialBar
 include(src/thirdparty/QmlRadialBar/QmlRadialBar.pri)
@@ -119,7 +118,8 @@ INCLUDEPATH += src/ src/thirdparty/
 RESOURCES   += qml/qml.qrc \
                qml/components.qrc \
                i18n/i18n.qrc \
-               assets/assets.qrc
+               assets/assets.qrc \
+               assets/icons.qrc
 
 lupdate_only {
     SOURCES += qml/*.qml qml/*.js \

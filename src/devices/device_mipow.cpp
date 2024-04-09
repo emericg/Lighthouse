@@ -312,8 +312,7 @@ void DeviceMiPow::setColors_rgb_hex(const QString &rgb_hex)
 {
     //qDebug() << "DeviceMiPow::setColors_rgb_hex(" << rgb_hex << ")";
 
-    QColor clr;
-    clr.setNamedColor(rgb_hex);
+    QColor clr = QColor::fromString(rgb_hex);
 
     int br = m_brightness;
     int rr = clr.red();

@@ -55,7 +55,7 @@ Popup {
 
             index: 1
             text: qsTr("Connect")
-            source: "qrc:/assets/icons_material/baseline-bluetooth_disabled-24px.svg"
+            source: "qrc:/assets/icons/material-icons/outlined/bluetooth_disabled.svg"
             layoutDirection: actionMenu.layoutDirection
             visible: (deviceManager.bluetooth && selectedDevice && !selectedDevice.busy)
 
@@ -70,7 +70,7 @@ Popup {
 
             index: 2
             text: qsTr("Disconnect")
-            source: "qrc:/assets/icons_material/baseline-bluetooth_disabled-24px.svg"
+            source: "qrc:/assets/icons/material-icons/outlined/bluetooth_disabled.svg"
             layoutDirection: actionMenu.layoutDirection
             visible: (deviceManager.bluetooth && selectedDevice && selectedDevice.busy)
 

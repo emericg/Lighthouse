@@ -184,7 +184,7 @@ Popup {
                     DesktopHeaderItem {
                         height: menuArea.height
 
-                        source: "qrc:/assets/icons_material/baseline-remote_tv-24px.svg"
+                        source: "qrc:/assets/icons/material-symbols/sensors/nest_remote.svg"
                         colorContent: Theme.colorHeaderContent
                         colorHighlight: Theme.colorHeaderHighlight
 
@@ -196,7 +196,7 @@ Popup {
                     DesktopHeaderItem {
                         height: menuArea.height
 
-                        source: "qrc:/assets/icons_material/play_pause_FILL0_wght400_GRAD0_opsz48.svg"
+                        source: "qrc:/assets/icons/material-symbols/play_pause.svg"
                         colorContent: Theme.colorHeaderContent
                         colorHighlight: Theme.colorHeaderHighlight
 
@@ -208,7 +208,7 @@ Popup {
                     DesktopHeaderItem {
                         height: menuArea.height
 
-                        source: "qrc:/assets/icons_material/keyboard-variant.svg"
+                        source: "qrc:/assets/gfx/icons/keyboard-variant.svg"
                         colorContent: Theme.colorHeaderContent
                         colorHighlight: Theme.colorHeaderHighlight
 
@@ -220,7 +220,7 @@ Popup {
                     DesktopHeaderItem {
                         height: menuArea.height
 
-                        source: "qrc:/assets/icons_material/duotone-launch-24px.svg"
+                        source: "qrc:/assets/icons/material-icons/duotone/launch.svg"
                         colorContent: Theme.colorHeaderContent
                         colorHighlight: Theme.colorHeaderHighlight
 
@@ -483,7 +483,7 @@ Popup {
                 anchors.verticalCenter: parent.verticalCenter
 
                 text: qsTr("Save")
-                source: "qrc:/assets/icons_material/baseline-save-24px.svg"
+                source: "qrc:/assets/icons/material-symbols/save.svg"
                 fullColor: true
                 primaryColor: Theme.colorSuccess
                 onClicked: {

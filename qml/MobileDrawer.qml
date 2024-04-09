@@ -63,7 +63,7 @@ Drawer {
                     anchors.leftMargin: 12
                     anchors.verticalCenter: parent.verticalCenter
 
-                    source: "qrc:/assets/icons_material/desk-lamp.svg"
+                    source: "qrc:/assets/gfx/icons/desk-lamp.svg"
                     //sourceSize: Qt.size(width, height)
                     color: Theme.colorIcon
                 }
@@ -109,7 +109,7 @@ Drawer {
                 DrawerItem {
                     highlighted: (appContent.state === "DeviceList")
                     text: qsTr("Sensors")
-                    source: "qrc:/assets/logos/logo_tray_symbolic.svg"
+                    source: "qrc:/assets/gfx/logos/logo_tray_symbolic.svg"
 
                     onClicked: {
                         screenDeviceList.loadScreen()
@@ -120,7 +120,7 @@ Drawer {
                 DrawerItem {
                     highlighted: (appContent.state === "Settings")
                     text: qsTr("Settings")
-                    source: "qrc:/assets/icons_material/outline-settings-24px.svg"
+                    source: "qrc:/assets/icons/material-symbols/settings.svg"
 
                     onClicked: {
                         screenSettings.loadScreen()
@@ -131,7 +131,7 @@ Drawer {
                 DrawerItem {
                     highlighted: (appContent.state === "About" || appContent.state === "AboutPermissions")
                     text: qsTr("About")
-                    source: "qrc:/assets/icons_material/outline-info-24px.svg"
+                    source: "qrc:/assets/icons/material-symbols/info.svg"
 
                     onClicked: {
                         screenAbout.loadScreen()
@@ -146,7 +146,7 @@ Drawer {
                 ////////
 
                 DrawerItem {
-                    source: "qrc:/assets/icons_material/baseline-sort-24px.svg"
+                    source: "qrc:/assets/icons/material-symbols/sort.svg"
                     text: {
                         var txt = qsTr("Order by:") + " "
                         if (settingsManager.orderBy === "model") {

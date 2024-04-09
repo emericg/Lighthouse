@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
 
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS) // desktop section
     app.setApplicationDisplayName("Lighthouse");
-    app.setWindowIcon(QIcon(":/assets/logos/logo.svg"));
+    app.setWindowIcon(QIcon(":/assets/gfx/logos/logo.svg"));
 
     SystrayManager *st = SystrayManager::getInstance();
     MenubarManager *mb = MenubarManager::getInstance();    

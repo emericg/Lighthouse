@@ -115,9 +115,9 @@ Rectangle {
                     height: (headerHeight / 2)
 
                     source: {
-                        if (leftMenuMode === "drawer") return "qrc:/assets/icons_material/baseline-menu-24px.svg"
-                        else if (leftMenuMode === "close") return "qrc:/assets/icons_material/baseline-close-24px.svg"
-                        return "qrc:/assets/icons_material/baseline-arrow_back-24px.svg"
+                        if (leftMenuMode === "drawer") return "qrc:/assets/icons/material-symbols/menu.svg"
+                        else if (leftMenuMode === "close") return "qrc:/assets/icons/material-symbols/close.svg"
+                        return "qrc:/assets/icons/material-symbols/arrow_back.svg"
                     }
                     color: Theme.colorHeaderContent
                 }
@@ -165,7 +165,7 @@ Rectangle {
                     width: 24; height: 24;
                     anchors.centerIn: parent
 
-                    source: "qrc:/assets/icons_material/baseline-autorenew-24px.svg"
+                    source: "qrc:/assets/icons/material-symbols/autorenew.svg"
                     color: Theme.colorHeaderContent
                     opacity: 0
                     Behavior on opacity { OpacityAnimator { duration: 333 } }
@@ -206,7 +206,7 @@ Rectangle {
                     height: (headerHeight / 2)
                     anchors.centerIn: parent
 
-                    source: "qrc:/assets/icons_material/baseline-more_vert-24px.svg"
+                    source: "qrc:/assets/icons/material-symbols/more_vert.svg"
                     color: Theme.colorHeaderContent
                 }
             }
