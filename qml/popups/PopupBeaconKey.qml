@@ -14,10 +14,13 @@ Popup {
     width: singleColumn ? parent.width : 640
     height: columnContent.height + padding*2 + screenPaddingNavbar + screenPaddingBottom
     padding: Theme.componentMarginXL
+    margins: 0
 
+    dim: true
     modal: true
     focus: true
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+    parent: Overlay.overlay
 
     signal confirmed()
 
@@ -31,11 +34,19 @@ Popup {
 
     ////////////////////////////////////////////////////////////////////////////
 
+    enter: Transition { NumberAnimation { property: "opacity"; from: 0.5; to: 1.0; duration: 133; } }
+    //exit: Transition { NumberAnimation { property: "opacity"; from: 1.0; to: 0.0; duration: 200; } }
+
+    Overlay.modal: Rectangle {
+        color: "#000"
+        opacity: ThemeEngine.isLight ? 0.24 : 0.666
+    }
+
     background: Rectangle {
-        radius: singleColumn ? 0 : Theme.componentRadius
         color: Theme.colorBackground
         border.color: Theme.colorSeparator
         border.width: singleColumn ? 0 : Theme.componentBorderWidth
+        radius: singleColumn ? 0 : Theme.componentRadius
 
         Rectangle {
             width: parent.width
@@ -131,24 +142,22 @@ Popup {
 
                 property var btnSize: singleColumn ? width : ((width-spacing) / 2)
 
-                ButtonWireframe {
+                ButtonFlat {
                     width: parent.btnSize
 
                     text: qsTr("Cancel")
-                    primaryColor: Theme.colorSubText
-                    secondaryColor: Theme.colorForeground
+                    color: Theme.colorSubText
 
                     onClicked: {
                         textInputBeaconKey.focus = false
                         popupBeaconKey.close()
                     }
                 }
-                ButtonWireframe {
+                ButtonFlat {
                     width: parent.btnSize
 
                     text: qsTr("Set key")
-                    primaryColor: Theme.colorPrimary
-                    fullColor: true
+                    color: Theme.colorPrimary
 
                     onClicked: {
                         if (selectedDevice /*&& textInputBeaconKey.text.length === 24*/) {

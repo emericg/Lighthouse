@@ -74,26 +74,31 @@ Rectangle {
 
                 visible: currentDevice.hasPress
 
-                ItemTag {
+                TagFlat {
                     anchors.verticalCenter: parent.verticalCenter
                     height: 36
                     width: 92
 
+                    text: qsTr("press")
+
                     color: Theme.colorForeground
-                    text: "press"
+                    colorText: Theme.colorText
+                    font.capitalization: Font.AllUppercase
+                    font.bold: true
                 }
 
-                ButtonWireframeIcon {
+                ButtonFlat {
                     anchors.verticalCenter: parent.verticalCenter
                     width: parent.width - 92 - 12*3
                     height: 36
 
-                    fullColor: true
-                    fulltextColor: Theme.colorText
-                    primaryColor: Theme.colorForeground
-
                     text: UtilsActions.getActionName(currentButton.singleAction)
                     source: UtilsActions.getActionIcon(currentButton.singleAction)
+
+                    color: Theme.colorForeground
+                    colorText: Theme.colorText
+                    layoutAlignment: (remoteButton.layoutDirection === Qt.LeftToRight) ? Qt.AlignLeft : Qt.AlignRight
+                    layoutDirection: remoteButton.layoutDirection
 
                     onClicked: popupActionsChooser.openAction(currentButton, 0)
                 }
@@ -111,26 +116,31 @@ Rectangle {
 
                 visible: currentDevice.hasDoublePress
 
-                ItemTag {
+                TagFlat {
                     anchors.verticalCenter: parent.verticalCenter
                     height: 36
                     width: 92
 
+                    text: qsTr("double")
+
                     color: Theme.colorForeground
-                    text: "double"
+                    colorText: Theme.colorText
+                    font.capitalization: Font.AllUppercase
+                    font.bold: true
                 }
 
-                ButtonWireframeIcon {
+                ButtonFlat {
                     anchors.verticalCenter: parent.verticalCenter
                     width: parent.width - 92 - 12*3
                     height: 36
 
-                    fullColor: true
-                    fulltextColor: Theme.colorText
-                    primaryColor: Theme.colorForeground
-
                     text: UtilsActions.getActionName(currentButton.doubleAction)
                     source: UtilsActions.getActionIcon(currentButton.doubleAction)
+
+                    color: Theme.colorForeground
+                    colorText: Theme.colorText
+                    layoutAlignment: (remoteButton.layoutDirection === Qt.LeftToRight) ? Qt.AlignLeft : Qt.AlignRight
+                    layoutDirection: remoteButton.layoutDirection
 
                     onClicked: popupActionsChooser.openAction(currentButton, 1)
                 }
@@ -148,26 +158,31 @@ Rectangle {
 
                 visible: currentDevice.hasLongPress
 
-                ItemTag {
+                TagFlat {
                     anchors.verticalCenter: parent.verticalCenter
                     height: 36
                     width: 92
 
+                    text: qsTr("long")
+
                     color: Theme.colorForeground
-                    text: "long"
+                    colorText: Theme.colorText
+                    font.capitalization: Font.AllUppercase
+                    font.bold: true
                 }
 
-                ButtonWireframeIcon {
+                ButtonFlat {
                     anchors.verticalCenter: parent.verticalCenter
                     width: parent.width - 92 - 12*3
                     height: 36
 
-                    fullColor: true
-                    fulltextColor: Theme.colorText
-                    primaryColor: Theme.colorForeground
-
                     text: UtilsActions.getActionName(currentButton.longAction)
                     source: UtilsActions.getActionIcon(currentButton.longAction)
+
+                    color: Theme.colorForeground
+                    colorText: Theme.colorText
+                    layoutAlignment: (remoteButton.layoutDirection === Qt.LeftToRight) ? Qt.AlignLeft : Qt.AlignRight
+                    layoutDirection: remoteButton.layoutDirection
 
                     onClicked: popupActionsChooser.openAction(currentButton, 2)
                 }

@@ -54,7 +54,7 @@ Loader {
 
             ////////////////
 
-            SectionTitle {
+            ListTitle {
                 text: qsTr("Application")
                 source: "qrc:/assets/icons/material-symbols/settings.svg"
             }
@@ -219,7 +219,7 @@ Loader {
                 SwitchThemedDesktop {
                     id: switch_appThemeAuto
                     anchors.right: parent.right
-                    anchors.rightMargin: 4
+                    anchors.rightMargin: 8
                     anchors.verticalCenter: parent.verticalCenter
                     z: 1
 
@@ -298,7 +298,7 @@ Loader {
                 SwitchThemedDesktop {
                     id: switch_minimized
                     anchors.right: parent.right
-                    anchors.rightMargin: 4
+                    anchors.rightMargin: 8
                     anchors.verticalCenter: parent.verticalCenter
                     z: 1
 
@@ -347,7 +347,7 @@ Loader {
                 SwitchThemedDesktop {
                     id: switch_service
                     anchors.right: parent.right
-                    anchors.rightMargin: 4
+                    anchors.rightMargin: 8
                     anchors.verticalCenter: parent.verticalCenter
                     z: 1
 
@@ -422,7 +422,7 @@ Loader {
                 SwitchThemedDesktop {
                     id: switch_notifications
                     anchors.right: parent.right
-                    anchors.rightMargin: 4
+                    anchors.rightMargin: 8
                     anchors.verticalCenter: parent.verticalCenter
                     z: 1
 
@@ -452,7 +452,7 @@ Loader {
 
             ////////////////
 
-            SectionTitle {
+            ListTitle {
                 text: qsTr("Bluetooth")
                 source: "qrc:/assets/icons/material-symbols/sensors/bluetooth.svg"
 
@@ -500,7 +500,7 @@ Loader {
                 SwitchThemedDesktop {
                     id: switch_bluetoothControl
                     anchors.right: parent.right
-                    anchors.rightMargin: 4
+                    anchors.rightMargin: 8
                     anchors.verticalCenter: parent.verticalCenter
                     z: 1
 
@@ -529,7 +529,7 @@ Loader {
 
             ////////////////
 
-            SectionTitle {
+            ListTitle {
                 visible: isDesktop
                 text: qsTr("Network server")
                 source: "qrc:/assets/icons/material-icons/duotone/list.svg"
@@ -575,7 +575,7 @@ Loader {
                 SwitchThemedDesktop {
                     id: switch_server
                     anchors.right: parent.right
-                    anchors.rightMargin: 4
+                    anchors.rightMargin: 8
                     anchors.verticalCenter: parent.verticalCenter
                     z: 1
 
@@ -623,7 +623,7 @@ Loader {
 
             ////////////////
 
-            SectionTitle {
+            ListTitle {
                 anchors.left: parent.left
                 visible: isMobile
                 text: qsTr("Desktop remote control")

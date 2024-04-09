@@ -2,11 +2,12 @@ import QtQuick
 
 import ThemeEngine
 import DeviceUtils
-import "qrc:/js/UtilsNumber.js" as UtilsNumber
+import "qrc:/utils/UtilsNumber.js" as UtilsNumber
 import "qrc:/js/UtilsDeviceSensors.js" as UtilsDeviceSensors
 
 Item {
     id: deviceWidget
+
     implicitWidth: 480
     implicitHeight: 128
 
@@ -89,13 +90,13 @@ Item {
 
                 if (boxDevice.rssi >= 0) {
                     imageStatus.source = "" // "qrc:/assets/icons/material-symbols/signal_cellular_off.svg"
-                } else if (boxDevice.rssi > -40) {
-                    imageStatus.source = "qrc:/assets/icons/material-symbols/signal_cellular_full.svg"
-                } else if (boxDevice.rssi > -55) {
-                    imageStatus.source = "qrc:/assets/icons/material-symbols/signal_cellular_3_bar.svg"
+                } else if (boxDevice.rssi > -50) {
+                    imageStatus.source = "qrc:/assets/icons/material-symbols/signal_cellular_4_bar.svg"
                 } else if (boxDevice.rssi > -65) {
-                    imageStatus.source = "qrc:/assets/icons/material-symbols/signal_cellular_2_bar.svg"
+                    imageStatus.source = "qrc:/assets/icons/material-symbols/signal_cellular_3_bar.svg"
                 } else if (boxDevice.rssi > -75) {
+                    imageStatus.source = "qrc:/assets/icons/material-symbols/signal_cellular_2_bar.svg"
+                } else if (boxDevice.rssi > -90) {
                     imageStatus.source = "qrc:/assets/icons/material-symbols/signal_cellular_1_bar.svg"
                 } else { // if (boxDevice.rssi > -90) {
                     imageStatus.source = "qrc:/assets/icons/material-symbols/signal_cellular_0_bar.svg"
@@ -127,9 +128,7 @@ Item {
 
     ////////////////////////////////////////////////////////////////////////////
 
-    Rectangle {
-        id: bottomSeparator
-        height: 1
+    Rectangle { // bottomSeparator
         anchors.left: parent.left
         anchors.leftMargin: -6
         anchors.right: parent.right
@@ -137,12 +136,12 @@ Item {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 0
 
+        height: 1
         visible: singleColumn
         color: Theme.colorSeparator
     }
 
-    Rectangle {
-        id: deviceWidgetRectangleSeparator
+    Rectangle { // deviceWidgetRectangleSeparator
         anchors.fill: deviceWidgetRectangle
         anchors.leftMargin: singleColumn ? -12 : 0
         anchors.rightMargin: singleColumn ? -12 : 0

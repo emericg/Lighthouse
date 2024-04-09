@@ -90,13 +90,17 @@ Loader {
 
         ////////////////
 
-        ButtonWireframeIcon { // open OS keyboard
+        ButtonClear { // open OS keyboard
             anchors.left: parent.left
             anchors.right: parent.right
 
             text: qsTr("keyboard")
-            fullColor: virtualtextfield.focus
             source: "qrc:/assets/gfx/icons/keyboard-variant.svg"
+
+            colorBackground: virtualtextfield.focus ? Theme.colorPrimary : "white"
+            colorHighlight: virtualtextfield.focus ? "white" : Theme.colorPrimary
+            colorBorder: virtualtextfield.focus ? Theme.colorPrimary : Theme.colorComponentBorder
+            colorText: virtualtextfield.focus ? "white" : Theme.colorPrimary
 
             onClicked: {
                 if (virtualtextfield.focus) {

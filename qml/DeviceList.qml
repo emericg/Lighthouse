@@ -166,15 +166,14 @@ Item {
                 font.pixelSize: Theme.componentFontSize
             }
 
-            ButtonWireframe {
+            ButtonFlat {
                 id: buttonBluetoothStatus
                 height: 32
                 anchors.right: parent.right
                 anchors.rightMargin: 16
                 anchors.verticalCenter: parent.verticalCenter
 
-                fullColor: true
-                primaryColor: Theme.colorActionbarHighlight
+                color: Theme.colorActionbarHighlight
 
                 text: {
                     if (Qt.platform.os === "android") {

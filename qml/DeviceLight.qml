@@ -397,7 +397,7 @@ Loader {
                             }
                         }
 
-                        SelectorMenu {
+                        SelectorMenuColorful {
                             id: btnLightMode
                             anchors.centerIn: parent
                             height: 36

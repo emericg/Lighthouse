@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Controls
 
 import ThemeEngine
-import "qrc:/js/UtilsNumber.js" as UtilsNumber
+import "qrc:/utils/UtilsNumber.js" as UtilsNumber
 
 Loader {
     id: screenAbout
@@ -103,37 +103,40 @@ Loader {
                     visible: wideWideMode
                     spacing: Theme.componentMargin
 
-                    ButtonWireframeIconCentered {
+                    ButtonSolid {
                         width: 160
-                        sourceSize: 28
-                        fullColor: true
-                        primaryColor: (Theme.currentTheme === ThemeEngine.THEME_NIGHT) ? Theme.colorHeader : "#5483EF"
+
+                        //color: (Theme.currentTheme === ThemeEngine.THEME_NIGHT) ? Theme.colorHeader : "#5483EF"
 
                         text: qsTr("WEBSITE")
                         source: "qrc:/assets/icons/material-symbols/link.svg"
+                        sourceSize: 28
+
                         onClicked: Qt.openUrlExternally("https://emeric.io/Lighthouse")
                     }
 
-                    ButtonWireframeIconCentered {
+                    ButtonSolid {
                         width: 160
-                        sourceSize: 22
-                        fullColor: true
-                        primaryColor: (Theme.currentTheme === ThemeEngine.THEME_NIGHT) ? Theme.colorHeader : "#5483EF"
+
+                        //color: (Theme.currentTheme === ThemeEngine.THEME_NIGHT) ? Theme.colorHeader : "#5483EF"
 
                         text: qsTr("SUPPORT")
                         source: "qrc:/assets/icons/material-symbols/support.svg"
+                        sourceSize: 22
+
                         onClicked: Qt.openUrlExternally("https://github.com/emericg/Lighthouse/issues")
                     }
 
-                    ButtonWireframeIconCentered {
+                    ButtonSolid {
                         visible: (appWindow.width > 800)
                         width: 160
-                        sourceSize: 22
-                        fullColor: true
-                        primaryColor: (Theme.currentTheme === ThemeEngine.THEME_NIGHT) ? Theme.colorHeader : "#5483EF"
+
+                        //color: (Theme.currentTheme === ThemeEngine.THEME_NIGHT) ? Theme.colorHeader : "#5483EF"
 
                         text: qsTr("GitHub")
                         source: "qrc:/assets/gfx/logos/github.svg"
+                        sourceSize: 22
+
                         onClicked: Qt.openUrlExternally("https://github.com/emericg/Lighthouse")
                     }
                 }
@@ -163,28 +166,26 @@ Loader {
                 visible: !wideWideMode
                 spacing: Theme.componentMargin
 
-                ButtonWireframeIconCentered {
+                ButtonFlat {
                     anchors.verticalCenter: parent.verticalCenter
                     width: ((parent.width - parent.spacing) / 2)
-
-                    sourceSize: 28
-                    fullColor: true
-                    primaryColor: (Theme.currentTheme === ThemeEngine.THEME_NIGHT) ? Theme.colorHeader : "#5483EF"
 
                     text: qsTr("WEBSITE")
+                    color: (Theme.currentTheme === ThemeEngine.THEME_NIGHT) ? Theme.colorHeader : "#5483EF"
                     source: "qrc:/assets/icons/material-symbols/link.svg"
+                    sourceSize: 28
+
                     onClicked: Qt.openUrlExternally("https://emeric.io/Lighthouse")
                 }
-                ButtonWireframeIconCentered {
+                ButtonFlat {
                     anchors.verticalCenter: parent.verticalCenter
                     width: ((parent.width - parent.spacing) / 2)
 
-                    sourceSize: 22
-                    fullColor: true
-                    primaryColor: (Theme.currentTheme === ThemeEngine.THEME_NIGHT) ? Theme.colorHeader : "#5483EF"
-
                     text: qsTr("SUPPORT")
+                    color: (Theme.currentTheme === ThemeEngine.THEME_NIGHT) ? Theme.colorHeader : "#5483EF"
                     source: "qrc:/assets/icons/material-symbols/support.svg"
+                    sourceSize: 22
+
                     onClicked: Qt.openUrlExternally("https://github.com/emericg/Lighthouse/issues")
                 }
             }

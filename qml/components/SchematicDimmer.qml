@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Controls
 
 import ThemeEngine
-import QmlRadialBar
 
 Rectangle {
     id: dimmerSchematics
@@ -57,7 +56,7 @@ Rectangle {
         }
     }
 
-    ////
+    ////////
 
     Rectangle {
         anchors.centerIn: parent
@@ -79,6 +78,8 @@ Rectangle {
             to: Theme.colorBackground
         }
 
+        ////
+
         MouseArea {
             anchors.fill: parent
             onClicked: {
@@ -89,27 +90,30 @@ Rectangle {
             }
         }
 
-        QmlRadialBar {
+        ////
+
+        ProgressArc {
+            anchors.top: parent.top
+            anchors.topMargin: 24
             anchors.left: parent.left
-            anchors.leftMargin: 20
-            anchors.verticalCenter: parent.verticalCenter
+            anchors.leftMargin: 24
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 24
+            width: height
 
-            width: parent.width*0.8
-            height: parent.height*0.8
+            arcCap: "round" // Qt.RoundCap
+            arcOffset: -90
+            arcSpan: 120
+            arcWidth: 12
 
-            penStyle: Qt.RoundCap
-            startAngle: 30
-            spanAngle: 120
-            dialWidth: 12
-
-            minValue: 0
-            maxValue: 100
             value: 8
+            valueMin: 0
+            valueMax: 100
 
-            progressColor: (itemDeviceRemote.btnClicked === 2) ? Theme.colorPrimary: Theme.colorSeparator
-            foregroundColor: Theme.colorForeground
+            arcColor: (itemDeviceRemote.btnClicked === 2) ? Theme.colorPrimary: Theme.colorSeparator
+            backgroundColor: Theme.colorForeground
 
-            ColorAnimation on foregroundColor {
+            ColorAnimation on arcColor {
                 id: dimmerLeftAnimation
                 loops: 1
                 running: false
@@ -136,26 +140,27 @@ Rectangle {
 
         ////
 
-        QmlRadialBar {
+        ProgressArc {
+            anchors.top: parent.top
+            anchors.topMargin: 24
             anchors.left: parent.right
-            anchors.leftMargin: -20
-            anchors.verticalCenter: parent.verticalCenter
+            anchors.leftMargin: -24
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 24
+            width: height
 
-            width: parent.width*0.8
-            height: parent.height*0.8
+            arcCap: "round" // Qt.RoundCap
+            arcOffset: -90
+            arcSpan: 120
+            arcWidth: 12
+            transform: Scale{ xScale: -1 } // invert the orientation
 
-            penStyle: Qt.RoundCap
-            startAngle: 30
-            spanAngle: 120
-            transform: Scale{ xScale: -1 }
-            dialWidth: 12
-
-            minValue: 0
-            maxValue: 100
             value: 8
+            valueMin: 0
+            valueMax: 100
 
-            progressColor: (itemDeviceRemote.btnClicked === 3) ? Theme.colorPrimary: Theme.colorSeparator
-            foregroundColor: Theme.colorForeground
+            arcColor: (itemDeviceRemote.btnClicked === 3) ? Theme.colorPrimary: Theme.colorSeparator
+            backgroundColor: Theme.colorForeground
 
             MouseArea {
                 anchors.top: parent.top
@@ -171,7 +176,7 @@ Rectangle {
                 }
             }
 
-            ColorAnimation on foregroundColor {
+            ColorAnimation on arcColor {
                 id: dimmerRightAnimation
                 loops: 1
                 running: false
@@ -181,5 +186,9 @@ Rectangle {
                 to: Theme.colorForeground
             }
         }
+
+        ////
     }
+
+    ////////
 }

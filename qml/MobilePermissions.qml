@@ -176,13 +176,10 @@ Item {
                 color: Theme.colorSubText
                 font.pixelSize: Theme.fontSizeContentSmall
             }
-            ButtonWireframeIcon {
+            ButtonWireframe {
                 height: 36
                 anchors.left: parent.left
                 anchors.leftMargin: 64
-
-                primaryColor: Theme.colorPrimary
-                secondaryColor: Theme.colorBackground
 
                 text: qsTr("Official information")
                 source: "qrc:/assets/icons/material-icons/duotone/launch.svg"
@@ -371,14 +368,12 @@ Item {
                 font.pixelSize: Theme.fontSizeContentSmall
             }
 
-            ButtonWireframeIcon {
+            ButtonWireframe {
                 anchors.left: parent.left
                 anchors.leftMargin: appHeader.headerPosition
                 height: 36
 
                 visible: (Qt.platform.os === "android")
-                primaryColor: Theme.colorPrimary
-                secondaryColor: Theme.colorBackground
 
                 text: qsTr("Application info")
                 source: "qrc:/assets/icons/material-icons/duotone/tune.svg"

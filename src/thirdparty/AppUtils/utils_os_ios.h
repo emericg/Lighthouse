@@ -24,6 +24,7 @@
 #define UTILS_OS_IOS_H
 
 #include <QtGlobal>
+#include <QString>
 
 #if defined(Q_OS_IOS)
 /* ************************************************************************** */
@@ -44,15 +45,11 @@ public:
      */
     static bool getPermission_notification();
 
-    /* ********************************************************************** */
-
     static void screenKeepOn(bool on);
 
     static void screenLockOrientation(int orientation);
 
     static void screenLockOrientation(int orientation, bool autoRotate);
-
-    /* ********************************************************************** */
 
     static void vibrate(int milliseconds);
 };

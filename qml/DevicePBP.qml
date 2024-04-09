@@ -4,7 +4,7 @@ import QtQuick.Controls
 import ThemeEngine
 import DeviceUtils
 import "qrc:/js/UtilsDeviceSensors.js" as UtilsDeviceSensors
-import "qrc:/js/UtilsNumber.js" as UtilsNumber
+import "qrc:/utils/UtilsNumber.js" as UtilsNumber
 
 Loader {
     id: devicePBP
@@ -137,6 +137,7 @@ Loader {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
+
             height: 72
             color: Theme.colorForeground
 
@@ -146,13 +147,12 @@ Loader {
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 16
 
-                ButtonWireframe {
+                ButtonSolid {
                     anchors.verticalCenter: parent.verticalCenter
-                    width: 160
 
-                    fullColor: currentDevice.connected
-                    primaryColor: (currentDevice.available || currentDevice.connected) ?
-                                      Theme.colorSuccess : Theme.colorWarning
+                    width: 160
+                    color: (currentDevice.available || currentDevice.connected) ? Theme.colorSuccess : Theme.colorWarning
+
                     text: {
                         if (currentDevice.status === DeviceUtils.DEVICE_OFFLINE) return qsTr("Offline")
                         if (currentDevice.status === DeviceUtils.DEVICE_OFFLINE) return qsTr("Available")
@@ -161,11 +161,13 @@ Loader {
                         if (currentDevice.status === DeviceUtils.DEVICE_CONNECTED) return qsTr("Connected")
                     }
                 }
+
                 ButtonWireframe {
                     anchors.verticalCenter: parent.verticalCenter
                     width: 128
 
-                    fullColor: currentDevice.connected
+                    font.bold: currentDevice.connected
+
                     text: {
                         if (currentDevice.status === DeviceUtils.DEVICE_OFFLINE) return qsTr("Connect")
                         return qsTr("Disconnect")
@@ -192,7 +194,23 @@ Loader {
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 16
 
-                SelectorMenu {
+                SelectorMenuColorful {
+                    id: selectorPbpView
+                    anchors.verticalCenter: parent.verticalCenter
+                    height: 40
+
+                    model: ListModel {
+                        ListElement { idx: 1; txt: qsTr("2D"); src: ""; sz: 16; }
+                        ListElement { idx: 2; txt: qsTr("3D"); src: ""; sz: 16; }
+                    }
+
+                    currentSelection: 1
+                    onMenuSelected: (index) => {
+                        currentSelection = index
+                    }
+                }
+
+                SelectorMenuColorful {
                     anchors.verticalCenter: parent.verticalCenter
                     height: 40
 
@@ -222,6 +240,82 @@ Loader {
         }
 
         ////////////////////////////////////////////////////////////////////////
+/*
+        Column { // DEBUG PBP AXIS
+            anchors.top: parent.top
+            anchors.topMargin: 24 + 72
+            anchors.left: parent.left
+            anchors.leftMargin: 24
+
+            Row {
+                DataBarSolid {
+                    legend: "x"
+                    value: currentDevice.gyroX
+                    valueMin: -180
+                    valueMax: 180
+                    floatprecision: 1
+                }
+                DataBarSolid {
+                    legend: "y"
+                    value: currentDevice.gyroY
+                    floatprecision: 1
+                    valueMin: -180
+                    valueMax: 180
+                }
+                DataBarSolid {
+                    legend: "z"
+                    value: currentDevice.gyroZ
+                    valueMin: -180
+                    valueMax: 180
+                    floatprecision: 1
+                }
+            }
+            Row {
+                DataBarSolid {
+                    legend: "x"
+                    value: currentDevice.acclX
+                    valueMin: -180
+                    valueMax: 180
+                    floatprecision: 1
+                }
+                DataBarSolid {
+                    legend: "y"
+                    value: currentDevice.acclY
+                    floatprecision: 1
+                    valueMin: -180
+                    valueMax: 180
+                }
+                DataBarSolid {
+                    legend: "z"
+                    value: currentDevice.acclZ
+                    valueMin: -180
+                    valueMax: 180
+                    floatprecision: 1
+                }
+            }
+            Row {
+                SliderThemed {
+                    id: fakeX
+                    value: 0
+                    from: -180
+                    to: 180
+                }
+                SliderThemed {
+                    id: fakeY
+                    value: 0
+                    from: -180
+                    to: 180
+                }
+                SliderThemed {
+                    id: fakeZ
+                    value: 0
+                    from: -180
+                    to: 180
+                }
+            }
+        }
+*/
+        ////////////////////////////////////////////////////////////////////////
 
         Row {
             anchors.fill: parent
@@ -229,14 +323,37 @@ Loader {
 
             ////
 
-            Item {
+            Row {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
                 width: parent.width*0.5
 
                 SchematicPokeball { // pokeball 2d
                     id: pokeball_2d
+                    anchors.centerIn: parent
                     width: parent.width * 0.5
+
+                    visible: (selectorPbpView.currentSelection === 1)
+                }
+
+                Pokeball3dView { // pokeball 3d
+                    id: pokeball_3d
+                    anchors.centerIn: parent
+                    width: parent.width * 0.66
+
+                    visible: (selectorPbpView.currentSelection === 2)
+
+                    // DEBUG PBP AXIS
+                    //xx : fakeX.value
+                    //yy : fakeY.value
+                    //zz : fakeZ.value
+
+                    xx : UtilsNumber.mapNumber(currentDevice.gyroX, -18, 18, 90 , -90)
+                    //yy : UtilsNumber.mapNumber(currentDevice.gyroZ, -20, 20, 180 , -180) // DISABLED
+                    zz : UtilsNumber.mapNumber(currentDevice.gyroY, -18, 18, 180, -180)
+
+                    joyx: currentDevice.axis_x * -6
+                    joyy: currentDevice.axis_y * -6
                 }
             }
 

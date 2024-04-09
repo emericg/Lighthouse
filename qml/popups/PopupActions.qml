@@ -8,6 +8,7 @@ import "qrc:/js/UtilsActions.js" as UtilsActions
 
 Popup {
     id: popupActions
+
     x: (appWindow.width / 2) - (width / 2)
     y: ((appWindow.height / 2) - (height / 2) - (appHeader.height))
 
@@ -15,6 +16,7 @@ Popup {
     height: singleColumn ? columnContent.height + padding*2 : parent.height * 0.8
     padding: 0
 
+    dim: true
     modal: true
     focus: true
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
@@ -83,15 +85,18 @@ Popup {
     ////////////////////////////////////////////////////////////////////////////
 
     enter: Transition { NumberAnimation { property: "opacity"; from: 0.5; to: 1.0; duration: 133; } }
-    exit: Transition { NumberAnimation { property: "opacity"; from: 1.0; to: 0.0; duration: 233; } }
+    //exit: Transition { NumberAnimation { property: "opacity"; from: 1.0; to: 0.0; duration: 200; } }
 
-    ////////////////////////////////////////////////////////////////////////////
+    Overlay.modal: Rectangle {
+        color: "#000"
+        opacity: ThemeEngine.isLight ? 0.24 : 0.666
+    }
 
     background: Rectangle {
-        radius: singleColumn ? 0 : Theme.componentRadius
         color: Theme.colorBackground
         border.color: Theme.colorSeparator
         border.width: singleColumn ? 0 : Theme.componentBorderWidth
+        radius: singleColumn ? 0 : Theme.componentRadius
 
         Rectangle {
             width: parent.width
@@ -154,13 +159,12 @@ Popup {
                         color: "white"
                     }
 
-                    ItemTag {
+                    TagFlat {
                         id: buttonMode
                         anchors.verticalCenter: parent.verticalCenter
-                        height: 40
+                        height: Theme.componentHeight
 
                         text: qsTr("SINGLE PRESS")
-                        textColor: "white"
                         color: Theme.colorHeaderHighlight
                     }
                 }
@@ -254,10 +258,11 @@ Popup {
                     Repeater {
                         model: [LocalActions.ACTION_NO_ACTION]
 
-                        ItemTag {
+                        TagFlat {
                             text: UtilsActions.getActionName(modelData)
-                            textColor: (modelData === currentButtonAction) ? "white" : Theme.colorSubText
+
                             color: (modelData === currentButtonAction) ? Theme.colorPrimary : Theme.colorForeground
+                            colorText: (modelData === currentButtonAction) ? "white" : Theme.colorSubText
 
                             MouseArea {
                                 anchors.fill: parent
@@ -291,10 +296,11 @@ Popup {
                                 LocalActions.ACTION_KEYBOARD_keyboard_brightness_up,
                                 LocalActions.ACTION_KEYBOARD_keyboard_brightness_down]
 
-                        ItemTag {
+                        TagFlat {
                             text: UtilsActions.getActionName(modelData)
-                            textColor: (modelData === currentButtonAction) ? "white" : Theme.colorSubText
+
                             color: (modelData === currentButtonAction) ? Theme.colorPrimary : Theme.colorForeground
+                            colorText: (modelData === currentButtonAction) ? "white" : Theme.colorSubText
 
                             MouseArea {
                                 anchors.fill: parent
@@ -330,10 +336,11 @@ Popup {
                                 LocalActions.ACTION_KEYBOARD_desktop_calendar,
                                 LocalActions.ACTION_KEYBOARD_desktop_files]
 
-                        ItemTag {
+                        TagFlat {
                             text: UtilsActions.getActionName(modelData)
-                            textColor: (modelData === currentButtonAction) ? "white" : Theme.colorSubText
+
                             color: (modelData === currentButtonAction) ? Theme.colorPrimary : Theme.colorForeground
+                            colorText: (modelData === currentButtonAction) ? "white" : Theme.colorSubText
 
                             MouseArea {
                                 anchors.fill: parent
@@ -366,10 +373,11 @@ Popup {
                                 LocalActions.ACTION_KEYBOARD_volume_up,
                                 LocalActions.ACTION_KEYBOARD_volume_down]
 
-                        ItemTag {
+                        TagFlat {
                             text: UtilsActions.getActionName(modelData)
-                            textColor: (modelData === currentButtonAction) ? "white" : Theme.colorSubText
+
                             color: (modelData === currentButtonAction) ? Theme.colorPrimary : Theme.colorForeground
+                            colorText: (modelData === currentButtonAction) ? "white" : Theme.colorSubText
 
                             MouseArea {
                                 anchors.fill: parent
@@ -454,7 +462,7 @@ Popup {
                     font.pixelSize: Theme.fontSizeContent
                 }
 
-                FileInputArea {
+                TextField_FileDialog {
                     id: fileinput
                     anchors.left: parent.left
                     anchors.right: parent.right
@@ -466,26 +474,25 @@ Popup {
 
         Row {
             anchors.right: parent.right
-            anchors.rightMargin: 24
+            anchors.rightMargin: Theme.componentMarginXL
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: 24
-            spacing: 24
+            anchors.bottomMargin: Theme.componentMarginXL
+            spacing: Theme.componentMarginL
 
-            ButtonWireframe {
+            ButtonFlat {
                 anchors.verticalCenter: parent.verticalCenter
 
                 text: qsTr("Cancel")
-                fullColor: true
-                primaryColor: Theme.colorGrey
+                color: Theme.colorGrey
+
                 onClicked: popupActions.close()
             }
-            ButtonWireframeIcon {
+            ButtonFlat {
                 anchors.verticalCenter: parent.verticalCenter
 
                 text: qsTr("Save")
                 source: "qrc:/assets/icons/material-symbols/save.svg"
-                fullColor: true
-                primaryColor: Theme.colorSuccess
+                color: Theme.colorSuccess
                 onClicked: {
                     var newAction
                     var newParameter

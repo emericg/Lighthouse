@@ -8,26 +8,37 @@ Popup {
     id: popupDeleteDevice
 
     x: singleColumn ? 0 : (appWindow.width / 2) - (width / 2)
-    y: singleColumn ? (appWindow.height - appHeader.height - height)
+    y: singleColumn ? (appWindow.height - height)
                     : ((appWindow.height / 2) - (height / 2))
 
-    width: singleColumn ? parent.width : 640
+    width: singleColumn ? appWindow.width : 720
     height: columnContent.height + padding*2 + screenPaddingNavbar + screenPaddingBottom
     padding: Theme.componentMarginXL
+    margins: 0
 
+    dim: true
     modal: true
     focus: true
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+    parent: Overlay.overlay
 
     signal confirmed()
 
     ////////////////////////////////////////////////////////////////////////////
 
+    enter: Transition { NumberAnimation { property: "opacity"; from: 0.5; to: 1.0; duration: 133; } }
+    //exit: Transition { NumberAnimation { property: "opacity"; from: 1.0; to: 0.0; duration: 200; } }
+
+    Overlay.modal: Rectangle {
+        color: "#000"
+        opacity: ThemeEngine.isLight ? 0.24 : 0.666
+    }
+
     background: Rectangle {
-        radius: singleColumn ? 0 : Theme.componentRadius
         color: Theme.colorBackground
         border.color: Theme.colorSeparator
         border.width: singleColumn ? 0 : Theme.componentBorderWidth
+        radius: singleColumn ? 0 : Theme.componentRadius
 
         Rectangle {
             width: parent.width
@@ -79,22 +90,20 @@ Popup {
 
                 property var btnSize: singleColumn ? width : ((width-spacing) / 2)
 
-                ButtonWireframe {
+                ButtonFlat {
                     width: parent.btnSize
 
                     text: qsTr("Cancel")
-                    primaryColor: Theme.colorSubText
-                    secondaryColor: Theme.colorForeground
+                    color: Theme.colorSubText
 
                     onClicked: popupDeleteDevice.close()
                 }
 
-                ButtonWireframe {
+                ButtonFlat {
                     width: parent.btnSize
 
                     text: qsTr("Delete")
-                    primaryColor: Theme.colorRed
-                    fullColor: true
+                    color: Theme.colorRed
 
                     onClicked: {
                         popupDeleteDevice.confirmed()

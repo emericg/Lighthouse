@@ -175,7 +175,7 @@ Rectangle {
 
         // MAIN MENU ACTIONS //////////
 
-        ButtonExperimental {
+        ButtonOutline {
             anchors.verticalCenter: parent.verticalCenter
 
             visible: networkServer.clientConnected

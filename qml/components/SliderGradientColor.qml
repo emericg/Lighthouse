@@ -3,7 +3,7 @@ import QtQuick.Controls.impl 2.15
 import QtQuick.Templates 2.15 as T
 
 import ThemeEngine 1.0
-import "qrc:/js/UtilsNumber.js" as UtilsNumber
+import "qrc:/utils/UtilsNumber.js" as UtilsNumber
 
 T.Slider {
     id: control

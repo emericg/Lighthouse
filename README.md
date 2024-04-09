@@ -43,9 +43,9 @@ Lamps and lighbulbs:
 #### Dependencies
 
 You will need a C++17 compiler and Qt 6.5+ with the following 'additional librairies':  
-- Qt 5 Compatibility Module
 - Qt Connectivity
 - Qt Multimedia
+- QtQuick 3D
 
 You will also need the `mbedtls` librairie installed in order to handle YLKG07YL and YLKG08YL devices.  
 On linux you'll need an `uinput` enabled kernel.  
@@ -87,7 +87,6 @@ Starting with macOS 11, the application will ask you for permission to use Bluet
 * [Qt6](https://www.qt.io) ([LGPL v3](https://www.gnu.org/licenses/lgpl-3.0.txt))
 * [MobileUI](src/thirdparty/MobileUI/README.md) ([MIT](https://opensource.org/licenses/MIT))
 * [SingleApplication](https://github.com/itay-grudev/SingleApplication) ([MIT](https://opensource.org/licenses/MIT))
-* [QmlRadialBar](src/thirdparty/QmlRadialBar/README.md) ([MIT](https://opensource.org/licenses/MIT))
 * RC4 code from Christophe Devine ([GPL v2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt))
 * Graphical resources: [assets/COPYING](assets/COPYING)
 

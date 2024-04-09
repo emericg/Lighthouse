@@ -26,9 +26,10 @@
 #include "utils_os_android.h"
 #elif defined(Q_OS_IOS)
 #include "utils_os_ios.h"
+#if defined(UTILS_NOTIFICATIONS_ENABLED)
+#include "utils_os_ios_notif.h"
 #endif
-
-#include <cmath>
+#endif
 
 #include <QDir>
 #include <QSize>
@@ -37,6 +38,19 @@
 #include <QCoreApplication>
 #include <QStandardPaths>
 #include <QDesktopServices>
+#include <QLibraryInfo>
+#include <QSysInfo>
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
+#include <QQuickWindow>
+#include <rhi/qrhi.h> // <QRhi> // ?
+#endif // Qt 6.6
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+#include <QGuiApplication>
+#include <QStyleHints>
+#include <QPalette>
+#endif // Qt 6.5
 
 /* ************************************************************************** */
 
@@ -116,9 +130,69 @@ bool UtilsApp::isDebugBuild()
     return true;
 }
 
+/* ************************************************************************** */
+/* ************************************************************************** */
+
 QString UtilsApp::qtVersion()
 {
     return QString(qVersion());
+}
+
+QString UtilsApp::qtBuildMode()
+{
+    if (QLibraryInfo::isDebugBuild())
+    {
+        return "DEBUG";
+    }
+
+    return "RELEASE";
+}
+
+QString UtilsApp::qtArchitecture()
+{
+    return QSysInfo::buildCpuArchitecture();
+}
+
+bool UtilsApp::qtIsDebug()
+{
+    return QLibraryInfo::isDebugBuild();
+}
+
+bool UtilsApp::qtIsRelease()
+{
+    return !QLibraryInfo::isDebugBuild();
+}
+
+bool UtilsApp::qtIsStatic()
+{
+    return !QLibraryInfo::isSharedBuild();
+}
+
+bool UtilsApp::qtIsShared()
+{
+    return QLibraryInfo::isSharedBuild();
+}
+
+QString UtilsApp::qtRhiBackend()
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
+    if (m_quickwindow && m_quickwindow->rhi())
+    {
+        return m_quickwindow->rhi()->backendName();
+    }
+#endif
+
+    return QString();
+}
+
+void UtilsApp::setQuickWindow(QQuickWindow *window)
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
+    if (window)
+    {
+        m_quickwindow = window;
+    }
+#endif
 }
 
 /* ************************************************************************** */
@@ -142,19 +216,6 @@ void UtilsApp::setAppPath(const QString &value)
         // Make sure the path is terminated with a separator.
         if (!m_appPath.endsWith('/')) m_appPath += '/';
     }
-}
-
-/* ************************************************************************** */
-
-void UtilsApp::vibrate(int ms)
-{
-#if defined(Q_OS_ANDROID)
-    return UtilsAndroid::vibrate(ms);
-#elif defined(Q_OS_IOS)
-    return UtilsIOS::vibrate(ms);
-#else
-    Q_UNUSED(ms)
-#endif
 }
 
 /* ************************************************************************** */
@@ -214,6 +275,28 @@ bool UtilsApp::isQColorLight(const QColor &color)
 }
 
 /* ************************************************************************** */
+
+bool UtilsApp::isOsThemeDark()
+{
+    bool isDark = false;
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+
+    const QStyleHints *styleHints = static_cast<QGuiApplication*>qApp->styleHints();
+    isDark = (styleHints && styleHints->colorScheme() == Qt::ColorScheme::Dark);
+
+#else
+
+    const QPalette defaultPalette = static_cast<QGuiApplication*>qApp->palette();
+    isDark = (defaultPalette.color(QPalette::WindowText).lightness() >
+              defaultPalette.color(QPalette::Window).lightness());
+
+#endif
+
+    return isDark;
+}
+
+/* ************************************************************************** */
 /* ************************************************************************** */
 
 QUrl UtilsApp::getStandardPath_url(const QString &type)
@@ -247,6 +330,19 @@ QString UtilsApp::getStandardPath_string(const QString &type)
 }
 
 /* ************************************************************************** */
+/* ************************************************************************** */
+
+void UtilsApp::vibrate(int ms)
+{
+#if defined(Q_OS_ANDROID)
+    return UtilsAndroid::vibrate(ms);
+#elif defined(Q_OS_IOS)
+    return UtilsIOS::vibrate(ms);
+#else
+    Q_UNUSED(ms)
+#endif
+}
+
 /* ************************************************************************** */
 
 int UtilsApp::getAndroidSdkVersion()
@@ -505,8 +601,8 @@ bool UtilsApp::checkMobileNotificationPermission()
 {
 #if defined(Q_OS_ANDROID)
     return UtilsAndroid::checkPermission_notification();
-#elif defined(Q_OS_IOS)
-    return UtilsIOS::checkPermission_notification();
+#elif defined(Q_OS_IOS) && defined(UTILS_NOTIFICATIONS_ENABLED)
+    return UtilsIOSNotifications::checkPermission_notification();
 #endif
 
     return true;
@@ -516,8 +612,8 @@ bool UtilsApp::getMobileNotificationPermission()
 {
 #if defined(Q_OS_ANDROID)
     return UtilsAndroid::getPermission_notification();
-#elif defined(Q_OS_IOS)
-    return UtilsIOS::getPermission_notification();
+#elif defined(Q_OS_IOS) && defined(UTILS_NOTIFICATIONS_ENABLED)
+    return UtilsIOSNotifications::getPermission_notification();
 #endif
 
     return true;

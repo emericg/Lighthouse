@@ -41,7 +41,6 @@
 
 #include <MobileUI>
 #include <SingleApplication>
-#include <QmlRadialBar>
 
 #include <QtGlobal>
 #include <QLibraryInfo>
@@ -142,7 +141,6 @@ int main(int argc, char *argv[])
     MobileUI::registerQML();
     DeviceUtils::registerQML();
     LocalActions::registerQML();
-    QmlRadialBar::registerQML();
 
     // Then we start the UI
     QQmlApplicationEngine engine;

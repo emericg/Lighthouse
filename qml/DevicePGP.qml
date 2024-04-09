@@ -136,6 +136,7 @@ Loader {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
+
             height: 72
             color: Theme.colorForeground
 
@@ -145,13 +146,12 @@ Loader {
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 16
 
-                ButtonWireframe {
+                ButtonSolid {
                     anchors.verticalCenter: parent.verticalCenter
-                    width: 160
 
-                    fullColor: currentDevice.connected
-                    primaryColor: (currentDevice.available || currentDevice.connected) ?
-                                      Theme.colorSuccess : Theme.colorWarning
+                    width: 160
+                    color: (currentDevice.available || currentDevice.connected) ? Theme.colorSuccess : Theme.colorWarning
+
                     text: {
                         if (currentDevice.status === DeviceUtils.DEVICE_OFFLINE) return qsTr("Offline")
                         if (currentDevice.status === DeviceUtils.DEVICE_OFFLINE) return qsTr("Available")
@@ -160,11 +160,13 @@ Loader {
                         if (currentDevice.status === DeviceUtils.DEVICE_CONNECTED) return qsTr("Connected")
                     }
                 }
+
                 ButtonWireframe {
                     anchors.verticalCenter: parent.verticalCenter
-                    width: 128
 
-                    fullColor: currentDevice.connected
+                    width: 128
+                    font.bold: currentDevice.connected
+
                     text: {
                         if (currentDevice.status === DeviceUtils.DEVICE_OFFLINE) return qsTr("Connect")
                         return qsTr("Disconnect")

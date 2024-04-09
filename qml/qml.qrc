@@ -7,8 +7,6 @@
         <file>MobilePermissions.qml</file>
         <file>DesktopApplication.qml</file>
         <file>DesktopHeader.qml</file>
-        <file>About.qml</file>
-        <file>Settings.qml</file>
         <file>Tutorial.qml</file>
         <file>DeviceWidget.qml</file>
         <file>DeviceList.qml</file>
@@ -18,15 +16,14 @@
         <file>DeviceRemote.qml</file>
         <file>DeviceLight.qml</file>
         <file>VirtualInputs.qml</file>
-        <file>ThemeEngine.qml</file>
-        <file>WindowGeometrySaver.qml</file>
+        <file>Settings.qml</file>
+        <file>About.qml</file>
 
         <file alias="PopupActions.qml">popups/PopupActions.qml</file>
         <file alias="PopupBeaconKey.qml">popups/PopupBeaconKey.qml</file>
         <file alias="PopupDeleteDevice.qml">popups/PopupDeleteDevice.qml</file>
 
         <file alias="ItemKey.qml">components/ItemKey.qml</file>
-        <file alias="FileInputArea.qml">components/FileInputArea.qml</file>
         <file alias="RemoteButtonKey.qml">components/RemoteButtonKey.qml</file>
         <file alias="RemoteButtonWidget.qml">components/RemoteButtonWidget.qml</file>
         <file alias="SchematicButton.qml">components/SchematicButton.qml</file>
@@ -34,16 +31,18 @@
         <file alias="SchematicPokeball.qml">components/SchematicPokeball.qml</file>
         <file alias="SchematicPokemonGoPlus.qml">components/SchematicPokemonGoPlus.qml</file>
         <file alias="SchematicRemote.qml">components/SchematicRemote.qml</file>
-
         <file alias="Pokeball3dView.qml">components/Pokeball3dView.qml</file>
         <file alias="Pokeball3dModel.qml">components/Pokeball3dModel.qml</file>
 
         <file alias="ActionMenuFixed.qml">components/ActionMenuFixed.qml</file>
-        <file alias="ButtonExperimental.qml">components/ButtonExperimental.qml</file>
         <file alias="ItemLoadData.qml">components/ItemLoadData.qml</file>
         <file alias="ItemNoBluetooth.qml">components/ItemNoBluetooth.qml</file>
-        <file alias="SectionTitle.qml">components/SectionTitle.qml</file>
         <file alias="SliderGradientLuminosity.qml">components/SliderGradientLuminosity.qml</file>
         <file alias="SliderGradientColor.qml">components/SliderGradientColor.qml</file>
+    </qresource>
+
+    <qresource prefix="js">
+        <file alias="UtilsActions.js">components_js/UtilsActions.js</file>
+        <file alias="UtilsDeviceSensors.js">components_js/UtilsDeviceSensors.js</file>
     </qresource>
 </RCC>
