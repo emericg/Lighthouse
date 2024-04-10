@@ -77,7 +77,7 @@ Rectangle {
     }
 
     function setActiveMenu() {
-        if (appContent.state === "Tutorial") {
+        if (appContent.state === "ScreenTutorial") {
             title.text = qsTr("Welcome")
             menus.visible = false
 
@@ -86,7 +86,7 @@ Rectangle {
             title.text = "Lighthouse"
             menus.visible = true
 
-            if (appContent.state === "DeviceList") {
+            if (appContent.state === "ScreenDeviceList") {
                 buttonBack.source = "qrc:/assets/gfx/logos/logo.svg"
             } else {
                 buttonBack.source = "qrc:/assets/gfx/icons/menu_back.svg"
@@ -192,7 +192,7 @@ Rectangle {
             height: compact ? 36 : 34
             anchors.verticalCenter: parent.verticalCenter
 
-            visible: (appContent.state === "DeviceList")
+            visible: (appContent.state === "ScreenDeviceList")
             enabled: visible
 
             source: "qrc:/assets/icons/material-symbols/filter_list.svg"
@@ -244,7 +244,7 @@ Rectangle {
             height: 40
             width: Theme.componentBorderWidth
             color: Theme.colorHeaderHighlight
-            visible: (deviceManager.bluetooth && appContent.state === "DeviceList")
+            visible: (deviceManager.bluetooth && appContent.state === "ScreenDeviceList")
         }
 
         // DEVICE MENU //////////
@@ -307,9 +307,9 @@ Rectangle {
         Row {
             id: menuMain
 
-            visible: (appContent.state === "DeviceList" ||
-                      appContent.state === "Settings" ||
-                      appContent.state === "About")
+            visible: (appContent.state === "ScreenDeviceList" ||
+                      appContent.state === "ScreenSettings" ||
+                      appContent.state === "ScreenAbout")
             spacing: 0
 
             DesktopHeaderItem {
@@ -321,7 +321,7 @@ Rectangle {
                 colorContent: Theme.colorHeaderContent
                 colorHighlight: Theme.colorHeaderHighlight
 
-                highlighted: (appContent.state === "DeviceList")
+                highlighted: (appContent.state === "ScreenDeviceList")
                 onClicked: devicesButtonClicked()
             }
             DesktopHeaderItem {
@@ -333,7 +333,7 @@ Rectangle {
                 colorContent: Theme.colorHeaderContent
                 colorHighlight: Theme.colorHeaderHighlight
 
-                highlighted: (appContent.state === "Settings")
+                highlighted: (appContent.state === "ScreenSettings")
                 onClicked: settingsButtonClicked()
             }
             DesktopHeaderItem {
@@ -345,7 +345,7 @@ Rectangle {
                 colorContent: Theme.colorHeaderContent
                 colorHighlight: Theme.colorHeaderHighlight
 
-                highlighted: (appContent.state === "About")
+                highlighted: (appContent.state === "ScreenAbout")
                 onClicked: aboutButtonClicked()
             }
         }
@@ -361,7 +361,7 @@ Rectangle {
         visible: (!headerUnicolor &&
                   appContent.state !== "DeviceThermometer" &&
                   appContent.state !== "DeviceEnvironmental" &&
-                  appContent.state !== "Tutorial")
+                  appContent.state !== "ScreenTutorial")
 
         height: 2
         opacity: 0.33

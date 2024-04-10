@@ -84,9 +84,9 @@ ApplicationWindow {
     Connections {
         target: appHeader
         function onBackButtonClicked() {
-            if (appContent.state === "Tutorial") {
+            if (appContent.state === "ScreenTutorial") {
                 appContent.state = screenTutorial.entryPoint
-            } else if (appContent.state !== "DeviceList") {
+            } else if (appContent.state !== "ScreenDeviceList") {
                 screenDeviceList.loadScreen()
             }
         }
@@ -228,11 +228,11 @@ ApplicationWindow {
     // User generated events handling //////////////////////////////////////////
 
     function backAction() {
-        if (appContent.state === "Tutorial" && screenTutorial.entryPoint === "DeviceList") {
+        if (appContent.state === "ScreenTutorial" && screenTutorial.entryPoint === "ScreenDeviceList") {
             return // do nothing
         }
 
-        if (appContent.state === "DeviceList") {
+        if (appContent.state === "ScreenDeviceList") {
             if (screenDeviceList.selectionList.length !== 0) {
                 screenDeviceList.exitSelectionMode()
             }
@@ -248,14 +248,14 @@ ApplicationWindow {
             screenDeviceLight.backAction()
         } else if (appContent.state === "VirtualInputs") {
             screenVirtualInputs.backAction()
-        } else if (appContent.state === "Tutorial") {
+        } else if (appContent.state === "ScreenTutorial") {
             appContent.state = screenTutorial.entryPoint
         } else { // default
             screenDeviceList.loadScreen()
         }
     }
     function forwardAction() {
-        if (appContent.state === "DeviceList") {
+        if (appContent.state === "ScreenDeviceList") {
             appContent.previousStates.pop()
 
             if (appContent.previousStates[appContent.previousStates.length-1] === "DeviceBeacon")
@@ -368,12 +368,12 @@ ApplicationWindow {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
 
-        Tutorial {
+        ScreenTutorial {
             anchors.fill: parent
             id: screenTutorial
         }
 
-        DeviceList {
+        ScreenDeviceList {
             anchors.fill: parent
             id: screenDeviceList
         }
@@ -403,11 +403,11 @@ ApplicationWindow {
             id: screenVirtualInputs
         }
 
-        Settings {
+        ScreenSettings {
             anchors.fill: parent
             id: screenSettings
         }
-        About {
+        ScreenAbout {
             anchors.fill: parent
             id: screenAbout
         }
@@ -418,7 +418,7 @@ ApplicationWindow {
         }
 
         // Initial state
-        state: "DeviceList"
+        state: "ScreenDeviceList"
 
         property var previousStates: []
 
@@ -433,7 +433,7 @@ ApplicationWindow {
 
         states: [
             State {
-                name: "Tutorial"
+                name: "ScreenTutorial"
                 PropertyChanges { target: screenTutorial; visible: true; enabled: true; focus: true; }
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceBeacon; visible: false; enabled: false; }
@@ -446,7 +446,7 @@ ApplicationWindow {
                 PropertyChanges { target: screenAbout; visible: false; enabled: false; }
             },
             State {
-                name: "DeviceList"
+                name: "ScreenDeviceList"
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceList; visible: true; enabled: true; focus: true; }
                 PropertyChanges { target: screenDeviceBeacon; visible: false; enabled: false; }
@@ -537,7 +537,7 @@ ApplicationWindow {
                 PropertyChanges { target: screenAbout; visible: false; enabled: false; }
             },
             State {
-                name: "Settings"
+                name: "ScreenSettings"
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceBeacon; visible: false; enabled: false; }
@@ -550,7 +550,7 @@ ApplicationWindow {
                 PropertyChanges { target: screenAbout; visible: false; enabled: false; }
             },
             State {
-                name: "About"
+                name: "ScreenAbout"
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceBeacon; visible: false; enabled: false; }

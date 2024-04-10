@@ -7,7 +7,7 @@ Item {
     id: screenAboutPermissions
     anchors.fill: parent
 
-    property string entryPoint: "About"
+    property string entryPoint: "ScreenAbout"
 
     ////////////////////////////////////////////////////////////////////////////
 
@@ -16,7 +16,7 @@ Item {
         refreshPermissions()
 
         // Change screen
-        appContent.state = "AboutPermissions"
+        appContent.state = "ScreenAboutPermissions"
     }
 
     function loadScreenFrom(screenname) {

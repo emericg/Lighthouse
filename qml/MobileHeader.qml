@@ -62,7 +62,7 @@ Rectangle {
     ActionMenuFixed {
         id: actionMenu
 
-        x: parent.width - actionMenu.width - 12
+        x: appHeader.width - actionMenu.width - 12
         y: screenPaddingStatusbar + 16
 
         onMenuSelected: (index) => {
@@ -158,7 +158,7 @@ Rectangle {
                 width: parent.height
                 height: width
                 anchors.verticalCenter: parent.verticalCenter
-                visible: (appContent.state === "DeviceList")
+                visible: (appContent.state === "ScreenDeviceList")
 
                 IconSvg {
                     id: workingIndicator

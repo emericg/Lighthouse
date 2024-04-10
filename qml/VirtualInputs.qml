@@ -24,15 +24,9 @@ Loader {
     active: false
     asynchronous: false
 
-    sourceComponent: Column {
-        id: itemVirtualInputs
-        anchors.top: parent.top
-        anchors.topMargin: 16
-        anchors.left: parent.left
-        anchors.leftMargin: 16
-        anchors.right: parent.right
-        anchors.rightMargin: 16
-        spacing: 16
+    sourceComponent: Item {
+        anchors.fill: parent
+        anchors.margins: 16
 
         focus: parent.focus
 
@@ -47,93 +41,73 @@ Loader {
 
         ////////////////
 
-        Item { // gamepad
-            //
-        }
+        SelectorMenuColorful {
+            id: inputSelector
 
-        ////////////////
-
-        Rectangle { // touchpad
+            anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
+            height: 40
 
-            height: width
-            radius: 8
-            clip: true
-            color: Theme.colorForeground
-            border.width: 2
-            border.color: Theme.colorSeparator
-
-            MouseArea {
-                id: mousearea
-                anchors.fill: parent
-
-                hoverEnabled: true
-
-                //onPressed: { }
-                //onClicked: { }
-                //onDoubleClicked: { }
+            model: ListModel {
+                ListElement { idx: 1; txt: qsTr("touchpad"); src: ""; sz: 16; }
+                ListElement { idx: 2; txt: qsTr("gamepad"); src: ""; sz: 16; }
+                ListElement { idx: 3; txt: qsTr("remote"); src: ""; sz: 16; }
+                ListElement { idx: 4; txt: qsTr("media"); src: ""; sz: 16; }
             }
 
-            Rectangle { // mousePointer
-                id: mouseBackground
-                width: 32; height: 32; radius: 32;
-                x: mousearea.mouseX - (width / 2)
-                y: mousearea.mouseY - (width / 2)
-
-                color: "red"
-                opacity: mousearea.containsMouse ? 0.16 : 0
-                Behavior on opacity { NumberAnimation { duration: 333 } }
-                Behavior on width { NumberAnimation { duration: 200 } }
+            currentSelection: 1
+            onMenuSelected: (index) => {
+                currentSelection = index
             }
         }
 
         ////////////////
 
-        ButtonClear { // open OS keyboard
+        VirtualInput_touchpad {
+            anchors.top: inputSelector.bottom
+            anchors.topMargin: 16
             anchors.left: parent.left
             anchors.right: parent.right
+            anchors.bottom: parent.bottom
 
-            text: qsTr("keyboard")
-            source: "qrc:/assets/gfx/icons/keyboard-variant.svg"
-
-            colorBackground: virtualtextfield.focus ? Theme.colorPrimary : "white"
-            colorHighlight: virtualtextfield.focus ? "white" : Theme.colorPrimary
-            colorBorder: virtualtextfield.focus ? Theme.colorPrimary : Theme.colorComponentBorder
-            colorText: virtualtextfield.focus ? "white" : Theme.colorPrimary
-
-            onClicked: {
-                if (virtualtextfield.focus) {
-                    virtualtextfield.focus = false
-                    virtualtextfield.clear()
-                } else {
-                    virtualtextfield.forceActiveFocus()
-                }
-            }
+            visible: (inputSelector.currentSelection === 1)
         }
 
         ////////////////
 
-        TextField {
-            id: virtualtextfield
+        VirtualInput_gamepad {
+            anchors.top: inputSelector.bottom
+            anchors.topMargin: 16
             anchors.left: parent.left
             anchors.right: parent.right
+            anchors.bottom: parent.bottom
 
-            visible: false // < it is invisible
-            cursorVisible: false
-            echoMode: TextInput.NoEcho
+            visible: (inputSelector.currentSelection === 2)
+        }
 
-            onDisplayTextChanged: {
-                if (displayText) {
-                    console.log("TEXT CHANGED : " + displayText)
-                    // send virtual event
-                    clear()
-                }
-            }
-            onEditingFinished: {
-                virtualtextfield.focus = false
-                clear()
-            }
+        ////////////////
+
+        VirtualInput_remote {
+            anchors.top: inputSelector.bottom
+            anchors.topMargin: 16
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+
+            visible: (inputSelector.currentSelection === 3)
+        }
+
+        ////////////////
+
+        VirtualInput_media {
+            anchors.top: inputSelector.bottom
+            anchors.topMargin: 16
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+
+            visible: (inputSelector.currentSelection === 4)
         }
 
         ////////////////

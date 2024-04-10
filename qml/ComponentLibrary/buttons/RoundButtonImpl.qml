@@ -64,7 +64,7 @@ T.Button {
         }
 
         RippleThemed {
-            width: parent.height
+            width: parent.width
             height: parent.height
 
             anchor: control

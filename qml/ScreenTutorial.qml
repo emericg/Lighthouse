@@ -8,18 +8,18 @@ Rectangle {
 
     color: Theme.colorHeader
 
-    property string entryPoint: "DeviceList"
+    property string entryPoint: "ScreenDeviceList"
 
     ////////////////////////////////////////////////////////////////////////////
 
     function loadScreen() {
-        entryPoint = "DeviceList"
-        appContent.state = "Tutorial"
+        entryPoint = "ScreenDeviceList"
+        appContent.state = "ScreenTutorial"
     }
 
     function loadScreenFrom(screenname) {
         entryPoint = screenname
-        appContent.state = "Tutorial"
+        appContent.state = "ScreenTutorial"
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -28,7 +28,7 @@ Rectangle {
         id: tutorialLoader
         anchors.fill: parent
 
-        active: (appContent.state === "Tutorial")
+        active: (appContent.state === "ScreenTutorial")
         asynchronous: true
 
         sourceComponent: Item {

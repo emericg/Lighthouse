@@ -14,13 +14,13 @@ Item {
 
     height: hhh + screenPaddingNavbar + screenPaddingBottom
 
-    visible: (isTablet && (appContent.state === "DeviceList" ||
+    visible: (isTablet && (appContent.state === "ScreenDeviceList" ||
                            appContent.state === "DeviceBeacon" ||
                            appContent.state === "DeviceRemote" ||
                            appContent.state === "DeviceLight" ||
-                           appContent.state === "Settings" ||
-                           appContent.state === "About" ||
-                           appContent.state === "AboutPermissions")) ||
+                           appContent.state === "ScreenSettings" ||
+                           appContent.state === "ScreenAbout" ||
+                           appContent.state === "ScreenAboutPermissions")) ||
              (isPhone && screenOrientation === Qt.PortraitOrientation &&
                           (appContent.state === "DeviceLight"))
 
@@ -93,10 +93,10 @@ Item {
             anchors.centerIn: parent
             spacing: (!appWindow.wideMode || (isPhone && utilsScreen.screenSize < 5.0)) ? -10 : 20
 
-            visible: (appContent.state === "DeviceList" ||
-                      appContent.state === "Settings" ||
-                      appContent.state === "About" ||
-                      appContent.state === "AboutPermissions")
+            visible: (appContent.state === "ScreenDeviceList" ||
+                      appContent.state === "ScreenSettings" ||
+                      appContent.state === "ScreenAbout" ||
+                      appContent.state === "ScreenAboutPermissions")
 
             MobileMenuItem_horizontal {
                 id: menuMainView
@@ -108,7 +108,7 @@ Item {
                 colorContent: Theme.colorTabletmenuContent
                 colorHighlight: Theme.colorTabletmenuHighlight
 
-                highlighted: (appContent.state === "DeviceList")
+                highlighted: (appContent.state === "ScreenDeviceList")
                 onClicked: screenDeviceList.loadScreen()
             }
             MobileMenuItem_horizontal {
@@ -121,7 +121,7 @@ Item {
                 colorContent: Theme.colorTabletmenuContent
                 colorHighlight: Theme.colorTabletmenuHighlight
 
-                highlighted: (appContent.state === "Settings")
+                highlighted: (appContent.state === "ScreenSettings")
                 onClicked: screenSettings.loadScreen()
             }
             MobileMenuItem_horizontal {
@@ -134,7 +134,8 @@ Item {
                 colorContent: Theme.colorTabletmenuContent
                 colorHighlight: Theme.colorTabletmenuHighlight
 
-                highlighted: (appContent.state === "About" || appContent.state === "AboutPermissions")
+                highlighted: (appContent.state === "ScreenAbout" ||
+                              appContent.state === "ScreenAboutPermissions")
                 onClicked: screenAbout.loadScreen()
             }
         }

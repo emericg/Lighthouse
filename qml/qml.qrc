@@ -7,21 +7,29 @@
         <file>MobilePermissions.qml</file>
         <file>DesktopApplication.qml</file>
         <file>DesktopHeader.qml</file>
-        <file>Tutorial.qml</file>
+        <file>ScreenTutorial.qml</file>
+        <file>ScreenDeviceList.qml</file>
+        <file>ScreenSettings.qml</file>
+        <file>ScreenAbout.qml</file>
         <file>DeviceWidget.qml</file>
-        <file>DeviceList.qml</file>
         <file>DeviceBeacon.qml</file>
         <file>DevicePBP.qml</file>
         <file>DevicePGP.qml</file>
         <file>DeviceRemote.qml</file>
         <file>DeviceLight.qml</file>
         <file>VirtualInputs.qml</file>
-        <file>Settings.qml</file>
-        <file>About.qml</file>
+        <file>VirtualInput_touchpad.qml</file>
+        <file>VirtualInput_gamepad.qml</file>
+        <file>VirtualInput_remote.qml</file>
+        <file>VirtualInput_media.qml</file>
 
         <file alias="PopupActions.qml">popups/PopupActions.qml</file>
         <file alias="PopupBeaconKey.qml">popups/PopupBeaconKey.qml</file>
         <file alias="PopupDeleteDevice.qml">popups/PopupDeleteDevice.qml</file>
+
+        <file alias="ButtonRowElement.qml">components/ButtonRowElement.qml</file>
+        <file alias="MediaButtonRow.qml">components/MediaButtonRow.qml</file>
+        <file alias="VolumeButtonRow.qml">components/VolumeButtonRow.qml</file>
 
         <file alias="ItemKey.qml">components/ItemKey.qml</file>
         <file alias="RemoteButtonKey.qml">components/RemoteButtonKey.qml</file>

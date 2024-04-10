@@ -128,4 +128,29 @@ void NetworkClient::sendPress(int btn)
     m_tcpSocket->write(block);
 }
 
+void NetworkClient::media_prev()
+{
+    sendPress(4);
+}
+void NetworkClient::media_playpause()
+{
+    sendPress(1);
+}
+void NetworkClient::media_next()
+{
+    sendPress(3);
+}
+void NetworkClient::volume_mute()
+{
+    sendPress(5);
+}
+void NetworkClient::volume_down()
+{
+    sendPress(7);
+}
+void NetworkClient::volume_up()
+{
+    sendPress(6);
+}
+
 /* ************************************************************************** */

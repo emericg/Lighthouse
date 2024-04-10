@@ -14,7 +14,7 @@ Loader {
         screenSettings.active = true
 
         // change screen
-        appContent.state = "Settings"
+        appContent.state = "ScreenSettings"
     }
 
     function backAction() {

@@ -97,7 +97,7 @@ ApplicationWindow {
 
         statusbarTheme: Theme.themeStatusbar
         navbarColor: {
-            if (appContent.state === "Tutorial") return Theme.colorHeader
+            if (appContent.state === "ScreenTutorial") return Theme.colorHeader
             return Theme.colorBackground
         }
     }
@@ -109,7 +109,7 @@ ApplicationWindow {
 
     MobileDrawer {
         id: appDrawer
-        interactive: (appContent.state !== "Tutorial")
+        interactive: (appContent.state !== "ScreenTutorial")
     }
 
     // Events handling /////////////////////////////////////////////////////////
@@ -119,14 +119,14 @@ ApplicationWindow {
     Connections {
         target: appHeader
         function onLeftMenuClicked() {
-            if (appContent.state === "DeviceList") {
+            if (appContent.state === "ScreenDeviceList") {
                 appDrawer.open()
             } else {
-                if (appContent.state === "Tutorial")
+                if (appContent.state === "ScreenTutorial")
                     appContent.state = screenTutorial.entryPoint
                  else if (appContent.state === "PlantBrowser")
                     appContent.state = screenPlantBrowser.entryPoint
-                else if (appContent.state === "AboutPermissions")
+                else if (appContent.state === "ScreenAboutPermissions")
                     appContent.state = screenAboutPermissions.entryPoint
                 else
                     screenDeviceList.loadScreen()
@@ -235,7 +235,7 @@ ApplicationWindow {
 
         focus: true
         Keys.onBackPressed: {
-            if (appContent.state === "Tutorial" && screenTutorial.entryPoint === "DeviceList") {
+            if (appContent.state === "ScreenTutorial" && screenTutorial.entryPoint === "ScreenDeviceList") {
                 return // do nothing
             }
 
@@ -244,7 +244,7 @@ ApplicationWindow {
                 return
             }
 
-            if (appContent.state === "DeviceList") {
+            if (appContent.state === "ScreenDeviceList") {
                 if (screenDeviceList.selectionList.length !== 0) {
                     screenDeviceList.exitSelectionMode()
                 } else {
@@ -255,9 +255,9 @@ ApplicationWindow {
                 }
             } else if (appContent.state === "DeviceLight") {
                 screenDeviceLight.backAction()
-            } else if (appContent.state === "AboutPermissions") {
+            } else if (appContent.state === "ScreenAboutPermissions") {
                 appContent.state = screenAboutPermissions.entryPoint
-            } else if (appContent.state === "Tutorial") {
+            } else if (appContent.state === "ScreenTutorial") {
                 appContent.state = screenTutorial.entryPoint
             } else if (appContent.state === "VirtualInputs") {
                 screenVirtualInputs.backAction()
@@ -266,12 +266,12 @@ ApplicationWindow {
             }
         }
 
-        Tutorial {
+        ScreenTutorial {
             id: screenTutorial
             anchors.bottomMargin: mobileMenu.hhv
         }
 
-        DeviceList {
+        ScreenDeviceList {
             id: screenDeviceList
             anchors.bottomMargin: mobileMenu.hhv
         }
@@ -285,11 +285,11 @@ ApplicationWindow {
             anchors.bottomMargin: mobileMenu.hhv
         }
 
-        Settings {
+        ScreenSettings {
             id: screenSettings
             anchors.bottomMargin: mobileMenu.hhv
         }
-        About {
+        ScreenAbout {
             id: screenAbout
             anchors.bottomMargin: mobileMenu.hhv
         }
@@ -304,14 +304,14 @@ ApplicationWindow {
         }
 
         // Initial state
-        state: "DeviceList"
+        state: "ScreenDeviceList"
 
         onStateChanged: {
             screenDeviceList.exitSelectionMode()
 
-            if (state === "DeviceList")
+            if (state === "ScreenDeviceList")
                 appHeader.leftMenuMode = "drawer"
-            else if (state === "Tutorial")
+            else if (state === "ScreenTutorial")
                 appHeader.leftMenuMode = "close"
             else
                 appHeader.leftMenuMode = "back"
@@ -319,7 +319,7 @@ ApplicationWindow {
 
         states: [
             State {
-                name: "Tutorial"
+                name: "ScreenTutorial"
                 PropertyChanges { target: appHeader; headerTitle: qsTr("Welcome"); }
                 PropertyChanges { target: screenTutorial; visible: true; enabled: true; }
                 PropertyChanges { target: screenVirtualInputs; visible: false; enabled: false; }
@@ -341,7 +341,7 @@ ApplicationWindow {
                 PropertyChanges { target: screenAbout; visible: false; enabled: false; }
             },
             State {
-                name: "DeviceList"
+                name: "ScreenDeviceList"
                 PropertyChanges { target: appHeader; headerTitle: "Lighthouse"; }
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
                 PropertyChanges { target: screenVirtualInputs; visible: false; enabled: false; }
@@ -364,7 +364,7 @@ ApplicationWindow {
             },
 
             State {
-                name: "Settings"
+                name: "ScreenSettings"
                 PropertyChanges { target: appHeader; headerTitle: qsTr("Settings"); }
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
                 PropertyChanges { target: screenVirtualInputs; visible: false; enabled: false; }
@@ -375,7 +375,7 @@ ApplicationWindow {
                 PropertyChanges { target: screenAboutPermissions; visible: false; enabled: false; }
             },
             State {
-                name: "About"
+                name: "ScreenAbout"
                 PropertyChanges { target: appHeader; headerTitle: qsTr("About"); }
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
                 PropertyChanges { target: screenVirtualInputs; visible: false; enabled: false; }
@@ -386,7 +386,7 @@ ApplicationWindow {
                 PropertyChanges { target: screenAboutPermissions; visible: false; enabled: false; }
             },
             State {
-                name: "AboutPermissions"
+                name: "ScreenAboutPermissions"
                 PropertyChanges { target: appHeader; headerTitle: qsTr("About permissions"); }
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
                 PropertyChanges { target: screenVirtualInputs; visible: false; enabled: false; }
@@ -407,10 +407,10 @@ ApplicationWindow {
         anchors.bottom: parent.bottom
         height: screenPaddingNavbar + screenPaddingBottom
 
-        //visible: (mobileMenu.visible || appContent.state === "Tutorial")
+        //visible: (mobileMenu.visible || appContent.state === "ScreenTutorial")
         opacity: 0.95
         color: {
-            if (appContent.state === "Tutorial") return Theme.colorHeader
+            if (appContent.state === "ScreenTutorial") return Theme.colorHeader
             return Theme.colorBackground
         }
     }

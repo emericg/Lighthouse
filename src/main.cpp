@@ -155,9 +155,9 @@ int main(int argc, char *argv[])
 
     engine_context->setContextProperty("networkServer", networkServer);
     engine_context->setContextProperty("networkClient", networkClient);
+    engine_context->setContextProperty("networkControls", networkClient);
 
 #if defined(Q_OS_ANDROID) || defined(Q_OS_IOS) || defined(FORCE_MOBILE_UI)
-
     // Load the main view
     engine.load(QUrl(QStringLiteral("qrc:/qml/MobileApplication.qml")));
 #else

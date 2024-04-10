@@ -14,7 +14,7 @@ Item {
         checkBluetoothStatus()
 
         // change screen
-        appContent.state = "DeviceList"
+        appContent.state = "ScreenDeviceList"
     }
 
     function backAction() {
@@ -188,7 +188,7 @@ Item {
                         //deviceManager.checkBluetoothPermissions()
 
                         // someone clicked 'never ask again'?
-                        screenAboutPermissions.loadScreenFrom("DeviceList")
+                        screenAboutPermissions.loadScreenFrom("ScreenDeviceList")
                     } else {
                         deviceManager.enableBluetooth(settingsManager.bluetoothControl)
                     }
@@ -298,110 +298,38 @@ Item {
         anchors.bottom: screenDeviceList.bottom
         anchors.bottomMargin: singleColumn ? 0 : 16
 
+        property int listMargin: (cellColumnsTarget === 1) ? -(Theme.componentMargin / 2) : (Theme.componentMargin / 2)
+
         ////////////////
 
         header: Column {
             anchors.left: parent.left
             anchors.right: parent.right
 
-            spacing: 8
+            topPadding: isDesktop ? 4 : 0
+            bottomPadding: isDesktop ? 16 : 0
+            spacing: isDesktop ? 20 : 8
 
-            Text {
-                height: 40
+            ListTitle { ////////////////////////////////////////////////////////
+                anchors.leftMargin: devicesView.listMargin
+                anchors.rightMargin: devicesView.listMargin
                 visible: isDesktop
-
                 text: qsTr("Local control(s)")
-                font.pixelSize: Theme.fontSizeContentBig
-                verticalAlignment: Text.AlignVCenter
-                color: Theme.colorText
             }
 
-            Row {
+            Grid {
                 anchors.left: parent.left
                 anchors.leftMargin: 8
                 anchors.right: parent.right
+                anchors.rightMargin: 8
 
                 visible: isDesktop
+                rows: singleColumn ? 3 : 1
+                columns: singleColumn ? 1 : 3
                 spacing: 12
 
-                Rectangle { // KEYBOARD
-                    width: 420
-                    height: 128
-                    radius: 4
-
-                    color: Theme.colorDeviceWidget
-                    border.width: 2
-                    border.color: singleColumn ? "transparent" : Theme.colorSeparator
-
-                    Row {
-                        anchors.centerIn: parent
-                        spacing: 6
-
-                        RoundButtonIcon {
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            backgroundVisible: true
-                            highlightMode: "color"
-                            source: "qrc:/assets/icons/material-symbols/skip_previous.svg"
-                            onClicked: localControls.keyboard_media_prev()
-                        }
-                        RoundButtonIcon {
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            backgroundVisible: true
-                            highlightMode: "color"
-                            source: "qrc:/assets/icons/material-symbols/play_pause.svg"
-                            onClicked: localControls.keyboard_media_playpause()
-                        }
-                        RoundButtonIcon {
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            backgroundVisible: true
-                            highlightMode: "color"
-                            source: "qrc:/assets/icons/material-symbols/skip_next.svg"
-                            onClicked: localControls.keyboard_media_next()
-                        }
-
-                        IconSvg {
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            width: 64
-                            height: 64
-
-                            color: Theme.colorSeparator
-                            opacity: 0.5
-                            source: "qrc:/assets/gfx/icons/keyboard-variant.svg"
-                        }
-
-                        RoundButtonIcon {
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            backgroundVisible: true
-                            highlightMode: "color"
-                            source: "qrc:/assets/icons/material-icons/duotone/volume_off.svg"
-                            onClicked: localControls.keyboard_volume_mute()
-                        }
-                        RoundButtonIcon {
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            backgroundVisible: true
-                            highlightMode: "color"
-                            source: "qrc:/assets/icons/material-icons/duotone/volume_down.svg"
-                            onClicked: localControls.keyboard_volume_down()
-                        }
-                        RoundButtonIcon {
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            backgroundVisible: true
-                            highlightMode: "color"
-                            source: "qrc:/assets/icons/material-icons/duotone/volume_up_1.svg"
-                            onClicked: localControls.keyboard_volume_up()
-                        }
-                    }
-                }
-
                 Rectangle { // MPRIS
-                    width: 540
+                    width: singleColumn ? parent.width : 520
                     height: 128
                     radius: 4
 
@@ -441,30 +369,12 @@ Item {
                             elide: Text.ElideRight
                         }
 
-                        Row {
-                            spacing: 4
-
-                            RoundButtonIcon {
-                                //visible: mprisControls.canGoPrevious
-                                backgroundVisible: true
-                                highlightMode: "color"
-                                source: "qrc:/assets/icons/material-symbols/skip_previous.svg"
-                                onClicked: mprisControls.media_prev()
-                            }
-                            RoundButtonIcon {
-                                //visible: mprisControls.canControl
-                                backgroundVisible: true
-                                highlightMode: "color"
-                                source: "qrc:/assets/icons/material-symbols/play_pause.svg"
-                                onClicked: mprisControls.media_playpause()
-                            }
-                            RoundButtonIcon {
-                                //visible: mprisControls.canGoNext
-                                backgroundVisible: true
-                                highlightMode: "color"
-                                source: "qrc:/assets/icons/material-symbols/skip_next.svg"
-                                onClicked: mprisControls.media_next()
-                            }
+                        MediaButtonRow {
+                            btnSize: 36
+                            //visible: mprisControls.canControl
+                            onMediaPrevious: mprisControls.media_prev()
+                            onMediaPlayPause: mprisControls.media_playpause()
+                            onMediaNext: mprisControls.media_next()
                         }
 
                         SliderThemed {
@@ -513,8 +423,50 @@ Item {
                     }
                 }
 
+                Rectangle { // KEYBOARD
+                    width: singleColumn ? parent.width : 420
+                    height: 128
+                    radius: 4
+
+                    color: Theme.colorDeviceWidget
+                    border.width: 2
+                    border.color: singleColumn ? "transparent" : Theme.colorSeparator
+
+                    Row {
+                        anchors.centerIn: parent
+                        spacing: 6
+
+                        MediaButtonRow {
+                            anchors.verticalCenter: parent.verticalCenter
+                            btnSize: 48
+                            onMediaPrevious: localControls.keyboard_media_prev()
+                            onMediaPlayPause: localControls.keyboard_media_playpause()
+                            onMediaNext: localControls.keyboard_media_next()
+                        }
+
+                        IconSvg {
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            width: 64
+                            height: 64
+
+                            color: Theme.colorSeparator
+                            opacity: 0.5
+                            source: "qrc:/assets/gfx/icons/keyboard-variant.svg"
+                        }
+
+                        VolumeButtonRow {
+                            anchors.verticalCenter: parent.verticalCenter
+                            btnSize: 48
+                            onVolumeMute: localControls.keyboard_volume_mute()
+                            onVolumeDown: localControls.keyboard_volume_down()
+                            onVolumeUp: localControls.keyboard_volume_up()
+                        }
+                    }
+                }
+
                 Rectangle { // VIRTUAL INPUTS
-                    width: 420
+                    width: singleColumn ? parent.width : 420
                     height: 128
                     radius: 4
 
@@ -562,17 +514,14 @@ Item {
                     }
                 }
             }
-/*
-            Text {
-                height: 40
-                visible: (isMobile && networkClient.connected)
 
-                text: qsTr("Network control(s)")
-                font.pixelSize: Theme.fontSizeContentBig
-                verticalAlignment: Text.AlignVCenter
-                color: Theme.colorText
-            }
-*/
+            //ListTitle { //////////////////////////////////////////////////////
+            //    anchors.leftMargin: devicesView.listMargin
+            //    anchors.rightMargin: devicesView.listMargin
+            //    visible: (isMobile && networkClient.connected)
+            //    text: qsTr("Network control(s)")
+            //}
+
             Rectangle { // NETWORK
                 width: singleColumn ? parent.width : 480
                 height: singleColumn ? 112 : 128
@@ -593,75 +542,19 @@ Item {
 
                 Row {
                     anchors.centerIn: parent
-                    spacing: 4
+                    spacing: 16
 
-                    RoundButtonIcon {
-                        width: isMobile ? 48 : Theme.componentHeight
-                        height: isMobile ? 48 : Theme.componentHeight
-                        borderVisible: true
-                        backgroundVisible: true
-                        backgroundColor: Theme.colorBackground
-                        highlightMode: "color"
-
-                        source: "qrc:/assets/icons/material-symbols/skip_previous.svg"
-                        onClicked: networkClient.sendPress(4)
+                    MediaButtonRow {
+                        btnSize: 52
+                        onMediaPrevious: networkControls.media_prev()
+                        onMediaPlayPause: networkControls.media_playpause()
+                        onMediaNext: networkControls.media_next()
                     }
-                    RoundButtonIcon {
-                        width: isMobile ? 48 : Theme.componentHeight
-                        height: isMobile ? 48 : Theme.componentHeight
-                        borderVisible: true
-                        backgroundVisible: true
-                        backgroundColor: Theme.colorBackground
-                        highlightMode: "color"
-
-                        source: "qrc:/assets/icons/material-symbols/play_pause.svg"
-                        onClicked: networkClient.sendPress(1)
-                    }
-                    RoundButtonIcon {
-                        width: isMobile ? 48 : Theme.componentHeight
-                        height: isMobile ? 48 : Theme.componentHeight
-                        borderVisible: true
-                        backgroundVisible: true
-                        backgroundColor: Theme.colorBackground
-                        highlightMode: "color"
-
-                        source: "qrc:/assets/icons/material-symbols/skip_next.svg"
-                        onClicked: networkClient.sendPress(3)
-                    }
-
-                    Item { width: 24; height: 8; } // spacer
-
-                    RoundButtonIcon {
-                        width: isMobile ? 48 : Theme.componentHeight
-                        height: isMobile ? 48 : Theme.componentHeight
-                        borderVisible: true
-                        backgroundVisible: true
-                        backgroundColor: Theme.colorBackground
-                        highlightMode: "color"
-
-                        source: "qrc:/assets/icons/material-icons/duotone/volume_off.svg"
-                        onClicked: networkClient.sendPress(5)
-                    }
-                    RoundButtonIcon {
-                        width: isMobile ? 48 : Theme.componentHeight
-                        height: isMobile ? 48 : Theme.componentHeight
-                        borderVisible: true
-                        backgroundVisible: true
-                        backgroundColor: Theme.colorBackground
-                        highlightMode: "color"
-
-                        source: "qrc:/assets/icons/material-icons/duotone/volume_down.svg"
-                        onClicked: networkClient.sendPress(7)
-                    }
-                    RoundButtonIcon {
-                        width: isMobile ? 48 : Theme.componentHeight
-                        height: isMobile ? 48 : Theme.componentHeight
-                        borderVisible: true
-                        backgroundVisible: true
-                        backgroundColor: Theme.colorBackground
-                        highlightMode: "color"
-                        source: "qrc:/assets/icons/material-icons/duotone/volume_up_1.svg"
-                        onClicked: networkClient.sendPress(6)
+                    VolumeButtonRow {
+                        btnSize: 52
+                        onVolumeMute: networkControls.volume_mute()
+                        onVolumeDown: networkControls.volume_down()
+                        onVolumeUp: networkControls.volume_up()
                     }
                 }
             }
@@ -725,14 +618,11 @@ Item {
                 }
             }
 
-            Text {
-                height: 40
+            ListTitle { ////////////////////////////////////////////////////////
+                anchors.leftMargin: devicesView.listMargin
+                anchors.rightMargin: devicesView.listMargin
                 visible: isDesktop
-
-                text: "Bluetooth Low Energy device(s)"
-                font.pixelSize: Theme.fontSizeContentBig
-                verticalAlignment: Text.AlignVCenter
-                color: Theme.colorText
+                text: qsTr("Bluetooth Low Energy device(s)")
             }
         }
 
@@ -766,11 +656,11 @@ Item {
         }
 
         ////////////////
-/*
+
         footer: Item {
             //
         }
-*/
+
         ////////////////
     }
 

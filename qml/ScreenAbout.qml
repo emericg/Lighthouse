@@ -15,7 +15,7 @@ Loader {
         screenAbout.active = true
 
         // change screen
-        appContent.state = "About"
+        appContent.state = "ScreenAbout"
     }
 
     ////////
@@ -71,7 +71,7 @@ Loader {
                         height: 128
                         anchors.verticalCenter: parent.verticalCenter
 
-                        source: "qrc:/assets/gfx/icons/desk-lamp.svg"
+                        source: "qrc:/assets/gfx/icons/desk-lamp-logo.svg"
                         //sourceSize: Qt.size(width, height)
                         color: Theme.colorIcon
                     }
@@ -234,7 +234,7 @@ Loader {
                 iconSize: 28
                 indicatorSource: "qrc:/assets/icons/material-symbols/chevron_right.svg"
 
-                onClicked: screenTutorial.loadScreenFrom("About")
+                onClicked: screenTutorial.loadScreenFrom("ScreenAbout")
             }
 */
 
@@ -262,7 +262,7 @@ Loader {
                 sourceSize: 28
                 indicatorSource: "qrc:/assets/icons/material-symbols/chevron_right.svg"
 
-                onClicked: screenAboutPermissions.loadScreenFrom("About")
+                onClicked: screenAboutPermissions.loadScreenFrom("ScreenAbout")
             }
 
             ////////

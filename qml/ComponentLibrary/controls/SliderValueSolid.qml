@@ -13,7 +13,7 @@ T.Slider {
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                              implicitHandleHeight + topPadding + bottomPadding)
 
-    padding: 4
+    padding: 0
 
     // settings
     property int hhh: 18

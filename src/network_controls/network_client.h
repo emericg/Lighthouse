@@ -60,6 +60,14 @@ public slots:
 
     void readMetadata();
     void sendPress(int btn);
+
+    void media_prev();
+    void media_playpause();
+    void media_next();
+
+    void volume_mute();
+    void volume_down();
+    void volume_up();
 };
 
 /* ************************************************************************** */

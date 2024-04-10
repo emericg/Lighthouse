@@ -63,7 +63,7 @@ Drawer {
                     anchors.leftMargin: 12
                     anchors.verticalCenter: parent.verticalCenter
 
-                    source: "qrc:/assets/gfx/icons/desk-lamp.svg"
+                    source: "qrc:/assets/gfx/icons/desk-lamp-logo.svg"
                     //sourceSize: Qt.size(width, height)
                     color: Theme.colorIcon
                 }
@@ -107,7 +107,7 @@ Drawer {
                 ////////
 
                 DrawerItem {
-                    highlighted: (appContent.state === "DeviceList")
+                    highlighted: (appContent.state === "ScreenDeviceList")
                     text: qsTr("Sensors")
                     source: "qrc:/assets/gfx/logos/logo_tray_symbolic.svg"
 
@@ -118,7 +118,7 @@ Drawer {
                 }
 
                 DrawerItem {
-                    highlighted: (appContent.state === "Settings")
+                    highlighted: (appContent.state === "ScreenSettings")
                     text: qsTr("Settings")
                     source: "qrc:/assets/icons/material-symbols/settings.svg"
 
@@ -129,7 +129,8 @@ Drawer {
                 }
 
                 DrawerItem {
-                    highlighted: (appContent.state === "About" || appContent.state === "AboutPermissions")
+                    highlighted: (appContent.state === "ScreenAbout" ||
+                                  appContent.state === "ScreenAboutPermissions")
                     text: qsTr("About")
                     source: "qrc:/assets/icons/material-symbols/info.svg"
 

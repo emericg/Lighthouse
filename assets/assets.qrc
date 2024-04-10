@@ -10,6 +10,7 @@
         <file>gfx/icons/menu_back.svg</file>
         <file>gfx/icons/menu_close.svg</file>
         <file>gfx/icons/desk-lamp.svg</file>
+        <file>gfx/icons/desk-lamp-logo.svg</file>
 
         <file>models/pokeball_meshes/bottom_.mesh</file>
         <file>models/pokeball_meshes/bottom_black.mesh</file>
