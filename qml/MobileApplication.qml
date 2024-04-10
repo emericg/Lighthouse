@@ -406,7 +406,9 @@ ApplicationWindow {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         height: screenPaddingNavbar + screenPaddingBottom
-        visible: (mobileMenu.visible || appContent.state === "Tutorial")
+
+        //visible: (mobileMenu.visible || appContent.state === "Tutorial")
+        opacity: 0.95
         color: {
             if (appContent.state === "Tutorial") return Theme.colorHeader
             return Theme.colorBackground
