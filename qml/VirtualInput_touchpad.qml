@@ -42,16 +42,19 @@ Grid {
                 //onDoubleClicked: { }
             }
 
-            Rectangle { // mousePointer
+            Rectangle { // touch pointer
                 id: mouseBackground
-                width: 40; height: 40; radius: 40;
+
+                width: 64
+                height: 64
+                radius: 64
+
                 x: mousearea.mouseX - (width / 2)
                 y: mousearea.mouseY - (width / 2)
 
                 color: Theme.colorMaterialDeepOrange
                 opacity: mousearea.containsMouse ? 1 : 0
                 Behavior on opacity { NumberAnimation { duration: 133 } }
-                Behavior on width { NumberAnimation { duration: 200 } }
             }
         }
     }
@@ -69,7 +72,7 @@ Grid {
 
             text: qsTr("keyboard")
             source: "qrc:/assets/gfx/icons/keyboard-variant.svg"
-
+/*
             colorBackground: virtualtextfield.focus ? Theme.colorPrimary : "white"
             colorHighlight: virtualtextfield.focus ? "white" : Theme.colorPrimary
             colorBorder: virtualtextfield.focus ? Theme.colorPrimary : Theme.colorComponentBorder
@@ -105,6 +108,7 @@ Grid {
                     clear()
                 }
             }
+*/
         }
     }
 

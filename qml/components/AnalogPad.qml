@@ -16,10 +16,10 @@ Rectangle {
     property bool verticalOnly: false
     property bool horizontalOnly: false
 
-    signal joystick_moved(double x, double y)
-
     property real angle: 0
     property real distance: 0
+
+    signal joystick_moved(double x, double y)
 
     ParallelAnimation {
         id: returnAnimation
@@ -29,12 +29,16 @@ Rectangle {
                           to: 0; duration: 200; easing.type: Easing.OutSine }
     }
 
-    MouseArea {
-        id: mousearea
+    MultiPointTouchArea {
+        id: toucharea
         anchors.fill: parent
 
-        property real mouseX2: joystick.verticalOnly ? width * 0.5 : mouseX
-        property real mouseY2: joystick.horizontalOnly ? height * 0.5 : mouseY
+        touchPoints: [
+            TouchPoint { id: touchpoint }
+        ]
+
+        property real mouseX2: joystick.verticalOnly ? width * 0.5 : touchpoint.x
+        property real mouseY2: joystick.horizontalOnly ? height * 0.5 : touchpoint.y
         property real fingerAngle: Math.atan2(mouseX2, mouseY2)
         property int mcx: mouseX2 - width * 0.5
         property int mcy: mouseY2 - height * 0.5
@@ -46,15 +50,27 @@ Rectangle {
         property double signal_x: (mouseX2 - joystick.width/2) / distanceBound
         property double signal_y: -(mouseY2 - joystick.height/2) / distanceBound
 
-        onPressed: {
+        onPressed: (points) => {
             returnAnimation.stop()
+            moveAround()
         }
-        onReleased: {
+        onReleased: (points) => {
             returnAnimation.restart()
             joystick.joystick_moved(0, 0)
         }
+        onCanceled: (points) => {
+            returnAnimation.restart()
+            joystick.joystick_moved(0, 0)
+        }
+        onTouchUpdated: (points) => {
+            //
+        }
 
-        onPositionChanged: {
+        onUpdated: (points) => {
+            moveAround()
+        }
+
+        function moveAround() {
             if (fingerInBounds) {
                 thumb.anchors.horizontalCenterOffset = mcx
                 thumb.anchors.verticalCenterOffset = mcy
@@ -81,7 +97,7 @@ Rectangle {
         }
     }
 
-    Rectangle {
+    Rectangle { // joystick thumb cap
         id: thumb
         anchors.centerIn: parent
 
@@ -89,7 +105,6 @@ Rectangle {
         height: 64
         radius: 64
 
-        color: mousearea.containsPress ? Theme.colorMaterialDeepOrange : Theme.colorSeparator
-        //opacity: 0.8
+        color: touchpoint.pressed ? Theme.colorMaterialDeepOrange : Theme.colorSeparator
     }
 }
