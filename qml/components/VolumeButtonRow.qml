@@ -20,7 +20,7 @@ Rectangle {
 
     // colors
     property color colorBackground: Theme.colorBackground
-    property color colorHighlight: Theme.colorPrimary
+    property color colorHighlight: Theme.colorMaterialBlue
     property color colorBorder: Theme.colorComponentBorder
     property color colorIcon: Theme.colorIcon
 

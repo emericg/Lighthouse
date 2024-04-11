@@ -298,6 +298,13 @@ Item {
         anchors.bottom: screenDeviceList.bottom
         anchors.bottomMargin: singleColumn ? 0 : 16
 
+        ScrollBar.vertical: ScrollBar {
+            visible: false
+            anchors.right: parent.right
+            anchors.rightMargin: -6
+            policy: ScrollBar.AsNeeded
+        }
+
         property int listMargin: (cellColumnsTarget === 1) ? -(Theme.componentMargin / 2) : (Theme.componentMargin / 2)
 
         ////////////////
@@ -641,13 +648,6 @@ Item {
 
         cellWidth: (devicesView.width / cellColumnsTarget)
         cellHeight: (bigWidget ? 144 : 100)
-
-        ScrollBar.vertical: ScrollBar {
-            visible: false
-            anchors.right: parent.right
-            anchors.rightMargin: -6
-            policy: ScrollBar.AsNeeded
-        }
 
         model: deviceManager.devicesList
         delegate: DeviceWidget {

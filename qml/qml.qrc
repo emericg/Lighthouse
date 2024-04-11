@@ -30,6 +30,7 @@
         <file alias="ButtonRowElement.qml">components/ButtonRowElement.qml</file>
         <file alias="MediaButtonRow.qml">components/MediaButtonRow.qml</file>
         <file alias="VolumeButtonRow.qml">components/VolumeButtonRow.qml</file>
+        <file alias="AnalogPad.qml">components/AnalogPad.qml</file>
 
         <file alias="ItemKey.qml">components/ItemKey.qml</file>
         <file alias="RemoteButtonKey.qml">components/RemoteButtonKey.qml</file>

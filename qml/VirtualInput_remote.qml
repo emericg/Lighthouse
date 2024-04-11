@@ -10,45 +10,52 @@ Item {
     signal buttonNext()
     signal buttonPrevious()
 
-    Column {
+    ////////////////
+
+    SelectorMenuColorful {
+        id: remoteSelector
+
+        anchors.top: parent.top
         anchors.left: parent.left
-        anchors.leftMargin: 0
         anchors.right: parent.right
-        anchors.rightMargin: 0
 
-        spacing: 64
+        height: 40
 
-        ////////////////
-
-        SelectorMenuColorful {
-            id: remoteSelector
-
-            anchors.left: parent.left
-            anchors.right: parent.right
-            height: 40
-
-            model: ListModel {
-                ListElement { idx: 1; txt: qsTr("presentation"); src: ""; sz: 16; }
-                ListElement { idx: 2; txt: qsTr("media"); src: ""; sz: 16; }
-                ListElement { idx: 3; txt: qsTr("keyboard"); src: ""; sz: 16; }
-            }
-
-            currentSelection: 1
-            onMenuSelected: (index) => {
-                currentSelection = index
-            }
+        model: ListModel {
+            ListElement { idx: 1; txt: qsTr("presentation"); src: ""; sz: 16; }
+            ListElement { idx: 2; txt: qsTr("media"); src: ""; sz: 16; }
+            ListElement { idx: 3; txt: qsTr("keyboard"); src: ""; sz: 16; }
         }
 
-        ////////////////
+        currentSelection: 1
+        onMenuSelected: (index) => {
+            currentSelection = index
+        }
+    }
+
+    ////////////////
+
+    Item {
+        anchors.top: remoteSelector.bottom
+        anchors.topMargin: 16
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+
+        ////////
 
         Item {
             anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: -(btn111.height/2)
+
             width: parent.width * 0.66
             height: width
 
             visible: (remoteSelector.currentSelection === 1) // presentation
 
             RoundButtonClear {
+                id: btn111
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: parent.bottom
                 anchors.topMargin: -width * 0.16
@@ -60,6 +67,7 @@ Item {
                 sourceRotation: -180
             }
             RoundButtonFlat {
+                id: btn222
                 width: parent.width
                 height: parent.width
 
@@ -67,12 +75,11 @@ Item {
             }
         }
 
-        ////////////////
+        ////////
 
         Column {
-            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.centerIn: parent
             width: parent.width * 0.8
-            height: width
 
             visible: (remoteSelector.currentSelection === 2) // media
             spacing: 32
@@ -96,56 +103,57 @@ Item {
                     opacity: 0.2
                 }
 
-                RoundButtonClear {
+                SquareButtonClear {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.top: parent.top
-                    width: parent.width * 0.44
-                    height: parent.height * 0.28
-                    clip: true
-                    shape: "square"
+                    width: parent.width
+                    height: parent.height * 0.32
+                    radius: 0
+
                     colorBackground: "transparent"
-                    source: "qrc:/assets/icons/material-symbols/chevron_right.svg"
+                    source: "qrc:/assets/icons/material-symbols/add.svg"
                     sourceSize: 40
                 }
-                RoundButtonClear {
+                SquareButtonClear {
                     anchors.left: parent.left
-                    width: parent.width * 0.34
+                    width: parent.width * 0.32
                     height: parent.height
-                    clip: true
-                    shape: "square"
+                    radius: 0
+
                     colorBackground: "transparent"
                     source: "qrc:/assets/icons/material-symbols/chevron_left.svg"
                     sourceSize: 40
                 }
-                RoundButtonClear {
+                SquareButtonClear {
                     anchors.right: parent.right
-                    width: parent.width * 0.34
+                    width: parent.width * 0.32
                     height: parent.height
-                    clip: true
-                    shape: "square"
+
+                    clip: false
+                    radius: 0
+
                     colorBackground: "transparent"
                     source: "qrc:/assets/icons/material-symbols/chevron_right.svg"
                     sourceSize: 40
                 }
-                RoundButtonClear {
+                SquareButtonClear {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottom: parent.bottom
-                    width: parent.width * 0.44
-                    height: parent.height * 0.28
-                    clip: true
-                    shape: "square"
+                    width: parent.width
+                    height: parent.height * 0.32
+                    radius: 0
+
                     colorBackground: "transparent"
-                    source: "qrc:/assets/icons/material-symbols/chevron_right.svg"
+                    source: "qrc:/assets/icons/material-symbols/remove.svg"
                     sourceSize: 40
                 }
 
-                RoundButtonFlat {
+                SquareButtonFlat {
                     anchors.centerIn: parent
                     width: parent.width * 0.44
                     height: width
 
-                    shape: "square"
-                    color: Theme.colorPrimary
+                    //color: Theme.colorPrimary
                     source: "qrc:/assets/icons/material-symbols/play_pause.svg"
                 }
 
@@ -175,20 +183,17 @@ Item {
                 anchors.right: parent.right
                 spacing: 24
 
-                RoundButtonFlat {
+                SquareButtonClear {
                     width: ((parent.width - 24) / 2)
                     height: 64
-                    clip: true
-                    shape: "square"
                     source: "qrc:/assets/icons/material-symbols/language.svg"
                     sourceSize: 40
                 }
 
-                RoundButtonFlat {
+                SquareButtonClear {
                     width: ((parent.width - 24) / 2)
                     height: 64
                     clip: true
-                    shape: "square"
                     source: "qrc:/assets/icons/material-symbols/left_click.svg"
                     sourceSize: 40
                 }
@@ -197,7 +202,7 @@ Item {
             ////
         }
 
-        ////////////////
+        ////////
 
         Item {
             anchors.horizontalCenter: parent.horizontalCenter
@@ -207,6 +212,6 @@ Item {
             visible: (remoteSelector.currentSelection === 3) // keyboard
         }
 
-        ////////////////
+        ////////
     }
 }
