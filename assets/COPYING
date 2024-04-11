@@ -1,9 +1,12 @@
 
+# Application logo and icons:
+- assets/gfx/logos/logo.svg                     // Emeric Grange // CC0
+
 # Sounds:
-- assets/sounds/car-lock-sound-effect.ogg   // https://www.freesoundslibrary.com // CC BY 4.0
+- assets/sounds/car-lock-sound-effect.ogg       // https://www.freesoundslibrary.com // CC BY 4.0
 
 # 3d models:
-- assets/models/pokeball_meshes/*           // https://www.cgtrader.com/free-3d-models/sports/toy/pokeball-c3ad59319be15d1c1a5d8e99d9df9cf9 // Editorial No Ai License
+- assets/models/pokeball_meshes/*               // https://www.cgtrader.com/free-3d-models/sports/toy/pokeball-c3ad59319be15d1c1a5d8e99d9df9cf9 // Editorial No Ai License
 
 # Others:
 - assets/gfx/menus/menu_back.svg                // Emeric Grange // CC BY-SA 4.0

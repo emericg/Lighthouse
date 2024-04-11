@@ -310,6 +310,8 @@ Item {
             bottomPadding: isDesktop ? 16 : 0
             spacing: isDesktop ? 20 : 8
 
+            visible: (isDesktop) || (isMobile && networkClient.connected)
+
             ListTitle { ////////////////////////////////////////////////////////
                 anchors.leftMargin: devicesView.listMargin
                 anchors.rightMargin: devicesView.listMargin

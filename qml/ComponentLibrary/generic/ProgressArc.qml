@@ -16,8 +16,9 @@ Item {
     property real arcOffset: 0              // rotation (0 means starts at bottom center)
     property real arcSpan: 270              // arc span (in degree)
     property real arcWidth: 16              // width of the arc (in pixel)
-    property real arcOpacity: 1
+
     property color arcColor: Theme.colorPrimary
+    property real arcOpacity: 1
     property string arcCap: "butt"          // butt, round or square // Qt.RoundCap // //
 
     property bool background: true          // draw a background arc (full arc span)

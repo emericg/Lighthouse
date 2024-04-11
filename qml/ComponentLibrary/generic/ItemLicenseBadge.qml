@@ -73,13 +73,5 @@ Item {
         id: mouseArea
         anchors.fill: parent
         onClicked: control.clicked()
-
-        hoverEnabled: true
-        cursorShape: Qt.CrossCursor
-
-        HoverHandler {
-            acceptedDevices: PointerDevice.Mouse
-            cursorShape: Qt.PointingHandCursor // Qt.CrossCursor
-        }
     }
 }
