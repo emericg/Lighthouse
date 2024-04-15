@@ -129,6 +129,8 @@ function getDeviceStatusText(deviceStatus) {
         txt = qsTr("Offline")
     } else if (deviceStatus === DeviceUtils.DeviceUtils.DEVICE_QUEUED) {
         txt = qsTr("Queued")
+    } else if (deviceStatus === DeviceUtils.DeviceUtils.DEVICE_DISCONNECTING) {
+        txt = qsTr("Disconnecting...")
     } else if (deviceStatus === DeviceUtils.DeviceUtils.DEVICE_CONNECTING) {
         txt = qsTr("Connecting...")
     } else if (deviceStatus === DeviceUtils.DeviceUtils.DEVICE_CONNECTED) {
@@ -151,9 +153,9 @@ function getDeviceStatusColor(deviceStatus) {
 
     if (deviceStatus === DeviceUtils.DeviceUtils.DEVICE_OFFLINE) {
         clr = ThemeEngine.Theme.colorRed
-    } else if (deviceStatus === DeviceUtils.DeviceUtils.DEVICE_QUEUED) {
-        clr = ThemeEngine.Theme.colorYellow
-    } else if (deviceStatus === DeviceUtils.DeviceUtils.DEVICE_CONNECTING) {
+    } else if (deviceStatus === DeviceUtils.DeviceUtils.DEVICE_QUEUED ||
+               deviceStatus === DeviceUtils.DeviceUtils.DEVICE_DISCONNECTING ||
+               deviceStatus === DeviceUtils.DeviceUtils.DEVICE_CONNECTING) {
         clr = ThemeEngine.Theme.colorYellow
     } else if (deviceStatus === DeviceUtils.DeviceUtils.DEVICE_CONNECTED) {
         clr = ThemeEngine.Theme.colorGreen
@@ -166,6 +168,27 @@ function getDeviceStatusColor(deviceStatus) {
     }
 
     return clr
+}
+
+function getDeviceStatusIcon(deviceStatus) {
+    var src = "qrc:/assets/icons/material-icons/outlined/bluetooth.svg"
+
+    if (deviceStatus === DeviceUtils.DeviceUtils.DEVICE_OFFLINE) {
+        src = "qrc:/assets/icons/material/bluetooth_disabled.svg"
+    } else if (deviceStatus === DeviceUtils.DeviceUtils.DEVICE_QUEUED ||
+               deviceStatus === DeviceUtils.DeviceUtils.DEVICE_DISCONNECTING ||
+               deviceStatus === DeviceUtils.DeviceUtils.DEVICE_CONNECTING) {
+        src = "qrc:/assets/icons/material-icons/duotone/settings_bluetooth.svg"
+    } else if (deviceStatus === DeviceUtils.DeviceUtils.DEVICE_CONNECTED) {
+        src = "qrc:/assets/icons/material-icons/duotone/bluetooth_connected.svg"
+    } else if (deviceStatus === DeviceUtils.DeviceUtils.DEVICE_WORKING ||
+               deviceStatus === DeviceUtils.DeviceUtils.DEVICE_UPDATING ||
+               deviceStatus === DeviceUtils.DeviceUtils.DEVICE_UPDATING_HISTORY ||
+               deviceStatus === DeviceUtils.DeviceUtils.DEVICE_UPDATING_REALTIME) {
+        src = "qrc:/assets/icons/material-icons/duotone/bluetooth_searching.svg"
+    }
+
+    return src
 }
 
 /* ************************************************************************** */

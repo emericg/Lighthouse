@@ -149,14 +149,17 @@ Loader {
 
                 ButtonSolid {
                     anchors.verticalCenter: parent.verticalCenter
-
                     width: 160
-                    color: (currentDevice.available || currentDevice.connected) ? Theme.colorSuccess : Theme.colorWarning
 
+                    color: {
+                        if (currentDevice.connected) return Theme.colorSuccess
+                        if (currentDevice.available) return Theme.colorSuccess
+                        return Theme.colorWarning
+                    }
                     text: {
                         if (currentDevice.status === DeviceUtils.DEVICE_OFFLINE) return qsTr("Offline")
-                        if (currentDevice.status === DeviceUtils.DEVICE_OFFLINE) return qsTr("Available")
-                        if (currentDevice.status === DeviceUtils.DEVICE_QUEUED) return qsTr("Connecting...")
+                        if (currentDevice.status === DeviceUtils.DEVICE_QUEUED) return qsTr("Queued")
+                        if (currentDevice.status === DeviceUtils.DEVICE_DISCONNECTING) return qsTr("Disconnecting...")
                         if (currentDevice.status === DeviceUtils.DEVICE_CONNECTING) return qsTr("Connecting...")
                         if (currentDevice.status === DeviceUtils.DEVICE_CONNECTED) return qsTr("Connected")
                     }

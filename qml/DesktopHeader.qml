@@ -274,7 +274,8 @@ Rectangle {
                     if (selectedDevice.status === DeviceUtils.DEVICE_OFFLINE)
                         return "qrc:/assets/icons/material-icons/outlined/bluetooth_disabled.svg"
                     if (selectedDevice.status === DeviceUtils.DEVICE_QUEUED ||
-                        selectedDevice.status === DeviceUtils.DEVICE_CONNECTING)
+                        selectedDevice.status === DeviceUtils.DEVICE_CONNECTING ||
+                        selectedDevice.status === DeviceUtils.DEVICE_DISCONNECTING)
                         return "qrc:/assets/icons/material-icons/duotone/bluetooth_searching.svg"
                     if (selectedDevice.status === DeviceUtils.DEVICE_CONNECTED)
                         return "qrc:/assets/icons/material-icons/duotone/bluetooth_connected.svg"
@@ -282,6 +283,7 @@ Rectangle {
                 tooltipText: {
                     if (!selectedDevice) return ""
                     if (selectedDevice.status === DeviceUtils.DEVICE_OFFLINE) return qsTr("Connect")
+                    if (selectedDevice.status === DeviceUtils.DEVICE_DISCONNECTING) return qsTr("Disconnecting...")
                     if (selectedDevice.status === DeviceUtils.DEVICE_QUEUED ||
                         selectedDevice.status === DeviceUtils.DEVICE_CONNECTING) return qsTr("Connecting...")
                     if (selectedDevice.status === DeviceUtils.DEVICE_CONNECTED) return qsTr("Disconnect")
