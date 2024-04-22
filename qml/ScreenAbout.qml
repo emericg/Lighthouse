@@ -105,6 +105,7 @@ Loader {
 
                     ButtonSolid {
                         width: 160
+                        height: 40
 
                         //color: (Theme.currentTheme === ThemeEngine.THEME_NIGHT) ? Theme.colorHeader : "#5483EF"
 
@@ -117,6 +118,7 @@ Loader {
 
                     ButtonSolid {
                         width: 160
+                        height: 40
 
                         //color: (Theme.currentTheme === ThemeEngine.THEME_NIGHT) ? Theme.colorHeader : "#5483EF"
 
@@ -130,6 +132,7 @@ Loader {
                     ButtonSolid {
                         visible: (appWindow.width > 800)
                         width: 160
+                        height: 40
 
                         //color: (Theme.currentTheme === ThemeEngine.THEME_NIGHT) ? Theme.colorHeader : "#5483EF"
 
@@ -169,6 +172,7 @@ Loader {
                 ButtonFlat {
                     anchors.verticalCenter: parent.verticalCenter
                     width: ((parent.width - parent.spacing) / 2)
+                    height: 40
 
                     text: qsTr("WEBSITE")
                     color: (Theme.currentTheme === ThemeEngine.THEME_NIGHT) ? Theme.colorHeader : "#5483EF"
@@ -180,6 +184,7 @@ Loader {
                 ButtonFlat {
                     anchors.verticalCenter: parent.verticalCenter
                     width: ((parent.width - parent.spacing) / 2)
+                    height: 40
 
                     text: qsTr("SUPPORT")
                     color: (Theme.currentTheme === ThemeEngine.THEME_NIGHT) ? Theme.colorHeader : "#5483EF"

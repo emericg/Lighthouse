@@ -97,9 +97,9 @@ QHash <int, QByteArray> DeviceModel::roleNames() const
     roles[DeviceNameRole] = "name";
     roles[DeviceRssiRole] = "rssi";
 
+    roles[ManualIndexRole] = "manual";
     roles[AssociatedLocationRole] = "location";
     roles[AssociatedNameRole] = "plant";
-    roles[ManualIndexRole] = "manual";
 
     roles[PlantNameRole] = "plant";
     roles[SoilMoistureRole] = "waterlevel";
@@ -127,10 +127,6 @@ QVariant DeviceModel::data(const QModelIndex &index, int role) const
     if (device)
     {
         // hw device
-        if (role == ManualIndexRole)
-        {
-            return device->getManualIndex();
-        }
         if (role == DeviceModelRole)
         {
             if (device->getName() == "MIPOW smart bulb") {
@@ -156,6 +152,10 @@ QVariant DeviceModel::data(const QModelIndex &index, int role) const
             return std::abs(device->getRssi());
         }
         // user set
+        if (role == ManualIndexRole)
+        {
+            return device->getManualIndex();
+        }
         if (role == AssociatedLocationRole)
         {
             if (device->getLocationName().isEmpty())
@@ -169,6 +169,13 @@ QVariant DeviceModel::data(const QModelIndex &index, int role) const
                 return "zzz";
             else
                 return device->getAssociatedName();
+        }
+        // plant sensors
+        //if (role == PlantNameRole)
+        //if (role == SoilMoistureRole)
+        if (role == InsideOutsideRole)
+        {
+            return device->isInside();
         }
 
         if (role == PointerRole)

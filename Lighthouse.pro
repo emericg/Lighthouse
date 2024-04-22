@@ -25,7 +25,7 @@ QMAKE_BUNDLE = lighthouse
 # Use Qt Quick compiler
 ios | android { CONFIG += qtquickcompiler }
 
-DEFINES += ENABLE_MBEDTLS
+linux:!android { DEFINES += ENABLE_MBEDTLS }
 #linux:!android { DEFINES += ENABLE_XTEST }
 linux:!android { DEFINES += ENABLE_UINPUT }
 linux:!android { DEFINES += ENABLE_MPRIS }
@@ -119,8 +119,7 @@ RESOURCES   += qml/qml.qrc \
                assets/icons.qrc
 
 lupdate_only {
-    SOURCES += qml/*.qml qml/*.js \
-               qml/components/*.qml qml/components_generic/*.qml qml/components_js/*.js
+    SOURCES += qml/*.qml qml/*.js qml/components/*.qml qml/components_js/*.js
 }
 
 # Build settings ###############################################################
@@ -209,7 +208,7 @@ macx {
     QMAKE_APPLE_DEVICE_ARCHS = x86_64 arm64
 
     # Target OS
-    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.14
+    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.15
 
     # Automatic bundle packaging
 
