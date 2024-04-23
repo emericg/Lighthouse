@@ -177,6 +177,18 @@ void NetworkServer::readPress()
         else if (nextPress == "press:mute") ctrls->action(LocalActions::ACTION_KEYBOARD_volume_mute);
         else if (nextPress == "press:volumeup") ctrls->action(LocalActions::ACTION_KEYBOARD_volume_up);
         else if (nextPress == "press:volumedown") ctrls->action(LocalActions::ACTION_KEYBOARD_volume_down);
+        else if (nextPress == "press:up") ctrls->action(LocalActions::ACTION_KEYBOARD_up);
+        else if (nextPress == "press:down") ctrls->action(LocalActions::ACTION_KEYBOARD_down);
+        else if (nextPress == "press:left") ctrls->action(LocalActions::ACTION_KEYBOARD_left);
+        else if (nextPress == "press:right") ctrls->action(LocalActions::ACTION_KEYBOARD_right);
+        else if (nextPress.startsWith("key:"))
+        {
+            //
+        }
+        else
+        {
+            //
+        }
     }
 
     m_clientDataStream.commitTransaction();

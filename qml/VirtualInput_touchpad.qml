@@ -12,6 +12,15 @@ Grid {
 
     property int gridSize: singleColumn ? width : Math.min(height, parent.width / 2 - 16)
 
+    function backAction() {
+        if (virtualtextfield.focus) {
+            virtualtextfield.focus = false
+            return
+        }
+
+        screenDeviceList.loadScreen()
+    }
+
     ////////
 
     Column { // touchpad
@@ -72,7 +81,7 @@ Grid {
 
             text: qsTr("keyboard")
             source: "qrc:/assets/gfx/icons/keyboard-variant.svg"
-/*
+
             colorBackground: virtualtextfield.focus ? Theme.colorPrimary : "white"
             colorHighlight: virtualtextfield.focus ? "white" : Theme.colorPrimary
             colorBorder: virtualtextfield.focus ? Theme.colorPrimary : Theme.colorComponentBorder
@@ -86,29 +95,28 @@ Grid {
                     virtualtextfield.forceActiveFocus()
                 }
             }
+        }
 
-            TextField {
-                id: virtualtextfield
-                anchors.left: parent.left
-                anchors.right: parent.right
+        TextField {
+            id: virtualtextfield
+            anchors.left: parent.left
+            anchors.right: parent.right
 
-                visible: false // < it is invisible
-                cursorVisible: false
-                echoMode: TextInput.NoEcho
+            //visible: false // < set to invisible
+            cursorVisible: false
+            echoMode: TextInput.NoEcho
 
-                onDisplayTextChanged: {
-                    if (displayText) {
-                        console.log("TEXT CHANGED : " + displayText)
-                        // send virtual event
-                        clear()
-                    }
-                }
-                onEditingFinished: {
-                    virtualtextfield.focus = false
+            onDisplayTextChanged: {
+                if (displayText) {
+                    console.log("TEXT CHANGED : " + displayText)
+                    // send virtual event
                     clear()
                 }
             }
-*/
+            onEditingFinished: {
+                virtualtextfield.focus = false
+                clear()
+            }
         }
     }
 

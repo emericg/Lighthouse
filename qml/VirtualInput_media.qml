@@ -13,6 +13,10 @@ Grid {
 
     property int gridSize: singleColumn ? width : Math.min(height, parent.width / 2 - 16)
 
+    function backAction() {
+        screenDeviceList.loadScreen()
+    }
+
     ////////
 
     Column {
@@ -95,10 +99,18 @@ Grid {
 
             MediaButtonRow {
                 btnSize: parent.btnSize
+
+                onMediaPrevious: networkControls.media_prev()
+                onMediaPlayPause: networkControls.media_playpause()
+                onMediaNext: networkControls.media_next()
             }
 
             VolumeButtonRow {
                 btnSize: parent.btnSize
+
+                onVolumeMute: networkControls.volume_mute()
+                onVolumeDown: networkControls.volume_down()
+                onVolumeUp: networkControls.volume_up()
             }
         }
 

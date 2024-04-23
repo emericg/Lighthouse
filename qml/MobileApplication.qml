@@ -253,14 +253,14 @@ ApplicationWindow {
                     else
                         exitTimer.start()
                 }
+            } else if (appContent.state === "VirtualInputs") {
+                screenVirtualInputs.backAction()
             } else if (appContent.state === "DeviceLight") {
                 screenDeviceLight.backAction()
             } else if (appContent.state === "ScreenAboutPermissions") {
                 appContent.state = screenAboutPermissions.entryPoint
             } else if (appContent.state === "ScreenTutorial") {
                 appContent.state = screenTutorial.entryPoint
-            } else if (appContent.state === "VirtualInputs") {
-                screenVirtualInputs.backAction()
             } else {
                 screenDeviceList.loadScreen()
             }

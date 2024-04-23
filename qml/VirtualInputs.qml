@@ -31,12 +31,17 @@ Loader {
         focus: parent.focus
 
         function backAction() {
-            if (virtualtextfield.focus) {
-                virtualtextfield.focus = false
-                return
+            if (inputSelector.currentSelection === 0) {
+                virtualInput_touchpad.backAction()
+            } else if (inputSelector.currentSelection === 1) {
+                virtualInput_gamepad.backAction()
+            } else if (inputSelector.currentSelection === 2) {
+                virtualInput_remote.backAction()
+            } else if (inputSelector.currentSelection === 3) {
+                virtualInput_media.backAction()
+            } else {
+                screenDeviceList.loadScreen()
             }
-
-            screenDeviceList.loadScreen()
         }
 
         ////////////////
@@ -65,6 +70,8 @@ Loader {
         ////////////////
 
         VirtualInput_touchpad {
+            id: virtualInput_touchpad
+
             anchors.top: inputSelector.bottom
             anchors.topMargin: 16
             anchors.left: parent.left
@@ -77,6 +84,8 @@ Loader {
         ////////////////
 
         VirtualInput_gamepad {
+            id: virtualInput_gamepad
+
             anchors.top: inputSelector.bottom
             anchors.topMargin: 16
             anchors.left: parent.left
@@ -89,6 +98,8 @@ Loader {
         ////////////////
 
         VirtualInput_remote {
+            id: virtualInput_remote
+
             anchors.top: inputSelector.bottom
             anchors.topMargin: 16
             anchors.left: parent.left
@@ -101,6 +112,8 @@ Loader {
         ////////////////
 
         VirtualInput_media {
+            id: virtualInput_media
+
             anchors.top: inputSelector.bottom
             anchors.topMargin: 16
             anchors.left: parent.left

@@ -59,7 +59,14 @@ public slots:
     void displayError(QAbstractSocket::SocketError socketError);
 
     void readMetadata();
+
     void sendPress(int btn);
+    void sendKey(QChar key);
+
+    void key_up();
+    void key_down();
+    void key_left();
+    void key_right();
 
     void media_prev();
     void media_playpause();

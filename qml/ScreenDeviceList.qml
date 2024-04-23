@@ -555,12 +555,14 @@ Item {
 
                     MediaButtonRow {
                         btnSize: 52
+
                         onMediaPrevious: networkControls.media_prev()
                         onMediaPlayPause: networkControls.media_playpause()
                         onMediaNext: networkControls.media_next()
                     }
                     VolumeButtonRow {
                         btnSize: 52
+
                         onVolumeMute: networkControls.volume_mute()
                         onVolumeDown: networkControls.volume_down()
                         onVolumeUp: networkControls.volume_up()

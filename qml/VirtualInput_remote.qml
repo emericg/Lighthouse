@@ -10,6 +10,10 @@ Item {
     signal buttonNext()
     signal buttonPrevious()
 
+    function backAction() {
+        screenDeviceList.loadScreen()
+    }
+
     ////////////////
 
     SelectorMenuColorful {
@@ -44,7 +48,7 @@ Item {
 
         ////////
 
-        Item {
+        Item { //// SLIDE REMOTE
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             anchors.verticalCenterOffset: -(btn111.height/2)
@@ -65,6 +69,8 @@ Item {
 
                 source: "qrc:/assets/icons/material-symbols/play_arrow-fill.svg"
                 sourceRotation: -180
+
+                onClicked: networkControls.key_left()
             }
             RoundButtonFlat {
                 id: btn222
@@ -72,12 +78,14 @@ Item {
                 height: parent.width
 
                 source: "qrc:/assets/icons/material-symbols/play_arrow-fill.svg"
+
+                onClicked: networkControls.key_right()
             }
         }
 
         ////////
 
-        Column {
+        Column { // MEDIA REMOTE
             anchors.centerIn: parent
             width: parent.width * 0.8
 
@@ -113,6 +121,8 @@ Item {
                     colorBackground: "transparent"
                     source: "qrc:/assets/icons/material-symbols/add.svg"
                     sourceSize: 40
+
+                    onClicked: networkControls.volume_up()
                 }
                 SquareButtonClear {
                     anchors.left: parent.left
@@ -123,6 +133,8 @@ Item {
                     colorBackground: "transparent"
                     source: "qrc:/assets/icons/material-symbols/chevron_left.svg"
                     sourceSize: 40
+
+                    onClicked: networkControls.media_prev()
                 }
                 SquareButtonClear {
                     anchors.right: parent.right
@@ -135,6 +147,8 @@ Item {
                     colorBackground: "transparent"
                     source: "qrc:/assets/icons/material-symbols/chevron_right.svg"
                     sourceSize: 40
+
+                    onClicked: networkControls.media_next()
                 }
                 SquareButtonClear {
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -146,6 +160,8 @@ Item {
                     colorBackground: "transparent"
                     source: "qrc:/assets/icons/material-symbols/remove.svg"
                     sourceSize: 40
+
+                    onClicked: networkControls.volume_down()
                 }
 
                 SquareButtonFlat {
@@ -155,6 +171,8 @@ Item {
 
                     //color: Theme.colorPrimary
                     source: "qrc:/assets/icons/material-symbols/play_pause.svg"
+
+                    onClicked: networkControls.media_playpause()
                 }
 
                 layer.enabled: true

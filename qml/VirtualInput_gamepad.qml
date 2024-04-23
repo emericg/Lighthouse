@@ -6,6 +6,10 @@ import ThemeEngine
 Item {
     id: virtualInput_gamepad
 
+    function backAction() {
+        screenDeviceList.loadScreen()
+    }
+
     ////////
 
     Column {
