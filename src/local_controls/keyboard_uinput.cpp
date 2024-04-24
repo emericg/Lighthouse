@@ -126,13 +126,15 @@ void Keyboard_uinput::action(int action_code)
 {
     if (m_fd < 0) setup(); // setup?
 
-    // get key
+    // get key macro
     unsigned keymacro = 0;
 
     if (action_code == LocalActions::ACTION_KEYBOARD_up) keymacro = KEY_UP;
     else if (action_code == LocalActions::ACTION_KEYBOARD_down) keymacro = KEY_DOWN;
     else if (action_code == LocalActions::ACTION_KEYBOARD_left) keymacro = KEY_LEFT;
     else if (action_code == LocalActions::ACTION_KEYBOARD_right) keymacro = KEY_RIGHT;
+    else if (action_code == LocalActions::ACTION_KEYBOARD_enter) keymacro = KEY_ENTER;
+    else if (action_code == LocalActions::ACTION_KEYBOARD_escape) keymacro = KEY_ESC;
 
     else if (action_code == LocalActions::ACTION_KEYBOARD_computer_lock) keymacro = KEY_SCREENLOCK;
     else if (action_code == LocalActions::ACTION_KEYBOARD_computer_sleep) keymacro = KEY_SLEEP;
@@ -173,6 +175,78 @@ void Keyboard_uinput::action(int action_code)
         emitevent(EV_KEY, keymacro, 0);
         emitevent(EV_SYN, SYN_REPORT, 0);
         //usleep(33000); // 33 ms
+    }
+}
+
+/* ************************************************************************** */
+
+void Keyboard_uinput::key(QChar key_value)
+{
+    // get key macro
+    unsigned keymacro = 0;
+    unsigned keymodifier = 0;
+
+    if (key_value >= '0' && key_value <= '9')
+    {
+        keymodifier = KEY_LEFTSHIFT;
+        if (key_value == '0') keymacro = KEY_0;
+        else keymacro = 1 + key_value.digitValue();
+    }
+    else if ((key_value >= 'a' && key_value <= 'z') ||
+             (key_value >= 'A' && key_value <= 'A'))
+    {
+        if (key_value >= 'A' && key_value <= 'Z')
+            keymodifier = KEY_CAPSLOCK;
+
+        if (key_value.toLower() == 'a') keymacro = KEY_A;
+        if (key_value.toLower() == 'b') keymacro = KEY_B;
+        if (key_value.toLower() == 'c') keymacro = KEY_C;
+        if (key_value.toLower() == 'd') keymacro = KEY_D;
+        if (key_value.toLower() == 'e') keymacro = KEY_E;
+        if (key_value.toLower() == 'f') keymacro = KEY_F;
+        if (key_value.toLower() == 'g') keymacro = KEY_G;
+        if (key_value.toLower() == 'h') keymacro = KEY_H;
+        if (key_value.toLower() == 'i') keymacro = KEY_I;
+        if (key_value.toLower() == 'j') keymacro = KEY_J;
+        if (key_value.toLower() == 'k') keymacro = KEY_K;
+        if (key_value.toLower() == 'l') keymacro = KEY_L;
+        if (key_value.toLower() == 'm') keymacro = KEY_M;
+        if (key_value.toLower() == 'n') keymacro = KEY_N;
+        if (key_value.toLower() == 'o') keymacro = KEY_O;
+        if (key_value.toLower() == 'p') keymacro = KEY_P;
+        if (key_value.toLower() == 'q') keymacro = KEY_Q;
+        if (key_value.toLower() == 'r') keymacro = KEY_R;
+        if (key_value.toLower() == 's') keymacro = KEY_S;
+        if (key_value.toLower() == 't') keymacro = KEY_T;
+        if (key_value.toLower() == 'u') keymacro = KEY_U;
+        if (key_value.toLower() == 'v') keymacro = KEY_V;
+        if (key_value.toLower() == 'w') keymacro = KEY_W;
+        if (key_value.toLower() == 'x') keymacro = KEY_X;
+        if (key_value.toLower() == 'y') keymacro = KEY_Y;
+        if (key_value.toLower() == 'z') keymacro = KEY_Z;
+    }
+    else
+    {
+        // TODO
+    }
+
+    // simulate keystroke
+    if (keymacro > 0)
+    {
+        if (m_fd < 0) setup(); // setup?
+
+        if (m_fd >= 0)
+        {
+            if (keymodifier > 0) emitevent(EV_KEY, keymodifier, 1);
+            emitevent(EV_KEY, keymacro, 1);
+            emitevent(EV_SYN, SYN_REPORT, 0);
+            //usleep(33000); // 33 ms
+
+            if (keymodifier > 0) emitevent(EV_KEY, keymodifier, 0);
+            emitevent(EV_KEY, keymacro, 0);
+            emitevent(EV_SYN, SYN_REPORT, 0);
+            //usleep(33000); // 33 ms
+        }
     }
 }
 

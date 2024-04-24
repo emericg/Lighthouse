@@ -121,20 +121,24 @@ void NetworkClient::sendPress(int btn)
     if (btn == 2) dataOutput << QString("press:stop");
     if (btn == 3) dataOutput << QString("press:next");
     if (btn == 4) dataOutput << QString("press:prev");
+
     if (btn == 5) dataOutput << QString("press:mute");
     if (btn == 6) dataOutput << QString("press:volumeup");
     if (btn == 7) dataOutput << QString("press:volumedown");
+
     if (btn == 8) dataOutput << QString("press:up");
     if (btn == 9) dataOutput << QString("press:down");
     if (btn == 10) dataOutput << QString("press:left");
     if (btn == 11) dataOutput << QString("press:right");
+    if (btn == 12) dataOutput << QString("press:enter");
+    if (btn == 13) dataOutput << QString("press:escape");
 
     m_tcpSocket->write(block);
 }
 
 void NetworkClient::sendKey(QChar key)
 {
-    qDebug() << "NetworkClient::sendKey(" << key << ")";
+    //qDebug() << "NetworkClient::sendKey(" << key << ")";
 
     QByteArray block;
     QDataStream dataOutput(&block, QIODevice::WriteOnly);
@@ -151,20 +155,25 @@ void NetworkClient::key_up()
 {
     sendPress(8);
 }
-
 void NetworkClient::key_down()
 {
     sendPress(9);
 }
-
 void NetworkClient::key_left()
 {
     sendPress(10);
 }
-
 void NetworkClient::key_right()
 {
     sendPress(11);
+}
+void NetworkClient::key_enter()
+{
+    sendPress(12);
+}
+void NetworkClient::key_escape()
+{
+    sendPress(13);
 }
 
 void NetworkClient::media_prev()
@@ -179,6 +188,7 @@ void NetworkClient::media_next()
 {
     sendPress(3);
 }
+
 void NetworkClient::volume_mute()
 {
     sendPress(5);

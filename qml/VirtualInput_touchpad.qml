@@ -110,6 +110,7 @@ Grid {
                 if (displayText) {
                     console.log("TEXT CHANGED : " + displayText)
                     // send virtual event
+                    networkControls.sendKey(displayText)
                     clear()
                 }
             }

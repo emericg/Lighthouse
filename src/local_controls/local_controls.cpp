@@ -160,9 +160,22 @@ void LocalControls::action(int action_code, const QString &action_params)
 
 /* ************************************************************************** */
 
+void LocalControls::keyboard_key(QChar key)
+{
+    if (keyboard)
+    {
+        keyboard->key(key);
+    }
+}
+
+/* ************************************************************************** */
+
 void LocalControls::mouse_action(int x, int y, int btn_left, int btn_right, int btn_middle)
 {
-    mouse->action(x, y, btn_left, btn_right, btn_middle);
+    if (mouse)
+    {
+        mouse->action(x, y, btn_left, btn_right, btn_middle);
+    }
 }
 
 /* ************************************************************************** */

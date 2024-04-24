@@ -66,6 +66,8 @@ public:
 
     Q_INVOKABLE void action(int action_code, const QString &action_params = QString());
 
+    Q_INVOKABLE void keyboard_key(QChar key);
+
     Q_INVOKABLE void mouse_action(int x, int y, int btn_left, int btn_right, int btn_middle);
 
     Q_INVOKABLE void gamepad_action(float x1, float y1, float x2, float y2,

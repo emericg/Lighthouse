@@ -166,7 +166,7 @@ void NetworkServer::readPress()
 
     QString nextPress;
     m_clientDataStream >> nextPress;
-    //qDebug() << "NetworkServer::readPress() >" << nextPress;
+    qDebug() << "NetworkServer::readPress() >" << nextPress;
 
     if (nextPress.startsWith("press:"))
     {
@@ -181,14 +181,13 @@ void NetworkServer::readPress()
         else if (nextPress == "press:down") ctrls->action(LocalActions::ACTION_KEYBOARD_down);
         else if (nextPress == "press:left") ctrls->action(LocalActions::ACTION_KEYBOARD_left);
         else if (nextPress == "press:right") ctrls->action(LocalActions::ACTION_KEYBOARD_right);
-        else if (nextPress.startsWith("key:"))
-        {
-            //
-        }
-        else
-        {
-            //
-        }
+        else if (nextPress == "press:enter") ctrls->action(LocalActions::ACTION_KEYBOARD_enter);
+        else if (nextPress == "press:escape") ctrls->action(LocalActions::ACTION_KEYBOARD_escape);
+    }
+    else if (nextPress.startsWith("key:"))
+    {
+        LocalControls *ctrls = LocalControls::getInstance();
+        ctrls->keyboard_key(nextPress.back());
     }
 
     m_clientDataStream.commitTransaction();

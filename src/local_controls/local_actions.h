@@ -64,6 +64,8 @@ public:
                 ACTION_KEYBOARD_down,
                 ACTION_KEYBOARD_left,
                 ACTION_KEYBOARD_right,
+                ACTION_KEYBOARD_enter,
+                ACTION_KEYBOARD_escape,
             ACTION_KEYS_STOP,
 
             ACTION_SHORTCUTS_START = 64,

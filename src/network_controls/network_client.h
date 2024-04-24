@@ -67,6 +67,8 @@ public slots:
     void key_down();
     void key_left();
     void key_right();
+    void key_enter();
+    void key_escape();
 
     void media_prev();
     void media_playpause();

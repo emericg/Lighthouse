@@ -49,6 +49,7 @@ public:
 
     virtual void setup();
     virtual void action(int key_code);
+    virtual void key(QChar key_value);
 };
 
 /* ************************************************************************** */
