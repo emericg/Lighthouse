@@ -61,7 +61,8 @@ signals:
 private slots:
     void newClientConnection();
     void closeClientConnection();
-    void readPress();
+
+    void readClientData();
 
 public:
     explicit NetworkServer(QObject *parent = nullptr);

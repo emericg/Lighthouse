@@ -60,8 +60,10 @@ public slots:
 
     void readMetadata();
 
-    void sendPress(int btn);
+    void sendAction(int action);
     void sendKey(QChar key);
+    void sendGamepad(float x1, float y1, float x2, float y2,
+                     int a, int b, int x, int y);
 
     void key_up();
     void key_down();
@@ -72,6 +74,7 @@ public slots:
 
     void media_prev();
     void media_playpause();
+    void media_stop();
     void media_next();
 
     void volume_mute();

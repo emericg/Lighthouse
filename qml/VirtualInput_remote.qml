@@ -53,7 +53,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             anchors.verticalCenterOffset: -(btn111.height/2)
 
-            width: parent.width * 0.66
+            width: singleColumn ? parent.width * 0.66 : parent.height * 0.6
             height: width
 
             visible: (remoteSelector.currentSelection === 1) // presentation
@@ -87,7 +87,8 @@ Item {
 
         Column { // MEDIA REMOTE
             anchors.centerIn: parent
-            width: parent.width * 0.8
+
+            width: singleColumn ? parent.width * 0.66 : parent.height * 0.5
 
             visible: (remoteSelector.currentSelection === 2) // media
             spacing: 32

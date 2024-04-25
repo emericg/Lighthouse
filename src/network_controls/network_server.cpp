@@ -126,7 +126,7 @@ void NetworkServer::newClientConnection()
     if (m_clientConnection)
     {
         //qDebug() << "NetworkServer::newClientConnection(ACCEPTED)";
-        connect(m_clientConnection, &QIODevice::readyRead, this, &NetworkServer::readPress);
+        connect(m_clientConnection, &QIODevice::readyRead, this, &NetworkServer::readClientData);
         connect(m_clientConnection, &QAbstractSocket::disconnected, this, &NetworkServer::closeClientConnection);
 
         m_clientConnected = true;
@@ -160,34 +160,73 @@ void NetworkServer::closeClientConnection()
     Q_EMIT connectionEvent();
 }
 
-void NetworkServer::readPress()
+void NetworkServer::readClientData()
 {
+    QString cData;
     m_clientDataStream.startTransaction();
+    m_clientDataStream >> cData;
 
-    QString nextPress;
-    m_clientDataStream >> nextPress;
-    qDebug() << "NetworkServer::readPress() >" << nextPress;
+    //qDebug() << "NetworkServer::readClientData() >" << cData;
 
-    if (nextPress.startsWith("press:"))
+    if (cData.startsWith("press:"))
     {
         LocalControls *ctrls = LocalControls::getInstance();
-        if (nextPress == "press:playpause") ctrls->action(LocalActions::ACTION_KEYBOARD_media_playpause);
-        else if (nextPress == "press:next") ctrls->action(LocalActions::ACTION_KEYBOARD_media_next);
-        else if (nextPress == "press:prev") ctrls->action(LocalActions::ACTION_KEYBOARD_media_prev);
-        else if (nextPress == "press:mute") ctrls->action(LocalActions::ACTION_KEYBOARD_volume_mute);
-        else if (nextPress == "press:volumeup") ctrls->action(LocalActions::ACTION_KEYBOARD_volume_up);
-        else if (nextPress == "press:volumedown") ctrls->action(LocalActions::ACTION_KEYBOARD_volume_down);
-        else if (nextPress == "press:up") ctrls->action(LocalActions::ACTION_KEYBOARD_up);
-        else if (nextPress == "press:down") ctrls->action(LocalActions::ACTION_KEYBOARD_down);
-        else if (nextPress == "press:left") ctrls->action(LocalActions::ACTION_KEYBOARD_left);
-        else if (nextPress == "press:right") ctrls->action(LocalActions::ACTION_KEYBOARD_right);
-        else if (nextPress == "press:enter") ctrls->action(LocalActions::ACTION_KEYBOARD_enter);
-        else if (nextPress == "press:escape") ctrls->action(LocalActions::ACTION_KEYBOARD_escape);
+        if (cData == "press:playpause") ctrls->action(LocalActions::ACTION_KEYBOARD_media_playpause);
+        else if (cData == "press:stop") ctrls->action(LocalActions::ACTION_KEYBOARD_media_stop);
+        else if (cData == "press:next") ctrls->action(LocalActions::ACTION_KEYBOARD_media_next);
+        else if (cData == "press:prev") ctrls->action(LocalActions::ACTION_KEYBOARD_media_prev);
+        else if (cData == "press:mute") ctrls->action(LocalActions::ACTION_KEYBOARD_volume_mute);
+        else if (cData == "press:volumeup") ctrls->action(LocalActions::ACTION_KEYBOARD_volume_up);
+        else if (cData == "press:volumedown") ctrls->action(LocalActions::ACTION_KEYBOARD_volume_down);
+        else if (cData == "press:up") ctrls->action(LocalActions::ACTION_KEYBOARD_up);
+        else if (cData == "press:down") ctrls->action(LocalActions::ACTION_KEYBOARD_down);
+        else if (cData == "press:left") ctrls->action(LocalActions::ACTION_KEYBOARD_left);
+        else if (cData == "press:right") ctrls->action(LocalActions::ACTION_KEYBOARD_right);
+        else if (cData == "press:enter") ctrls->action(LocalActions::ACTION_KEYBOARD_enter);
+        else if (cData == "press:escape") ctrls->action(LocalActions::ACTION_KEYBOARD_escape);
     }
-    else if (nextPress.startsWith("key:"))
+    else if (cData.startsWith("key:"))
     {
         LocalControls *ctrls = LocalControls::getInstance();
-        ctrls->keyboard_key(nextPress.back());
+        ctrls->keyboard_key(cData.back());
+    }
+    else if (cData.startsWith("mouse:"))
+    {
+        LocalControls *ctrls = LocalControls::getInstance();
+        //ctrls->mouse_action(int x, int y, int btn_left, int btn_right, int btn_middle);
+    }
+    else if (cData.startsWith("pad:"))
+    {
+        cData.remove(0, 4);
+        QStringList axis = cData.split(';');
+
+        float x1 = 0.f;
+        float y1 = 0.f;
+        float x2 = 0.f;
+        float y2 = 0.f;
+
+        int a = 0;
+        int b = 0;
+        int x = 0;
+        int y = 0;
+
+        if (axis.size() >= 4)
+        {
+            x1 = axis.at(0).toFloat();
+            y1 = axis.at(1).toFloat();
+            x2 = axis.at(2).toFloat();
+            y2 = axis.at(3).toFloat();
+        }
+        if (axis.size() >= 8)
+        {
+            a = axis.at(4).toInt();
+            b = axis.at(5).toInt();
+            x = axis.at(6).toInt();
+            y = axis.at(7).toInt();
+        }
+
+        LocalControls *ctrls = LocalControls::getInstance();
+        ctrls->gamepad_action(x1*32767.f, y1*32767.f, x2*32767.f, y2*32767.f, a, b, x, y);
     }
 
     m_clientDataStream.commitTransaction();

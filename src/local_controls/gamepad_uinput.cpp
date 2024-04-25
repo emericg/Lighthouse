@@ -107,6 +107,8 @@ void Gamepad_uinput::setup()
         // setup buttons and axis
         ioctl(m_fd, UI_SET_ABSBIT, ABS_X);
         ioctl(m_fd, UI_SET_ABSBIT, ABS_Y);
+        ioctl(m_fd, UI_SET_ABSBIT, ABS_RX);
+        ioctl(m_fd, UI_SET_ABSBIT, ABS_RY);
         ioctl(m_fd, UI_SET_KEYBIT, BTN_A);
         ioctl(m_fd, UI_SET_KEYBIT, BTN_B);
         ioctl(m_fd, UI_SET_KEYBIT, BTN_X);
@@ -135,14 +137,20 @@ void Gamepad_uinput::action(int x1, int y1, int x2, int y2,
 
     if (m_fd >= 0)
     {
+        // first axis
         emitevent(EV_ABS, ABS_X, x1);
         emitevent(EV_ABS, ABS_Y, y1);
-        // TODO second axis
+        emitevent(EV_SYN, SYN_REPORT, 0);
+
+        // second axis
+        emitevent(EV_ABS, ABS_RX, x2);
+        emitevent(EV_ABS, ABS_RY, y2);
+        emitevent(EV_SYN, SYN_REPORT, 0);
+
         emitevent(EV_KEY, BTN_A, a);
         emitevent(EV_KEY, BTN_B, b);
         emitevent(EV_KEY, BTN_X, x);
         emitevent(EV_KEY, BTN_Y, y);
-
         emitevent(EV_SYN, SYN_REPORT, 0);
     }
 }

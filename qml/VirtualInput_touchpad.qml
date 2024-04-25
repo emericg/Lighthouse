@@ -108,7 +108,8 @@ Grid {
 
             onDisplayTextChanged: {
                 if (displayText) {
-                    console.log("TEXT CHANGED : " + displayText)
+                    //console.log("virtualtextfield::onDisplayTextChanged(" + displayText + ")")
+
                     // send virtual event
                     networkControls.sendKey(displayText)
                     clear()
