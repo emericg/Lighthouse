@@ -57,10 +57,10 @@ Drawer {
 
                 IconSvg {
                     id: imageHeader
-                    width: 40
-                    height: 40
+                    width: 48
+                    height: 48
                     anchors.left: parent.left
-                    anchors.leftMargin: 12
+                    anchors.leftMargin: 8
                     anchors.verticalCenter: parent.verticalCenter
 
                     source: "qrc:/assets/gfx/icons/desk-lamp-logo.svg"
@@ -70,14 +70,14 @@ Drawer {
                 Text {
                     id: textHeader
                     anchors.left: imageHeader.right
-                    anchors.leftMargin: 10
+                    anchors.leftMargin: 8
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.verticalCenterOffset: 2
 
                     text: "Lighthouse"
                     color: Theme.colorText
                     font.bold: true
-                    font.pixelSize: 22
+                    font.pixelSize: Theme.fontSizeHeader
                 }
             }
 

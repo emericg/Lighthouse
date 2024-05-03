@@ -104,18 +104,18 @@ Rectangle {
     }
 
     MouseArea {
-        width: 40
-        height: 40
+        width: 48
+        height: 48
         anchors.left: parent.left
         anchors.leftMargin: 12
         anchors.verticalCenter: parent.verticalCenter
 
         hoverEnabled: (buttonBack.source !== "qrc:/assets/gfx/logos/logo.svg")
         onEntered: { buttonBackBg.opacity = 0.5; }
-        onExited: { buttonBackBg.opacity = 0; buttonBack.width = 24; }
+        onExited: { buttonBackBg.opacity = 0; buttonBack.width = 32; }
 
-        onPressed: buttonBack.width = 20
-        onReleased: buttonBack.width = 24
+        onPressed: buttonBack.width = 28
+        onReleased: buttonBack.width = 32
         onClicked: backButtonClicked()
 
         enabled: (buttonBack.source !== "qrc:/assets/gfx/logos/logo.svg" || wideMode)
@@ -133,7 +133,7 @@ Rectangle {
 
         IconSvg {
             id: buttonBack
-            width: 24
+            width: 32
             height: width
             anchors.centerIn: parent
 

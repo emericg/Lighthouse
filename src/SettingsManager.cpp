@@ -210,6 +210,8 @@ bool SettingsManager::readSettings()
             m_netctrlHost = settings.value("netctrl/host").toString();
         if (settings.contains("netctrl/port"))
             m_netctrlPort = settings.value("netctrl/port").toInt();
+        if (settings.contains("netctrl/password"))
+            m_netctrlPassword = settings.value("netctrl/password").toString();
 
         status = true;
     }
@@ -270,6 +272,7 @@ bool SettingsManager::writeSettings()
         settings.setValue("netctrl/enabled", m_netctrl);
         settings.setValue("netctrl/host", m_netctrlHost);
         settings.setValue("netctrl/port", m_netctrlPort);
+        settings.setValue("netctrl/password", m_netctrlPassword);
 
         if (settings.status() == QSettings::NoError)
         {
@@ -370,6 +373,12 @@ void SettingsManager::resetSettings()
     m_mqttPassword = "lighthouse";
     m_mqttTopics = "lighthouse";
     Q_EMIT mqttChanged();
+
+    m_netctrl = false;
+    m_netctrlHost = "";
+    m_netctrlPort = 5555;
+    m_netctrlPassword = "lighthouse";
+    Q_EMIT netctrlChanged();
 }
 
 /* ************************************************************************** */
@@ -623,6 +632,18 @@ void SettingsManager::setOrderBy(const QString &value)
 
 /* ************************************************************************** */
 
+void SettingsManager::setFakeIt(const bool value)
+{
+    if (m_fakeIt != value)
+    {
+        m_fakeIt = value;
+        //writeSettings();
+        Q_EMIT fakeitChanged();
+    }
+}
+
+/* ************************************************************************** */
+
 void SettingsManager::setMySQL(const bool value)
 {
     if (m_mysql != value)
@@ -760,6 +781,16 @@ void SettingsManager::setNetCtrlPort(const int value)
     if (m_netctrlPort != value)
     {
         m_netctrlPort = value;
+        writeSettings();
+        Q_EMIT netctrlChanged();
+    }
+}
+
+void SettingsManager::setNetCtrlPassword(const QString &value)
+{
+    if (m_netctrlPassword != value)
+    {
+        m_netctrlPassword = value;
         writeSettings();
         Q_EMIT netctrlChanged();
     }

@@ -628,6 +628,19 @@ Loader {
                 visible: isMobile
                 text: qsTr("Desktop remote control")
                 source: "qrc:/assets/icons/material-icons/duotone/devices.svg"
+
+                Rectangle {
+                    anchors.left: parent.left
+                    anchors.leftMargin: 36
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenterOffset: 8
+                    width: 8
+                    height: 8
+                    radius: 8
+
+                    visible: (isMobile && networkClient.connected)
+                    color: Theme.colorGreen
+                }
             }
 
             ////////////////
@@ -637,7 +650,7 @@ Loader {
                 anchors.leftMargin: screenPaddingLeft
                 anchors.right: parent.right
                 anchors.rightMargin: screenPaddingRight
-                height: Theme.componentHeightXL
+                height: Theme.componentHeight
 
                 visible: isMobile
 
@@ -664,6 +677,18 @@ Loader {
                     text: settingsManager.netctrlHost
                     onEditingFinished: settingsManager.netctrlHost = text
                     selectByMouse: true
+
+                    Text {
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.componentMargin
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        visible: parent.text
+                        text: qsTr("Host")
+                        textFormat: Text.PlainText
+                        font.pixelSize: Theme.fontSizeContentVerySmall
+                        color: Theme.colorSubText
+                    }
                 }
             }
 
@@ -674,7 +699,7 @@ Loader {
                 anchors.leftMargin: screenPaddingLeft
                 anchors.right: parent.right
                 anchors.rightMargin: screenPaddingRight
-                height: Theme.componentHeightXL
+                height: Theme.componentHeight
 
                 visible: isMobile
 
@@ -702,6 +727,117 @@ Loader {
                     onEditingFinished: settingsManager.netctrlPort = parseInt(text, 10)
                     validator: IntValidator { bottom: 1; top: 65535; }
                     selectByMouse: true
+
+                    Text {
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.componentMargin
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        visible: parent.text
+                        text: qsTr("Port")
+                        textFormat: Text.PlainText
+                        font.pixelSize: Theme.fontSizeContentVerySmall
+                        color: Theme.colorSubText
+                    }
+                }
+            }
+
+            ////////
+
+            Item { // element_remoteServer_password
+                anchors.left: parent.left
+                anchors.leftMargin: screenPaddingLeft
+                anchors.right: parent.right
+                anchors.rightMargin: screenPaddingRight
+                height: Theme.componentHeight
+
+                visible: isMobile
+
+                IconSvg {
+                    anchors.left: parent.left
+                    anchors.leftMargin: contentColumn.padIcon
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    width: 24
+                    height: 24
+                    color: Theme.colorIcon
+                    source: "qrc:/assets/icons/material-symbols/password.svg"
+                }
+
+                TextFieldThemed {
+                    anchors.left: parent.left
+                    anchors.leftMargin: contentColumn.padText
+                    anchors.right: parent.right
+                    anchors.rightMargin: Theme.componentMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    height: 36
+
+                    placeholderText: qsTr("Password")
+                    text: settingsManager.netctrlPassword
+                    //onEditingFinished: settingsManager.netctrlPassword = text
+                    validator: IntValidator { bottom: 1; top: 65535; }
+                    selectByMouse: true
+
+                    Text {
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.componentMargin
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        visible: parent.text
+                        text: qsTr("Password")
+                        textFormat: Text.PlainText
+                        font.pixelSize: Theme.fontSizeContentVerySmall
+                        color: Theme.colorSubText
+                    }
+                }
+            }
+
+            ////////
+
+            Item { // element_fakeIt
+                anchors.left: parent.left
+                anchors.leftMargin: screenPaddingLeft
+                anchors.right: parent.right
+                anchors.rightMargin: screenPaddingRight
+                height: Theme.componentHeight
+
+                visible: (isMobile && !networkClient.connected)
+
+                IconSvg {
+                    anchors.left: parent.left
+                    anchors.leftMargin: contentColumn.padIcon
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    width: 24
+                    height: 24
+                    color: Theme.colorIcon
+                    source: "qrc:/assets/icons/material-symbols/supervisor_account.svg"
+                }
+
+                Text {
+                    anchors.left: parent.left
+                    anchors.leftMargin: contentColumn.padText
+                    anchors.right: switch_fakeIt.left
+                    anchors.rightMargin: Theme.componentMargin
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    text: qsTr("Fake it till you make it")
+                    textFormat: Text.PlainText
+                    font.pixelSize: Theme.fontSizeContent
+                    color: Theme.colorText
+                    wrapMode: Text.WordWrap
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                SwitchThemedDesktop {
+                    id: switch_fakeIt
+                    anchors.right: parent.right
+                    anchors.rightMargin: 8
+                    anchors.verticalCenter: parent.verticalCenter
+                    z: 1
+
+                    checked: settingsManager.fakeIt
+                    onClicked: settingsManager.fakeIt = checked
                 }
             }
 

@@ -317,7 +317,7 @@ Item {
             bottomPadding: isDesktop ? 16 : 0
             spacing: isDesktop ? 20 : 8
 
-            visible: (isDesktop) || (isMobile && networkClient.connected)
+            visible: (isDesktop) || (isMobile && networkClient.connected) || (settingsManager.fakeIt)
 
             ListTitle { ////////////////////////////////////////////////////////
                 anchors.leftMargin: devicesView.listMargin
@@ -536,7 +536,7 @@ Item {
                 height: singleColumn ? 112 : 128
                 radius: 4
 
-                visible: (isMobile && networkClient.connected)
+                visible: (isMobile && networkClient.connected) || (settingsManager.fakeIt)
 
                 color: Theme.colorDeviceWidget
                 border.width: 2
@@ -575,7 +575,7 @@ Item {
                 height: singleColumn ? 96 : 96
                 radius: 4
 
-                visible: (isMobile && networkClient.connected)
+                visible: (isMobile && networkClient.connected) || (settingsManager.fakeIt)
 
                 color: Theme.colorForeground // Theme.colorDeviceWidget
                 border.width: 2

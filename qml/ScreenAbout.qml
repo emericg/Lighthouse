@@ -97,7 +97,7 @@ Loader {
 
                 Row { // desktop buttons row
                     anchors.right: parent.right
-                    anchors.rightMargin: Theme.componentMargin
+                    anchors.rightMargin: Theme.componentMarginXL
                     anchors.verticalCenter: parent.verticalCenter
 
                     visible: wideWideMode
@@ -124,7 +124,7 @@ Loader {
 
                         text: qsTr("SUPPORT")
                         source: "qrc:/assets/icons/material-symbols/support.svg"
-                        sourceSize: 22
+                        sourceSize: 24
 
                         onClicked: Qt.openUrlExternally("https://github.com/emericg/Lighthouse/issues")
                     }

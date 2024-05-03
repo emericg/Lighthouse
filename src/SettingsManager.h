@@ -67,6 +67,8 @@ class SettingsManager: public QObject
     Q_PROPERTY(bool bigIndicator READ getBigIndicator WRITE setBigIndicator NOTIFY bigIndicatorChanged)
     Q_PROPERTY(bool dynaScale READ getDynaScale WRITE setDynaScale NOTIFY dynaScaleChanged)
 
+    Q_PROPERTY(bool fakeIt READ getFakeIt WRITE setFakeIt NOTIFY fakeitChanged)
+
     Q_PROPERTY(bool mysql READ getMySQL WRITE setMySQL NOTIFY mysqlChanged)
     Q_PROPERTY(QString mysqlHost READ getMysqlHost WRITE setMysqlHost NOTIFY mysqlChanged)
     Q_PROPERTY(uint mysqlPort READ getMysqlPort WRITE setMysqlPort NOTIFY mysqlChanged)
@@ -83,6 +85,7 @@ class SettingsManager: public QObject
     Q_PROPERTY(bool netctrl READ getNetCtrl WRITE setNetCtrl NOTIFY netctrlChanged)
     Q_PROPERTY(QString netctrlHost READ getNetCtrlHost WRITE setNetCtrlHost NOTIFY netctrlChanged)
     Q_PROPERTY(uint netctrlPort READ getNetCtrlPort WRITE setNetCtrlPort NOTIFY netctrlChanged)
+    Q_PROPERTY(QString netctrlPassword READ getNetCtrlPassword WRITE setNetCtrlPassword NOTIFY netctrlChanged)
 
     bool m_firstlaunch = true;
 
@@ -102,6 +105,8 @@ class SettingsManager: public QObject
     bool m_startMinimized = false;
     bool m_systrayEnabled = true;
     bool m_notificationsEnabled = true;
+
+    bool m_fakeIt = false; // not persistent
 
     bool m_bluetoothControl = false;
     bool m_bluetoothLimitScanningRange = false;
@@ -140,6 +145,7 @@ class SettingsManager: public QObject
     bool m_netctrl = true;
     QString m_netctrlHost;
     int m_netctrlPort = 5555;
+    QString m_netctrlPassword = "lighthouse";
 
     // Singleton
     static SettingsManager *instance;
@@ -178,6 +184,7 @@ Q_SIGNALS:
     void mysqlChanged();
     void mqttChanged();
     void netctrlChanged();
+    void fakeitChanged();
 
 public:
     static const unsigned s_intervalBackgroundUpdate = 60;
@@ -265,6 +272,9 @@ public:
     QString getOrderBy() const { return m_orderBy; }
     void setOrderBy(const QString &value);
 
+    bool getFakeIt() const { return m_fakeIt; }
+    void setFakeIt(const bool value);
+
     unsigned getDataRetentionDays() const { return m_dataRetentionDays; }
 
     bool getMySQL() const { return m_mysql; }
@@ -314,6 +324,9 @@ public:
 
     int getNetCtrlPort() const { return m_netctrlPort; }
     void setNetCtrlPort(const int value);
+
+    QString getNetCtrlPassword() const { return m_netctrlPassword; }
+    void setNetCtrlPassword(const QString &value);
 
     // Utils
     Q_INVOKABLE void reloadSettings();
