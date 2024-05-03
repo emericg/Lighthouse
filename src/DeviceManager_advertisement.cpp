@@ -67,6 +67,7 @@ void DeviceManager::updateBleDevice(const QBluetoothDeviceInfo &info,
 
             // Auto connection //
 
+#if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
             if (dd->getName() == "Pokemon PBP") {
                 if (qobject_cast<DevicePokeballPlus*>(dd)->getAutoConnect()) {
                     dd->actionConnect();
@@ -77,6 +78,7 @@ void DeviceManager::updateBleDevice(const QBluetoothDeviceInfo &info,
                     dd->actionConnect();
                 }
             }
+#endif
 
             // Handle advertisement //
 
