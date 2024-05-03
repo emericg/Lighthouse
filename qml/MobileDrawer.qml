@@ -109,7 +109,7 @@ Drawer {
                 DrawerItem {
                     highlighted: (appContent.state === "ScreenDeviceList")
                     text: qsTr("Sensors")
-                    source: "qrc:/assets/gfx/logos/logo_tray_symbolic.svg"
+                    source: "qrc:/assets/gfx/logos/logo_drawer.svg"
 
                     onClicked: {
                         screenDeviceList.loadScreen()
@@ -120,7 +120,7 @@ Drawer {
                 DrawerItem {
                     highlighted: (appContent.state === "ScreenSettings")
                     text: qsTr("Settings")
-                    source: "qrc:/assets/icons/material-symbols/settings.svg"
+                    source: "qrc:/assets/icons/material-icons/duotone/tune.svg"
 
                     onClicked: {
                         screenSettings.loadScreen()
@@ -132,7 +132,7 @@ Drawer {
                     highlighted: (appContent.state === "ScreenAbout" ||
                                   appContent.state === "ScreenAboutPermissions")
                     text: qsTr("About")
-                    source: "qrc:/assets/icons/material-symbols/info.svg"
+                    source: "qrc:/assets/icons/material-icons/duotone/info.svg"
 
                     onClicked: {
                         screenAbout.loadScreen()

@@ -359,7 +359,7 @@ Loader {
                     anchors.left: parent.left
                     anchors.leftMargin: 4
 
-                    source: "qrc:/assets/icons/material-icons/duotone/info.svg"
+                    source: "qrc:/assets/icons/material-symbols/info.svg"
                     color: Theme.colorSubText
                 }
 

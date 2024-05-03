@@ -67,7 +67,7 @@ Item {
                 height: width
                 z: -1
 
-                source: "qrc:/assets/icons/material-symbols/play_arrow-fill.svg"
+                source: "qrc:/assets/icons/material-symbols/media/play_arrow-fill.svg"
                 sourceRotation: -180
 
                 onClicked: networkControls.key_left()
@@ -77,7 +77,7 @@ Item {
                 width: parent.width
                 height: parent.width
 
-                source: "qrc:/assets/icons/material-symbols/play_arrow-fill.svg"
+                source: "qrc:/assets/icons/material-symbols/media/play_arrow-fill.svg"
 
                 onClicked: networkControls.key_right()
             }
@@ -171,7 +171,7 @@ Item {
                     height: width
 
                     //color: Theme.colorPrimary
-                    source: "qrc:/assets/icons/material-symbols/play_pause.svg"
+                    source: "qrc:/assets/icons/material-symbols/media/play_pause.svg"
 
                     onClicked: networkControls.media_playpause()
                 }

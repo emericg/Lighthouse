@@ -65,8 +65,8 @@ Rectangle {
             colorHighlight: control.colorHighlight
             colorIcon: control.colorIcon
 
-            source: "qrc:/assets/icons/material-symbols/play_pause.svg"
-            source_checked: "qrc:/assets/icons/material-symbols/play_pause.svg"
+            source: "qrc:/assets/icons/material-symbols/media/play_pause.svg"
+            source_checked: "qrc:/assets/icons/material-symbols/media/play_pause.svg"
 
             onClicked: mediaPlayPause()
         }

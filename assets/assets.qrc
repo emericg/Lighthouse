@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/assets">
         <file>gfx/logos/logo.svg</file>
+        <file>gfx/logos/logo_drawer.svg</file>
         <file>gfx/logos/logo_tray_symbolic.svg</file>
         <file>gfx/logos/github.svg</file>
 
