@@ -1,9 +1,8 @@
+import QtCore
 import QtQuick
+import QtQuick.Dialogs
 import QtQuick.Controls.impl
 import QtQuick.Templates as T
-
-import QtQuick.Dialogs
-import QtCore
 
 import ThemeEngine
 import "qrc:/utils/UtilsPath.js" as UtilsPath
@@ -18,12 +17,12 @@ T.TextField {
                              contentHeight + topPadding + bottomPadding,
                              placeholder.implicitHeight + topPadding + bottomPadding)
 
-    leftPadding: 12
-    rightPadding: 12
+    leftPadding: 8
+    rightPadding: buttonWidth + 6
 
     clip: true
     color: colorText
-    opacity: control.enabled ? 1 : 0.66
+    //opacity: control.enabled ? 1 : 0.66
 
     text: ""
     font.pixelSize: Theme.componentFontSize
@@ -32,7 +31,7 @@ T.TextField {
     placeholderText: ""
     placeholderTextColor: colorPlaceholderText
 
-    selectByMouse: false
+    selectByMouse: true
     selectionColor: colorSelection
     selectedTextColor: colorSelectedText
 
@@ -42,8 +41,7 @@ T.TextField {
     // settings
     property string dialogTitle: qsTr("Please choose a file!")
     property var dialogFilter: ["All files (*)"]
-    property int dialogFileMode: FileDialog.SaveFile
-
+    property int dialogFileMode: FileDialog.SaveFile // OpenFile / OpenFiles / SaveFile
     property var currentFolder: StandardPaths.writableLocation(StandardPaths.HomeLocation)
 
     // button
@@ -61,7 +59,7 @@ T.TextField {
     ////////////////
 
     Loader {
-        id: pathDialogLoader
+        id: fileDialogLoader
 
         active: false
         asynchronous: false
@@ -95,6 +93,8 @@ T.TextField {
         color: control.colorBackground
     }
 
+    ////////////////
+
     PlaceholderText {
         id: placeholder
         x: control.leftPadding
@@ -111,18 +111,19 @@ T.TextField {
         renderType: control.renderType
     }
 
+    ////////////////
+
     ButtonThemed {
         id: buttonChange
         anchors.top: parent.top
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        anchors.margins: 0
 
         text: control.buttonText
 
         onClicked: {
-            pathDialogLoader.active = true
-            pathDialogLoader.item.open()
+            fileDialogLoader.active = true
+            fileDialogLoader.item.open()
         }
     }
 

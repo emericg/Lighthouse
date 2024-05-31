@@ -1,9 +1,8 @@
+import QtCore
 import QtQuick
+import QtQuick.Dialogs
 import QtQuick.Controls.impl
 import QtQuick.Templates as T
-
-import QtQuick.Dialogs
-import QtCore
 
 import ThemeEngine
 import "qrc:/utils/UtilsPath.js" as UtilsPath
@@ -18,12 +17,12 @@ T.TextField {
                              contentHeight + topPadding + bottomPadding,
                              placeholder.implicitHeight + topPadding + bottomPadding)
 
-    leftPadding: 12
-    rightPadding: 12
+    leftPadding: 8
+    rightPadding: buttonWidth + 6
 
     clip: true
     color: colorText
-    opacity: control.enabled ? 1 : 0.66
+    //opacity: control.enabled ? 1 : 0.66
 
     text: ""
     font.pixelSize: Theme.componentFontSize
@@ -32,7 +31,7 @@ T.TextField {
     placeholderText: ""
     placeholderTextColor: colorPlaceholderText
 
-    selectByMouse: false
+    selectByMouse: true
     selectionColor: colorSelection
     selectedTextColor: colorSelectedText
 
@@ -40,8 +39,7 @@ T.TextField {
     Keys.onBackPressed: focus = false
 
     // settings
-    property string dialogTitle: qsTr("Please choose a folder!")
-
+    property string dialogTitle: qsTr("Please choose a directory!")
     property var currentFolder: StandardPaths.writableLocation(StandardPaths.HomeLocation)
 
     // button
@@ -59,18 +57,19 @@ T.TextField {
     ////////////////
 
     Loader {
-        id: pathDialogLoader
+        id: folderDialogLoader
 
         active: false
         asynchronous: false
         sourceComponent: FolderDialog {
             title: control.dialogTitle
 
+            //currentFolder: UtilsPath.makeUrl(control.text)
             currentFolder: UtilsPath.makeUrl(control.currentFolder)
 
             onAccepted: {
-                //console.log("fileDialog currentFolder: " + currentFolder)
-                //console.log("fileDialog selectedFolder: " + selectedFolder)
+                //console.log("folderDialog currentFolder: " + currentFolder)
+                //console.log("folderDialog selectedFolder: " + selectedFolder)
 
                 var f = UtilsPath.cleanUrl(selectedFolder)
                 if (f.slice(0, -1) !== "/") f += "/"
@@ -90,6 +89,8 @@ T.TextField {
         color: control.colorBackground
     }
 
+    ////////////////
+
     PlaceholderText {
         id: placeholder
         x: control.leftPadding
@@ -106,18 +107,19 @@ T.TextField {
         renderType: control.renderType
     }
 
+    ////////////////
+
     ButtonThemed {
         id: buttonChange
         anchors.top: parent.top
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        anchors.margins: 0
 
         text: control.buttonText
 
         onClicked: {
-            pathDialogLoader.active = true
-            pathDialogLoader.item.open()
+            folderDialogLoader.active = true
+            folderDialogLoader.item.open()
         }
     }
 
