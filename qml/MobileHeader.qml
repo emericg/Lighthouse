@@ -151,36 +151,63 @@ Rectangle {
             anchors.rightMargin: 4
             anchors.bottom: parent.bottom
 
-            spacing: 4
+            spacing: 0
             visible: true
 
-            Item { // right indicators
-                width: parent.height
-                height: width
-                anchors.verticalCenter: parent.verticalCenter
+            Item { // network status
+                width: headerHeight
+                height: headerHeight
                 visible: (appContent.state === "ScreenDeviceList")
 
                 IconSvg {
-                    id: workingIndicator
                     width: 24; height: 24;
                     anchors.centerIn: parent
-
-                    source: "qrc:/assets/icons/material-symbols/autorenew.svg"
+                    source: networkClient.connected ?
+                                "qrc:/assets/icons/material-symbols/signal_wifi_0_bar.svg" :
+                                "qrc:/assets/icons/material-symbols/signal_wifi_0_bar.svg" // _off.svg
                     color: Theme.colorHeaderContent
-                    opacity: 0
-                    Behavior on opacity { OpacityAnimator { duration: 333 } }
 
-                    SequentialAnimation on opacity { // (fade)
-                        loops: Animation.Infinite
-                        running: (deviceManager.scanning || deviceManager.listening || deviceManager.syncing)
-                        onStopped: workingIndicator.opacity = 0
-                        PropertyAnimation { to: 1; duration: 750; }
-                        PropertyAnimation { to: 0.33; duration: 750; }
+                    Rectangle {
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+                        width: 8; height: 8; radius: 8;
+                        color: Theme.colorGreen
+                        visible: (networkClient.connected)
+                    }
+                }
+            }
+            Item { // bluetooth status
+                width: headerHeight
+                height: headerHeight
+                visible: (appContent.state === "ScreenDeviceList")
+
+                IconSvg {
+                    width: 24; height: 24;
+                    anchors.centerIn: parent
+                    source: deviceManager.bluetooth ?
+                                "qrc:/assets/icons/material-symbols/sensors/bluetooth.svg" :
+                                "qrc:/assets/icons/material-symbols/sensors/bluetooth_disabled.svg"
+                    color: Theme.colorHeaderContent
+
+                    Rectangle {
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+                        width: 8; height: 8; radius: 8;
+                        color: Theme.colorGreen
+                        visible: (deviceManager.scanning || deviceManager.listening || deviceManager.syncing)
+
+                        //SequentialAnimation on opacity { // (fade)
+                        //    loops: Animation.Infinite
+                        //    running: (deviceManager.scanning || deviceManager.listening || deviceManager.syncing)
+                        //    onStopped: workingIndicator.opacity = 0
+                        //    PropertyAnimation { to: 1; duration: 750; }
+                        //    PropertyAnimation { to: 0.33; duration: 750; }
+                        //}
                     }
                 }
             }
 
-            MouseArea { // right button
+            MouseArea { // right menu button
                 width: headerHeight
                 height: headerHeight
 

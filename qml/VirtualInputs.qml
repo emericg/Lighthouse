@@ -45,8 +45,8 @@ Loader {
         }
 
         ////////////////
-
-        SelectorMenuColorful {
+/*
+        SelectorMenuColorful { // top menu selector
             id: inputSelector
 
             anchors.top: parent.top
@@ -66,61 +66,132 @@ Loader {
                 currentSelection = index
             }
         }
-
-        ////////////////
-
-        VirtualInput_touchpad {
-            id: virtualInput_touchpad
-
-            anchors.top: inputSelector.bottom
-            anchors.topMargin: 16
+*/
+        Item { // bottom menu selector
+            id: inputSelector
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
+            height: mobileMenu.hhh
 
-            visible: (inputSelector.currentSelection === 1)
+            property int hhh: 72
+            property int hhi: (hhh * 0.4)
+            property int www: 80
+
+            property int currentSelection: 1
+
+            Row {
+                anchors.centerIn: parent
+                spacing: Theme.componentMargin
+
+                MobileMenuItem_vertical {
+                    width: mobileMenu.www
+                    height: mobileMenu.hhh
+                    sourceSize: mobileMenu.hhi
+
+                    colorContent: Theme.colorTabletmenuContent
+                    colorHighlight: Theme.colorTabletmenuHighlight
+
+                    text: qsTr("touchpad")
+                    source: "qrc:/assets/icons/material-icons/duotone/touch_app.svg"
+                    highlighted: (inputSelector.currentSelection === 1)
+                    onClicked: inputSelector.currentSelection = 1
+                }
+                MobileMenuItem_vertical {
+                    width: mobileMenu.www
+                    height: mobileMenu.hhh
+                    sourceSize: mobileMenu.hhi
+
+                    colorContent: Theme.colorTabletmenuContent
+                    colorHighlight: Theme.colorTabletmenuHighlight
+
+                    text: qsTr("gamepad")
+                    source: highlighted ?
+                                "qrc:/assets/icons/material-symbols/hardware/joystick-fill.svg" :
+                                "qrc:/assets/icons/material-symbols/hardware/joystick.svg"
+                    highlighted: (inputSelector.currentSelection === 2)
+                    onClicked: inputSelector.currentSelection = 2
+                }
+                MobileMenuItem_vertical {
+                    width: mobileMenu.www
+                    height: mobileMenu.hhh
+                    sourceSize: mobileMenu.hhi
+
+                    colorContent: Theme.colorTabletmenuContent
+                    colorHighlight: Theme.colorTabletmenuHighlight
+
+                    text: qsTr("remote")
+                    source: highlighted ?
+                                "qrc:/assets/icons/material-symbols/sensors/nest_remote-fill.svg" :
+                                "qrc:/assets/icons/material-symbols/sensors/nest_remote.svg"
+                    highlighted: (inputSelector.currentSelection === 3)
+                    onClicked: inputSelector.currentSelection = 3
+                }
+                MobileMenuItem_vertical {
+                    width: mobileMenu.www
+                    height: mobileMenu.hhh
+                    sourceSize: mobileMenu.hhi
+
+                    colorContent: Theme.colorTabletmenuContent
+                    colorHighlight: Theme.colorTabletmenuHighlight
+
+                    text: qsTr("media")
+                    source: highlighted ?
+                                "qrc:/assets/icons/material-symbols/media/album-fill.svg" :
+                                "qrc:/assets/icons/material-symbols/media/album.svg"
+                    highlighted: (inputSelector.currentSelection === 4)
+                    onClicked: inputSelector.currentSelection = 4
+                }
+            }
         }
 
         ////////////////
 
-        VirtualInput_gamepad {
-            id: virtualInput_gamepad
-
-            anchors.top: inputSelector.bottom
-            anchors.topMargin: 16
+        Item {
+            anchors.top: parent.top
+            anchors.topMargin: 0 + 8
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
+            anchors.bottomMargin: 72
 
-            visible: (inputSelector.currentSelection === 2)
-        }
+            ////
 
-        ////////////////
+            VirtualInput_touchpad {
+                id: virtualInput_touchpad
+                anchors.fill: parent
 
-        VirtualInput_remote {
-            id: virtualInput_remote
+                visible: (inputSelector.currentSelection === 1)
+            }
 
-            anchors.top: inputSelector.bottom
-            anchors.topMargin: 16
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
+            ////
 
-            visible: (inputSelector.currentSelection === 3)
-        }
+            VirtualInput_gamepad {
+                id: virtualInput_gamepad
+                anchors.fill: parent
 
-        ////////////////
+                visible: (inputSelector.currentSelection === 2)
+            }
 
-        VirtualInput_media {
-            id: virtualInput_media
+            ////
 
-            anchors.top: inputSelector.bottom
-            anchors.topMargin: 16
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
+            VirtualInput_remote {
+                id: virtualInput_remote
+                anchors.fill: parent
 
-            visible: (inputSelector.currentSelection === 4)
+                visible: (inputSelector.currentSelection === 3)
+            }
+
+            ////
+
+            VirtualInput_media {
+                id: virtualInput_media
+                anchors.fill: parent
+
+                visible: (inputSelector.currentSelection === 4)
+            }
+
+            ////
         }
 
         ////////////////

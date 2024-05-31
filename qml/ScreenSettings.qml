@@ -801,7 +801,7 @@ Loader {
                 anchors.rightMargin: screenPaddingRight
                 height: Theme.componentHeight
 
-                visible: (isMobile && !networkClient.connected)
+                visible: isMobile // && !networkClient.connected
 
                 IconSvg {
                     anchors.left: parent.left
