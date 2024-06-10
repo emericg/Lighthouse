@@ -27,6 +27,9 @@
         <file alias="PopupBeaconKey.qml">popups/PopupBeaconKey.qml</file>
         <file alias="PopupDeleteDevice.qml">popups/PopupDeleteDevice.qml</file>
 
+        <file alias="SettingsQrReader.qml">components/SettingsQrReader.qml</file>
+        <file alias="SettingsQrGenerator.qml">components/SettingsQrGenerator.qml</file>
+
         <file alias="ActionbarBluetooth.qml">components/ActionbarBluetooth.qml</file>
         <file alias="ActionbarSelection.qml">components/ActionbarSelection.qml</file>
         <file alias="ButtonRowElement.qml">components/ButtonRowElement.qml</file>

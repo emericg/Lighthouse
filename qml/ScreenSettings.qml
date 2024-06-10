@@ -623,6 +623,17 @@ Loader {
 
             ////////////////
 
+            Loader { // QrCode generator
+                anchors.left: parent.left
+                anchors.leftMargin: screenPaddingLeft + contentColumn.padText
+
+                active: isDesktop && networkServer && networkServer.running
+                asynchronous: true
+                source: "SettingsQrGenerator.qml"
+            }
+
+            ////////////////
+
             ListTitle {
                 anchors.left: parent.left
                 visible: isMobile
@@ -641,9 +652,42 @@ Loader {
                     visible: (isMobile && networkClient.connected)
                     color: Theme.colorGreen
                 }
+
+                RoundButtonSunken {
+                    id: buttonReader
+
+                    anchors.right: parent.right
+                    anchors.rightMargin: 12
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    colorBackground: highlighted ? Theme.colorBackground : Theme.colorForeground
+                    source: "qrc:/assets/icons/material-icons/duotone/qr_code_scanner.svg"
+
+                    onClicked: {
+                        if (!utilsApp.checkMobileCameraPermission()) {
+                            utilsApp.getMobileCameraPermission()
+                        } else {
+                            highlighted = !highlighted
+                        }
+                    }
+                }
             }
 
-            ////////////////
+            ////////
+
+            Loader { // QrCode reader
+                anchors.left: parent.left
+                anchors.leftMargin: screenPaddingLeft + 16
+                anchors.right: parent.right
+                anchors.rightMargin: screenPaddingRight + 16
+                height: active ? (width / 1.333) : 0
+
+                active: isMobile && buttonReader.highlighted
+                asynchronous: true
+                source: "SettingsQrReader.qml"
+            }
+
+            ////////
 
             Item { // element_remoteServer_ip
                 anchors.left: parent.left
@@ -675,8 +719,12 @@ Loader {
 
                     placeholderText: qsTr("Host")
                     text: settingsManager.netctrlHost
-                    onEditingFinished: settingsManager.netctrlHost = text
                     selectByMouse: true
+
+                    onEditingFinished: {
+                        settingsManager.netctrlHost = text
+                        networkClient.connectToServer()
+                    }
 
                     Text {
                         anchors.right: parent.right
@@ -724,9 +772,13 @@ Loader {
 
                     placeholderText: qsTr("Port")
                     text: settingsManager.netctrlPort
-                    onEditingFinished: settingsManager.netctrlPort = parseInt(text, 10)
                     validator: IntValidator { bottom: 1; top: 65535; }
                     selectByMouse: true
+
+                    onEditingFinished: {
+                        settingsManager.netctrlPort = parseInt(text, 10)
+                        networkClient.connectToServer()
+                    }
 
                     Text {
                         anchors.right: parent.right
@@ -774,9 +826,13 @@ Loader {
 
                     placeholderText: qsTr("Password")
                     text: settingsManager.netctrlPassword
-                    //onEditingFinished: settingsManager.netctrlPassword = text
                     validator: IntValidator { bottom: 1; top: 65535; }
                     selectByMouse: true
+
+                    onEditingFinished: {
+                        settingsManager.netctrlPassword = text
+                        networkClient.connectToServer()
+                    }
 
                     Text {
                         anchors.right: parent.right

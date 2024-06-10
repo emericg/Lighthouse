@@ -182,12 +182,12 @@ ApplicationWindow {
                 case Qt.ApplicationHidden:
                     //console.log("Qt.ApplicationHidden")
                     deviceManager.listenDevices_stop()
-                    networkClient.disconnectFromServer()
+                    //networkClient.disconnectFromServer()
                     break
                 case Qt.ApplicationInactive:
                     //console.log("Qt.ApplicationInactive")
                     deviceManager.listenDevices_stop()
-                    networkClient.disconnectFromServer()
+                    //networkClient.disconnectFromServer()
                     break
 
                 case Qt.ApplicationActive:

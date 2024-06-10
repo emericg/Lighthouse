@@ -331,6 +331,8 @@ public:
     // Utils
     Q_INVOKABLE void reloadSettings();
     Q_INVOKABLE void resetSettings();
+
+    Q_INVOKABLE bool setNetCtrlSettings(const QString &value);
 };
 
 /* ************************************************************************** */

@@ -796,4 +796,33 @@ void SettingsManager::setNetCtrlPassword(const QString &value)
     }
 }
 
+bool SettingsManager::setNetCtrlSettings(const QString &value)
+{
+    bool status = false;
+
+    if (value.startsWith("lighthouse://"))
+    {
+        QStringList p = value.last(value.size() - 13).split('/');
+
+        if (p.size() >= 2)
+        {
+            setNetCtrlHost(p.at(0));
+            setNetCtrlPort(p.at(1).toInt());
+
+            status = true;
+        }
+        if (p.size() >= 3)
+        {
+            setNetCtrlPassword(p.at(2));
+        }
+
+        qDebug() << "setNetCtrlSettings(" << value << ")";
+        qDebug() << "- host " << m_netctrlHost;
+        qDebug() << "- port " << m_netctrlPort;
+        qDebug() << "- pass " << m_netctrlPassword;
+    }
+
+    return status;
+}
+
 /* ************************************************************************** */
