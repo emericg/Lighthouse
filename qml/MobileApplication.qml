@@ -298,9 +298,14 @@ ApplicationWindow {
             anchors.bottomMargin: mobileMenu.hhv
         }
 
-        // Start on the tutorial?
+        // Start on the device list or tutorial?
         Component.onCompleted: {
-            //
+            if (deviceManager.areDevicesAvailable()) {
+                screenDeviceList.loadScreen()
+            } else {
+                screenDeviceList.loadScreen()
+                //screenTutorial.loadScreen()
+            }
         }
 
         // Initial state

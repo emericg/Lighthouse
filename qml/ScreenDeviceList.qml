@@ -32,27 +32,29 @@ Item {
     }
 
     function checkBluetoothStatus() {
-        if (!utilsApp.checkMobileBleLocationPermission()) {
-            utilsApp.getMobileBleLocationPermission()
-        }
-
         if (deviceManager.hasDevices) {
             // The device list is shown
-            itemStatus.source = ""
+            loaderItemStatus.source = ""
 
-            if (!deviceManager.bluetooth) {
-                rectangleBluetoothStatus.setBluetoothWarning()
-            } else if (!deviceManager.bluetoothPermissions) {
-                rectangleBluetoothStatus.setPermissionWarning()
+            if (!deviceManager.bluetoothPermissions) {
+                actionbarBluetoothStatus.setPermissionWarning()
+            } else if (!deviceManager.bluetoothAdapter) {
+                actionbarBluetoothStatus.setAdapterWarning()
+            } else if (!deviceManager.bluetoothEnabled) {
+                actionbarBluetoothStatus.setBluetoothWarning()
             } else {
-                rectangleBluetoothStatus.hide()
+                actionbarBluetoothStatus.hide()
             }
         } else {
-            // The device list is not populated
-            rectangleBluetoothStatus.hide()
+            // The sensor list is not populated
+            actionbarBluetoothStatus.hide()
 
-            if (!deviceManager.bluetooth) {
-                itemStatus.source = "ItemNoBluetooth.qml"
+            if (!deviceManager.bluetoothPermissions) {
+                loaderItemStatus.source = "ItemNoPermissions.qml"
+            } else if (!deviceManager.bluetoothAdapter || !deviceManager.bluetoothEnabled) {
+                loaderItemStatus.source = "ItemNoBluetooth.qml"
+            } else {
+                loaderItemStatus.source = ""
             }
         }
     }
@@ -136,155 +138,26 @@ Item {
         anchors.right: parent.right
         z: 2
 
-        ////////////////
+        ////////
 
-        Rectangle {
-            id: rectangleBluetoothStatus
+        ActionbarBluetooth {
+            id: actionbarBluetoothStatus
             anchors.left: parent.left
             anchors.right: parent.right
-
-            height: 0
-            Behavior on height { NumberAnimation { duration: 133 } }
-
-            clip: true
-            visible: (height > 0)
-            color: Theme.colorActionbar
-
-            // prevent clicks below this area
-            MouseArea { anchors.fill: parent; acceptedButtons: Qt.AllButtons; }
-
-            Text {
-                id: textBluetoothStatus
-                anchors.fill: parent
-                anchors.leftMargin: 16
-                anchors.rightMargin: 16
-
-                color: Theme.colorActionbarContent
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignLeft
-                font.bold: isDesktop ? true : false
-                font.pixelSize: Theme.componentFontSize
-            }
-
-            ButtonFlat {
-                id: buttonBluetoothStatus
-                height: 32
-                anchors.right: parent.right
-                anchors.rightMargin: 16
-                anchors.verticalCenter: parent.verticalCenter
-
-                color: Theme.colorActionbarHighlight
-
-                text: {
-                    if (Qt.platform.os === "android") {
-                        if (!deviceManager.bluetoothEnabled) return qsTr("Enable")
-                        else if (!deviceManager.bluetoothPermissions) return qsTr("About")
-                    }
-                    return qsTr("Retry")
-                }
-                onClicked: {
-                    if (Qt.platform.os === "android" && !deviceManager.bluetoothPermissions) {
-                        //utilsApp.getMobileBleLocationPermission()
-                        //deviceManager.checkBluetoothPermissions()
-
-                        // someone clicked 'never ask again'?
-                        screenAboutPermissions.loadScreenFrom("ScreenDeviceList")
-                    } else {
-                        deviceManager.enableBluetooth(settingsManager.bluetoothControl)
-                    }
-                }
-            }
-
-            function hide() {
-                rectangleBluetoothStatus.height = 0
-            }
-            function setBluetoothWarning() {
-                textBluetoothStatus.text = qsTr("Bluetooth is disabled...")
-                rectangleBluetoothStatus.height = 48
-            }
-            function setPermissionWarning() {
-                textBluetoothStatus.text = qsTr("Bluetooth permission is missing...")
-                rectangleBluetoothStatus.height = 48
-            }
         }
 
-        ////////////////
+        ////////
 
-        Rectangle {
-            id: rectangleActions
+        ActionbarSelection {
+            id: actionbarSelection
             anchors.left: parent.left
             anchors.right: parent.right
-
-            height: (screenDeviceList.selectionCount) ? 48 : 0
-            Behavior on height { NumberAnimation { duration: 133 } }
-
-            clip: true
-            visible: (height > 0)
-            color: Theme.colorActionbar
-
-            // prevent clicks below this area
-            MouseArea { anchors.fill: parent; acceptedButtons: Qt.AllButtons; }
-
-            Row {
-                anchors.left: parent.left
-                anchors.leftMargin: 12
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: 8
-
-                RoundButtonIcon {
-                    id: buttonClear
-                    width: 36
-                    height: 36
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    source: "qrc:/assets/icons/material-symbols/backspace-fill.svg"
-                    rotation: 180
-                    iconColor: Theme.colorActionbarContent
-                    backgroundColor: Theme.colorActionbarHighlight
-                    onClicked: screenDeviceList.exitSelectionMode()
-                }
-
-                Text {
-                    id: textActions
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    text: qsTr("%n device(s) selected", "", screenDeviceList.selectionCount)
-                    color: Theme.colorActionbarContent
-                    font.bold: true
-                    font.pixelSize: Theme.componentFontSize
-                }
-            }
-
-            Row {
-                anchors.right: parent.right
-                anchors.rightMargin: 12
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: 8
-
-                ButtonCompactable {
-                    id: buttonDelete
-                    height: compact ? 36 : 34
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    compact: !wideMode
-                    iconColor: Theme.colorActionbarContent
-                    backgroundColor: Theme.colorActionbarHighlight
-                    onClicked: confirmDeleteDevice.open()
-
-                    text: qsTr("Delete")
-                    source: "qrc:/assets/icons/material-symbols/delete.svg"
-                }
-            }
         }
+
+        ////////
     }
 
     ////////////////////////////////////////////////////////////////////////////
-
-    Loader {
-        id: itemStatus
-        anchors.fill: parent
-        asynchronous: true
-    }
 
     GridView {
         id: devicesView
@@ -407,7 +280,7 @@ Item {
                         width: height
 
                         source: {
-                            if (mprisControls.playbackStatus == "paused")
+                            if (mprisControls.playbackStatus === "paused")
                                 return "qrc:/assets/icons/material-symbols/media/slideshow.svg"
                             else
                                 return "qrc:/assets/icons/material-symbols/media/slideshow.svg"
@@ -666,6 +539,14 @@ Item {
         }
 
         ////////////////
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+
+    Loader {
+        id: loaderItemStatus
+        anchors.fill: parent
+        asynchronous: true
     }
 
     ////////////////////////////////////////////////////////////////////////////
