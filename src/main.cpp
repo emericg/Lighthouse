@@ -40,6 +40,7 @@
 #include "local_controls/mpris_dbus.h"
 
 #include <MobileUI>
+#include <ZXingCpp>
 #include <SingleApplication>
 
 #include <QtGlobal>
@@ -156,6 +157,10 @@ int main(int argc, char *argv[])
     engine_context->setContextProperty("networkServer", networkServer);
     engine_context->setContextProperty("networkClient", networkClient);
     engine_context->setContextProperty("networkControls", networkClient);
+
+    // Barcode (zxing-cpp)
+    ZXingCpp::registerQMLTypes();
+    ZXingCpp::registerQMLImageProvider(engine);
 
 #if defined(Q_OS_ANDROID) || defined(Q_OS_IOS) || defined(FORCE_MOBILE_UI)
     // Load the main view

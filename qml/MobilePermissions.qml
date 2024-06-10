@@ -24,15 +24,21 @@ Item {
         loadScreen()
     }
 
+    function backAction() {
+        screenAbout.loadScreen()
+    }
+
     function refreshPermissions() {
         // Refresh permissions
+        button_network_test.validperm = true
         button_location_test.validperm = utilsApp.checkMobileBleLocationPermission()
         button_gps_test.validperm = utilsApp.isMobileGpsEnabled()
+        button_camera_test.validperm = utilsApp.checkMobileCameraPermission()
     }
 
     Timer {
         id: retryPermissions
-        interval: 1000
+        interval: 333
         repeat: false
         onTriggered: refreshPermissions()
     }
@@ -307,6 +313,71 @@ Item {
                 anchors.rightMargin: 16
 
                 text: qsTr("Network state and internet permissions are used to connect to remote desktop control.")
+                textFormat: Text.PlainText
+                wrapMode: Text.WordWrap
+                color: Theme.colorSubText
+                font.pixelSize: Theme.fontSizeContentSmall
+            }
+
+            ////////
+
+            ListSeparatorPadded { height: 16+1 }
+
+            ////////
+
+            Item {
+                id: element_camera
+                height: 20
+                anchors.left: parent.left
+                anchors.right: parent.right
+
+                RoundButtonIcon {
+                    id: button_camera_test
+                    width: 32
+                    height: 32
+                    anchors.left: parent.left
+                    anchors.leftMargin: 16
+                    anchors.verticalCenter: parent.verticalCenter
+                    z: 1
+
+                    property bool validperm: true
+
+                    source: (validperm) ? "qrc:/assets/icons/material-symbols/check.svg" : "qrc:/assets/icons/material-symbols/close.svg"
+                    iconColor: (validperm) ? "white" : "white"
+                    backgroundColor: (validperm) ? Theme.colorSuccess : Theme.colorSubText
+                    backgroundVisible: true
+
+                    onClicked: {
+                        utilsApp.getMobileCameraPermission()
+                        retryPermissions.start()
+                    }
+                }
+
+                Text {
+                    id: text_camera
+                    height: 16
+                    anchors.left: parent.left
+                    anchors.leftMargin: 64
+                    anchors.right: parent.right
+                    anchors.rightMargin: 16
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    text: qsTr("Camera")
+                    textFormat: Text.PlainText
+                    wrapMode: Text.WordWrap
+                    font.pixelSize: Theme.fontSizeContentBig
+                    color: Theme.colorText
+                    verticalAlignment: Text.AlignVCenter
+                }
+            }
+            Text {
+                id: legend_camera
+                anchors.left: parent.left
+                anchors.leftMargin: 64
+                anchors.right: parent.right
+                anchors.rightMargin: 16
+
+                text: qsTr("Camera is used to scan the settings and credentials directly from the desktop application.")
                 textFormat: Text.PlainText
                 wrapMode: Text.WordWrap
                 color: Theme.colorSubText

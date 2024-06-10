@@ -12,6 +12,9 @@ QT     += qml quick quickcontrols2 svg
     QT += multimedia # to play sound effects on actions
     QT += widgets # for proper systray and menubar support
 }
+android:ios {
+    QT += multimedia # barcode reader
+}
 
 # Bundle name
 QMAKE_TARGET_BUNDLE_PREFIX = io.emeric
@@ -44,6 +47,9 @@ android | ios {
     DEFINES += QAPPLICATION_CLASS=QApplication
 }
 include(src/thirdparty/SingleApplication/SingleApplication.pri)
+
+# zxing-cpp
+include(src/thirdparty/zxing-cpp/zxing-cpp.pri)
 
 # Project files ################################################################
 
