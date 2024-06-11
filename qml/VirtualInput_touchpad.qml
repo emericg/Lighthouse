@@ -106,6 +106,12 @@ Grid {
             cursorVisible: false
             echoMode: TextInput.NoEcho
 
+            background: Rectangle { // fake invisibility
+                border.width: 0
+                color: Theme.colorBackground
+                border.color: Theme.colorBackground
+            }
+
             onDisplayTextChanged: {
                 if (displayText) {
                     //console.log("virtualtextfield::onDisplayTextChanged(" + displayText + ")")
