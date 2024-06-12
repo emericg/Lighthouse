@@ -1,16 +1,19 @@
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Controls
-import QtMultimedia
 
+import QtMultimedia
 import ZXingCpp
+
 import ThemeEngine
 
 Rectangle {
+    id: qrreader
     anchors.left: parent.left
     anchors.right: parent.right
 
     height: width / 1.333
-    radius: 12
+    radius: 8
     color: Theme.colorForeground
 
     CaptureSession {
@@ -92,6 +95,45 @@ Rectangle {
 
         onDecodingFinished: (result) => {
             //console.log("ZXingCpp::onDecodingFinished(" + result.isValid + " / " + result.runTime + " ms)")
+        }
+    }
+
+    Text {
+        anchors.left: parent.left
+        anchors.leftMargin: Theme.componentMargin*2
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: Theme.componentMargin*1.5
+
+        text: "Scanning..."
+        color: "white"
+
+        Rectangle {
+            anchors.fill: parent
+            anchors.margins: -Theme.componentMargin*0.5
+            anchors.leftMargin: -Theme.componentMargin
+            anchors.rightMargin: -Theme.componentMargin
+            radius: height
+            z: -1
+            color: "black"
+            opacity: 0.66
+        }
+    }
+
+    layer.enabled: true
+    layer.effect: MultiEffect {
+        maskEnabled: true
+        maskInverted: false
+        maskThresholdMin: 0.5
+        maskSpreadAtMin: 1.0
+        maskSpreadAtMax: 0.0
+        maskSource: ShaderEffectSource {
+            sourceItem: Rectangle {
+                x: qrreader.x
+                y: qrreader.y
+                width: qrreader.width
+                height: qrreader.height
+                radius: qrreader.radius
+            }
         }
     }
 }
