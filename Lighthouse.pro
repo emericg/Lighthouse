@@ -119,10 +119,14 @@ HEADERS  += src/MenubarManager.h \
 INCLUDEPATH += src/ src/thirdparty/
 
 RESOURCES   += qml/ComponentLibrary/ComponentLibrary.qrc
+RESOURCES   += assets/icons.qrc
+
 RESOURCES   += qml/qml.qrc \
                i18n/i18n.qrc \
-               assets/assets.qrc \
-               assets/icons.qrc
+               assets/assets.qrc
+
+OTHER_FILES += README.md \
+               .gitignore
 
 lupdate_only {
     SOURCES += qml/*.qml qml/*.js qml/components/*.qml qml/components_js/*.js

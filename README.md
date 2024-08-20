@@ -44,13 +44,13 @@ Lamps and lighbulbs:
 
 You will need a C++17 compiler and Qt 6.5+ with the following 'additional librairies':  
 - Qt Connectivity
-- Qt Multimedia
-- QtQuick 3D
+- Qt Multimedia (for mobile builds)
+- Qt Quick 3D (for desktop builds)
 
 You will also need the `mbedtls` librairie installed in order to handle YLKG07YL and YLKG08YL devices.  
 On linux you'll need an `uinput` enabled kernel.  
 
-For Android builds, you'll need the appropriates JDK (11) SDK (24+) and NDK (25+). You can customize Android build environment using the `assets/android/gradle.properties` file.  
+For Android builds, you'll need the appropriates JDK (17) SDK (24+) and NDK (26+). You can customize Android build environment using the `assets/android/gradle.properties` file.  
 For Windows builds, you'll need the MSVC 2019+ compiler. Bluetooth won't work with MinGW.  
 For macOS and iOS builds, you'll need Xcode 13+ installed.  
 
@@ -105,6 +105,6 @@ You can help us find and report bugs, suggest new features, help with translatio
 ## License
 
 Lighthouse is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.  
-Read the [LICENSE](LICENSE) file or [consult the license on the FSF website](https://www.gnu.org/licenses/gpl-3.0.txt) directly.
+Read the [LICENSE](LICENSE.md) file or [consult the license on the FSF website](https://www.gnu.org/licenses/gpl-3.0.txt) directly.
 
 > Emeric Grange <emeric.grange@gmail.com>
