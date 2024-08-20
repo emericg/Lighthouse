@@ -63,9 +63,7 @@ Loader {
 
             Item { // element_appTheme
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft
                 anchors.right: parent.right
-                anchors.rightMargin: screenPaddingRight
                 height: Theme.componentHeightXL
 
                 IconSvg {
@@ -185,9 +183,7 @@ Loader {
 
             Item { // element_appThemeAuto
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft
                 anchors.right: parent.right
-                anchors.rightMargin: screenPaddingRight
                 height: Theme.componentHeightXL
 
                 IconSvg {
@@ -232,9 +228,9 @@ Loader {
             }
             Text { // legend_appThemeAuto
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft + contentColumn.padText
+                anchors.leftMargin: contentColumn.padText
                 anchors.right: parent.right
-                anchors.rightMargin: screenPaddingRight + Theme.componentMargin
+                anchors.rightMargin: Theme.componentMargin
 
                 topPadding: -12
                 bottomPadding: 12
@@ -262,9 +258,7 @@ Loader {
 
             Item { // element_minimized
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft
                 anchors.right: parent.right
-                anchors.rightMargin: screenPaddingRight
                 height: Theme.componentHeightXL
 
                 visible: isDesktop
@@ -311,9 +305,7 @@ Loader {
 
             Item { // element_service
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft
                 anchors.right: parent.right
-                anchors.rightMargin: screenPaddingRight
                 height: Theme.componentHeightXL
 
                 visible: isDesktop
@@ -363,9 +355,9 @@ Loader {
             }
             Text { // legend_service_desktop
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft + contentColumn.padText
+                anchors.leftMargin: contentColumn.padText
                 anchors.right: parent.right
-                anchors.rightMargin: screenPaddingRight + Theme.componentMargin
+                anchors.rightMargin: Theme.componentMargin
 
                 topPadding: -12
                 bottomPadding: 0
@@ -384,9 +376,7 @@ Loader {
 
             Item { // element_notifications
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft
                 anchors.right: parent.right
-                anchors.rightMargin: screenPaddingRight
                 height: Theme.componentHeightXL
 
                 visible: isDesktop
@@ -432,9 +422,9 @@ Loader {
             }
             Text { // legend_notifications
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft + contentColumn.padText
+                anchors.leftMargin: contentColumn.padText
                 anchors.right: parent.right
-                anchors.rightMargin: screenPaddingRight + Theme.componentMargin
+                anchors.rightMargin: Theme.componentMargin
 
                 topPadding: -12
                 bottomPadding: 12
@@ -464,9 +454,7 @@ Loader {
 
             Item { // element_bluetoothControl
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft
                 anchors.right: parent.right
-                anchors.rightMargin: screenPaddingRight
                 height: Theme.componentHeightXL
 
                 visible: (Qt.platform.os === "android")
@@ -510,9 +498,9 @@ Loader {
             }
             Text { // legend_bluetoothControl
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft + contentColumn.padText
+                anchors.leftMargin: contentColumn.padText
                 anchors.right: parent.right
-                anchors.rightMargin: screenPaddingRight + Theme.componentMargin
+                anchors.rightMargin: Theme.componentMargin
 
                 topPadding: -12
                 bottomPadding: 12
@@ -539,9 +527,7 @@ Loader {
 
             Item { // element_server
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft
                 anchors.right: parent.right
-                anchors.rightMargin: screenPaddingRight
                 height: Theme.componentHeightXL
 
                 visible: isDesktop
@@ -590,9 +576,9 @@ Loader {
             }
             Text { // legend_server_desktop
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft + contentColumn.padText
+                anchors.leftMargin: contentColumn.padText
                 anchors.right: parent.right
-                anchors.rightMargin: screenPaddingRight + Theme.componentMargin
+                anchors.rightMargin: Theme.componentMargin
 
                 topPadding: -12
                 bottomPadding: 0
@@ -608,7 +594,7 @@ Loader {
             }
             Text {
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft + contentColumn.padText
+                anchors.leftMargin: contentColumn.padText
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.componentMargin
 
@@ -625,7 +611,7 @@ Loader {
 
             Loader { // QrCode generator
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft + contentColumn.padText
+                anchors.leftMargin: contentColumn.padText
 
                 active: isDesktop && networkServer && networkServer.running
                 asynchronous: true
@@ -677,9 +663,9 @@ Loader {
 
             Loader { // QrCode reader
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft + 16
+                anchors.leftMargin: 16
                 anchors.right: parent.right
-                anchors.rightMargin: screenPaddingRight + 16
+                anchors.rightMargin: 16
                 height: active ? (width / 1.333) : 0
 
                 active: isMobile && buttonReader.highlighted
@@ -691,9 +677,7 @@ Loader {
 
             Item { // element_remoteServer_ip
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft
                 anchors.right: parent.right
-                anchors.rightMargin: screenPaddingRight
                 height: Theme.componentHeight
 
                 visible: isMobile
@@ -744,9 +728,7 @@ Loader {
 
             Item { // element_remoteServer_port
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft
                 anchors.right: parent.right
-                anchors.rightMargin: screenPaddingRight
                 height: Theme.componentHeight
 
                 visible: isMobile
@@ -798,9 +780,7 @@ Loader {
 
             Item { // element_remoteServer_password
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft
                 anchors.right: parent.right
-                anchors.rightMargin: screenPaddingRight
                 height: Theme.componentHeight
 
                 visible: isMobile
@@ -852,9 +832,7 @@ Loader {
 
             Item { // element_fakeIt
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft
                 anchors.right: parent.right
-                anchors.rightMargin: screenPaddingRight
                 height: Theme.componentHeight
 
                 visible: isMobile // && !networkClient.connected

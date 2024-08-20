@@ -51,14 +51,16 @@ Loader {
 
             Rectangle { // header
                 anchors.left: parent.left
+                anchors.leftMargin: -screenPaddingLeft
                 anchors.right: parent.right
+                anchors.rightMargin: -screenPaddingRight
 
                 height: 128
                 color: headerUnicolor ? Theme.colorBackground : Theme.colorForeground
 
                 Row { // logo
                     anchors.left: parent.left
-                    anchors.leftMargin: Theme.componentMargin
+                    anchors.leftMargin: screenPaddingLeft + Theme.componentMargin
                     anchors.verticalCenter: parent.verticalCenter
 
                     z: 2
@@ -97,7 +99,7 @@ Loader {
 
                 Row { // desktop buttons row
                     anchors.right: parent.right
-                    anchors.rightMargin: Theme.componentMarginXL
+                    anchors.rightMargin: screenPaddingRight + Theme.componentMarginXL
                     anchors.verticalCenter: parent.verticalCenter
 
                     visible: wideWideMode
@@ -276,9 +278,9 @@ Loader {
 
             Item { // list dependencies
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft + Theme.componentMargin
+                anchors.leftMargin: Theme.componentMargin
                 anchors.right: parent.right
-                anchors.rightMargin: screenPaddingRight + Theme.componentMargin
+                anchors.rightMargin: Theme.componentMargin
 
                 height: 40 + dependenciesText.height + dependenciesColumn.height
 
@@ -345,9 +347,9 @@ Loader {
 
             Item { // list debug stuff
                 anchors.left: parent.left
-                anchors.leftMargin: screenPaddingLeft + Theme.componentMargin
+                anchors.leftMargin: Theme.componentMargin
                 anchors.right: parent.right
-                anchors.rightMargin: screenPaddingRight + Theme.componentMargin
+                anchors.rightMargin: Theme.componentMargin
 
                 height: 16 + debugColumn.height
 

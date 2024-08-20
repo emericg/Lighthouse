@@ -35,80 +35,102 @@ ApplicationWindow {
     property int screenPaddingRight: 0
     property int screenPaddingBottom: 0
 
-    onScreenOrientationChanged: handleSafeAreas()
-    onVisibilityChanged: handleSafeAreas()
-
-    function handleSafeAreas() {
-        // safe areas are only taken into account when using maximized geometry / full screen mode
-        if (appWindow.visibility === Window.FullScreen ||
-            appWindow.flags & Qt.MaximizeUsingFullscreenGeometryHint) {
-
-            screenPaddingStatusbar = mobileUI.statusbarHeight
-            screenPaddingNavbar = mobileUI.navbarHeight
-
-            screenPaddingTop = mobileUI.safeAreaTop
-            screenPaddingLeft = mobileUI.safeAreaLeft
-            screenPaddingRight = mobileUI.safeAreaRight
-            screenPaddingBottom = mobileUI.safeAreaBottom
-
-            // hacks
-            if (Qt.platform.os === "android") {
-                if (appWindow.visibility === Window.FullScreen) {
-                    screenPaddingStatusbar = 0
-                    screenPaddingNavbar = 0
-                }
-            }
-            // hacks
-            if (Qt.platform.os === "ios") {
-                if (appWindow.visibility === Window.FullScreen) {
-                    screenPaddingStatusbar = 0
-                }
-            }
-        } else {
-            screenPaddingStatusbar = 0
-            screenPaddingNavbar = 0
-            screenPaddingTop = 0
-            screenPaddingLeft = 0
-            screenPaddingRight = 0
-            screenPaddingBottom = 0
-        }
-/*
-        console.log("> handleSafeAreas()")
-        console.log("- window mode:         " + appWindow.visibility)
-        console.log("- window flags:        " + appWindow.flags)
-        console.log("- screen dpi:          " + Screen.devicePixelRatio)
-        console.log("- screen width:        " + Screen.width)
-        console.log("- screen width avail:  " + Screen.desktopAvailableWidth)
-        console.log("- screen height:       " + Screen.height)
-        console.log("- screen height avail: " + Screen.desktopAvailableHeight)
-        console.log("- screen orientation (full): " + Screen.orientation)
-        console.log("- screen orientation (primary): " + Screen.primaryOrientation)
-        console.log("- screenSizeStatusbar: " + screenPaddingStatusbar)
-        console.log("- screenSizeNavbar:    " + screenPaddingNavbar)
-        console.log("- screenPaddingTop:    " + screenPaddingTop)
-        console.log("- screenPaddingLeft:   " + screenPaddingLeft)
-        console.log("- screenPaddingRight:  " + screenPaddingRight)
-        console.log("- screenPaddingBottom: " + screenPaddingBottom)
-*/
+    Connections {
+        target: Screen
+        function onOrientationChanged() { mobileUI.handleSafeAreas() }
     }
 
     MobileUI {
         id: mobileUI
 
+        statusbarColor: "transparent"
         statusbarTheme: Theme.themeStatusbar
         navbarColor: {
             if (appContent.state === "ScreenTutorial") return Theme.colorHeader
             return Theme.colorBackground
         }
+
+        Component.onCompleted: handleSafeAreas()
+
+        function handleSafeAreas() {
+            // safe areas handling is a work in progress /!\
+            // safe areas are only taken into account when using maximized geometry / full screen mode
+
+            mobileUI.refreshUI() // hack
+
+            if (appWindow.visibility === Window.FullScreen ||
+                appWindow.flags & Qt.MaximizeUsingFullscreenGeometryHint) {
+
+                screenPaddingStatusbar = mobileUI.statusbarHeight
+                screenPaddingNavbar = mobileUI.navbarHeight
+
+                screenPaddingTop = mobileUI.safeAreaTop
+                screenPaddingLeft = mobileUI.safeAreaLeft
+                screenPaddingRight = mobileUI.safeAreaRight
+                screenPaddingBottom = mobileUI.safeAreaBottom
+
+                // hacks
+                if (Qt.platform.os === "android") {
+                    if (appWindow.visibility === Window.FullScreen) {
+                        screenPaddingStatusbar = 0
+                        screenPaddingNavbar = 0
+                    }
+                    if (appWindow.flags & Qt.MaximizeUsingFullscreenGeometryHint) {
+                        if (mobileUI.isPhone) {
+                            if (Screen.orientation === Qt.LandscapeOrientation) {
+                                screenPaddingLeft = screenPaddingStatusbar
+                                screenPaddingRight = screenPaddingNavbar
+                                screenPaddingNavbar = 0
+                            } else if (Screen.orientation === Qt.InvertedLandscapeOrientation) {
+                                screenPaddingLeft = screenPaddingNavbar
+                                screenPaddingRight = screenPaddingStatusbar
+                                screenPaddingNavbar = 0
+                            }
+                        }
+                    }
+                }
+                // hacks
+                if (Qt.platform.os === "ios") {
+                    if (appWindow.visibility === Window.FullScreen) {
+                        screenPaddingStatusbar = 0
+                    }
+                }
+            } else {
+                screenPaddingStatusbar = 0
+                screenPaddingNavbar = 0
+                screenPaddingTop = 0
+                screenPaddingLeft = 0
+                screenPaddingRight = 0
+                screenPaddingBottom = 0
+            }
+/*
+            console.log("> handleSafeAreas()")
+            console.log("- window mode:         " + appWindow.visibility)
+            console.log("- window flags:        " + appWindow.flags)
+            console.log("- screen dpi:          " + Screen.devicePixelRatio)
+            console.log("- screen width:        " + Screen.width)
+            console.log("- screen width avail:  " + Screen.desktopAvailableWidth)
+            console.log("- screen height:       " + Screen.height)
+            console.log("- screen height avail: " + Screen.desktopAvailableHeight)
+            console.log("- screen orientation (full): " + Screen.orientation)
+            console.log("- screen orientation (primary): " + Screen.primaryOrientation)
+            console.log("- screenSizeStatusbar: " + screenPaddingStatusbar)
+            console.log("- screenSizeNavbar:    " + screenPaddingNavbar)
+            console.log("- screenPaddingTop:    " + screenPaddingTop)
+            console.log("- screenPaddingLeft:   " + screenPaddingLeft)
+            console.log("- screenPaddingRight:  " + screenPaddingRight)
+            console.log("- screenPaddingBottom: " + screenPaddingBottom)
+*/
+        }
     }
 
     MobileHeader {
         id: appHeader
-        width: appWindow.width
     }
 
     MobileDrawer {
         id: appDrawer
+
         interactive: (appContent.state !== "ScreenTutorial")
     }
 
@@ -227,9 +249,12 @@ ApplicationWindow {
 
     FocusScope {
         id: appContent
+
         anchors.top: appHeader.bottom
         anchors.left: parent.left
+        anchors.leftMargin: screenPaddingLeft
         anchors.right: parent.right
+        anchors.rightMargin: screenPaddingRight
         anchors.bottom: parent.bottom
         anchors.bottomMargin: screenPaddingNavbar + screenPaddingBottom
 
@@ -248,10 +273,14 @@ ApplicationWindow {
                 if (screenDeviceList.selectionList.length !== 0) {
                     screenDeviceList.exitSelectionMode()
                 } else {
-                    if (exitTimer.running)
-                        Qt.quit()
-                    else
-                        exitTimer.start()
+                    if (mobileExit.enabled) {
+                        if (mobileExit.timerRunning)
+                            Qt.quit()
+                        else
+                            mobileExit.timerStart()
+                    } else {
+                        mobileUI.backToHomeScreen()
+                    }
                 }
             } else if (appContent.state === "VirtualInputs") {
                 screenVirtualInputs.backAction()
@@ -406,6 +435,18 @@ ApplicationWindow {
 
     ////////////////
 
+    MobileExit {
+        id: mobileExit
+    }
+
+    ////////////////
+
+    MobileMenu {
+        id: mobileMenu
+    }
+
+    ////////////////
+
     Rectangle { // navbar area
         anchors.left: parent.left
         anchors.right: parent.right
@@ -417,51 +458,6 @@ ApplicationWindow {
         color: {
             if (appContent.state === "ScreenTutorial") return Theme.colorHeader
             return Theme.colorBackground
-        }
-    }
-
-    ////////////////
-
-    MobileMenu {
-        id: mobileMenu
-    }
-
-    ////////////////
-
-    Timer {
-        id: exitTimer
-        interval: 2222
-        running: false
-        repeat: false
-    }
-    Rectangle {
-        id: exitWarning
-
-        anchors.left: parent.left
-        anchors.leftMargin: Theme.componentMargin
-        anchors.right: parent.right
-        anchors.rightMargin: Theme.componentMargin
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: Theme.componentMargin + screenPaddingNavbar + screenPaddingBottom
-
-        height: Theme.componentHeightL
-        radius: Theme.componentRadius
-
-        color: Theme.colorComponentBackground
-        border.color: Theme.colorSeparator
-        border.width: Theme.componentBorderWidth
-
-        opacity: exitTimer.running ? 1 : 0
-        Behavior on opacity { OpacityAnimator { duration: 333 } }
-        visible: opacity
-
-        Text {
-            anchors.centerIn: parent
-
-            text: qsTr("Press one more time to exit...")
-            textFormat: Text.PlainText
-            font.pixelSize: Theme.fontSizeContent
-            color: Theme.colorText
         }
     }
 

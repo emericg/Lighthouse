@@ -29,7 +29,6 @@ Item {
     }
 
     function refreshPermissions() {
-        // Refresh permissions
         button_network_test.validperm = true
         button_location_test.validperm = utilsApp.checkMobileBleLocationPermission()
         button_gps_test.validperm = utilsApp.isMobileGpsEnabled()
@@ -54,9 +53,7 @@ Item {
         Column {
             id: contentColumn
             anchors.left: parent.left
-            anchors.leftMargin: screenPaddingLeft
             anchors.right: parent.right
-            anchors.rightMargin: screenPaddingRight
 
             topPadding: 20
             bottomPadding: 20
@@ -183,9 +180,11 @@ Item {
                 font.pixelSize: Theme.fontSizeContentSmall
             }
             ButtonWireframe {
-                height: 36
                 anchors.left: parent.left
                 anchors.leftMargin: 64
+                height: 38
+
+                colorBackground: Theme.colorForeground
 
                 text: qsTr("Official information")
                 source: "qrc:/assets/icons/material-icons/duotone/launch.svg"
@@ -442,9 +441,10 @@ Item {
             ButtonWireframe {
                 anchors.left: parent.left
                 anchors.leftMargin: appHeader.headerPosition
-                height: 36
+                height: 38
 
                 visible: (Qt.platform.os === "android")
+                colorBackground: Theme.colorForeground
 
                 text: qsTr("Application info")
                 source: "qrc:/assets/icons/material-icons/duotone/tune.svg"

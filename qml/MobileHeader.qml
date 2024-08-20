@@ -16,9 +16,9 @@ Rectangle {
 
     property int headerHeight: 52
 
-    property int headerPosition: 64
+    property int headerPosition: 56
 
-    property string headerTitle: "Lighthouse"
+    property string headerTitle: utilsApp.appName()
 
     ////////////////////////////////////////////////////////////////////////////
 
@@ -77,13 +77,15 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
 
-        height: screenPaddingStatusbar
+        height: Math.max(screenPaddingStatusbar, screenPaddingTop)
         color: Theme.colorStatusbar
     }
 
     Item {
         anchors.fill: parent
-        anchors.topMargin: screenPaddingStatusbar
+        anchors.topMargin: Math.max(screenPaddingStatusbar, screenPaddingTop)
+        anchors.leftMargin: screenPaddingLeft
+        anchors.rightMargin: screenPaddingRight
 
         Row { // left area
             id: leftArea
@@ -91,6 +93,10 @@ Rectangle {
             anchors.left: parent.left
             anchors.leftMargin: 4
             anchors.bottom: parent.bottom
+
+            spacing: 4
+
+            ////
 
             MouseArea { // left button
                 width: headerHeight
@@ -100,9 +106,8 @@ Rectangle {
                 onClicked: leftMenuClicked()
 
                 RippleThemed {
+                    anchors.fill: parent
                     anchor: parent
-                    width: headerHeight
-                    height: headerHeight
 
                     pressed: parent.pressed
                     //active: enabled && parent.containsPress
@@ -122,6 +127,8 @@ Rectangle {
                     color: Theme.colorHeaderContent
                 }
             }
+
+            ////
         }
 
         ////////////
@@ -151,8 +158,9 @@ Rectangle {
             anchors.rightMargin: 4
             anchors.bottom: parent.bottom
 
-            spacing: 0
-            visible: true
+            spacing: 4
+
+            ////
 
             Item { // network status
                 width: headerHeight
@@ -176,6 +184,9 @@ Rectangle {
                     }
                 }
             }
+
+            ////
+
             Item { // bluetooth status
                 width: headerHeight
                 height: headerHeight
@@ -207,6 +218,8 @@ Rectangle {
                 }
             }
 
+            ////
+
             MouseArea { // right menu button
                 width: headerHeight
                 height: headerHeight
@@ -220,8 +233,8 @@ Rectangle {
                 }
 
                 RippleThemed {
-                    width: headerHeight
-                    height: headerHeight
+                    anchors.fill: parent
+                    anchor: parent
 
                     pressed: parent.pressed
                     //active: enabled && parent.containsPress
@@ -237,6 +250,8 @@ Rectangle {
                     color: Theme.colorHeaderContent
                 }
             }
+
+            ////
         }
 
         ////////////
