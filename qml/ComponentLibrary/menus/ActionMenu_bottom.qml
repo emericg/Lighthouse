@@ -9,17 +9,19 @@ import ThemeEngine
 T.Popup {
     id: actionMenu
 
-    width: parent.width
-    height: contentColumn.height
+    implicitWidth: parent.width
+    implicitHeight: contentColumn.height
+
+    y: appWindow.height
 
     padding: 0
     margins: 0
 
     modal: true
     dim: true
-    focus: isMobile
+    focus: appWindow.isMobile
     closePolicy: T.Popup.CloseOnEscape | T.Popup.CloseOnPressOutside
-    parent: Overlay.overlay
+    parent: T.Overlay.overlay
 
     property string titleTxt
     property string titleSrc // disabled
@@ -32,23 +34,26 @@ T.Popup {
 
     ////////////////
 
-    y: appWindow.height
+    property int actualHeight: {
+        if (typeof mobileMenu !== "undefined" && mobileMenu.height)
+            return contentColumn.height + appWindow.screenPaddingNavbar + appWindow.screenPaddingBottom
+        return contentColumn.height
+    }
 
-    property int realHeight: 0
-    Component.onCompleted: realHeight = actionMenu.height + screenPaddingNavbar + screenPaddingBottom
+    enter: Transition { NumberAnimation { duration: 233; property: "height"; from: 0; to: actionMenu.actualHeight; } }
+    exit: Transition { NumberAnimation { duration: 233; property: "height"; from: actionMenu.actualHeight; to: 0; } }
 
-    enter: Transition { NumberAnimation { duration: 233; property: "height"; from: 0; to: realHeight; } }
-    exit: Transition { NumberAnimation { duration: 233; property: "height"; from: realHeight; to: 0; } }
-
-    Overlay.modal: Rectangle {
+    T.Overlay.modal: Rectangle {
         color: "#000"
         opacity: ThemeEngine.isLight ? 0.24 : 0.666
     }
 
     background: Rectangle {
         color: Theme.colorComponentBackground
+
         Rectangle {
-            width: parent.width
+            anchors.left: parent.left
+            anchors.right: parent.right
             height: Theme.componentBorderWidth
             color: Theme.colorSeparator
         }
@@ -59,10 +64,13 @@ T.Popup {
     contentItem: Item {
         Column {
             id: contentColumn
-            width: parent.width
+            anchors.left: parent.left
+            anchors.leftMargin: screenPaddingLeft
+            anchors.right: parent.right
+            anchors.rightMargin: screenPaddingRight
 
-            topPadding: 12
-            bottomPadding: 8
+            topPadding: Theme.componentMargin
+            bottomPadding: 4
             spacing: 4
 
             ////

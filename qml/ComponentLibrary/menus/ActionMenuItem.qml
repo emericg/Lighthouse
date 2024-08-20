@@ -27,6 +27,7 @@ T.Button {
     property int index
     property url source
     property int sourceSize: 20
+    property int sourceRotation: 0
     property int layoutDirection: Qt.RightToLeft
 
     ////////////////
@@ -73,7 +74,7 @@ T.Button {
     ////////////////
 
     contentItem: RowLayout {
-        spacing: (Theme.componentMargin / 1)
+        spacing: Theme.componentMargin
         layoutDirection: control.layoutDirection
 
         IconSvg {
@@ -81,6 +82,7 @@ T.Button {
             Layout.preferredHeight: control.sourceSize
 
             source: control.source
+            rotation: control.sourceRotation
             color: Theme.colorIcon
         }
 
@@ -95,7 +97,7 @@ T.Button {
             horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignVCenter
             elide: Text.ElideRight
-            color: Theme.colorText
+            color: Theme.colorComponentText
         }
     }
 

@@ -39,9 +39,12 @@ T.TextField {
     Keys.onBackPressed: focus = false
 
     // settings
-    property string dialogTitle: qsTr("Please choose a file!")
-    property var dialogFilter: ["All files (*)"]
-    property int dialogFileMode: FileDialog.SaveFile // OpenFile / OpenFiles / SaveFile
+    property alias folder: control.text
+    property string path: control.text
+    property bool isValid: (control.text.length > 0)
+
+    // settings
+    property string dialogTitle: qsTr("Please choose a directory!")
     property var currentFolder: StandardPaths.writableLocation(StandardPaths.HomeLocation)
 
     // button
@@ -59,24 +62,22 @@ T.TextField {
     ////////////////
 
     Loader {
-        id: fileDialogLoader
+        id: folderDialogLoader
 
         active: false
         asynchronous: false
-        sourceComponent: FileDialog {
+        sourceComponent: FolderDialog {
             title: control.dialogTitle
-            nameFilters: control.dialogFilter
 
-            fileMode: control.dialogFileMode
-            currentFolder: UtilsPath.makeUrl(control.currentFolder)
-            currentFile: UtilsPath.makeUrl(control.text)
+            currentFolder: UtilsPath.makeUrl(control.text)
+            //currentFolder: UtilsPath.makeUrl(control.currentFolder)
 
             onAccepted: {
-                //console.log("fileDialog currentFolder: " + currentFolder)
-                //console.log("fileDialog currentFile: " + currentFile)
-                //console.log("fileDialog selectedFile: " + selectedFile)
+                //console.log("folderDialog currentFolder: " + currentFolder)
+                //console.log("folderDialog selectedFolder: " + selectedFolder)
 
-                var f = UtilsPath.cleanUrl(selectedFile)
+                var f = UtilsPath.cleanUrl(selectedFolder)
+                if (f.slice(0, -1) !== "/") f += "/"
 
                 control.text = f
             }
@@ -122,8 +123,8 @@ T.TextField {
         text: control.buttonText
 
         onClicked: {
-            fileDialogLoader.active = true
-            fileDialogLoader.item.open()
+            folderDialogLoader.active = true
+            folderDialogLoader.item.open()
         }
     }
 
