@@ -252,9 +252,7 @@ ApplicationWindow {
 
         anchors.top: appHeader.bottom
         anchors.left: parent.left
-        anchors.leftMargin: screenPaddingLeft
         anchors.right: parent.right
-        anchors.rightMargin: screenPaddingRight
         anchors.bottom: parent.bottom
         anchors.bottomMargin: screenPaddingNavbar + screenPaddingBottom
 
@@ -316,14 +314,20 @@ ApplicationWindow {
 
         ScreenSettings {
             id: screenSettings
+            anchors.leftMargin: screenPaddingLeft
+            anchors.rightMargin: screenPaddingRight
             anchors.bottomMargin: mobileMenu.hhv
         }
         ScreenAbout {
             id: screenAbout
+            anchors.leftMargin: screenPaddingLeft
+            anchors.rightMargin: screenPaddingRight
             anchors.bottomMargin: mobileMenu.hhv
         }
         MobilePermissions {
             id: screenAboutPermissions
+            anchors.leftMargin: screenPaddingLeft
+            anchors.rightMargin: screenPaddingRight
             anchors.bottomMargin: mobileMenu.hhv
         }
 

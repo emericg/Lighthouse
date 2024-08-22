@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    // GUI application /////////////////////////////////////////////////////////
+    // Hacks ///////////////////////////////////////////////////////////////////
 
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
     // NVIDIA suspend&resume hack
@@ -79,10 +79,21 @@ int main(int argc, char *argv[])
     QSurfaceFormat::setDefaultFormat(format);
 #endif
 
+#if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
+    // Qt 6.6+ mouse wheel hack
+    qputenv("QT_QUICK_FLICKABLE_WHEEL_DECELERATION", "2500");
+#endif
+
+    // Qt 6.7+ debugger hack
+    qputenv("QT_ANDROID_DEBUGGER_MAIN_THREAD_SLEEP_MS", "0");
+
+    // GUI application /////////////////////////////////////////////////////////
+
     SingleApplication app(argc, argv, false);
 
     // Application name
     app.setApplicationName("Lighthouse");
+    app.setApplicationDisplayName("Lighthouse");
     app.setOrganizationName("Lighthouse");
     app.setOrganizationDomain("Lighthouse");
 

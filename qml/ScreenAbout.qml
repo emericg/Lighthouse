@@ -106,7 +106,7 @@ Loader {
                     spacing: Theme.componentMargin
 
                     ButtonSolid {
-                        width: 160
+                        width: isPhone ? 150 : 160
                         height: 40
 
                         //color: (Theme.currentTheme === ThemeEngine.THEME_NIGHT) ? Theme.colorHeader : "#5483EF"
@@ -119,7 +119,7 @@ Loader {
                     }
 
                     ButtonSolid {
-                        width: 160
+                        width: isPhone ? 150 : 160
                         height: 40
 
                         //color: (Theme.currentTheme === ThemeEngine.THEME_NIGHT) ? Theme.colorHeader : "#5483EF"
@@ -132,10 +132,10 @@ Loader {
                     }
 
                     ButtonSolid {
-                        visible: (appWindow.width > 800)
-                        width: 160
+                        width: isPhone ? 150 : 160
                         height: 40
 
+                        visible: (appWindow.width > 800)
                         //color: (Theme.currentTheme === ThemeEngine.THEME_NIGHT) ? Theme.colorHeader : "#5483EF"
 
                         text: qsTr("GitHub")
@@ -256,9 +256,9 @@ Loader {
                 onClicked: Qt.openUrlExternally("https://github.com/emericg/Lighthouse/releases")
             }
 
-            ////////
+            ListSeparator { }
 
-            ListSeparator { visible: (Qt.platform.os === "android") }
+            ////////
 
             ListItemClickable { // permissions
                 width: parent.width
@@ -272,9 +272,9 @@ Loader {
                 onClicked: screenAboutPermissions.loadScreenFrom("ScreenAbout")
             }
 
-            ////////
+            ListSeparator { visible: (Qt.platform.os === "android") }
 
-            ListSeparator { }
+            ////////
 
             Item { // list dependencies
                 anchors.left: parent.left
@@ -341,23 +341,24 @@ Loader {
                 }
             }
 
-            ////////
-
             ListSeparatorPadded { }
 
-            Item { // list debug stuff
+            ////////
+
+            Item { // list debug infos
                 anchors.left: parent.left
                 anchors.leftMargin: Theme.componentMargin
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.componentMargin
 
-                height: 16 + debugColumn.height
+                height: 24 + debugColumn.height
+                visible: utilsApp.isDebug
 
                 IconSvg {
                     width: 24
                     height: 24
                     anchors.top: debugColumn.top
-                    anchors.topMargin: 4
+                    anchors.topMargin: 0
                     anchors.left: parent.left
                     anchors.leftMargin: 4
 
@@ -372,37 +373,48 @@ Loader {
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
 
-                    spacing: Theme.componentMargin * 0.4
+                    spacing: Theme.componentMargin * 0.33
 
                     Text {
                         color: Theme.colorSubText
                         text: "App name: %1".arg(utilsApp.appName())
+                        textFormat: Text.PlainText
                         font.pixelSize: Theme.fontSizeContent
                     }
                     Text {
                         color: Theme.colorSubText
                         text: "App version: %1".arg(utilsApp.appVersion())
+                        textFormat: Text.PlainText
                         font.pixelSize: Theme.fontSizeContent
                     }
                     Text {
                         color: Theme.colorSubText
                         text: "Build mode: %1".arg(utilsApp.appBuildModeFull())
+                        textFormat: Text.PlainText
+                        font.pixelSize: Theme.fontSizeContent
+                    }
+                    Text {
+                        color: Theme.colorSubText
+                        text: "Build architecture: %1".arg(utilsApp.qtArchitecture())
+                        textFormat: Text.PlainText
                         font.pixelSize: Theme.fontSizeContent
                     }
                     Text {
                         color: Theme.colorSubText
                         text: "Build date: %1".arg(utilsApp.appBuildDateTime())
+                        textFormat: Text.PlainText
                         font.pixelSize: Theme.fontSizeContent
                     }
                     Text {
                         color: Theme.colorSubText
                         text: "Qt version: %1".arg(utilsApp.qtVersion())
+                        textFormat: Text.PlainText
                         font.pixelSize: Theme.fontSizeContent
                     }
                 }
             }
 
-            ListSeparatorPadded { }
+            ListSeparatorPadded { visible: utilsApp.isDebug }
 
             ////////
         }
