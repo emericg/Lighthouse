@@ -6,7 +6,7 @@ DEFINES+= APP_VERSION=\\\"$$VERSION\\\"
 
 CONFIG += c++17
 QT     += core bluetooth network sql
-QT     += qml quick quickcontrols2 svg
+QT     += qml quick quickcontrols2 quick3d svg
 
 !android:!ios {
     QT += multimedia # to play sound effects on actions

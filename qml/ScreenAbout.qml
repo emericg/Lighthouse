@@ -352,7 +352,7 @@ Loader {
                 anchors.rightMargin: Theme.componentMargin
 
                 height: 24 + debugColumn.height
-                visible: utilsApp.isDebug
+                visible: utilsApp.isDebugBuild()
 
                 IconSvg {
                     width: 24
@@ -414,7 +414,7 @@ Loader {
                 }
             }
 
-            ListSeparatorPadded { visible: utilsApp.isDebug }
+            ListSeparatorPadded { visible: utilsApp.isDebugBuild() }
 
             ////////
         }

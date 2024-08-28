@@ -462,7 +462,7 @@ Popup {
                     font.pixelSize: Theme.fontSizeContent
                 }
 
-                TextField_FileDialog {
+                FileInputArea {
                     id: fileinput
                     anchors.left: parent.left
                     anchors.right: parent.right
