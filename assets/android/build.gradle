@@ -5,7 +5,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.2.1' // works with Qt 6.7+ // Java 17
+        classpath 'com.android.tools.build:gradle:8.2.2' // works with Qt 6.7+ // Java 17
     }
 }
 
@@ -87,7 +87,7 @@ android {
         ndk.abiFilters = qtTargetAbiList.split(",")
 
         namespace 'io.emeric.lighthouse'
-        versionName "0.6"
+        versionName "0.7"
         versionCode timestampInt
         //manifestPlaceholders = [versionName: versionName, versionCode: versionCode]
     }
