@@ -97,7 +97,8 @@ Item {
 
             Rectangle {
                 id: mediaRectangle
-                width: parent.width
+                anchors.left: parent.left
+                anchors.right: parent.right
                 height: width
 
                 radius: 32

@@ -200,13 +200,16 @@ Loader {
             ////////////////
 
             ListItem { // description
-                width: parent.width
+                anchors.left: parent.left
+                anchors.right: parent.right
+
                 text: qsTr("Control your computer from anywhere.")
                 source: "qrc:/IconLibrary/material-symbols/info.svg"
             }
 
             ListItemClickable { // authors
-                width: parent.width
+                anchors.left: parent.left
+                anchors.right: parent.right
 
                 text: qsTr("Application by <a href=\"https://emeric.io\">Emeric Grange</a>")
                 source: "qrc:/IconLibrary/material-symbols/supervised_user_circle.svg"
@@ -216,7 +219,8 @@ Loader {
             }
 
             ListItemClickable { // rate
-                width: parent.width
+                anchors.left: parent.left
+                anchors.right: parent.right
                 visible: (Qt.platform.os === "android" || Qt.platform.os === "ios")
 
                 text: qsTr("Rate the application")
@@ -234,7 +238,8 @@ Loader {
             }
 /*
             ListItemClickable { // tutorial
-                width: parent.width
+                anchors.left: parent.left
+                anchors.right: parent.right
 
                 text: qsTr("Open the tutorial")
                 source: "qrc:/IconLibrary/material-symbols/import_contacts.svg"
@@ -246,7 +251,8 @@ Loader {
 */
 
             ListItemClickable { // release notes
-                width: parent.width
+                anchors.left: parent.left
+                anchors.right: parent.right
 
                 text: qsTr("Release notes")
                 source: "qrc:/IconLibrary/material-symbols/new_releases.svg"
@@ -261,7 +267,8 @@ Loader {
             ////////
 
             ListItemClickable { // permissions
-                width: parent.width
+                anchors.left: parent.left
+                anchors.right: parent.right
                 visible: (Qt.platform.os === "android")
 
                 text: qsTr("About app permissions")
@@ -330,7 +337,8 @@ Loader {
                             "Google Material Icons (MIT)",
                         ]
                         delegate: Text {
-                            width: parent.width
+                            anchors.left: parent.left
+                            anchors.right: parent.right
                             text: "- " + modelData
                             textFormat: Text.PlainText
                             color: Theme.colorSubText

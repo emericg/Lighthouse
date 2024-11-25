@@ -31,7 +31,7 @@ Popup {
 
     Overlay.modal: Rectangle {
         color: "#000"
-        opacity: Theme.isLight ? 0.24 : 0.666
+        opacity: Theme.isLight ? 0.24 : 0.48
     }
 
     background: Rectangle {
@@ -41,18 +41,19 @@ Popup {
         radius: singleColumn ? 0 : Theme.componentRadius
 
         Rectangle {
-            width: parent.width
+            anchors.left: parent.left
+            anchors.right: parent.right
             height: Theme.componentBorderWidth
             visible: singleColumn
             color: Theme.colorSeparator
         }
 
-        layer.enabled: true
-        layer.effect:  MultiEffect {
-            anchors.fill: parent
+        layer.enabled: !singleColumn
+        layer.effect: MultiEffect { // shadow
             autoPaddingEnabled: true
+            blurMax: 48
             shadowEnabled: true
-            shadowColor: Theme.isLight ? "#88000000" : "#88ffffff"
+            shadowColor: Theme.isLight ? "#aa000000" : "#cc000000"
         }
     }
 
@@ -61,11 +62,15 @@ Popup {
     contentItem: Item {
         Column {
             id: columnContent
-            width: parent.width
+            anchors.left: parent.left
+            anchors.right: parent.right
             spacing: Theme.componentMarginXL
 
+            ////////
+
             Text {
-                width: parent.width
+                anchors.left: parent.left
+                anchors.right: parent.right
 
                 text: qsTr("Are you sure you want to delete selected sensor(s)?")
                 textFormat: Text.PlainText
@@ -74,8 +79,11 @@ Popup {
                 wrapMode: Text.WordWrap
             }
 
+            ////////
+
             Text {
-                width: parent.width
+                anchors.left: parent.left
+                anchors.right: parent.right
 
                 text: qsTr("Data from the sensors are kept for an additional 90 days, in case you would like to re-add a sensor later.")
                 textFormat: Text.PlainText
@@ -84,33 +92,37 @@ Popup {
                 wrapMode: Text.WordWrap
             }
 
+            ////////
+
             Flow {
-                width: parent.width
+                anchors.left: parent.left
+                anchors.right: parent.right
                 spacing: Theme.componentMargin
 
-                property var btnSize: singleColumn ? width : ((width-spacing) / 2)
+                property int btnCount: 2
+                property int btnSize: singleColumn ? width : ((width-(spacing*(btnCount-1))) / btnCount)
 
                 ButtonFlat {
                     width: parent.btnSize
+                    color: Theme.colorGrey
 
                     text: qsTr("Cancel")
-                    color: Theme.colorSubText
-
                     onClicked: popupDeleteDevice.close()
                 }
 
                 ButtonFlat {
                     width: parent.btnSize
+                    color: Theme.colorError
 
                     text: qsTr("Delete")
-                    color: Theme.colorRed
-
                     onClicked: {
                         popupDeleteDevice.confirmed()
                         popupDeleteDevice.close()
                     }
                 }
             }
+
+            ////////
         }
     }
 

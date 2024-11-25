@@ -89,7 +89,7 @@ Popup {
 
     Overlay.modal: Rectangle {
         color: "#000"
-        opacity: Theme.isLight ? 0.24 : 0.666
+        opacity: Theme.isLight ? 0.24 : 0.48
     }
 
     background: Rectangle {
@@ -99,17 +99,19 @@ Popup {
         radius: singleColumn ? 0 : Theme.componentRadius
 
         Rectangle {
-            width: parent.width
+            anchors.left: parent.left
+            anchors.right: parent.right
             height: Theme.componentBorderWidth
             visible: singleColumn
             color: Theme.colorSeparator
         }
 
-        layer.enabled: true
-        layer.effect:  MultiEffect {
+        layer.enabled: !singleColumn
+        layer.effect: MultiEffect { // shadow
             autoPaddingEnabled: true
+            blurMax: 48
             shadowEnabled: true
-            shadowColor: Theme.isLight ? "#88000000" : "#88ffffff"
+            shadowColor: Theme.isLight ? "#aa000000" : "#cc000000"
         }
     }
 
@@ -481,18 +483,17 @@ Popup {
 
             ButtonFlat {
                 anchors.verticalCenter: parent.verticalCenter
-
-                text: qsTr("Cancel")
                 color: Theme.colorGrey
 
+                text: qsTr("Cancel")
                 onClicked: popupActions.close()
             }
             ButtonFlat {
                 anchors.verticalCenter: parent.verticalCenter
+                color: Theme.colorSuccess
 
                 text: qsTr("Save")
                 source: "qrc:/IconLibrary/material-symbols/save.svg"
-                color: Theme.colorSuccess
                 onClicked: {
                     var newAction
                     var newParameter
@@ -524,6 +525,8 @@ Popup {
                 }
             }
         }
+
+        ////////
     }
 
     ////////////////////////////////////////////////////////////////////////////
