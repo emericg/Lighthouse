@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Effects
 import QtQuick.Controls
 
-import ThemeEngine
+import ComponentLibrary
 
 Rectangle {
     id: control
@@ -45,8 +45,8 @@ Rectangle {
             colorHighlight: control.colorHighlight
             colorIcon: control.colorIcon
 
-            source: "qrc:/assets/icons/material-icons/duotone/volume_off.svg"
-            source_checked: "qrc:/assets/icons/material-icons/duotone/volume_off.svg"
+            source: "qrc:/IconLibrary/material-icons/duotone/volume_off.svg"
+            source_checked: "qrc:/IconLibrary/material-icons/duotone/volume_off.svg"
 
             onClicked: volumeMute()
         }
@@ -66,7 +66,7 @@ Rectangle {
             colorHighlight: control.colorHighlight
             colorIcon: control.colorIcon
 
-            source: "qrc:/assets/icons/material-icons/duotone/volume_down.svg"
+            source: "qrc:/IconLibrary/material-icons/duotone/volume_down.svg"
 
             onClicked: volumeDown()
         }
@@ -86,7 +86,7 @@ Rectangle {
             colorHighlight: control.colorHighlight
             colorIcon: control.colorIcon
 
-            source: "qrc:/assets/icons/material-icons/duotone/volume_up_1.svg"
+            source: "qrc:/IconLibrary/material-icons/duotone/volume_up_1.svg"
 
             onClicked: volumeUp()
         }

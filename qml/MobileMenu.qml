@@ -1,6 +1,7 @@
 import QtQuick
 
-import ThemeEngine
+import ComponentLibrary
+import Lighthouse
 
 Item {
     id: mobileMenu
@@ -103,7 +104,7 @@ Item {
                 height: mobileMenu.hhh
 
                 text: qsTr("Device list")
-                source: "qrc:/assets/icons/material-symbols/sensors/lightbulb.svg"
+                source: "qrc:/IconLibrary/material-symbols/hardware/lightbulb.svg"
                 sourceSize: mobileMenu.hhi
                 colorContent: Theme.colorTabletmenuContent
                 colorHighlight: Theme.colorTabletmenuHighlight
@@ -116,7 +117,7 @@ Item {
                 height: mobileMenu.hhh
 
                 text: qsTr("Settings")
-                source: "qrc:/assets/icons/material-symbols/settings.svg"
+                source: "qrc:/IconLibrary/material-symbols/settings.svg"
                 sourceSize: mobileMenu.hhi
                 colorContent: Theme.colorTabletmenuContent
                 colorHighlight: Theme.colorTabletmenuHighlight
@@ -129,7 +130,7 @@ Item {
                 height: mobileMenu.hhh
 
                 text: qsTr("About")
-                source: "qrc:/assets/icons/material-symbols/info.svg"
+                source: "qrc:/IconLibrary/material-symbols/info.svg"
                 sourceSize: mobileMenu.hhi
                 colorContent: Theme.colorTabletmenuContent
                 colorHighlight: Theme.colorTabletmenuHighlight

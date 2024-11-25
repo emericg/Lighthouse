@@ -2,9 +2,9 @@ import QtQuick
 import QtQuick.Controls
 import Qt.labs.platform
 
-import ThemeEngine
+import ComponentLibrary
 import DeviceUtils
-import "qrc:/js/UtilsDeviceSensors.js" as UtilsDeviceSensors
+import Lighthouse
 
 Loader {
     id: deviceLight
@@ -199,7 +199,7 @@ Loader {
                         id: imageLightbulb
                         width: 180; height: 180;
                         anchors.horizontalCenter: parent.horizontalCenter
-                        source: "qrc:/assets/icons/material-symbols/sensors/light.svg"
+                        source: "qrc:/IconLibrary/material-symbols/hardware/light.svg"
                         color: Theme.colorHeaderContent
                     }
 
@@ -237,7 +237,7 @@ Loader {
                         height: 24
                         anchors.verticalCenter: parent.verticalCenter
 
-                        source: "qrc:/assets/icons/material-icons/duotone/schedule.svg"
+                        source: "qrc:/IconLibrary/material-icons/duotone/schedule.svg"
                         color: cccc
                     }
                     Text {
@@ -271,7 +271,7 @@ Loader {
                         height: 20
                         anchors.verticalCenter: parent.verticalCenter
 
-                        source: "qrc:/assets/icons/material-icons/duotone/edit.svg"
+                        source: "qrc:/IconLibrary/material-icons/duotone/edit.svg"
                         color: cccc
 
                         opacity: (isMobile || !textInputLocation.text || textInputLocation.focus || textInputLocationArea.containsMouse) ? 0.9 : 0
@@ -315,7 +315,7 @@ Loader {
                         height: 24
                         anchors.verticalCenter: parent.verticalCenter
 
-                        source: "qrc:/assets/icons/material-icons/duotone/pin_drop.svg"
+                        source: "qrc:/IconLibrary/material-icons/duotone/pin_drop.svg"
                         color: cccc
                     }
                 }
@@ -773,7 +773,7 @@ Loader {
                                 height: width
                                 color: utilsApp.isQColorLight(parent.color) ? Theme.colorHighContrast : Theme.colorLowContrast
                                 opacity: 0.5
-                                source: "qrc:/assets/icons/material-icons/duotone/style.svg"
+                                source: "qrc:/IconLibrary/material-icons/duotone/style.svg"
                             }
 
                             MouseArea {

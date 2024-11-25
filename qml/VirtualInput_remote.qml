@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Effects
 import QtQuick.Controls
 
-import ThemeEngine
+import ComponentLibrary
 
 Item {
     id: virtualInput_remote
@@ -67,7 +67,7 @@ Item {
                 height: width
                 z: -1
 
-                source: "qrc:/assets/icons/material-symbols/media/play_arrow-fill.svg"
+                source: "qrc:/IconLibrary/material-symbols/media/play_arrow-fill.svg"
                 sourceRotation: -180
 
                 onClicked: networkControls.key_left()
@@ -77,7 +77,7 @@ Item {
                 width: parent.width
                 height: parent.width
 
-                source: "qrc:/assets/icons/material-symbols/media/play_arrow-fill.svg"
+                source: "qrc:/IconLibrary/material-symbols/media/play_arrow-fill.svg"
 
                 onClicked: networkControls.key_right()
             }
@@ -120,7 +120,7 @@ Item {
                     radius: 0
 
                     colorBackground: "transparent"
-                    source: "qrc:/assets/icons/material-symbols/add.svg"
+                    source: "qrc:/IconLibrary/material-symbols/add.svg"
                     sourceSize: 40
 
                     onClicked: networkControls.volume_up()
@@ -132,7 +132,7 @@ Item {
                     radius: 0
 
                     colorBackground: "transparent"
-                    source: "qrc:/assets/icons/material-symbols/chevron_left.svg"
+                    source: "qrc:/IconLibrary/material-symbols/chevron_left.svg"
                     sourceSize: 40
 
                     onClicked: networkControls.media_prev()
@@ -146,7 +146,7 @@ Item {
                     radius: 0
 
                     colorBackground: "transparent"
-                    source: "qrc:/assets/icons/material-symbols/chevron_right.svg"
+                    source: "qrc:/IconLibrary/material-symbols/chevron_right.svg"
                     sourceSize: 40
 
                     onClicked: networkControls.media_next()
@@ -159,7 +159,7 @@ Item {
                     radius: 0
 
                     colorBackground: "transparent"
-                    source: "qrc:/assets/icons/material-symbols/remove.svg"
+                    source: "qrc:/IconLibrary/material-symbols/remove.svg"
                     sourceSize: 40
 
                     onClicked: networkControls.volume_down()
@@ -171,7 +171,7 @@ Item {
                     height: width
 
                     //color: Theme.colorPrimary
-                    source: "qrc:/assets/icons/material-symbols/media/play_pause.svg"
+                    source: "qrc:/IconLibrary/material-symbols/media/play_pause.svg"
 
                     onClicked: networkControls.media_playpause()
                 }
@@ -205,7 +205,7 @@ Item {
                 SquareButtonClear {
                     width: ((parent.width - 24) / 2)
                     height: 64
-                    source: "qrc:/assets/icons/material-symbols/language.svg"
+                    source: "qrc:/IconLibrary/material-symbols/language.svg"
                     sourceSize: 40
                 }
 
@@ -213,7 +213,7 @@ Item {
                     width: ((parent.width - 24) / 2)
                     height: 64
                     clip: true
-                    source: "qrc:/assets/icons/material-symbols/left_click.svg"
+                    source: "qrc:/IconLibrary/material-symbols/left_click.svg"
                     sourceSize: 40
                 }
             }

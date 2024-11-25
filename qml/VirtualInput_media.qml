@@ -2,7 +2,8 @@ import QtQuick
 import QtQuick.Effects
 import QtQuick.Controls
 
-import ThemeEngine
+import ComponentLibrary
+import Lighthouse
 
 Grid {
     id: virtualInput_media
@@ -41,7 +42,7 @@ Grid {
                 IconSvg { // generic thumbnail
                     anchors.fill: parent
 
-                    source: "qrc:/assets/icons/material-symbols/media/slideshow.svg"
+                    source: "qrc:/IconLibrary/material-symbols/media/slideshow.svg"
                     color: Theme.colorIcon
                     opacity: 0.33
                 }

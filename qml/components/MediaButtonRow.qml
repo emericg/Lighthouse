@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Effects
 import QtQuick.Controls
 
-import ThemeEngine
+import ComponentLibrary
 
 Rectangle {
     id: control
@@ -42,7 +42,7 @@ Rectangle {
             colorHighlight: control.colorHighlight
             colorIcon: control.colorIcon
 
-            source: "qrc:/assets/icons/material-symbols/skip_previous.svg"
+            source: "qrc:/IconLibrary/material-symbols/skip_previous.svg"
 
             onClicked: mediaPrevious()
         }
@@ -65,8 +65,8 @@ Rectangle {
             colorHighlight: control.colorHighlight
             colorIcon: control.colorIcon
 
-            source: "qrc:/assets/icons/material-symbols/media/play_pause.svg"
-            source_checked: "qrc:/assets/icons/material-symbols/media/play_pause.svg"
+            source: "qrc:/IconLibrary/material-symbols/media/play_pause.svg"
+            source_checked: "qrc:/IconLibrary/material-symbols/media/play_pause.svg"
 
             onClicked: mediaPlayPause()
         }
@@ -86,7 +86,7 @@ Rectangle {
             colorHighlight: control.colorHighlight
             colorIcon: control.colorIcon
 
-            source: "qrc:/assets/icons/material-symbols/skip_next.svg"
+            source: "qrc:/IconLibrary/material-symbols/skip_next.svg"
 
             onClicked: mediaNext()
         }

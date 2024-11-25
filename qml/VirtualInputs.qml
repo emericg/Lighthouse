@@ -1,7 +1,8 @@
 import QtQuick
 import QtQuick.Controls
 
-import ThemeEngine
+import ComponentLibrary
+import Lighthouse
 
 Loader {
     id: virtualInputs
@@ -93,7 +94,7 @@ Loader {
                     colorHighlight: Theme.colorTabletmenuHighlight
 
                     text: qsTr("touchpad")
-                    source: "qrc:/assets/icons/material-icons/duotone/touch_app.svg"
+                    source: "qrc:/IconLibrary/material-icons/duotone/touch_app.svg"
                     highlighted: (inputSelector.currentSelection === 1)
                     onClicked: inputSelector.currentSelection = 1
                 }
@@ -107,8 +108,8 @@ Loader {
 
                     text: qsTr("gamepad")
                     source: highlighted ?
-                                "qrc:/assets/icons/material-symbols/hardware/joystick-fill.svg" :
-                                "qrc:/assets/icons/material-symbols/hardware/joystick.svg"
+                                "qrc:/IconLibrary/material-symbols/hardware/joystick-fill.svg" :
+                                "qrc:/IconLibrary/material-symbols/hardware/joystick.svg"
                     highlighted: (inputSelector.currentSelection === 2)
                     onClicked: inputSelector.currentSelection = 2
                 }
@@ -122,8 +123,8 @@ Loader {
 
                     text: qsTr("remote")
                     source: highlighted ?
-                                "qrc:/assets/icons/material-symbols/sensors/nest_remote-fill.svg" :
-                                "qrc:/assets/icons/material-symbols/sensors/nest_remote.svg"
+                                "qrc:/IconLibrary/material-symbols/sensors/nest_remote-fill.svg" :
+                                "qrc:/IconLibrary/material-symbols/sensors/nest_remote.svg"
                     highlighted: (inputSelector.currentSelection === 3)
                     onClicked: inputSelector.currentSelection = 3
                 }
@@ -137,8 +138,8 @@ Loader {
 
                     text: qsTr("media")
                     source: highlighted ?
-                                "qrc:/assets/icons/material-symbols/media/album-fill.svg" :
-                                "qrc:/assets/icons/material-symbols/media/album.svg"
+                                "qrc:/IconLibrary/material-symbols/media/album-fill.svg" :
+                                "qrc:/IconLibrary/material-symbols/media/album.svg"
                     highlighted: (inputSelector.currentSelection === 4)
                     onClicked: inputSelector.currentSelection = 4
                 }

@@ -1,6 +1,7 @@
 import QtQuick
 
-import ThemeEngine
+import ComponentLibrary
+import Lighthouse
 
 Rectangle {
     id: appHeader
@@ -120,9 +121,9 @@ Rectangle {
                     height: (headerHeight / 2)
 
                     source: {
-                        if (leftMenuMode === "drawer") return "qrc:/assets/icons/material-symbols/menu.svg"
-                        else if (leftMenuMode === "close") return "qrc:/assets/icons/material-symbols/close.svg"
-                        return "qrc:/assets/icons/material-symbols/arrow_back.svg"
+                        if (leftMenuMode === "drawer") return "qrc:/IconLibrary/material-symbols/menu.svg"
+                        else if (leftMenuMode === "close") return "qrc:/IconLibrary/material-symbols/close.svg"
+                        return "qrc:/IconLibrary/material-symbols/arrow_back.svg"
                     }
                     color: Theme.colorHeaderContent
                 }
@@ -171,8 +172,8 @@ Rectangle {
                     width: 24; height: 24;
                     anchors.centerIn: parent
                     source: networkClient.connected ?
-                                "qrc:/assets/icons/material-symbols/signal_wifi_0_bar.svg" :
-                                "qrc:/assets/icons/material-symbols/signal_wifi_0_bar.svg" // _off.svg
+                                "qrc:/IconLibrary/material-symbols/signal_wifi_0_bar.svg" :
+                                "qrc:/IconLibrary/material-symbols/signal_wifi_0_bar.svg" // _off.svg
                     color: Theme.colorHeaderContent
 
                     Rectangle {
@@ -196,8 +197,8 @@ Rectangle {
                     width: 24; height: 24;
                     anchors.centerIn: parent
                     source: deviceManager.bluetooth ?
-                                "qrc:/assets/icons/material-symbols/sensors/bluetooth.svg" :
-                                "qrc:/assets/icons/material-symbols/sensors/bluetooth_disabled.svg"
+                                "qrc:/IconLibrary/material-symbols/sensors/bluetooth.svg" :
+                                "qrc:/IconLibrary/material-symbols/sensors/bluetooth_disabled.svg"
                     color: Theme.colorHeaderContent
 
                     Rectangle {
@@ -246,7 +247,7 @@ Rectangle {
                     height: (headerHeight / 2)
                     anchors.centerIn: parent
 
-                    source: "qrc:/assets/icons/material-symbols/more_vert.svg"
+                    source: "qrc:/IconLibrary/material-symbols/more_vert.svg"
                     color: Theme.colorHeaderContent
                 }
             }

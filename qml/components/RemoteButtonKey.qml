@@ -1,9 +1,9 @@
 import QtQuick
 import QtQuick.Controls
 
-import ThemeEngine
+import ComponentLibrary
 import LocalActions
-import "qrc:/js/UtilsActions.js" as UtilsActions
+import Lighthouse
 
 Rectangle {
     id: remoteButtonKey
@@ -46,7 +46,7 @@ Rectangle {
 
             IconSvg {
                 anchors.centerIn: parent
-                source: "qrc:/assets/icons/material-symbols/lock.svg"
+                source: "qrc:/IconLibrary/material-symbols/lock.svg"
             }
         }
 
@@ -57,8 +57,8 @@ Rectangle {
 
             color: remoteButtonKey.isValid ? Theme.colorSuccess : Theme.colorWarning
             source: remoteButtonKey.isValid ?
-                        "qrc:/assets/icons/material-symbols/check.svg" :
-                        "qrc:/assets/icons/material-symbols/warning.svg"
+                        "qrc:/IconLibrary/material-symbols/check.svg" :
+                        "qrc:/IconLibrary/material-symbols/warning.svg"
         }
 
         Text {

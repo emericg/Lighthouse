@@ -5,7 +5,7 @@ import QtQuick.Controls
 import QtMultimedia
 import ZXingCpp
 
-import ThemeEngine
+import ComponentLibrary
 
 Rectangle {
     id: qrreader

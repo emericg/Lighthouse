@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 
-import ThemeEngine
+import ComponentLibrary
 
 Rectangle {
     id: actionbarSelection
@@ -34,7 +34,7 @@ Rectangle {
             height: 36
             anchors.verticalCenter: parent.verticalCenter
 
-            source: "qrc:/assets/icons/material-symbols/backspace-fill.svg"
+            source: "qrc:/IconLibrary/material-symbols/backspace-fill.svg"
             sourceRotation: 180
             iconColor: Theme.colorActionbarContent
             backgroundColor: Theme.colorActionbarHighlight
@@ -69,7 +69,7 @@ Rectangle {
             onClicked: confirmDeleteDevice.open()
 
             text: qsTr("Delete")
-            source: "qrc:/assets/icons/material-symbols/delete.svg"
+            source: "qrc:/IconLibrary/material-symbols/delete.svg"
         }
     }
 

@@ -3,7 +3,7 @@ import QtQuick.Controls
 
 import ZXingCpp
 
-import ThemeEngine
+import ComponentLibrary
 
 Image {
     id: settingsQrCode

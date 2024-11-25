@@ -1,6 +1,7 @@
 import QtQuick
 
-import ThemeEngine
+import ComponentLibrary
+import Lighthouse
 
 Rectangle {
     id: mobileExit

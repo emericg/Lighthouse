@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 
-import ThemeEngine
+import ComponentLibrary
 
 Popup {
     id: actionMenu
@@ -55,7 +55,7 @@ Popup {
 
             index: 1
             text: qsTr("Connect")
-            source: "qrc:/assets/icons/material-icons/outlined/bluetooth_disabled.svg"
+            source: "qrc:/IconLibrary/material-icons/outlined/bluetooth_disabled.svg"
             layoutDirection: actionMenu.layoutDirection
             visible: (deviceManager.bluetooth && selectedDevice && !selectedDevice.busy)
 
@@ -70,7 +70,7 @@ Popup {
 
             index: 2
             text: qsTr("Disconnect")
-            source: "qrc:/assets/icons/material-icons/outlined/bluetooth_disabled.svg"
+            source: "qrc:/IconLibrary/material-icons/outlined/bluetooth_disabled.svg"
             layoutDirection: actionMenu.layoutDirection
             visible: (deviceManager.bluetooth && selectedDevice && selectedDevice.busy)
 

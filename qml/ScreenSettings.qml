@@ -1,7 +1,8 @@
 import QtQuick
 import QtQuick.Controls
 
-import ThemeEngine
+import ComponentLibrary
+import Lighthouse
 
 Loader {
     id: screenSettings
@@ -56,7 +57,7 @@ Loader {
 
             ListTitle {
                 text: qsTr("Application")
-                source: "qrc:/assets/icons/material-symbols/settings.svg"
+                source: "qrc:/IconLibrary/material-symbols/settings.svg"
             }
 
             ////////////////
@@ -74,7 +75,7 @@ Loader {
                     width: 24
                     height: 24
                     color: Theme.colorIcon
-                    source: "qrc:/assets/icons/material-icons/duotone/style.svg"
+                    source: "qrc:/IconLibrary/material-icons/duotone/style.svg"
                 }
 
                 Text {
@@ -194,7 +195,7 @@ Loader {
                     width: 24
                     height: 24
                     color: Theme.colorIcon
-                    source: "qrc:/assets/icons/material-icons/duotone/brightness_4.svg"
+                    source: "qrc:/IconLibrary/material-icons/duotone/brightness_4.svg"
                 }
 
                 Text {
@@ -212,7 +213,7 @@ Loader {
                     verticalAlignment: Text.AlignVCenter
                 }
 
-                SwitchThemedDesktop {
+                SwitchThemed {
                     id: switch_appThemeAuto
                     anchors.right: parent.right
                     anchors.rightMargin: 8
@@ -271,7 +272,7 @@ Loader {
                     width: 24
                     height: 24
                     color: Theme.colorIcon
-                    source: "qrc:/assets/icons/material-icons/duotone/minimize.svg"
+                    source: "qrc:/IconLibrary/material-icons/duotone/minimize.svg"
                 }
 
                 Text {
@@ -289,7 +290,7 @@ Loader {
                     verticalAlignment: Text.AlignVCenter
                 }
 
-                SwitchThemedDesktop {
+                SwitchThemed {
                     id: switch_minimized
                     anchors.right: parent.right
                     anchors.rightMargin: 8
@@ -318,7 +319,7 @@ Loader {
                     width: 24
                     height: 24
                     color: Theme.colorIcon
-                    source: "qrc:/assets/icons/material-symbols/autorenew.svg"
+                    source: "qrc:/IconLibrary/material-symbols/autorenew.svg"
                 }
 
                 Text {
@@ -336,7 +337,7 @@ Loader {
                     verticalAlignment: Text.AlignVCenter
                 }
 
-                SwitchThemedDesktop {
+                SwitchThemed {
                     id: switch_service
                     anchors.right: parent.right
                     anchors.rightMargin: 8
@@ -391,7 +392,7 @@ Loader {
                     width: 24
                     height: 24
                     color: Theme.colorIcon
-                    source: "qrc:/assets/icons/material-symbols/notifications.svg"
+                    source: "qrc:/IconLibrary/material-symbols/notifications.svg"
                 }
 
                 Text {
@@ -409,7 +410,7 @@ Loader {
                     verticalAlignment: Text.AlignVCenter
                 }
 
-                SwitchThemedDesktop {
+                SwitchThemed {
                     id: switch_notifications
                     anchors.right: parent.right
                     anchors.rightMargin: 8
@@ -444,7 +445,7 @@ Loader {
 
             ListTitle {
                 text: qsTr("Bluetooth")
-                source: "qrc:/assets/icons/material-symbols/sensors/bluetooth.svg"
+                source: "qrc:/IconLibrary/material-symbols/sensors/bluetooth.svg"
 
                 // Android only
                 visible: (Qt.platform.os === "android")
@@ -467,7 +468,7 @@ Loader {
                     width: 24
                     height: 24
                     color: Theme.colorIcon
-                    source: "qrc:/assets/icons/material-icons/outlined/bluetooth_disabled.svg"
+                    source: "qrc:/IconLibrary/material-icons/outlined/bluetooth_disabled.svg"
                 }
 
                 Text {
@@ -485,7 +486,7 @@ Loader {
                     verticalAlignment: Text.AlignVCenter
                 }
 
-                SwitchThemedDesktop {
+                SwitchThemed {
                     id: switch_bluetoothControl
                     anchors.right: parent.right
                     anchors.rightMargin: 8
@@ -520,7 +521,7 @@ Loader {
             ListTitle {
                 visible: isDesktop
                 text: qsTr("Network server")
-                source: "qrc:/assets/icons/material-icons/duotone/list.svg"
+                source: "qrc:/IconLibrary/material-icons/duotone/list.svg"
             }
 
             ////////////////
@@ -540,7 +541,7 @@ Loader {
                     width: 24
                     height: 24
                     color: Theme.colorIcon
-                    source: "qrc:/assets/icons/material-icons/duotone/devices.svg"
+                    source: "qrc:/IconLibrary/material-icons/duotone/devices.svg"
                 }
 
                 Text {
@@ -558,7 +559,7 @@ Loader {
                     verticalAlignment: Text.AlignVCenter
                 }
 
-                SwitchThemedDesktop {
+                SwitchThemed {
                     id: switch_server
                     anchors.right: parent.right
                     anchors.rightMargin: 8
@@ -615,7 +616,7 @@ Loader {
 
                 active: isDesktop && networkServer && networkServer.running
                 asynchronous: true
-                source: "SettingsQrGenerator.qml"
+                source: "components/SettingsQrGenerator.qml"
             }
 
             ////////////////
@@ -624,7 +625,7 @@ Loader {
                 anchors.left: parent.left
                 visible: isMobile
                 text: qsTr("Desktop remote control")
-                source: "qrc:/assets/icons/material-icons/duotone/devices.svg"
+                source: "qrc:/IconLibrary/material-icons/duotone/devices.svg"
 
                 Rectangle {
                     anchors.left: parent.left
@@ -647,7 +648,7 @@ Loader {
                     anchors.verticalCenter: parent.verticalCenter
 
                     colorBackground: highlighted ? Theme.colorBackground : Theme.colorForeground
-                    source: "qrc:/assets/icons/material-icons/duotone/qr_code_scanner.svg"
+                    source: "qrc:/IconLibrary/material-icons/duotone/qr_code_scanner.svg"
 
                     onClicked: {
                         if (!utilsApp.checkMobileCameraPermission()) {
@@ -670,7 +671,7 @@ Loader {
 
                 active: isMobile && buttonReader.highlighted
                 asynchronous: true
-                source: "SettingsQrReader.qml"
+                source: "components/SettingsQrReader.qml"
             }
 
             ////////
@@ -741,7 +742,7 @@ Loader {
                     width: 24
                     height: 24
                     color: Theme.colorIcon
-                    source: "qrc:/assets/icons/material-symbols/pin.svg"
+                    source: "qrc:/IconLibrary/material-symbols/pin.svg"
                 }
 
                 TextFieldThemed {
@@ -793,7 +794,7 @@ Loader {
                     width: 24
                     height: 24
                     color: Theme.colorIcon
-                    source: "qrc:/assets/icons/material-symbols/password.svg"
+                    source: "qrc:/IconLibrary/material-symbols/password.svg"
                 }
 
                 TextFieldThemed {
@@ -845,7 +846,7 @@ Loader {
                     width: 24
                     height: 24
                     color: Theme.colorIcon
-                    source: "qrc:/assets/icons/material-symbols/supervisor_account.svg"
+                    source: "qrc:/IconLibrary/material-symbols/supervisor_account.svg"
                 }
 
                 Text {
@@ -863,7 +864,7 @@ Loader {
                     verticalAlignment: Text.AlignVCenter
                 }
 
-                SwitchThemedDesktop {
+                SwitchThemed {
                     id: switch_fakeIt
                     anchors.right: parent.right
                     anchors.rightMargin: 8

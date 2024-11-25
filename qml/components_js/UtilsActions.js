@@ -1,25 +1,27 @@
 // UtilsActions.js
 // Version 0
 
+.pragma library
+
+//.import ComponentLibrary 1.0 as ThemeEngine
 .import LocalActions 1.0 as LocalActions
-.import ThemeEngine 1.0 as ThemeEngine
 
 /* ************************************************************************** */
 
 function getActionIcon(action) {
 
     if (action === LocalActions.LocalActions.ACTION_NO_ACTION)
-        return "qrc:/assets/icons/material-icons/duotone/touch_app.svg"
+        return "qrc:/IconLibrary/material-icons/duotone/touch_app.svg"
 
     if (action === LocalActions.LocalActions.ACTION_keys)
         return "qrc:/assets/gfx/icons/keyboard-variant.svg"
 
     if (action === LocalActions.LocalActions.ACTION_commands)
-        return "qrc:/assets/icons/material-icons/duotone/launch.svg"
+        return "qrc:/IconLibrary/material-icons/duotone/launch.svg"
 
     if (action > LocalActions.LocalActions.ACTION_MEDIA_START &&
         action < LocalActions.LocalActions.ACTION_MEDIA_STOP)
-        return "qrc:/assets/icons/material-symbols/media/slideshow.svg"
+        return "qrc:/IconLibrary/material-symbols/media/slideshow.svg"
 
     if (action > LocalActions.LocalActions.ACTION_KEYBOARD_START &&
         action < LocalActions.LocalActions.ACTION_KEYBOARD_STOP)
@@ -27,7 +29,7 @@ function getActionIcon(action) {
 
     if (action > LocalActions.LocalActions.ACTION_MPRIS_START &&
         action < LocalActions.LocalActions.ACTION_MPRIS_STOP)
-        return "qrc:/assets/icons/material-symbols/media/slideshow.svg"
+        return "qrc:/IconLibrary/material-symbols/media/slideshow.svg"
 
     return ""
 }

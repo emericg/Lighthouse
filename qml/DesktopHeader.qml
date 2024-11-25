@@ -1,8 +1,8 @@
 import QtQuick
 
-import ThemeEngine
+import ComponentLibrary
 import DeviceUtils
-import "qrc:/js/UtilsDeviceSensors.js" as UtilsDeviceSensors
+import Lighthouse
 
 Rectangle {
     id: appHeader
@@ -195,7 +195,7 @@ Rectangle {
             visible: (appContent.state === "ScreenDeviceList")
             enabled: visible
 
-            source: "qrc:/assets/icons/material-symbols/filter_list.svg"
+            source: "qrc:/IconLibrary/material-symbols/filter_list.svg"
             iconColor: Theme.colorHeaderContent
             textColor: Theme.colorHeaderContent
             backgroundColor: Theme.colorHeaderHighlight
@@ -272,13 +272,13 @@ Rectangle {
                 source: {
                     if (!selectedDevice) return ""
                     if (selectedDevice.status === DeviceUtils.DEVICE_OFFLINE)
-                        return "qrc:/assets/icons/material-icons/outlined/bluetooth_disabled.svg"
+                        return "qrc:/IconLibrary/material-icons/outlined/bluetooth_disabled.svg"
                     if (selectedDevice.status === DeviceUtils.DEVICE_QUEUED ||
                         selectedDevice.status === DeviceUtils.DEVICE_CONNECTING ||
                         selectedDevice.status === DeviceUtils.DEVICE_DISCONNECTING)
-                        return "qrc:/assets/icons/material-icons/duotone/bluetooth_searching.svg"
+                        return "qrc:/IconLibrary/material-icons/duotone/bluetooth_searching.svg"
                     if (selectedDevice.status === DeviceUtils.DEVICE_CONNECTED)
-                        return "qrc:/assets/icons/material-icons/duotone/bluetooth_connected.svg"
+                        return "qrc:/IconLibrary/material-icons/duotone/bluetooth_connected.svg"
                 }
                 tooltipText: {
                     if (!selectedDevice) return ""
@@ -319,7 +319,7 @@ Rectangle {
                 width: headerHeight
                 height: headerHeight
 
-                source: "qrc:/assets/icons/material-icons/duotone/devices.svg"
+                source: "qrc:/IconLibrary/material-icons/duotone/devices.svg"
                 colorContent: Theme.colorHeaderContent
                 colorHighlight: Theme.colorHeaderHighlight
 
@@ -331,7 +331,7 @@ Rectangle {
                 width: headerHeight
                 height: headerHeight
 
-                source: "qrc:/assets/icons/material-icons/duotone/tune.svg"
+                source: "qrc:/IconLibrary/material-icons/duotone/tune.svg"
                 colorContent: Theme.colorHeaderContent
                 colorHighlight: Theme.colorHeaderHighlight
 
@@ -343,7 +343,7 @@ Rectangle {
                 width: headerHeight
                 height: headerHeight
 
-                source: "qrc:/assets/icons/material-icons/duotone/info.svg"
+                source: "qrc:/IconLibrary/material-icons/duotone/info.svg"
                 colorContent: Theme.colorHeaderContent
                 colorHighlight: Theme.colorHeaderHighlight
 
@@ -369,4 +369,6 @@ Rectangle {
         opacity: 0.33
         color: Theme.colorHeaderHighlight
     }
+
+    ////////////
 }

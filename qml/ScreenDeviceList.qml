@@ -1,7 +1,8 @@
 import QtQuick
 import QtQuick.Controls
 
-import ThemeEngine
+import ComponentLibrary
+import Lighthouse
 
 Item {
     id: screenDeviceList
@@ -281,9 +282,9 @@ Item {
 
                         source: {
                             if (mprisControls.playbackStatus === "paused")
-                                return "qrc:/assets/icons/material-symbols/media/slideshow.svg"
+                                return "qrc:/IconLibrary/material-symbols/media/slideshow.svg"
                             else
-                                return "qrc:/assets/icons/material-symbols/media/slideshow.svg"
+                                return "qrc:/IconLibrary/material-symbols/media/slideshow.svg"
                         }
                         color: Theme.colorSeparator
                         opacity: 0.5
@@ -387,7 +388,7 @@ Item {
 
                         opacity: 0.66
                         color: Theme.colorSeparator
-                        source: "qrc:/assets/icons/material-icons/duotone/devices.svg"
+                        source: "qrc:/IconLibrary/material-icons/duotone/devices.svg"
                     }
 
                     MouseArea {
@@ -483,7 +484,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
 
                     color: Theme.colorHighContrast
-                    source: "qrc:/assets/icons/material-icons/duotone/devices.svg"
+                    source: "qrc:/IconLibrary/material-icons/duotone/devices.svg"
                 }
                 IconSvg {
                     width: 32
@@ -493,7 +494,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
 
                     color: Theme.colorHighContrast
-                    source: "qrc:/assets/icons/material-symbols/chevron_right.svg"
+                    source: "qrc:/IconLibrary/material-symbols/chevron_right.svg"
                 }
 
                 MouseArea {

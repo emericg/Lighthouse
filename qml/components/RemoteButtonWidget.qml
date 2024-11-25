@@ -1,9 +1,9 @@
 import QtQuick
 import QtQuick.Controls
 
-import ThemeEngine
+import ComponentLibrary
 import LocalActions
-import "qrc:/js/UtilsActions.js" as UtilsActions
+import Lighthouse
 
 Rectangle {
     id: remoteButton

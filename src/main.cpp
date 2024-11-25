@@ -40,8 +40,10 @@
 #include "local_controls/mpris_dbus.h"
 
 #include <MobileUI>
-#include <ZXingCpp>
 #include <SingleApplication>
+#if defined(ENABLE_ZXING)
+#include <ZXingCpp>
+#endif
 
 #include <QtGlobal>
 #include <QLibraryInfo>
@@ -113,14 +115,14 @@ int main(int argc, char *argv[])
     app.setWindowIcon(QIcon(":/assets/gfx/logos/logo.svg"));
 
     SystrayManager *st = SystrayManager::getInstance();
-    MenubarManager *mb = MenubarManager::getInstance();    
+    MenubarManager *mb = MenubarManager::getInstance();
     LocalControls *localControls = LocalControls::getInstance();
 
 #if defined(ENABLE_MPRIS)
     MprisController *mprisControls = MprisController::getInstance();
     mprisControls->select_player();
 #endif
-#endif
+#endif // desktop section
 
 #if defined(Q_OS_ANDROID) || defined(Q_OS_IOS) // mobile section
     networkClient = new NetworkClient();
@@ -129,7 +131,7 @@ int main(int argc, char *argv[])
     networkServer = new NetworkServer();
 
     dm->listenDevices_start();
-#endif
+#endif // mobile section
 
     // Init generic utils
     UtilsApp *utilsApp = UtilsApp::getInstance();
@@ -144,15 +146,15 @@ int main(int argc, char *argv[])
     // Translate the application
     utilsLanguage->loadLanguage(sm->getAppLanguage());
 
-    // ThemeEngine
-    qmlRegisterSingletonType(QUrl("qrc:/qml/ThemeEngine.qml"), "ThemeEngine", 1, 0, "Theme");
-
     MobileUI::registerQML();
     DeviceUtils::registerQML();
     LocalActions::registerQML();
 
     // Then we start the UI
     QQmlApplicationEngine engine;
+    engine.addImportPath(":/qt/qml/Lighthouse");
+    engine.addImportPath(":/qt/qml/ComponentLibrary");
+
     QQmlContext *engine_context = engine.rootContext();
 
     engine_context->setContextProperty("deviceManager", dm);
@@ -166,13 +168,15 @@ int main(int argc, char *argv[])
     engine_context->setContextProperty("networkClient", networkClient);
     engine_context->setContextProperty("networkControls", networkClient);
 
+#if defined(ENABLE_ZXING)
     // Barcode (zxing-cpp)
     ZXingCpp::registerQMLTypes();
     ZXingCpp::registerQMLImageProvider(engine);
+#endif
 
 #if defined(Q_OS_ANDROID) || defined(Q_OS_IOS) || defined(FORCE_MOBILE_UI)
     // Load the main view
-    engine.load(QUrl(QStringLiteral("qrc:/qml/MobileApplication.qml")));
+    engine.loadFromModule("Lighthouse", "MobileApplication");
 #else
     // desktop specific stuff
     engine_context->setContextProperty("startMinimized", (start_minimized || sm->getMinimized()));
@@ -182,7 +186,7 @@ int main(int argc, char *argv[])
     engine_context->setContextProperty("mprisControls", mprisControls);
 
     // Load the main view
-    engine.load(QUrl(QStringLiteral("qrc:/qml/DesktopApplication.qml")));
+    engine.loadFromModule("Lighthouse", "DesktopApplication");
 #endif
 
     if (engine.rootObjects().isEmpty())

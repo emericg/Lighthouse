@@ -1,7 +1,8 @@
 import QtQuick
 import QtQuick.Controls
 
-import ThemeEngine
+import ComponentLibrary
+import Lighthouse
 
 Drawer {
     width: (appWindow.screenOrientation === Qt.PortraitOrientation || appWindow.width < 480)
@@ -120,7 +121,7 @@ Drawer {
                 DrawerItem {
                     highlighted: (appContent.state === "ScreenSettings")
                     text: qsTr("Settings")
-                    source: "qrc:/assets/icons/material-icons/duotone/tune.svg"
+                    source: "qrc:/IconLibrary/material-icons/duotone/tune.svg"
 
                     onClicked: {
                         screenSettings.loadScreen()
@@ -132,7 +133,7 @@ Drawer {
                     highlighted: (appContent.state === "ScreenAbout" ||
                                   appContent.state === "ScreenAboutPermissions")
                     text: qsTr("About")
-                    source: "qrc:/assets/icons/material-icons/duotone/info.svg"
+                    source: "qrc:/IconLibrary/material-icons/duotone/info.svg"
 
                     onClicked: {
                         screenAbout.loadScreen()
@@ -147,7 +148,7 @@ Drawer {
                 ////////
 
                 DrawerItem {
-                    source: "qrc:/assets/icons/material-symbols/sort.svg"
+                    source: "qrc:/IconLibrary/material-symbols/sort.svg"
                     text: {
                         var txt = qsTr("Order by:") + " "
                         if (settingsManager.orderBy === "model") {

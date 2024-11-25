@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Effects
 import QtQuick.Controls
 
-import ThemeEngine
+import ComponentLibrary
 
 Popup {
     id: popupBeaconKey
@@ -39,7 +39,7 @@ Popup {
 
     Overlay.modal: Rectangle {
         color: "#000"
-        opacity: ThemeEngine.isLight ? 0.24 : 0.666
+        opacity: Theme.isLight ? 0.24 : 0.666
     }
 
     background: Rectangle {
@@ -59,7 +59,7 @@ Popup {
         layer.effect:  MultiEffect {
             autoPaddingEnabled: true
             shadowEnabled: true
-            shadowColor: ThemeEngine.isLight ? "#88000000" : "#88ffffff"
+            shadowColor: Theme.isLight ? "#88000000" : "#88ffffff"
         }
     }
 

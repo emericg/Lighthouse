@@ -1,10 +1,9 @@
 import QtQuick
 import QtQuick.Controls
 
-import ThemeEngine
+import ComponentLibrary
 import DeviceUtils
-import "qrc:/js/UtilsDeviceSensors.js" as UtilsDeviceSensors
-import "qrc:/utils/UtilsNumber.js" as UtilsNumber
+import Lighthouse
 
 Loader {
     id: devicePBP

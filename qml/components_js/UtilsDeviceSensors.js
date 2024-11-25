@@ -1,8 +1,10 @@
 // UtilsDeviceSensors.js
 // Version 4
 
+.pragma library
+
+//.import ComponentLibrary 1.0 as ThemeEngine
 .import DeviceUtils 1.0 as DeviceUtils
-.import ThemeEngine 1.0 as ThemeEngine
 
 /* ************************************************************************** */
 
@@ -71,50 +73,50 @@ function getDeviceIcon(device, devicePlanted) {
             if (deviceName === "ropot" || deviceName === "Parrot pot")
                 src = "qrc:/assets/gfx/icons/pot_flower.svg"
             else
-                src = "qrc:/assets/icons/material-symbols/local_florist.svg"
+                src = "qrc:/IconLibrary/material-symbols/local_florist.svg"
         } else {
             if (deviceName === "ropot" || deviceName === "Parrot pot")
                 src = "qrc:/assets/gfx/icons/pot_empty.svg"
             else
-                src = "qrc:/assets/icons/material-symbols/settings_remote.svg"
+                src = "qrc:/IconLibrary/material-symbols/settings_remote.svg"
         }
     } else if (device.isThermometer) {
         if (deviceName === "ThermoBeacon" ||
             deviceName === "MJ_HT_V1" ||
             deviceName === "ClearGrass Temp & RH" || deviceName === "Qingping Temp & RH M" ||
             deviceName === "Qingping Temp RH Lite") {
-            src = "qrc:/assets/icons/material-symbols/trip_origin.svg"
+            src = "qrc:/IconLibrary/material-symbols/trip_origin.svg"
         } else if (deviceName === "LYWSD02" ||
                    deviceName === "MHO-C303") {
-            src = "qrc:/assets/icons/material-symbols/crop_16_9.svg"
+            src = "qrc:/IconLibrary/material-symbols/crop_16_9.svg"
         } else if (deviceName === "LYWSD03MMC" ||
                    deviceName === "MHO-C401" ||
                    deviceName === "XMWSDJO4MMC") {
-            src = "qrc:/assets/icons/material-symbols/crop_square.svg"
+            src = "qrc:/IconLibrary/material-symbols/crop_square.svg"
         } else if (deviceName === "Qingping Alarm Clock" ||
                    deviceName === "Qingping Temp RH Barometer") {
-            src = "qrc:/assets/icons/material-icons/duotone/timer.svg"
+            src = "qrc:/IconLibrary/material-icons/duotone/timer.svg"
         } else {
-            src = "qrc:/assets/icons/material-symbols/settings_remote.svg"
+            src = "qrc:/IconLibrary/material-symbols/settings_remote.svg"
         }
     } else if (device.isEnvironmentalSensor) {
         if (deviceName === "GeigerCounter") {
             src = "qrc:/assets/gfx/icons/nuclear_icon.svg"
         } else {
-            src = "qrc:/assets/icons/material-symbols/settings_remote.svg"
+            src = "qrc:/IconLibrary/material-symbols/settings_remote.svg"
         }
     } else if (device.isLight) {
-        src = "qrc:/assets/icons/material-symbols/sensors/lightbulb.svg"
+        src = "qrc:/IconLibrary/material-symbols/hardware/lightbulb.svg"
     } else if (device.isBeacon) {
-        src = "qrc:/assets/icons/material-symbols/sensors/sensors.svg"
+        src = "qrc:/IconLibrary/material-symbols/sensors/sensors.svg"
     } else if (device.isRemote) {
-        src = "qrc:/assets/icons/material-symbols/sensors/nest_remote.svg"
+        src = "qrc:/IconLibrary/material-symbols/hardware/nest_remote.svg"
     } else if (device.isPBP) {
         src = "qrc:/assets/gfx/icons/pbp.svg"
     } else if (device.isPGP) {
         src = "qrc:/assets/gfx/icons/pgp.svg"
     } else {
-        src = "qrc:/assets/icons/material-symbols/settings_remote.svg"
+        src = "qrc:/IconLibrary/material-symbols/hardware/settings_remote.svg"
     }
 
     return src
@@ -171,21 +173,21 @@ function getDeviceStatusColor(deviceStatus) {
 }
 
 function getDeviceStatusIcon(deviceStatus) {
-    var src = "qrc:/assets/icons/material-icons/outlined/bluetooth.svg"
+    var src = "qrc:/IconLibrary/material-icons/outlined/bluetooth.svg"
 
     if (deviceStatus === DeviceUtils.DeviceUtils.DEVICE_OFFLINE) {
-        src = "qrc:/assets/icons/material/bluetooth_disabled.svg"
+        src = "qrc:/IconLibrary/material/bluetooth_disabled.svg"
     } else if (deviceStatus === DeviceUtils.DeviceUtils.DEVICE_QUEUED ||
                deviceStatus === DeviceUtils.DeviceUtils.DEVICE_DISCONNECTING ||
                deviceStatus === DeviceUtils.DeviceUtils.DEVICE_CONNECTING) {
-        src = "qrc:/assets/icons/material-icons/duotone/settings_bluetooth.svg"
+        src = "qrc:/IconLibrary/material-icons/duotone/settings_bluetooth.svg"
     } else if (deviceStatus === DeviceUtils.DeviceUtils.DEVICE_CONNECTED) {
-        src = "qrc:/assets/icons/material-icons/duotone/bluetooth_connected.svg"
+        src = "qrc:/IconLibrary/material-icons/duotone/bluetooth_connected.svg"
     } else if (deviceStatus === DeviceUtils.DeviceUtils.DEVICE_WORKING ||
                deviceStatus === DeviceUtils.DeviceUtils.DEVICE_UPDATING ||
                deviceStatus === DeviceUtils.DeviceUtils.DEVICE_UPDATING_HISTORY ||
                deviceStatus === DeviceUtils.DeviceUtils.DEVICE_UPDATING_REALTIME) {
-        src = "qrc:/assets/icons/material-icons/duotone/bluetooth_searching.svg"
+        src = "qrc:/IconLibrary/material-icons/duotone/bluetooth_searching.svg"
     }
 
     return src
@@ -197,23 +199,23 @@ function getDeviceBatteryIcon(batteryLevel) {
     var src = ""
 
     if (batteryLevel > 95) {
-        src = "qrc:/assets/icons/material-icons/duotone/battery_full.svg";
+        src = "qrc:/IconLibrary/material-icons/duotone/battery_full.svg";
     } else if (batteryLevel > 85) {
-        src = "qrc:/assets/icons/material-icons/duotone/battery_90.svg";
+        src = "qrc:/IconLibrary/material-icons/duotone/battery_90.svg";
     } else if (batteryLevel > 75) {
-        src = "qrc:/assets/icons/material-icons/duotone/battery_80.svg";
+        src = "qrc:/IconLibrary/material-icons/duotone/battery_80.svg";
     } else if (batteryLevel > 55) {
-        src = "qrc:/assets/icons/material-icons/duotone/battery_60.svg";
+        src = "qrc:/IconLibrary/material-icons/duotone/battery_60.svg";
     } else if (batteryLevel > 45) {
-        src = "qrc:/assets/icons/material-icons/duotone/battery_50.svg";
+        src = "qrc:/IconLibrary/material-icons/duotone/battery_50.svg";
     } else if (batteryLevel > 25) {
-        src = "qrc:/assets/icons/material-icons/duotone/battery_30.svg";
+        src = "qrc:/IconLibrary/material-icons/duotone/battery_30.svg";
     } else if (batteryLevel > 15) {
-        src = "qrc:/assets/icons/material-icons/duotone/battery_20.svg";
+        src = "qrc:/IconLibrary/material-icons/duotone/battery_20.svg";
     } else if (batteryLevel > 1) {
-        src = "qrc:/assets/icons/material-icons/duotone/battery_10.svg";
+        src = "qrc:/IconLibrary/material-icons/duotone/battery_10.svg";
     } else if (batteryLevel >= 0) {
-        src = "qrc:/assets/icons/material-icons/duotone/battery_unknown.svg";
+        src = "qrc:/IconLibrary/material-icons/duotone/battery_unknown.svg";
     }
 
     return src
@@ -268,27 +270,27 @@ function getDeviceCapabilityIcon(capabilityId) {
     var src = ""
 
     if (capabilityId === DeviceUtils.DeviceUtils.DEVICE_REALTIME) {
-        src = "qrc:/assets/icons/material-icons/duotone/update.svg"
+        src = "qrc:/IconLibrary/material-icons/duotone/update.svg"
     } else if (capabilityId === DeviceUtils.DeviceUtils.DEVICE_HISTORY) {
         src = "qrc:/assets/gfx/icons/duotone-date_all.svg"
     } else if (capabilityId === DeviceUtils.DeviceUtils.DEVICE_BATTERY) {
-        src = "qrc:/assets/icons/material-icons/duotone/battery_full.svg"
+        src = "qrc:/IconLibrary/material-icons/duotone/battery_full.svg"
     } else if (capabilityId === DeviceUtils.DeviceUtils.DEVICE_CLOCK) {
-        src = "qrc:/assets/icons/material-icons/duotone/timer.svg"
+        src = "qrc:/IconLibrary/material-icons/duotone/timer.svg"
     } else if (capabilityId === DeviceUtils.DeviceUtils.DEVICE_LED_STATUS) {
-        src = "qrc:/assets/icons/material-icons/duotone/emoji_objects.svg"
+        src = "qrc:/IconLibrary/material-icons/duotone/emoji_objects.svg"
     } else if (capabilityId === DeviceUtils.DeviceUtils.DEVICE_LED_RGB) {
-        src = "qrc:/assets/icons/material-icons/duotone/emoji_objects.svg"
+        src = "qrc:/IconLibrary/material-icons/duotone/emoji_objects.svg"
     } else if (capabilityId === DeviceUtils.DeviceUtils.DEVICE_BUTTONS) {
-        src = "qrc:/assets/icons/material-icons/duotone/touch_app.svg"
+        src = "qrc:/IconLibrary/material-icons/duotone/touch_app.svg"
     } else if (capabilityId === DeviceUtils.DeviceUtils.DEVICE_LAST_MOVE) {
-        src = "qrc:/assets/icons/material-icons/duotone/pin_drop.svg"
+        src = "qrc:/IconLibrary/material-icons/duotone/pin_drop.svg"
     } else if (capabilityId === DeviceUtils.DeviceUtils.DEVICE_WATER_TANK) {
-        src = "qrc:/assets/icons/material-icons/duotone/local_drink.svg"
+        src = "qrc:/IconLibrary/material-icons/duotone/local_drink.svg"
     } else if (capabilityId === DeviceUtils.DeviceUtils.DEVICE_CALIBRATION) {
-        src = "qrc:/assets/icons/material-icons/duotone/model_training.svg"
+        src = "qrc:/IconLibrary/material-icons/duotone/model_training.svg"
     } else if (capabilityId === DeviceUtils.DeviceUtils.DEVICE_REBOOT) {
-        src = "qrc:/assets/icons/material-icons/duotone/restart_alt.svg"
+        src = "qrc:/IconLibrary/material-icons/duotone/restart_alt.svg"
     }
 
     return src
@@ -360,55 +362,55 @@ function getDeviceSensorIcon(sensorId) {
     var src = ""
 
     if (sensorId === DeviceUtils.DeviceUtils.SENSOR_SOIL_MOISTURE) {
-        src = "qrc:/assets/icons/material-icons/duotone/water_mid.svg"
+        src = "qrc:/IconLibrary/material-icons/duotone/water_mid.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_SOIL_CONDUCTIVITY) {
-        src = "qrc:/assets/icons/material-symbols/tonality.svg"
+        src = "qrc:/IconLibrary/material-symbols/tonality.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_SOIL_TEMPERATURE) {
-        src = "qrc:/assets/icons/material-symbols/ac_unit.svg"
+        src = "qrc:/IconLibrary/material-symbols/ac_unit.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_SOIL_PH) {
-        src = "qrc:/assets/icons/material-symbols/tonality.svg"
+        src = "qrc:/IconLibrary/material-symbols/tonality.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_TEMPERATURE) {
-        src = "qrc:/assets/icons/material-symbols/ac_unit.svg"
+        src = "qrc:/IconLibrary/material-symbols/ac_unit.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_HUMIDITY) {
-        src = "qrc:/assets/icons/material-icons/duotone/water_full.svg"
+        src = "qrc:/IconLibrary/material-icons/duotone/water_full.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_PRESSURE) {
-        src = "qrc:/assets/icons/material-icons/duotone/speed.svg"
+        src = "qrc:/IconLibrary/material-icons/duotone/speed.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_LUMINOSITY) {
-        src = "qrc:/assets/icons/material-icons/duotone/wb_sunny.svg"
+        src = "qrc:/IconLibrary/material-icons/duotone/wb_sunny.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_UV) {
-        src = "qrc:/assets/icons/material-icons/duotone/wb_sunny.svg"
+        src = "qrc:/IconLibrary/material-icons/duotone/wb_sunny.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_SOUND) {
-        src = "qrc:/assets/icons/material-icons/duotone/mic.svg"
+        src = "qrc:/IconLibrary/material-icons/duotone/mic.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_WATER_LEVEL) {
-        src = "qrc:/assets/icons/material-icons/duotone/local_drink.svg"
+        src = "qrc:/IconLibrary/material-icons/duotone/local_drink.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_WIND_DIRECTION) {
-        src = "qrc:/assets/icons/material-symbols/near_me.svg"
+        src = "qrc:/IconLibrary/material-symbols/near_me.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_WIND_SPEED) {
-        src = "qrc:/assets/icons/material-symbols/air.svg"
+        src = "qrc:/IconLibrary/material-symbols/air.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_PM1) {
-        src = "qrc:/assets/icons/material-symbols/air_filter.svg"
+        src = "qrc:/IconLibrary/material-symbols/air_filter.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_PM25) {
-        src = "qrc:/assets/icons/material-symbols/air_filter.svg"
+        src = "qrc:/IconLibrary/material-symbols/air_filter.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_PM10) {
-        src = "qrc:/assets/icons/material-symbols/air_filter.svg"
+        src = "qrc:/IconLibrary/material-symbols/air_filter.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_O2) {
-        src = "qrc:/assets/icons/material-symbols/air.svg"
+        src = "qrc:/IconLibrary/material-symbols/air.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_O3) {
-        src = "qrc:/assets/icons/material-symbols/air.svg"
+        src = "qrc:/IconLibrary/material-symbols/air.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_CO) {
-        src = "qrc:/assets/icons/material-symbols/air.svg"
+        src = "qrc:/IconLibrary/material-symbols/air.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_CO2) {
-        src = "qrc:/assets/icons/material-symbols/air.svg"
+        src = "qrc:/IconLibrary/material-symbols/air.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_eCO2) {
-        src = "qrc:/assets/icons/material-symbols/air.svg"
+        src = "qrc:/IconLibrary/material-symbols/air.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_NO2) {
-        src = "qrc:/assets/icons/material-symbols/air.svg"
+        src = "qrc:/IconLibrary/material-symbols/air.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_SO2) {
-        src = "qrc:/assets/icons/material-symbols/air.svg"
+        src = "qrc:/IconLibrary/material-symbols/air.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_VOC) {
-        src = "qrc:/assets/icons/material-symbols/air.svg"
+        src = "qrc:/IconLibrary/material-symbols/air.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_HCHO) {
-        src = "qrc:/assets/icons/material-symbols/air.svg"
+        src = "qrc:/IconLibrary/material-symbols/air.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_GEIGER) {
         src = "qrc:/assets/gfx/icons/nuclear_icon.svg"
     }

@@ -1,9 +1,8 @@
 import QtQuick
 
-import ThemeEngine
+import ComponentLibrary
 import DeviceUtils
-import "qrc:/utils/UtilsNumber.js" as UtilsNumber
-import "qrc:/js/UtilsDeviceSensors.js" as UtilsDeviceSensors
+import Lighthouse
 
 Item {
     id: deviceWidget
@@ -46,11 +45,11 @@ Item {
 
         // Image
         if (boxDevice.status === DeviceUtils.DEVICE_CONNECTING) {
-            imageStatus.source = "qrc:/assets/icons/material-icons/duotone/bluetooth_searching.svg"
+            imageStatus.source = "qrc:/IconLibrary/material-icons/duotone/bluetooth_searching.svg"
         } else if (boxDevice.status === DeviceUtils.DEVICE_CONNECTED) {
-            imageStatus.source = "qrc:/assets/icons/material-icons/duotone/bluetooth_connected.svg"
+            imageStatus.source = "qrc:/IconLibrary/material-icons/duotone/bluetooth_connected.svg"
         } else if (boxDevice.status >= DeviceUtils.DEVICE_WORKING) {
-            imageStatus.source = "qrc:/assets/icons/material-icons/duotone/bluetooth_connected.svg"
+            imageStatus.source = "qrc:/IconLibrary/material-icons/duotone/bluetooth_connected.svg"
         } else {
             updateSensorRSSI()
         }
@@ -66,15 +65,15 @@ Item {
             if (boxDevice.status === DeviceUtils.DEVICE_CONNECTING) {
                 textStatus.text = UtilsDeviceSensors.getDeviceStatusText(boxDevice.status)
                 textStatus.color = UtilsDeviceSensors.getDeviceStatusColor(boxDevice.status)
-                imageStatus.source = "qrc:/assets/icons/material-icons/duotone/bluetooth_searching.svg"
+                imageStatus.source = "qrc:/IconLibrary/material-icons/duotone/bluetooth_searching.svg"
             } else if (boxDevice.status === DeviceUtils.DEVICE_CONNECTED) {
                 textStatus.text = UtilsDeviceSensors.getDeviceStatusText(boxDevice.status)
                 textStatus.color = UtilsDeviceSensors.getDeviceStatusColor(boxDevice.status)
-                imageStatus.source = "qrc:/assets/icons/material-icons/duotone/bluetooth_connected.svg"
+                imageStatus.source = "qrc:/IconLibrary/material-icons/duotone/bluetooth_connected.svg"
             } else if (boxDevice.status >= DeviceUtils.DEVICE_WORKING) {
                 textStatus.text = UtilsDeviceSensors.getDeviceStatusText(boxDevice.status)
                 textStatus.color = UtilsDeviceSensors.getDeviceStatusColor(boxDevice.status)
-                imageStatus.source = "qrc:/assets/icons/material-icons/duotone/bluetooth_connected.svg"
+                imageStatus.source = "qrc:/IconLibrary/material-icons/duotone/bluetooth_connected.svg"
             } else {
 
                 if (boxDevice.rssi < 0) {
@@ -89,17 +88,17 @@ Item {
                 rssiValue.text = boxDevice.rssi
 
                 if (boxDevice.rssi >= 0) {
-                    imageStatus.source = "" // "qrc:/assets/icons/material-symbols/signal_cellular_off.svg"
+                    imageStatus.source = "" // "qrc:/IconLibrary/material-symbols/signal_cellular_off.svg"
                 } else if (boxDevice.rssi > -50) {
-                    imageStatus.source = "qrc:/assets/icons/material-symbols/signal_cellular_4_bar.svg"
+                    imageStatus.source = "qrc:/IconLibrary/material-symbols/signal_cellular_4_bar.svg"
                 } else if (boxDevice.rssi > -65) {
-                    imageStatus.source = "qrc:/assets/icons/material-symbols/signal_cellular_3_bar.svg"
+                    imageStatus.source = "qrc:/IconLibrary/material-symbols/signal_cellular_3_bar.svg"
                 } else if (boxDevice.rssi > -75) {
-                    imageStatus.source = "qrc:/assets/icons/material-symbols/signal_cellular_2_bar.svg"
+                    imageStatus.source = "qrc:/IconLibrary/material-symbols/signal_cellular_2_bar.svg"
                 } else if (boxDevice.rssi > -90) {
-                    imageStatus.source = "qrc:/assets/icons/material-symbols/signal_cellular_1_bar.svg"
+                    imageStatus.source = "qrc:/IconLibrary/material-symbols/signal_cellular_1_bar.svg"
                 } else { // if (boxDevice.rssi > -90) {
-                    imageStatus.source = "qrc:/assets/icons/material-symbols/signal_cellular_0_bar.svg"
+                    imageStatus.source = "qrc:/IconLibrary/material-symbols/signal_cellular_0_bar.svg"
                 }
             }
 
@@ -375,7 +374,7 @@ Item {
 
                 visible: singleColumn && boxDevice.available
                 color: boxDevice.hasData ? Theme.colorHighContrast : Theme.colorSubText
-                source: "qrc:/assets/icons/material-symbols/chevron_right.svg"
+                source: "qrc:/IconLibrary/material-symbols/chevron_right.svg"
             }
         }
 
