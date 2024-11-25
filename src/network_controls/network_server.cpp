@@ -86,10 +86,10 @@ void NetworkServer::startServer()
 
 void NetworkServer::stopServer()
 {
-    qDebug() << "NetworkServer::stopServer()";
-
     if (m_tcpServer)
     {
+        qDebug() << "NetworkServer::stopServer()";
+
         m_tcpServer->close();
 
         delete m_tcpServer;
@@ -109,13 +109,13 @@ void NetworkServer::newClientConnection()
     if (conn && conn->peerAddress().toString() == "127.0.0.1") return;
     if (conn && conn->localPort() != m_tcpServerPort) return;
     if (!conn) return;
-/*
+
     qDebug() << "NetworkServer::newClientConnection()";
     qDebug() << "- " << conn->peerAddress();
     qDebug() << "- " << conn->peerName();
     qDebug() << "- " << conn->peerPort();
     qDebug() << "- " << conn->localPort();
-*/
+
     if (m_clientConnection)
     {
         m_clientConnection->close();
@@ -147,10 +147,10 @@ void NetworkServer::newClientConnection()
 
 void NetworkServer::closeClientConnection()
 {
-    //qDebug() << "NetworkServer::closeClientConnection()";
-
     if (m_clientConnection)
     {
+        qDebug() << "NetworkServer::closeClientConnection()";
+
         m_clientConnection->close();
         m_clientConnection->deleteLater();
         m_clientConnection = nullptr;

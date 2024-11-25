@@ -32,25 +32,31 @@ class NetworkClient: public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(bool connected READ isConnected NOTIFY connectionEvent)
+    Q_PROPERTY(bool wifi READ isWifiConnected NOTIFY wifiEvent)
+    Q_PROPERTY(bool connected READ isClientConnected NOTIFY connectionEvent)
 
     QTcpSocket *m_tcpSocket = nullptr;
     QDataStream m_dataInput;
 
+    QString m_ssid;
     QString m_host;
     unsigned m_port = 5555;
+
+    bool m_wifi = false;
     bool m_connected = false;
 
     void connected();
     void disconnected();
 
 signals:
+    void wifiEvent();
     void connectionEvent();
 
 public:
     explicit NetworkClient(QObject *parent = nullptr);
 
-    bool isConnected() const { return m_connected; }
+    bool isClientConnected() const { return m_connected; }
+    bool isWifiConnected() const { return m_wifi; }
 
 public slots:
     void connectToServer();

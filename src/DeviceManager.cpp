@@ -750,7 +750,7 @@ void DeviceManager::deviceDiscoveryError(QBluetoothDeviceDiscoveryAgent::Error e
 
 void DeviceManager::deviceDiscoveryFinished()
 {
-    //qDebug() << "DeviceManager::deviceDiscoveryFinished()";
+    qDebug() << "DeviceManager::deviceDiscoveryFinished()";
 
 #if defined(Q_OS_IOS)
     if (m_checking_ios_ble)
@@ -781,6 +781,17 @@ void DeviceManager::deviceDiscoveryFinished()
 void DeviceManager::deviceDiscoveryStopped()
 {
     qDebug() << "DeviceManager::deviceDiscoveryStopped()";
+
+    if (m_scanning)
+    {
+        m_scanning = false;
+        Q_EMIT scanningChanged();
+    }
+    if (m_listening)
+    {
+        m_listening = false;
+        Q_EMIT listeningChanged();
+    }
 }
 
 /* ************************************************************************** */

@@ -22,6 +22,7 @@
 #include "network_client.h"
 #include "SettingsManager.h"
 #include "local_controls/local_actions.h"
+#include "utils_wifi.h"
 
 #include <QtNetwork>
 
@@ -44,12 +45,34 @@ NetworkClient::NetworkClient(QObject *parent): QObject(parent)
 
 void NetworkClient::connectToServer()
 {
+    m_ssid = SettingsManager::getInstance()->getNetCtrlSSID();
     m_host = SettingsManager::getInstance()->getNetCtrlHost();
     m_port = SettingsManager::getInstance()->getNetCtrlPort();
 
     m_tcpSocket->abort();
 
     //qDebug() << "NetworkClient::connectToServer(" << m_host << "/" << m_port << ")";
+
+    if (!m_ssid.isEmpty())
+    {
+        UtilsWiFi *wf = UtilsWiFi::getInstance();
+        wf->refreshWiFi();
+        QString ssid_current = wf->getCurrentSSID();
+
+        if (m_ssid == ssid_current)
+        {
+            m_wifi = true;
+            Q_EMIT wifiEvent();
+        }
+        else
+        {
+            // this is not our WiFi, no need to attempt a connection
+            m_wifi = false;
+            Q_EMIT wifiEvent();
+            return;
+        }
+    }
+
     m_tcpSocket->connectToHost(m_host, m_port);
 }
 

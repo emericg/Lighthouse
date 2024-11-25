@@ -83,6 +83,7 @@ class SettingsManager: public QObject
     Q_PROPERTY(QString mqttTopics READ getMqttTopics WRITE setMqttTopics NOTIFY mqttChanged)
 
     Q_PROPERTY(bool netctrl READ getNetCtrl WRITE setNetCtrl NOTIFY netctrlChanged)
+    Q_PROPERTY(QString netctrlSSID READ getNetCtrlSSID WRITE setNetCtrlSSID NOTIFY netctrlChanged)
     Q_PROPERTY(QString netctrlHost READ getNetCtrlHost WRITE setNetCtrlHost NOTIFY netctrlChanged)
     Q_PROPERTY(uint netctrlPort READ getNetCtrlPort WRITE setNetCtrlPort NOTIFY netctrlChanged)
     Q_PROPERTY(QString netctrlPassword READ getNetCtrlPassword WRITE setNetCtrlPassword NOTIFY netctrlChanged)
@@ -143,6 +144,7 @@ class SettingsManager: public QObject
     QString m_mqttTopics = "lighthouse";
 
     bool m_netctrl = true;
+    QString m_netctrlSSID;
     QString m_netctrlHost;
     int m_netctrlPort = 5555;
     QString m_netctrlPassword = "lighthouse";
@@ -318,6 +320,9 @@ public:
 
     bool getNetCtrl() const { return m_netctrl; }
     void setNetCtrl(const bool value);
+
+    QString getNetCtrlSSID() const { return m_netctrlSSID; }
+    void setNetCtrlSSID(const QString &value);
 
     QString getNetCtrlHost() const { return m_netctrlHost; }
     void setNetCtrlHost(const QString &value);

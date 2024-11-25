@@ -63,9 +63,6 @@ Rectangle {
     ActionMenuFixed {
         id: actionMenu
 
-        x: appHeader.width - actionMenu.width - 12
-        y: screenPaddingStatusbar + 16
-
         onMenuSelected: (index) => {
             //console.log("ActionMenu clicked #" + index)
         }
@@ -139,7 +136,7 @@ Rectangle {
             anchors.left: parent.left
             anchors.leftMargin: headerPosition
             anchors.right: rightArea.left
-            anchors.rightMargin: 8
+            anchors.rightMargin: 4
             anchors.verticalCenter: parent.verticalCenter
 
             text: headerTitle
@@ -159,7 +156,7 @@ Rectangle {
             anchors.rightMargin: 4
             anchors.bottom: parent.bottom
 
-            spacing: 4
+            spacing: -8
 
             ////
 
@@ -169,19 +166,25 @@ Rectangle {
                 visible: (appContent.state === "ScreenDeviceList")
 
                 IconSvg {
-                    width: 24; height: 24;
+                    width: 26; height: 26;
                     anchors.centerIn: parent
-                    source: networkClient.connected ?
-                                "qrc:/IconLibrary/material-symbols/signal_wifi_0_bar.svg" :
-                                "qrc:/IconLibrary/material-symbols/signal_wifi_0_bar.svg" // _off.svg
+                    source: {
+                        if (settingsManager.netctrlSSID) {
+                            if (settingsManager.netctrlSSID === utilsWiFi.currentSSID) {
+                                return "qrc:/IconLibrary/material-symbols/signal_wifi_4_bar.svg"
+                            }
+                            return "qrc:/IconLibrary/material-symbols/signal_wifi_off.svg"
+                        }
+                        return "qrc:/IconLibrary/material-symbols/signal_wifi_0_bar.svg"
+                    }
                     color: Theme.colorHeaderContent
 
                     Rectangle {
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
                         width: 8; height: 8; radius: 8;
-                        color: Theme.colorGreen
-                        visible: (networkClient.connected)
+                        visible: !(settingsManager.netctrlSSID && settingsManager.netctrlSSID !== utilsWiFi.currentSSID)
+                        color: networkClient.connected ? Theme.colorSuccess : Theme.colorWarning
                     }
                 }
             }
@@ -194,7 +197,7 @@ Rectangle {
                 visible: (appContent.state === "ScreenDeviceList")
 
                 IconSvg {
-                    width: 24; height: 24;
+                    width: 26; height: 26;
                     anchors.centerIn: parent
                     source: deviceManager.bluetooth ?
                                 "qrc:/IconLibrary/material-symbols/sensors/bluetooth.svg" :
@@ -205,8 +208,8 @@ Rectangle {
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
                         width: 8; height: 8; radius: 8;
-                        color: Theme.colorGreen
-                        visible: (deviceManager.scanning || deviceManager.listening || deviceManager.syncing)
+                        visible: deviceManager.bluetooth
+                        color: (deviceManager.scanning || deviceManager.listening || deviceManager.syncing) ? Theme.colorSuccess : Theme.colorWarning
 
                         //SequentialAnimation on opacity { // (fade)
                         //    loops: Animation.Infinite

@@ -38,6 +38,28 @@ Loader {
         ScrollBar.vertical: ScrollBar { visible: false }
 
         function backAction() {
+            if (tf_ssid.focus) {
+                tf_ssid.focus = false
+                return
+            }
+            if (tf_host.focus) {
+                tf_host.focus = false
+                return
+            }
+            if (tf_port.focus) {
+                tf_port.focus = false
+                return
+            }
+            if (tf_password.focus) {
+                tf_password.focus = false
+                return
+            }
+
+            if (buttonReader.highlighted) {
+                buttonReader.highlighted = false
+                return
+            }
+
             screenDeviceList.loadScreen()
         }
 
@@ -49,6 +71,9 @@ Loader {
             topPadding: 16
             bottomPadding: 16
             spacing: 8
+
+            property int paddingLeft: (singleColumn ? 0 : 16)
+            property int paddingRight: (singleColumn ? 0 : 16)
 
             property int padIcon: singleColumn ? Theme.componentMarginL : Theme.componentMarginL
             property int padText: appHeader.headerPosition
@@ -64,7 +89,9 @@ Loader {
 
             Item { // element_appTheme
                 anchors.left: parent.left
+                anchors.leftMargin: contentColumn.paddingLeft
                 anchors.right: parent.right
+                anchors.rightMargin: contentColumn.paddingRight
                 height: Theme.componentHeightXL
 
                 IconSvg {
@@ -184,7 +211,9 @@ Loader {
 
             Item { // element_appThemeAuto
                 anchors.left: parent.left
+                anchors.leftMargin: contentColumn.paddingLeft
                 anchors.right: parent.right
+                anchors.rightMargin: contentColumn.paddingRight
                 height: Theme.componentHeightXL
 
                 IconSvg {
@@ -237,7 +266,7 @@ Loader {
                 bottomPadding: 12
 
                 text: settingsManager.appThemeAuto ?
-                          qsTr("Dark mode will switch on automatically between 9 PM and 9 AM.") :
+                          qsTr("Dark mode schedule will respect device setting.") :
                           qsTr("Dark mode schedule is disabled.")
                 textFormat: Text.PlainText
                 wrapMode: Text.WordWrap
@@ -259,7 +288,9 @@ Loader {
 
             Item { // element_minimized
                 anchors.left: parent.left
+                anchors.leftMargin: contentColumn.paddingLeft
                 anchors.right: parent.right
+                anchors.rightMargin: contentColumn.paddingRight
                 height: Theme.componentHeightXL
 
                 visible: isDesktop
@@ -306,7 +337,9 @@ Loader {
 
             Item { // element_service
                 anchors.left: parent.left
+                anchors.leftMargin: contentColumn.paddingLeft
                 anchors.right: parent.right
+                anchors.rightMargin: contentColumn.paddingRight
                 height: Theme.componentHeightXL
 
                 visible: isDesktop
@@ -377,7 +410,9 @@ Loader {
 
             Item { // element_notifications
                 anchors.left: parent.left
+                anchors.leftMargin: contentColumn.paddingLeft
                 anchors.right: parent.right
+                anchors.rightMargin: contentColumn.paddingRight
                 height: Theme.componentHeightXL
 
                 visible: isDesktop
@@ -455,7 +490,9 @@ Loader {
 
             Item { // element_bluetoothControl
                 anchors.left: parent.left
+                anchors.leftMargin: contentColumn.paddingLeft
                 anchors.right: parent.right
+                anchors.rightMargin: contentColumn.paddingRight
                 height: Theme.componentHeightXL
 
                 visible: (Qt.platform.os === "android")
@@ -528,7 +565,9 @@ Loader {
 
             Item { // element_server
                 anchors.left: parent.left
+                anchors.leftMargin: contentColumn.paddingLeft
                 anchors.right: parent.right
+                anchors.rightMargin: contentColumn.paddingRight
                 height: Theme.componentHeightXL
 
                 visible: isDesktop
@@ -669,16 +708,18 @@ Loader {
                 anchors.rightMargin: 16
                 height: active ? (width / 1.333) : 0
 
-                active: isMobile && buttonReader.highlighted
+                active: (isMobile && buttonReader.highlighted)
                 asynchronous: true
                 source: "components/SettingsQrReader.qml"
             }
 
             ////////
 
-            Item { // element_remoteServer_ip
+            Item { // element_remoteServer_ssid
                 anchors.left: parent.left
+                anchors.leftMargin: contentColumn.paddingLeft
                 anchors.right: parent.right
+                anchors.rightMargin: contentColumn.paddingRight
                 height: Theme.componentHeight
 
                 visible: isMobile
@@ -691,10 +732,66 @@ Loader {
                     width: 24
                     height: 24
                     color: Theme.colorIcon
-                    source: "qrc:/assets/icons/material-symbols/storage.svg"
+                    source: "qrc:/IconLibrary/material-symbols/signal_wifi_0_bar.svg"
                 }
 
                 TextFieldThemed {
+                    id: tf_ssid
+                    anchors.left: parent.left
+                    anchors.leftMargin: contentColumn.padText
+                    anchors.right: parent.right
+                    anchors.rightMargin: Theme.componentMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    height: 36
+
+                    placeholderText: qsTr("Filter by Wi-Fi network name?")
+                    text: settingsManager.netctrlSSID
+                    selectByMouse: true
+
+                    onEditingFinished: {
+                        //utilsWiFi.requestLocationPermissions() // BLE should have done that
+                        settingsManager.netctrlSSID = text
+                        networkClient.connectToServer()
+                    }
+
+                    Text {
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.componentMargin
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        visible: parent.text
+                        text: qsTr("SSID")
+                        textFormat: Text.PlainText
+                        font.pixelSize: Theme.fontSizeContentVerySmall
+                        color: Theme.colorSubText
+                    }
+                }
+            }
+
+            ////////
+
+            Item { // element_remoteServer_host
+                anchors.left: parent.left
+                anchors.leftMargin: contentColumn.paddingLeft
+                anchors.right: parent.right
+                anchors.rightMargin: contentColumn.paddingRight
+                height: Theme.componentHeight
+
+                visible: isMobile
+
+                IconSvg {
+                    anchors.left: parent.left
+                    anchors.leftMargin: contentColumn.padIcon
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    width: 24
+                    height: 24
+                    color: Theme.colorIcon
+                    source: "qrc:/IconLibrary/material-symbols/storage.svg"
+                }
+
+                TextFieldThemed {
+                    id: tf_host
                     anchors.left: parent.left
                     anchors.leftMargin: contentColumn.padText
                     anchors.right: parent.right
@@ -729,7 +826,9 @@ Loader {
 
             Item { // element_remoteServer_port
                 anchors.left: parent.left
+                anchors.leftMargin: contentColumn.paddingLeft
                 anchors.right: parent.right
+                anchors.rightMargin: contentColumn.paddingRight
                 height: Theme.componentHeight
 
                 visible: isMobile
@@ -746,6 +845,7 @@ Loader {
                 }
 
                 TextFieldThemed {
+                    id: tf_port
                     anchors.left: parent.left
                     anchors.leftMargin: contentColumn.padText
                     anchors.right: parent.right
@@ -781,7 +881,9 @@ Loader {
 
             Item { // element_remoteServer_password
                 anchors.left: parent.left
+                anchors.leftMargin: contentColumn.paddingLeft
                 anchors.right: parent.right
+                anchors.rightMargin: contentColumn.paddingRight
                 height: Theme.componentHeight
 
                 visible: isMobile
@@ -798,6 +900,7 @@ Loader {
                 }
 
                 TextFieldThemed {
+                    id: tf_password
                     anchors.left: parent.left
                     anchors.leftMargin: contentColumn.padText
                     anchors.right: parent.right
@@ -833,7 +936,9 @@ Loader {
 
             Item { // element_fakeIt
                 anchors.left: parent.left
+                anchors.leftMargin: contentColumn.paddingLeft
                 anchors.right: parent.right
+                anchors.rightMargin: contentColumn.paddingRight
                 height: Theme.componentHeight
 
                 visible: isMobile // && !networkClient.connected

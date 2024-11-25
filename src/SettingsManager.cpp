@@ -206,6 +206,8 @@ bool SettingsManager::readSettings()
 
         if (settings.contains("netctrl/enabled"))
             m_netctrl = settings.value("netctrl/enabled").toBool();
+        if (settings.contains("netctrl/SSID"))
+            m_netctrlSSID = settings.value("netctrl/SSID").toString();
         if (settings.contains("netctrl/host"))
             m_netctrlHost = settings.value("netctrl/host").toString();
         if (settings.contains("netctrl/port"))
@@ -270,6 +272,7 @@ bool SettingsManager::writeSettings()
         settings.setValue("mqtt/password", m_mqttPassword);
 
         settings.setValue("netctrl/enabled", m_netctrl);
+        settings.setValue("netctrl/SSID", m_netctrlSSID);
         settings.setValue("netctrl/host", m_netctrlHost);
         settings.setValue("netctrl/port", m_netctrlPort);
         settings.setValue("netctrl/password", m_netctrlPassword);
@@ -375,6 +378,7 @@ void SettingsManager::resetSettings()
     Q_EMIT mqttChanged();
 
     m_netctrl = false;
+    m_netctrlSSID = "";
     m_netctrlHost = "";
     m_netctrlPort = 5555;
     m_netctrlPassword = "lighthouse";
@@ -766,6 +770,16 @@ void SettingsManager::setNetCtrl(const bool value)
     }
 }
 
+void SettingsManager::setNetCtrlSSID(const QString &value)
+{
+    if (m_netctrlSSID != value)
+    {
+        m_netctrlSSID = value;
+        writeSettings();
+        Q_EMIT netctrlChanged();
+    }
+}
+
 void SettingsManager::setNetCtrlHost(const QString &value)
 {
     if (m_netctrlHost != value)
@@ -817,6 +831,7 @@ bool SettingsManager::setNetCtrlSettings(const QString &value)
         }
 
         qDebug() << "setNetCtrlSettings(" << value << ")";
+        qDebug() << "- SSID " << m_netctrlSSID;
         qDebug() << "- host " << m_netctrlHost;
         qDebug() << "- port " << m_netctrlPort;
         qDebug() << "- pass " << m_netctrlPassword;

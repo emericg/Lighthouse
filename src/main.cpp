@@ -27,6 +27,7 @@
 #include "DeviceManager.h"
 
 #include "utils_app.h"
+#include "utils_wifi.h"
 #include "utils_screen.h"
 #include "utils_language.h"
 #if defined(Q_OS_MACOS)
@@ -135,6 +136,7 @@ int main(int argc, char *argv[])
 
     // Init generic utils
     UtilsApp *utilsApp = UtilsApp::getInstance();
+    UtilsWiFi *utilsWiFi = UtilsWiFi ::getInstance();
     UtilsScreen *utilsScreen = UtilsScreen::getInstance();
     UtilsLanguage *utilsLanguage = UtilsLanguage::getInstance();
     if (!utilsScreen || !utilsApp || !utilsLanguage)
@@ -156,11 +158,11 @@ int main(int argc, char *argv[])
     engine.addImportPath(":/qt/qml/ComponentLibrary");
 
     QQmlContext *engine_context = engine.rootContext();
-
-    engine_context->setContextProperty("deviceManager", dm);
     engine_context->setContextProperty("settingsManager", sm);
+    engine_context->setContextProperty("deviceManager", dm);
 
     engine_context->setContextProperty("utilsApp", utilsApp);
+    engine_context->setContextProperty("utilsWiFi", utilsWiFi);
     engine_context->setContextProperty("utilsScreen", utilsScreen);
     engine_context->setContextProperty("utilsLanguage", utilsLanguage);
 
