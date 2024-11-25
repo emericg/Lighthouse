@@ -1,12 +1,9 @@
 import QtQuick
-import QtQuick.Controls
 
-import ZXingCpp
-
-import ComponentLibrary
+import ZXingQt
 
 Image {
-    id: settingsQrCode
+    id: settingsQrGenerator
 
     width: 256
     height: 256
@@ -15,17 +12,16 @@ Image {
 
     cache: true
     smooth: false
-
-    sourceSize.width: width
-    sourceSize.height: height
     fillMode: Image.PreserveAspectFit
 
-    source: "image://ZXingCpp/encode/" + barcode_string + barcode_settings
+    source: "image://ZXingQt/encode/" + barcode_string + barcode_settings
+    sourceSize.width: width
+    sourceSize.height: height
 
     ////////
 
-    property string barcode_string: "lighthouse://" + networkServer.serverAddress +
-                                    "/" + networkServer.serverPort
+    property string barcode_string: "lighthouse://" + networkServer.serverAddress + "/"
+                                                    + networkServer.serverPort
 
     property string barcode_settings: "?" + "format=" + format + "&"
                                           + "eccLevel=" + eccLevel + "&"

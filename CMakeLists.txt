@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(Lighthouse VERSION 0.7 LANGUAGES CXX)
+project(Lighthouse VERSION 0.7 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -198,6 +198,8 @@ if(NOT IOS AND NOT ANDROID)
     target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt6::Widgets)
 endif()
 
+add_definitions(-DENABLE_ZXING)
+
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     option(ENABLE_MBEDTLS "" ON)
     option(ENABLE_XTEST "" OFF)
@@ -228,7 +230,13 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE MobileUI)
 add_subdirectory(thirdparty/ComponentLibrary)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ComponentLibraryplugin)
 
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE thirdparty/)
+# zxing-cpp
+add_subdirectory(thirdparty/zxing-cpp)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ZXing)
+
+# zxing-cpp Qt wrapper
+add_subdirectory(thirdparty/zxing-cpp/wrappers/qt/)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ZXingQt)
 
 ################################################################################
 

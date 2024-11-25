@@ -43,7 +43,7 @@
 #include <MobileUI>
 #include <SingleApplication>
 #if defined(ENABLE_ZXING)
-#include <ZXingCpp>
+#include <ZXingQt>
 #endif
 
 #include <QtGlobal>
@@ -171,9 +171,9 @@ int main(int argc, char *argv[])
     engine_context->setContextProperty("networkControls", networkClient);
 
 #if defined(ENABLE_ZXING)
-    // Barcode (zxing-cpp)
-    ZXingCpp::registerQMLTypes();
-    ZXingCpp::registerQMLImageProvider(engine);
+    // Barcode (zxing-cpp Qt wrapper)
+    ZXingQt::registerQMLTypes();
+    ZXingQt::registerQMLImageProvider(engine);
 #endif
 
 #if defined(Q_OS_ANDROID) || defined(Q_OS_IOS) || defined(FORCE_MOBILE_UI)
@@ -185,7 +185,9 @@ int main(int argc, char *argv[])
     engine_context->setContextProperty("systrayManager", st);
     engine_context->setContextProperty("menubarManager", mb);
     engine_context->setContextProperty("localControls", localControls);
+#if defined(ENABLE_MPRIS)
     engine_context->setContextProperty("mprisControls", mprisControls);
+#endif
 
     // Load the main view
     engine.loadFromModule("Lighthouse", "DesktopApplication");

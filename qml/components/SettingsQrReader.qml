@@ -3,18 +3,29 @@ import QtQuick.Effects
 import QtQuick.Controls
 
 import QtMultimedia
-import ZXingCpp
+import ZXingQt
 
 import ComponentLibrary
 
 Rectangle {
-    id: qrreader
-    anchors.left: parent.left
-    anchors.right: parent.right
+    id: settingsQrReader
 
+    width: parent.width
     height: width / 1.333
     radius: 8
     color: Theme.colorForeground
+
+    ////////
+
+    IconSvg {
+        anchors.centerIn: parent
+        width: 48
+        height: 48
+        source: "qrc:/IconLibrary/material-icons/outlined/hourglass_empty.svg"
+        color: Theme.colorIcon
+    }
+
+    ////////
 
     CaptureSession {
         id: captureSession
@@ -35,8 +46,7 @@ Rectangle {
 
     VideoOutput {
         id: videoOutput
-        width: parent.width
-        height: parent.height
+        anchors.fill: parent
         orientation: 0
 
         fillMode: VideoOutput.PreserveAspectCrop
@@ -60,7 +70,7 @@ Rectangle {
         property rect captureRect_wide_right: Qt.rect(0.4, 0.12, 0.5, 0.76)
     }
 
-    ZXingCppVideoFilter {
+    ZXingQtVideoFilter {
         id: barcodeReader
 
         videoSink: videoOutput.videoSink
@@ -76,7 +86,7 @@ Rectangle {
         tryInvert: true
         tryDownscale: true
 
-        formats: ZXingCpp.QRCode
+        formats: ZXingQt.QRCode
 
         onTagFound: (result) => {
             //console.log("onTagFound : " + result)
@@ -94,9 +104,11 @@ Rectangle {
         }
 
         onDecodingFinished: (result) => {
-            //console.log("ZXingCpp::onDecodingFinished(" + result.isValid + " / " + result.runTime + " ms)")
+            //console.log("ZXingQt::onDecodingFinished(" + result.isValid + " / " + result.runTime + " ms)")
         }
     }
+
+    ////////
 
     Text {
         anchors.left: parent.left
@@ -128,12 +140,14 @@ Rectangle {
         maskSpreadAtMax: 0.0
         maskSource: ShaderEffectSource {
             sourceItem: Rectangle {
-                x: qrreader.x
-                y: qrreader.y
-                width: qrreader.width
-                height: qrreader.height
-                radius: qrreader.radius
+                x: settingsQrReader.x
+                y: settingsQrReader.y
+                width: settingsQrReader.width
+                height: settingsQrReader.height
+                radius: settingsQrReader.radius
             }
         }
     }
+
+    ////////
 }

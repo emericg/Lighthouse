@@ -1,11 +1,11 @@
 /*
  * Copyright 2020 Axel Waggershauser
  * Copyright 2023 ApiTracer developer
- * Copyright 2023 Emeric Grange
+ * Copyright 2024 Emeric Grange
  */
 
-#include "ZXingCppImageProvider.h"
-#include "ZXingCpp.h"
+#include "ZXingQtImageProvider.h"
+#include "ZXingQt.h"
 
 #include "BarcodeFormat.h"
 #include "BitMatrix.h"
@@ -15,15 +15,15 @@
 #include <QUrlQuery>
 #include <QRegularExpression>
 
-ZXingCppImageProvider::ZXingCppImageProvider() : QQuickImageProvider(QQuickImageProvider::Image)
+ZXingQtImageProvider::ZXingQtImageProvider() : QQuickImageProvider(QQuickImageProvider::Image)
 {
     //
 }
 
-QImage ZXingCppImageProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
+QImage ZXingQtImageProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
 {
     if (id.isEmpty() || requestedSize.width() <= 0 || requestedSize.height() <= 0) return QImage();
-    //qDebug() << "ZXingCppImageProvider::requestImage(" << id << ") size " << *size << " /  requestedSize" << requestedSize;
+    //qDebug() << "ZXingQtImageProvider::requestImage(" << id << ") size " << *size << " /  requestedSize" << requestedSize;
 
     int slashIndex = id.indexOf('/');
     if (slashIndex == -1)
@@ -65,7 +65,7 @@ QImage ZXingCppImageProvider::requestImage(const QString &id, QSize *size, const
         if (optionQuery.hasQueryItem("format"))
         {
             QString formatString = optionQuery.queryItemValue("format").toLower().remove('-');
-            format = (ZXing::BarcodeFormat)ZXingCpp::stringToFormat(formatString);
+            format = (ZXing::BarcodeFormat)ZXingQt::stringToFormat(formatString);
 
             if (format <= ZXing::BarcodeFormat::None)
             {
@@ -158,9 +158,9 @@ QImage ZXingCppImageProvider::requestImage(const QString &id, QSize *size, const
     bool formatMatrix = ((int)format & (int)ZXing::BarcodeFormat::MatrixCodes);
     if (!formatMatrix) height /= 3; // 1D codes
 
-    QImage img = ZXingCpp::generateImage(data, width, height, margins,
-                                         (int)format, (int)encoding, eccLevel,
-                                         bgc, fgc);
+    QImage img = ZXingQt::generateImage(data, width, height, margins,
+                                        (int)format, (int)encoding, eccLevel,
+                                        bgc, fgc);
 
     *size = img.size();
     return img;

@@ -1,13 +1,13 @@
 /*
  * Copyright 2020 Axel Waggershauser
  * Copyright 2023 ApiTracer developer
- * Copyright 2023 Emeric Grange
+ * Copyright 2024 Emeric Grange
  */
 
-#ifndef ZXINGCPP_VIDEOFILTER_H
-#define ZXINGCPP_VIDEOFILTER_H
+#ifndef ZXING_QT_VIDEOFILTER_H
+#define ZXING_QT_VIDEOFILTER_H
 
-#include "ZXingCpp.h"
+#include "ZXingQt.h"
 
 #include <QObject>
 #include <QRect>
@@ -16,7 +16,7 @@
 #include <QVideoFrame>
 #include <QFuture>
 
-class ZXingCppVideoFilter : public QObject
+class ZXingQtVideoFilter : public QObject
 {
     Q_OBJECT
 
@@ -56,8 +56,8 @@ public slots:
     Result process(const QVideoFrame &frame);
 
 public:
-    ZXingCppVideoFilter(QObject *parent = nullptr);
-    virtual ~ZXingCppVideoFilter();
+    ZXingQtVideoFilter(QObject *parent = nullptr);
+    virtual ~ZXingQtVideoFilter();
 
     Q_INVOKABLE void stopFilter();
 
@@ -78,4 +78,4 @@ public:
     void setTryDownscale(const bool value);
 };
 
-#endif // ZXINGCPP_VIDEOFILTER_H
+#endif // ZXING_QT_VIDEOFILTER_H

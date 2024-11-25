@@ -12,6 +12,7 @@
 
 #include <QUrl>
 #include <QList>
+#include <QString>
 #include <QRect>
 #include <QPoint>
 #include <QImage>
@@ -81,7 +82,7 @@ public:
     const Position &position() const { return m_position; }
 };
 
-class ZXingCpp : public QObject
+class ZXingQt : public QObject
 {
     Q_OBJECT
 
@@ -190,7 +191,7 @@ public:
     Q_ENUM(CharacterSet)
 
 public:
-    explicit ZXingCpp(QObject *parent = nullptr) : QObject(parent) {}
+    explicit ZXingQt(QObject *parent = nullptr) : QObject(parent) {}
 
     static void registerQMLTypes();
     static void registerQMLImageProvider(QQmlEngine &engine);

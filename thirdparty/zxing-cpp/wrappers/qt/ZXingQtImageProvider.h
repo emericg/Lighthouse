@@ -1,7 +1,7 @@
 /*
  * Copyright 2020 Axel Waggershauser
  * Copyright 2023 ApiTracer developer
- * Copyright 2023 Emeric Grange
+ * Copyright 2024 Emeric Grange
  */
 
 #ifndef ZXING_QT_IMAGEPROVIDER_H
@@ -12,10 +12,10 @@
 #include <QImage>
 #include <QSize>
 
-class ZXingCppImageProvider : public QQuickImageProvider
+class ZXingQtImageProvider : public QQuickImageProvider
 {
 public:
-    ZXingCppImageProvider();
+    ZXingQtImageProvider();
 
     QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
 };
