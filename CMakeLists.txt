@@ -198,8 +198,6 @@ if(NOT IOS AND NOT ANDROID)
     target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt6::Widgets)
 endif()
 
-add_definitions(-DENABLE_ZXING)
-
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     option(ENABLE_MBEDTLS "" ON)
     option(ENABLE_XTEST "" OFF)
@@ -215,6 +213,7 @@ endif()
 
 # AppUtils
 set(UTILS_DOCK_ENABLED true)
+set(UTILS_WIFI_ENABLED true)
 add_subdirectory(thirdparty/AppUtils)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE AppUtils)
 
@@ -235,6 +234,7 @@ add_subdirectory(thirdparty/zxing-cpp)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ZXing)
 
 # zxing-cpp Qt wrapper
+add_definitions(-DENABLE_ZXING)
 add_subdirectory(thirdparty/zxing-cpp/wrappers/qt/)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ZXingQt)
 
@@ -249,26 +249,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Android")
         QT_ANDROID_TARGET_SDK_VERSION 35
         QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/assets/android/"
     )
-
-    # Download SSL Libraries
-    include(FetchContent)
-    FetchContent_Declare(
-        android_openssl
-        DOWNLOAD_EXTRACT_TIMESTAMP true
-        URL https://github.com/KDAB/android_openssl/archive/refs/heads/master.zip
-    )
-    FetchContent_MakeAvailable(android_openssl)
-    include(${android_openssl_SOURCE_DIR}/android_openssl.cmake)
-    # Include SSL Libraries
-    add_android_openssl_libraries(${CMAKE_PROJECT_NAME})
 endif()
-
-#if (APPLE)
-#    set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO")
-#    set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
-#    set(CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "")
-#    set(CMAKE_XCODE_ATTRIBUTE_PROVISIONING_PROFILE "")
-#endif()
 
 ## macOS
 if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
@@ -278,11 +259,6 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
         MACOSX_BUNDLE ON
         MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/assets/macos/Info.plist"
-        # Old way (???)
-        MACOSX_BUNDLE_GUI_IDENTIFIER            "io.emeric.lighthouse"
-        MACOSX_BUNDLE_BUNDLE_NAME               ${CMAKE_PROJECT_NAME}
-        MACOSX_BUNDLE_BUNDLE_VERSION            ${CMAKE_PROJECT_VERSION}
-        MACOSX_BUNDLE_SHORT_VERSION_STRING      ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
         # New Xcode attributes (???)
         XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER           "io.emeric.lighthouse"
         XCODE_ATTRIBUTE_PRODUCT_NAME                        ${CMAKE_PROJECT_NAME}
@@ -336,15 +312,15 @@ endif()
 
 # Output?
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
-    #ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/lib"
-    #LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/lib"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/lib"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin"
 )
 
 # Output?
-#install(TARGETS ${CMAKE_PROJECT_NAME}
-#    BUNDLE DESTINATION bin/
-#    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#)
+install(TARGETS ${CMAKE_PROJECT_NAME}
+    BUNDLE DESTINATION bin/
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
 
 ################################################################################

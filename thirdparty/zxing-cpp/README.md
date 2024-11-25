@@ -11,50 +11,48 @@ It was originally ported from the Java [ZXing Library](https://github.com/zxing/
 You can sponsor this library at [GitHub Sponsors](https://github.com/sponsors/axxel).
 
 Named Sponsors:
+* [Liftric GmbH](https://github.com/Liftric)
 * [KURZ Digital Solutions GmbH & Co. KG](https://github.com/kurzdigital)
 * [Useful Sensors Inc](https://github.com/usefulsensors)
-* [EUREKAM](https://eurekam.fr/)
+* [Sergio Olivo](https://github.com/sergio-)
 
 Thanks a lot for your contribution!
 
 ## Features
 
-* Written in pure C++20 (/C++17), no third-party dependencies (for the library itself)
+* Written in pure C++17 (/C++20), no third-party dependencies (for the library itself)
 * Thread safe
 * Wrappers/Bindings for:
   * [Android](wrappers/android/README.md)
   * [C](wrappers/c/README.md)
   * [iOS](wrappers/ios/README.md)
-  * [Kotlin/Native](wrappers/kn/README.md)
-  * [.NET](wrappers/dotnet/README.md)
   * [Python](wrappers/python/README.md)
-  * [Rust](wrappers/rust/README.md)
   * [WebAssembly](wrappers/wasm/README.md)
   * [WinRT](wrappers/winrt/README.md)
   * [Flutter](https://pub.dev/packages/flutter_zxing) (external project)
 
 ## Supported Formats
 
-| Linear product  | Linear industrial | Matrix             |
-|-----------------|-------------------|--------------------|
-| UPC-A           | Code 39           | QR Code            |
-| UPC-E           | Code 93           | Micro QR Code      |
-| EAN-8           | Code 128          | rMQR Code          |
-| EAN-13          | Codabar           | Aztec              |
-| DataBar         | DataBar Expanded  | DataMatrix         |
-| DataBar Limited | DX Film Edge      | PDF417             |
-|                 | ITF               | MaxiCode (partial) |
+| Linear product | Linear industrial | Matrix             |
+|----------------|-------------------|--------------------|
+| UPC-A          | Code 39           | QR Code            |
+| UPC-E          | Code 93           | Micro QR Code      |
+| EAN-8          | Code 128          | rMQR Code          |
+| EAN-13         | Codabar           | Aztec              |
+| DataBar        | DataBar Expanded  | DataMatrix         |
+|                | ITF               | PDF417             |
+|                |                   | MaxiCode (partial) |
 
 [Note:]
  * DataBar used to be called RSS.
- * DataBar, DX Film Edge, MaxiCode, Micro QR Code and rMQR Code are not supported for writing.
- * Building with only C++17 (see [CMakeLists.txt](https://github.com/zxing-cpp/zxing-cpp/blob/d4b0f502775857f257d13efd25fb840ece1bca3e/CMakeLists.txt#L45)) changes the behavior of the library: it then lacks support for DataBarLimited and multi-symbol and position independent detection for DataMatrix.
+ * DataBar, MaxiCode, Micro QR Code and rMQR Code are not supported for writing.
+ * Building with C++20 (see [CMakeLists.txt](https://github.com/zxing-cpp/zxing-cpp/blob/d4b0f502775857f257d13efd25fb840ece1bca3e/CMakeLists.txt#L45)) changes the behaviour of the library: it then supports multi-symbol and position independent detection for DataMatrix. This comes at a noticable performace cost. C++20 is enabled by default for the Android, iOS, Python and WASM wrappers.
 
 ## Getting Started
 
 ### To read barcodes:
 1. Load your image into memory (3rd-party library required).
-2. Call `ReadBarcodes()` from [`ReadBarcode.h`](core/src/ReadBarcode.h), the simplest API to get a list of `Barcode` objects.
+2. Call `ReadBarcodes()` from [`ReadBarcode.h`](core/src/ReadBarcode.h), the simplest API to get a list of `Result` objects.
 
 A very simple example looks like this:
 ```c++
@@ -69,17 +67,15 @@ int main(int argc, char** argv)
 
     auto image = ZXing::ImageView(data, width, height, ZXing::ImageFormat::Lum);
     auto options = ZXing::ReaderOptions().setFormats(ZXing::BarcodeFormat::Any);
-    auto barcodes = ZXing::ReadBarcodes(image, options);
+    auto results = ZXing::ReadBarcodes(image, options);
 
-    for (const auto& b : barcodes)
-        std::cout << ZXing::ToString(b.format()) << ": " << b.text() << "\n";
+    for (const auto& r : results)
+        std::cout << ZXing::ToString(r.format()) << ": " << r.text() << "\n";
 
     return 0;
 }
 ```
 To see the full capability of the API, have a look at [`ZXingReader.cpp`](example/ZXingReader.cpp).
-
-[Note: At least C++17 is required on the client side to use the API.]
 
 ### To write barcodes:
 1. Create a [`MultiFormatWriter`](core/src/MultiFormatWriter.h) instance with the format you want to generate. Set encoding and margins if needed.
@@ -98,12 +94,12 @@ As an example, have a look at [`ZXingWriter.cpp`](example/ZXingWriter.cpp).
 ## Build Instructions
 These are the generic instructions to build the library on Windows/macOS/Linux. For details on how to build the individual wrappers, follow the links above.
 
-1. Make sure [CMake](https://cmake.org) version 3.16 or newer is installed. The python module requires 3.18 or higher.
-2. Make sure a sufficiently C++20 compliant compiler is installed (minimum VS 2019 16.10? / gcc 11 / clang 12?).
-3. See the cmake `ZXING_...` options to enable the testing code, python wrapper, etc.
+1. Make sure [CMake](https://cmake.org) version 3.15 or newer is installed.
+2. Make sure a C++17 compliant compiler is installed (minimum VS 2019 16.8 / gcc 7 / clang 5).
+3. See the cmake `BUILD_...` options to enable the testing code, python wrapper, etc.
 
 ```
-git clone https://github.com/zxing-cpp/zxing-cpp.git --recursive --single-branch --depth 1
+git clone https://github.com/zxing-cpp/zxing-cpp.git --single-branch --depth 1
 cmake -S zxing-cpp -B zxing-cpp.release -DCMAKE_BUILD_TYPE=Release
 cmake --build zxing-cpp.release -j8 --config Release
 ```

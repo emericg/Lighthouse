@@ -39,6 +39,7 @@ public class QGpsUtils
 
     public static boolean checkGpsEnabled(final Context context) {
 
+        // Android 9 'P' // API level 28+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
 
             LocationManager lm = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
@@ -61,12 +62,11 @@ public class QGpsUtils
 
             return gps_enabled;
 
-        } else {
+        } else { // up to API level 27
 
             final int locationMode;
-
             try {
-                // This was deprecated in API level 28.
+                // This constant was deprecated in API level 28.
                 locationMode = Settings.Secure.getInt(context.getContentResolver(),
                                                       Settings.Secure.LOCATION_MODE);
             } catch (Settings.SettingNotFoundException e) {
@@ -87,7 +87,11 @@ public class QGpsUtils
         }
     }
 
-    public static Intent forceGpsEnabled(final Context context) {
+    public static boolean forceGpsEnabled(final Context context) {
+        return false;
+    }
+
+    public static Intent openLocationSettings() {
         Intent gpsActivationIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
         return gpsActivationIntent;
     }

@@ -51,7 +51,7 @@ You will also need the `mbedtls` librairie installed in order to handle YLKG07YL
 On linux you'll need an `uinput` enabled kernel.  
 
 For macOS and iOS builds, you'll need Xcode (15+) installed.  
-For windows builds, you'll need MSVC 2019 (or 2022) installed. Bluetooth won't work with MinGW.  
+For Windows builds, you'll need MSVC 2019 (or 2022) installed. Bluetooth won't work with MinGW.  
 For Android builds, you'll need the appropriates JDK (17) SDK (23+) and NDK (26b+). You can customize Android build environment using the `assets/android/gradle.properties` file.  
 
 #### Building Lighthouse

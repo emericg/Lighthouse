@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(ZXing LANGUAGES C CXX)
-
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+project(ZXing)
 
 option (BUILD_WRITERS "Build with writer support (encoders)" ON)
 option (BUILD_READERS "Build with reader support (decoders)" ON)
@@ -12,7 +9,7 @@ option (BUILD_BLACKBOX_TESTS "Build the black box reader/writer tests" OFF)
 option (BUILD_UNIT_TESTS "Build the unit tests (don't enable for production builds)" OFF)
 option (BUILD_PYTHON_MODULE "Build the python module" OFF)
 option (BUILD_C_API "Build the C-API" OFF)
-option (BUILD_QT_QML "Build the Qt/QML wrapper" ON)
+option (BUILD_QT_QML "Build the Qt/QML wrapper" OFF)
 option (BUILD_EXPERIMENTAL_API "Build with experimental API" OFF)
 set(BUILD_DEPENDENCIES "AUTO" CACHE STRING "Fetch from github or use locally installed (AUTO/GITHUB/LOCAL)")
 
@@ -72,7 +69,7 @@ add_subdirectory (core)
 
 enable_testing()
 
-#include(zxing.cmake)
+include(zxing.cmake)
 
 if (BUILD_EXAMPLES)
     add_subdirectory (example)
@@ -90,5 +87,5 @@ if (BUILD_C_API)
     add_subdirectory (wrappers/c)
 endif()
 if (BUILD_QT_QML)
-    #add_subdirectory (wrappers/qt)
+    add_subdirectory (wrappers/qt)
 endif()

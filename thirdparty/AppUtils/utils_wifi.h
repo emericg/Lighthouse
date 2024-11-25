@@ -63,14 +63,12 @@ private slots:
 public:
     static UtilsWiFi *getInstance();
 
-    bool hasPermissionOS() const { return m_permOS; }
-
+    Q_INVOKABLE void refreshWiFi();
     QString getCurrentSSID() { return m_currentSSID; }
 
     Q_INVOKABLE bool checkLocationPermissions();
     Q_INVOKABLE void requestLocationPermissions();
-
-    Q_INVOKABLE void refreshWiFi();
+    bool hasPermissionOS() const { return m_permOS; }
 };
 
 /* ************************************************************************** */
