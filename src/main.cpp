@@ -154,8 +154,8 @@ int main(int argc, char *argv[])
 
     // Then we start the UI
     QQmlApplicationEngine engine;
-    engine.addImportPath(":/qt/qml/Lighthouse");
-    engine.addImportPath(":/qt/qml/ComponentLibrary");
+    engine.addImportPath(":/Lighthouse");
+    engine.addImportPath(":/ComponentLibrary");
 
     QQmlContext *engine_context = engine.rootContext();
     engine_context->setContextProperty("settingsManager", sm);

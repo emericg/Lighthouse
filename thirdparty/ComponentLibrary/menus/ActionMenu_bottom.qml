@@ -99,7 +99,7 @@ T.Popup {
 
             topPadding: Theme.componentMargin
             bottomPadding: 4
-            spacing: 4
+            spacing: 0
 
             ////
 
@@ -132,14 +132,15 @@ T.Popup {
                     role: "t"
                     DelegateChoice {
                         roleValue: "sep"
-                        ActionMenuSeparator {
+                        ActionMenuItem_separator {
                             width: actionMenu.width
                         }
                     }
                     DelegateChoice {
                         roleValue: "itm"
-                        ActionMenuItem {
+                        ActionMenuItem_button {
                             width: actionMenu.width
+                            height: Theme.componentHeightL
                             layoutDirection: actionMenu.layoutDirection
                             index: idx
                             text: txt

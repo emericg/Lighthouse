@@ -1,5 +1,10 @@
 qt_add_library(ComponentLibrary STATIC)
 
+# Use that find_package() call in the root project:
+find_package(Qt6 6.5 REQUIRED COMPONENTS Core Quick QuickControls2 LabsQmlModels)
+
+################################################################################
+
 list(APPEND MODULE_ASSETS
     #
 )
@@ -15,8 +20,9 @@ list(APPEND MODULE_QML_FILES
     menus/MobileMenuItem_vertical.qml
     menus/ActionMenu_bottom.qml
     menus/ActionMenu_floating.qml
-    menus/ActionMenuItem.qml
-    menus/ActionMenuSeparator.qml
+    menus/ActionMenuItem_button.qml
+    menus/ActionMenuItem_switch.qml
+    menus/ActionMenuItem_separator.qml
     menus/DrawerThemed.qml
     menus/DrawerItem.qml
     menus/DrawerButton.qml
@@ -128,12 +134,14 @@ list(APPEND MODULE_QML_FILES
     utils/CsdMac.qml
     utils/CsdWindows.qml
     utils/CsdLinux.qml
+    utils/FpsMonitor.qml
+    utils/MovablePoint.qml
     utils/RectangleDebug.qml
     utils/SwipeArea.qml
     utils/WindowGeometrySaver.qml
 )
 
-if (TARGET Qt::Location)
+if(TARGET Qt::Location)
     list(APPEND MODULE_QML_FILES
         maps/MapButton.qml
         maps/MapButtonCompass.qml
@@ -143,7 +151,7 @@ if (TARGET Qt::Location)
         maps/MapScale.qml
     )
 else()
-    message(NOTICE "Skipping the mapping components from ComponentLibrary as Qt6::Location is not used.")
+    message(STATUS "ComponentLibrary > Skipping the mapping components as Qt6::Location is not used by the root project.")
 endif()
 
 list(APPEND MODULE_QML_FILES
@@ -166,8 +174,10 @@ list(APPEND MODULE_SOURCES
     #
 )
 
-set_source_files_properties(QML_FILES PROPERTIES
-    QT_QML_SKIP_CACHEGEN FALSE
+################################################################################
+
+set_source_files_properties(${MODULE_QML_FILES} ${MODULE_JS_FILES} PROPERTIES
+    QT_QML_SKIP_CACHEGEN TRUE
 )
 
 set_source_files_properties(ThemeEngine.qml PROPERTIES
@@ -176,13 +186,16 @@ set_source_files_properties(ThemeEngine.qml PROPERTIES
 )
 
 set_target_properties(ComponentLibrary PROPERTIES AUTOMOC ON)
+set_target_properties(ComponentLibrary PROPERTIES AUTORCC ON)
 
-target_link_libraries(ComponentLibrary PRIVATE Qt::Quick)
+target_include_directories(ComponentLibrary PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(ComponentLibrary PRIVATE Qt6::Core Qt6::Quick Qt6::QuickControls2 Qt6::LabsQmlModels)
 
 qt_add_qml_module(ComponentLibrary
     URI ComponentLibrary
-    #VERSION 1.0 # not particularly necessary
-    #RESOURCE_PREFIX /ComponentLibrary/imports # ???
+    VERSION 1.0
+    DEPENDENCIES QtCore QtQuick LabsQmlModels
+    RESOURCE_PREFIX "/ComponentLibrary"
     QML_FILES ${MODULE_QML_FILES} ${MODULE_JS_FILES}
     RESOURCES ${MODULE_ASSETS}
     SOURCES ${MODULE_SOURCES}

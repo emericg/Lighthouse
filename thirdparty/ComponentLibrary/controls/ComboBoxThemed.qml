@@ -13,8 +13,8 @@ T.ComboBox {
                              implicitContentHeight + topPadding + bottomPadding,
                              implicitIndicatorHeight + topPadding + bottomPadding)
 
-    leftPadding: 16
-    rightPadding: 16
+    leftPadding: 12
+    rightPadding: 12
 
     font.pixelSize: Theme.componentFontSize
 
@@ -108,6 +108,9 @@ T.ComboBox {
         width: control.width
         implicitHeight: (contentItem.implicitHeight) ? contentItem.implicitHeight + 2 : 0
         padding: 1
+
+        topMargin: Math.max(screenPaddingStatusbar, screenPaddingTop)
+        bottomMargin: Math.max(screenPaddingNavbar, screenPaddingBottom)
 
         contentItem: ListView {
             implicitHeight: contentHeight

@@ -94,7 +94,7 @@ T.Popup {
 
             ////////
 
-            ActionMenuItem {
+            ActionMenuItem_button {
                 id: actionConnect
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -112,7 +112,7 @@ T.Popup {
                 }
             }
 
-            ActionMenuItem {
+            ActionMenuItem_button {
                 id: actionDisconnect
                 anchors.left: parent.left
                 anchors.right: parent.right
