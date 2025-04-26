@@ -143,6 +143,10 @@ void NetworkClient::sendAction(int action)
         QDataStream dataOutput(&block, QIODevice::WriteOnly);
         dataOutput.setVersion(QDataStream::Qt_6_0);
 
+        if (action == LocalActions::ACTION_KEYBOARD_computer_lock) dataOutput << QString("press:lock");
+        if (action == LocalActions::ACTION_KEYBOARD_computer_sleep) dataOutput << QString("press:sleep");
+        if (action == LocalActions::ACTION_KEYBOARD_computer_poweroff) dataOutput << QString("press:poweroff");
+
         if (action == LocalActions::ACTION_KEYBOARD_media_playpause) dataOutput << QString("press:playpause");
         if (action == LocalActions::ACTION_KEYBOARD_media_stop) dataOutput << QString("press:stop");
         if (action == LocalActions::ACTION_KEYBOARD_media_next) dataOutput << QString("press:next");

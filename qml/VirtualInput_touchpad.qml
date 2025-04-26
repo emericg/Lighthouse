@@ -127,6 +127,26 @@ Grid {
                 clear()
             }
         }
+
+        RowLayout { // buttons
+            anchors.left: parent.left
+            anchors.right: parent.right
+
+            ButtonClear {
+                text: qsTr("Lock")
+                onPressAndHold: networkControls.sendAction(LocalActions.ACTION_KEYBOARD_computer_lock)
+            }
+/*
+            ButtonClear {
+                text: qsTr("Sleep")
+                onPressAndHold: networkControls.sendAction(LocalActions.ACTION_KEYBOARD_computer_sleep)
+            }
+*/
+            ButtonClear {
+                text: qsTr("Shutdown")
+                onPressAndHold: networkControls.sendAction(LocalActions.ACTION_KEYBOARD_computer_poweroff)
+            }
+        }
     }
 
     ////////

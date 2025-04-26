@@ -192,6 +192,14 @@ void LocalControls::keyboard_computer_lock()
 {
     action(LocalActions::ACTION_KEYBOARD_computer_lock);
 }
+void LocalControls::keyboard_computer_sleep()
+{
+    action(LocalActions::ACTION_KEYBOARD_computer_sleep);
+}
+void LocalControls::keyboard_computer_poweroff()
+{
+    action(LocalActions::ACTION_KEYBOARD_computer_poweroff);
+}
 
 void LocalControls::keyboard_media_prev()
 {

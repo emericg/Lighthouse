@@ -79,7 +79,7 @@ public:
                 ACTION_KEYBOARD_keyboard_brightness_up,
                 ACTION_KEYBOARD_keyboard_brightness_down,
 
-                ACTION_KEYBOARD_desktop_backward = 64,
+                ACTION_KEYBOARD_desktop_backward,
                 ACTION_KEYBOARD_desktop_forward,
                 ACTION_KEYBOARD_desktop_refresh,
                 ACTION_KEYBOARD_desktop_stop,

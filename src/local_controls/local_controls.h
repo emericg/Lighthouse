@@ -75,6 +75,8 @@ public:
 
     // shortcuts
     Q_INVOKABLE void keyboard_computer_lock();
+    Q_INVOKABLE void keyboard_computer_sleep();
+    Q_INVOKABLE void keyboard_computer_poweroff();
     Q_INVOKABLE void keyboard_media_playpause();
     Q_INVOKABLE void keyboard_media_stop();
     Q_INVOKABLE void keyboard_media_next();

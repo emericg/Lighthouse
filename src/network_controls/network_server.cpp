@@ -171,13 +171,19 @@ void NetworkServer::readClientData()
     if (cData.startsWith("press:"))
     {
         LocalControls *ctrls = LocalControls::getInstance();
-        if (cData == "press:playpause") ctrls->action(LocalActions::ACTION_KEYBOARD_media_playpause);
+        if (cData == "press:lock") ctrls->action(LocalActions::ACTION_KEYBOARD_computer_lock);
+        else if (cData == "press:sleep") ctrls->action(LocalActions::ACTION_KEYBOARD_computer_sleep);
+        else if (cData == "press:poweroff") ctrls->action(LocalActions::ACTION_KEYBOARD_computer_poweroff);
+
+        else if (cData == "press:playpause") ctrls->action(LocalActions::ACTION_KEYBOARD_media_playpause);
         else if (cData == "press:stop") ctrls->action(LocalActions::ACTION_KEYBOARD_media_stop);
         else if (cData == "press:next") ctrls->action(LocalActions::ACTION_KEYBOARD_media_next);
         else if (cData == "press:prev") ctrls->action(LocalActions::ACTION_KEYBOARD_media_prev);
+
         else if (cData == "press:mute") ctrls->action(LocalActions::ACTION_KEYBOARD_volume_mute);
         else if (cData == "press:volumeup") ctrls->action(LocalActions::ACTION_KEYBOARD_volume_up);
         else if (cData == "press:volumedown") ctrls->action(LocalActions::ACTION_KEYBOARD_volume_down);
+
         else if (cData == "press:up") ctrls->action(LocalActions::ACTION_KEYBOARD_up);
         else if (cData == "press:down") ctrls->action(LocalActions::ACTION_KEYBOARD_down);
         else if (cData == "press:left") ctrls->action(LocalActions::ACTION_KEYBOARD_left);
