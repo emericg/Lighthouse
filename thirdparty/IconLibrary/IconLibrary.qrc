@@ -271,6 +271,8 @@
         <file>material-symbols/location/near_me-fill.svg</file>
         <file>material-symbols/location/pin_drop.svg</file>
         <file>material-symbols/location/pin_drop-fill.svg</file>
+        <file>material-symbols/location/satellite_alt.svg</file>
+        <file>material-symbols/location/satellite_alt-fill.svg</file>
 
         <file>material-symbols/media/2d.svg</file>
         <file>material-symbols/media/2d-fill.svg</file>
@@ -440,10 +442,6 @@
         <file>material-symbols/sensors/aq.svg</file>
         <file>material-symbols/sensors/aq_indoor.svg</file>
         <file>material-symbols/sensors/atm.svg</file>
-        <file>material-symbols/sensors/bluetooth.svg</file>
-        <file>material-symbols/sensors/bluetooth_connected.svg</file>
-        <file>material-symbols/sensors/bluetooth_disabled.svg</file>
-        <file>material-symbols/sensors/bluetooth_searching.svg</file>
         <file>material-symbols/sensors/bolt.svg</file>
         <file>material-symbols/sensors/bolt-fill.svg</file>
         <file>material-symbols/sensors/bubble_chart.svg</file>
@@ -497,7 +495,6 @@
         <file>material-symbols/sensors/salinity.svg</file>
         <file>material-symbols/sensors/salinity-fill.svg</file>
         <file>material-symbols/sensors/sensors.svg</file>
-        <file>material-symbols/sensors/settings_bluetooth.svg</file>
         <file>material-symbols/sensors/severe_cold.svg</file>
         <file>material-symbols/sensors/spo2.svg</file>
         <file>material-symbols/sensors/spo2-fill.svg</file>
@@ -583,6 +580,7 @@
         <file>material-symbols/add_circle.svg</file>
         <file>material-symbols/add_circle-fill.svg</file>
         <file>material-symbols/altitude.svg</file>
+        <file>material-symbols/altitude-fill.svg</file>
         <file>material-symbols/android.svg</file>
         <file>material-symbols/archive.svg</file>
         <file>material-symbols/archive-fill.svg</file>
@@ -610,6 +608,10 @@
         <file>material-symbols/barcode.svg</file>
         <file>material-symbols/barcode_scanner.svg</file>
         <file>material-symbols/block.svg</file>
+        <file>material-symbols/bluetooth.svg</file>
+        <file>material-symbols/bluetooth_connected.svg</file>
+        <file>material-symbols/bluetooth_disabled.svg</file>
+        <file>material-symbols/bluetooth_searching.svg</file>
         <file>material-symbols/bottom_panel_close-fill.svg</file>
         <file>material-symbols/bottom_panel_open-fill.svg</file>
         <file>material-symbols/bug_report.svg</file>
@@ -635,6 +637,15 @@
         <file>material-symbols/close.svg</file>
         <file>material-symbols/close_fullscreen.svg</file>
         <file>material-symbols/close_small.svg</file>
+        <file>material-symbols/cloud.svg</file>
+        <file>material-symbols/cloud_done.svg</file>
+        <file>material-symbols/cloud_done-fill.svg</file>
+        <file>material-symbols/cloud_download.svg</file>
+        <file>material-symbols/cloud_off.svg</file>
+        <file>material-symbols/cloud_off-fill.svg</file>
+        <file>material-symbols/cloud_sync.svg</file>
+        <file>material-symbols/cloud_sync-fill.svg</file>
+        <file>material-symbols/cloud_upload.svg</file>
         <file>material-symbols/collapse_content.svg</file>
         <file>material-symbols/communication.svg</file>
         <file>material-symbols/construction.svg</file>
@@ -651,6 +662,8 @@
         <file>material-symbols/crop_landscape.svg</file>
         <file>material-symbols/crop_portrait.svg</file>
         <file>material-symbols/crop_square.svg</file>
+        <file>material-symbols/dangerous.svg</file>
+        <file>material-symbols/dangerous-fill.svg</file>
         <file>material-symbols/delete.svg</file>
         <file>material-symbols/delete-fill.svg</file>
         <file>material-symbols/delete_forever.svg</file>
@@ -795,6 +808,7 @@
         <file>material-symbols/search.svg</file>
         <file>material-symbols/settings.svg</file>
         <file>material-symbols/settings_applications.svg</file>
+        <file>material-symbols/settings_bluetooth.svg</file>
         <file>material-symbols/settings-fill.svg</file>
         <file>material-symbols/share.svg</file>
         <file>material-symbols/share-fill.svg</file>
@@ -826,6 +840,8 @@
         <file>material-symbols/sliders.svg</file>
         <file>material-symbols/sort.svg</file>
         <file>material-symbols/sort_by_alpha.svg</file>
+        <file>material-symbols/speed.svg</file>
+        <file>material-symbols/speed-fill.svg</file>
         <file>material-symbols/stacks.svg</file>
         <file>material-symbols/stacks-fill.svg</file>
         <file>material-symbols/stars.svg</file>
@@ -857,6 +873,7 @@
         <file>material-symbols/view_in_ar.svg</file>
         <file>material-symbols/warning.svg</file>
         <file>material-symbols/warning-fill.svg</file>
+        <file>material-symbols/wifi.svg</file>
         <file>material-symbols/wifi_channel-fill.svg</file>
         <file>material-symbols/wifi_tethering.svg</file>
         <file>material-symbols/wifi_tethering_off.svg</file>

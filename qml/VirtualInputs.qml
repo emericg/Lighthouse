@@ -123,8 +123,8 @@ Loader {
 
                     text: qsTr("remote")
                     source: highlighted ?
-                                "qrc:/IconLibrary/material-symbols/sensors/nest_remote-fill.svg" :
-                                "qrc:/IconLibrary/material-symbols/sensors/nest_remote.svg"
+                                "qrc:/IconLibrary/material-symbols/hardware/nest_remote-fill.svg" :
+                                "qrc:/IconLibrary/material-symbols/hardware/nest_remote.svg"
                     highlighted: (inputSelector.currentSelection === 3)
                     onClicked: inputSelector.currentSelection = 3
                 }

@@ -200,8 +200,8 @@ Rectangle {
                     width: 26; height: 26;
                     anchors.centerIn: parent
                     source: deviceManager.bluetooth ?
-                                "qrc:/IconLibrary/material-symbols/sensors/bluetooth.svg" :
-                                "qrc:/IconLibrary/material-symbols/sensors/bluetooth_disabled.svg"
+                                "qrc:/IconLibrary/material-symbols/bluetooth.svg" :
+                                "qrc:/IconLibrary/material-symbols/bluetooth_disabled.svg"
                     color: Theme.colorHeaderContent
 
                     Rectangle {
