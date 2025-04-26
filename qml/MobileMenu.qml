@@ -9,9 +9,10 @@ Item {
     anchors.right: parent.right
     anchors.bottom: parent.bottom
 
-    property int hhh: (appWindow.isPhone ? 36 : 48)
-    property int hhi: (hhh * 0.666)
+    property int hhh: 56
+    property int hhi: (hhh * 0.4)
     property int hhv: visible ? hhh : 0
+    property int www: 80
 
     height: hhh + screenPaddingNavbar + screenPaddingBottom
 

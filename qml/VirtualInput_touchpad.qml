@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Layouts
 import QtQuick.Controls
 
 import ComponentLibrary
@@ -97,7 +98,7 @@ Grid {
             }
         }
 
-        TextField {
+        TextField { // virtual text field
             id: virtualtextfield
             anchors.left: parent.left
             anchors.right: parent.right

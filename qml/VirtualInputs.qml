@@ -73,10 +73,11 @@ Loader {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            height: mobileMenu.hhh
+            height: hhh
 
-            property int hhh: 72
+            property int hhh: 56
             property int hhi: (hhh * 0.4)
+            property int hhv: visible ? hhh : 0
             property int www: 80
 
             property int currentSelection: 1
@@ -86,9 +87,9 @@ Loader {
                 spacing: Theme.componentMargin
 
                 MobileMenuItem_vertical {
-                    width: mobileMenu.www
-                    height: mobileMenu.hhh
-                    sourceSize: mobileMenu.hhi
+                    width: inputSelector.www
+                    height: inputSelector.hhh
+                    sourceSize: inputSelector.hhi
 
                     colorContent: Theme.colorTabletmenuContent
                     colorHighlight: Theme.colorTabletmenuHighlight
@@ -99,9 +100,9 @@ Loader {
                     onClicked: inputSelector.currentSelection = 1
                 }
                 MobileMenuItem_vertical {
-                    width: mobileMenu.www
-                    height: mobileMenu.hhh
-                    sourceSize: mobileMenu.hhi
+                    width: inputSelector.www
+                    height: inputSelector.hhh
+                    sourceSize: inputSelector.hhi
 
                     colorContent: Theme.colorTabletmenuContent
                     colorHighlight: Theme.colorTabletmenuHighlight
@@ -114,9 +115,9 @@ Loader {
                     onClicked: inputSelector.currentSelection = 2
                 }
                 MobileMenuItem_vertical {
-                    width: mobileMenu.www
-                    height: mobileMenu.hhh
-                    sourceSize: mobileMenu.hhi
+                    width: inputSelector.www
+                    height: inputSelector.hhh
+                    sourceSize: inputSelector.hhi
 
                     colorContent: Theme.colorTabletmenuContent
                     colorHighlight: Theme.colorTabletmenuHighlight
@@ -129,9 +130,9 @@ Loader {
                     onClicked: inputSelector.currentSelection = 3
                 }
                 MobileMenuItem_vertical {
-                    width: mobileMenu.www
-                    height: mobileMenu.hhh
-                    sourceSize: mobileMenu.hhi
+                    width: inputSelector.www
+                    height: inputSelector.hhh
+                    sourceSize: inputSelector.hhi
 
                     colorContent: Theme.colorTabletmenuContent
                     colorHighlight: Theme.colorTabletmenuHighlight
