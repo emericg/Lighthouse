@@ -112,7 +112,6 @@ int main(int argc, char *argv[])
     NetworkClient *networkClient = nullptr;
 
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS) // desktop section
-    app.setApplicationDisplayName("Lighthouse");
     app.setWindowIcon(QIcon(":/assets/gfx/logos/logo.svg"));
 
     SystrayManager *st = SystrayManager::getInstance();
@@ -139,7 +138,7 @@ int main(int argc, char *argv[])
     UtilsWiFi *utilsWiFi = UtilsWiFi ::getInstance();
     UtilsScreen *utilsScreen = UtilsScreen::getInstance();
     UtilsLanguage *utilsLanguage = UtilsLanguage::getInstance();
-    if (!utilsScreen || !utilsApp || !utilsLanguage)
+    if (!utilsApp || !utilsWiFi || !utilsScreen || !utilsLanguage)
     {
         qWarning() << "Cannot init Lighthouse utils!";
         return EXIT_FAILURE;
