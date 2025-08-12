@@ -64,7 +64,7 @@ set(SOURCES
     src/crypto/pgp/secrets.c
 
     assets/assets.qrc
-    thirdparty/IconLibrary/IconLibrary.qrc
+    thirdparty/IconLibrary/IconLibrary_material.qrc
 )
 
 if(IOS OR ANDROID)
