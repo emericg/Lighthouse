@@ -24,10 +24,10 @@
 	<string>Lighthouse.icns</string>
 
 	<key>CFBundleVersion</key>
-	<string>00060001</string>
+	<string>00070001</string>
 
 	<key>CFBundleShortVersionString</key>
-	<string>0.6</string>
+	<string>0.7</string>
 
 	<key>LSMinimumSystemVersion</key>
 	<string>11.0</string>
