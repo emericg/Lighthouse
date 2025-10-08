@@ -103,7 +103,7 @@ Grid {
             anchors.left: parent.left
             anchors.right: parent.right
 
-            //visible: false // < set to invisible
+            visible: false // < set to invisible
             cursorVisible: false
             echoMode: TextInput.NoEcho
 
@@ -133,16 +133,25 @@ Grid {
             anchors.right: parent.right
 
             ButtonClear {
+                Layout.preferredWidth: 1
+                Layout.fillWidth: true
+
                 text: qsTr("Lock")
                 onPressAndHold: networkControls.sendAction(LocalActions.ACTION_KEYBOARD_computer_lock)
             }
 /*
             ButtonClear {
+                Layout.preferredWidth: 1
+                Layout.fillWidth: true
+
                 text: qsTr("Sleep")
                 onPressAndHold: networkControls.sendAction(LocalActions.ACTION_KEYBOARD_computer_sleep)
             }
 */
             ButtonClear {
+                Layout.preferredWidth: 1
+                Layout.fillWidth: true
+
                 text: qsTr("Shutdown")
                 onPressAndHold: networkControls.sendAction(LocalActions.ACTION_KEYBOARD_computer_poweroff)
             }

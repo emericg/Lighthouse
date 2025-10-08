@@ -144,24 +144,30 @@ void NetworkClient::sendAction(int action)
         dataOutput.setVersion(QDataStream::Qt_6_0);
 
         if (action == LocalActions::ACTION_KEYBOARD_computer_lock) dataOutput << QString("press:lock");
-        if (action == LocalActions::ACTION_KEYBOARD_computer_sleep) dataOutput << QString("press:sleep");
-        if (action == LocalActions::ACTION_KEYBOARD_computer_poweroff) dataOutput << QString("press:poweroff");
+        else if (action == LocalActions::ACTION_KEYBOARD_computer_sleep) dataOutput << QString("press:sleep");
+        else if (action == LocalActions::ACTION_KEYBOARD_computer_poweroff) dataOutput << QString("press:poweroff");
 
-        if (action == LocalActions::ACTION_KEYBOARD_media_playpause) dataOutput << QString("press:playpause");
-        if (action == LocalActions::ACTION_KEYBOARD_media_stop) dataOutput << QString("press:stop");
-        if (action == LocalActions::ACTION_KEYBOARD_media_next) dataOutput << QString("press:next");
-        if (action == LocalActions::ACTION_KEYBOARD_media_prev) dataOutput << QString("press:prev");
+        else if (action == LocalActions::ACTION_KEYBOARD_media_playpause) dataOutput << QString("press:playpause");
+        else if (action == LocalActions::ACTION_KEYBOARD_media_stop) dataOutput << QString("press:stop");
+        else if (action == LocalActions::ACTION_KEYBOARD_media_next) dataOutput << QString("press:next");
+        else if (action == LocalActions::ACTION_KEYBOARD_media_prev) dataOutput << QString("press:prev");
 
-        if (action == LocalActions::ACTION_KEYBOARD_volume_mute) dataOutput << QString("press:mute");
-        if (action == LocalActions::ACTION_KEYBOARD_volume_up) dataOutput << QString("press:volumeup");
-        if (action == LocalActions::ACTION_KEYBOARD_volume_down) dataOutput << QString("press:volumedown");
+        else if (action == LocalActions::ACTION_KEYBOARD_volume_mute) dataOutput << QString("press:mute");
+        else if (action == LocalActions::ACTION_KEYBOARD_volume_up) dataOutput << QString("press:volumeup");
+        else if (action == LocalActions::ACTION_KEYBOARD_volume_down) dataOutput << QString("press:volumedown");
 
-        if (action == LocalActions::ACTION_KEYBOARD_up) dataOutput << QString("press:up");
-        if (action == LocalActions::ACTION_KEYBOARD_down) dataOutput << QString("press:down");
-        if (action == LocalActions::ACTION_KEYBOARD_left) dataOutput << QString("press:left");
-        if (action == LocalActions::ACTION_KEYBOARD_right) dataOutput << QString("press:right");
-        if (action == LocalActions::ACTION_KEYBOARD_enter) dataOutput << QString("press:enter");
-        if (action == LocalActions::ACTION_KEYBOARD_escape) dataOutput << QString("press:escape");
+        else if (action == LocalActions::ACTION_KEYBOARD_up) dataOutput << QString("press:up");
+        else if (action == LocalActions::ACTION_KEYBOARD_down) dataOutput << QString("press:down");
+        else if (action == LocalActions::ACTION_KEYBOARD_left) dataOutput << QString("press:left");
+        else if (action == LocalActions::ACTION_KEYBOARD_right) dataOutput << QString("press:right");
+        else if (action == LocalActions::ACTION_KEYBOARD_enter) dataOutput << QString("press:enter");
+        else if (action == LocalActions::ACTION_KEYBOARD_escape) dataOutput << QString("press:escape");
+
+        else
+        {
+            qWarning() << "Unknown action code:" << action;
+            return;
+        }
 
         m_tcpSocket->write(block);
     }
