@@ -6,7 +6,7 @@ import ComponentLibrary
 import Lighthouse
 import MobileUI
 
-ApplicationWindow {
+Window {
     id: appWindow
     minimumWidth: 480
     minimumHeight: 960

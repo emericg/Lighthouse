@@ -42,7 +42,7 @@ Lamps and lighbulbs:
 
 #### Dependencies
 
-You will need a C++17 compiler and Qt 6.7+ with the following 'additional librairies':  
+You will need a C++17 compiler and Qt 6.8+ with the following 'additional librairies':  
 - Qt Connectivity
 - Qt Multimedia
 - Qt Quick 3D (for desktop builds)
@@ -51,8 +51,8 @@ You will also need the `mbedtls` librairie installed in order to handle YLKG07YL
 On linux you'll need an `uinput` enabled kernel.  
 
 For macOS and iOS builds, you'll need Xcode (15+) installed.  
-For Windows builds, you'll need MSVC 2019 (or 2022) installed. Bluetooth won't work with MinGW.  
-For Android builds, you'll need the appropriates JDK (17) SDK (23+) and NDK (26b+). You can customize Android build environment using the `assets/android/gradle.properties` file.  
+For Windows builds, you'll need MSVC (2022) installed. Bluetooth won't work with MinGW.  
+For Android builds, you'll need the appropriates JDK (17) SDK (28+) and NDK (28+). You can customize Android build environment using the `assets/android/gradle.properties` file.  
 
 #### Building Lighthouse
 

@@ -306,7 +306,7 @@ ApplicationWindow {
         onActivated: appWindow.close()
     }
     Shortcut {
-        sequence: StandardKey.Quit
+        sequences: [StandardKey.Quit]
         onActivated: utilsApp.appExit()
     }
 
