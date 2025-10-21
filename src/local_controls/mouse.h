@@ -35,7 +35,7 @@ class Mouse: public QObject
     Q_OBJECT
 
 public:
-    Mouse(QObject *parent = nullptr);
+    Mouse(QObject *parent = nullptr) : QObject(parent) { }
     virtual ~Mouse() = default;
 
     virtual void setup() = 0;

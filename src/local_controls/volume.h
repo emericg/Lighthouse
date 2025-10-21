@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * \date      2022
+ * \date      2025
  * \author    Emeric Grange <emeric.grange@gmail.com>
  */
 
-#ifndef KEYBOARD_H
-#define KEYBOARD_H
+#ifndef VOLUME_H
+#define VOLUME_H
 /* ************************************************************************** */
 
 #include <QObject>
@@ -28,23 +28,27 @@
 /* ************************************************************************** */
 
 /*!
- * Minimal API to create virtual keyboards.
- *
- * xinput | grep keyboard
- * libinput debug-events
+ * Minimal API to create virtual volume controllers.
  */
-class Keyboard: public QObject
+class Volume: public QObject
 {
     Q_OBJECT
 
 public:
-    Keyboard(QObject *parent = nullptr) : QObject(parent) { }
-    virtual ~Keyboard() = default;
+    Volume(QObject *parent = nullptr) : QObject(parent) { }
+    virtual ~Volume() = default;
 
     virtual void setup() = 0;
-    virtual void action(int key_code) = 0;
-    virtual void key(QChar key_value) = 0;
+
+    virtual QStringList listSinks() = 0;
+    virtual void selectSink(const QString &sink) = 0;
+
+    virtual float getVolume() = 0;
+    virtual void setVolume(float volume) = 0;
+
+    virtual void mute() = 0;
+    virtual void unmute() = 0;
 };
 
 /* ************************************************************************** */
-#endif // KEYBOARD_H
+#endif // VOLUME_H

@@ -90,16 +90,18 @@ bool MprisController::select_player()
 
                 if (m_player_selected.isEmpty())
                 {
-                    QDBusInterface remoteApp(name, mprisObjectPath, mprisInterface_root);
+                    m_serviceName = name;
+
+                    QDBusInterface remoteApp(m_serviceName, mprisObjectPath, mprisInterface_root);
                     m_playerName = remoteApp.property("Identity").toString();
 
-                    QDBusInterface remoteAppPlayer(name, mprisObjectPath, mprisInterface_player);
+                    QDBusInterface remoteAppPlayer(name, mprisObjectPath, mprisInterface_player);     
 
                     m_canControl = remoteAppPlayer.property("CanControl").toBool();
                     m_canPlayPause = remoteAppPlayer.property("CanPlayPause").toBool();
-                    m_canSeek = remoteAppPlayer.property("CanSeek").toBool();
                     m_canGoPrevious = remoteAppPlayer.property("CanGoPrevious").toBool();
                     m_canGoNext = remoteAppPlayer.property("CanGoNext").toBool();
+                    m_canSeek = remoteAppPlayer.property("CanSeek").toBool();
 
                     m_playbackStatus = remoteAppPlayer.property("PlaybackStatus").toString();
                     Q_EMIT statusUpdated();
@@ -116,14 +118,22 @@ bool MprisController::select_player()
                     {
                         getMetadata();
 
-                        m_volume = remoteAppPlayer.property("Volume").toReal();
-                        //Q_EMIT volumeUpdated();
+                        setVolume(remoteAppPlayer.property("Volume").toFloat());
 
-                        m_position = remoteAppPlayer.property("Position").toInt() / 60;
-                        //Q_EMIT positionUpdated();
+                        setPosition_us(remoteAppPlayer.property("Position").toInt() / 60);
 
+                        //qDebug() << "vol: " << m_volume << " / " << m_metaDuration;
                         //qDebug() << "pos: " << m_position << " / " << m_metaDuration;
                     }
+
+                    QDBusConnection::sessionBus().connect(
+                        name,
+                        mprisObjectPath,
+                        mprisInterface_properties,
+                        "PropertiesChanged",
+                        this,
+                        SLOT(onPropertiesChanged(QString, QVariantMap, QStringList))
+                    );
                 }
             }
         }
@@ -149,14 +159,118 @@ bool MprisController::select_player()
 
 /* ************************************************************************** */
 
-void MprisController::setPosition(int64_t pos)
+void MprisController::onPropertiesChanged(const QString &interfaceName,
+                                          const QVariantMap &changedProps,
+                                          const QStringList &invalidatedProps)
 {
-    //
+    qDebug() << "MprisController::onPropertiesChanged()";
+
+    Q_UNUSED(invalidatedProps);
+
+    if (interfaceName != "org.mpris.MediaPlayer2.Player")
+    {
+        qWarning() << "Wrong MPRIS interface ?" << interfaceName;
+        return;
+    }
+
+    qDebug() << "changedProps >> " << changedProps;
+    //changedProps >>  QMap(("PlaybackStatus", QVariant(QString, "Playing")))
+    //changedProps >>  QMap(("Metadata", QVariant(QDBusArgument, )))
+    //changedProps >>  QMap(("Rate", QVariant(double, 0)))
+    //changedProps >>  QMap(("Volume", QVariant(double, 0.426673)))
+
+    if (changedProps.contains("PlaybackStatus"))
+    {
+        setPlaybackStatus(changedProps.value("PlaybackStatus").toString());
+    }
+
+    if (changedProps.contains("Metadata"))
+    {
+        getMetadata();
+    }
+
+    if (changedProps.contains("Volume"))
+    {
+        setVolume(changedProps.value("Volume").toFloat());
+    }
+
+    if (changedProps.contains("Rate"))
+    {
+        setRate(changedProps.value("Rate").toFloat());
+    }
+
+    if (changedProps.contains("Position"))
+    {
+        setPosition(changedProps.value("Position").toLongLong() / 60);
+    }
+}
+
+/* ************************************************************************** */
+
+void MprisController::setPlaybackStatus(const QString &status)
+{
+    if (m_playbackStatus != status)
+    {
+        m_playbackStatus = status;
+        Q_EMIT statusUpdated();
+    }
+}
+
+void MprisController::setPosition_us(int64_t pos)
+{
+    if (m_position_us != pos)
+    {
+        m_position_us = pos;
+        Q_EMIT positionUpdated();
+    }
+}
+
+void MprisController::setPosition(float pos)
+{
+    if (pos >= 0.f && pos <= 100.f)
+    {
+        if (m_position != pos)
+        {
+            m_position = pos;
+            Q_EMIT positionUpdated();
+        }
+    }
+    else
+    {
+        qWarning() << "MprisController::setPosition(" << pos << ") ERROR";
+    }
 }
 
 void MprisController::setVolume(float vol)
 {
-    //
+    if (vol >= 0.f && vol <= 100.f)
+    {
+        if (m_volume != vol)
+        {
+            m_volume = vol;
+            Q_EMIT volumeUpdated();
+        }
+    }
+    else
+    {
+        qWarning() << "MprisController::setVolume(" << vol << ") ERROR";
+    }
+}
+
+void MprisController::setRate(float rate)
+{
+    if (rate >= 0.f && rate <= 100.f)
+    {
+        if (m_rate != rate)
+        {
+            m_rate = rate;
+            Q_EMIT rateUpdated();
+        }
+    }
+    else
+    {
+        qWarning() << "MprisController::setRate(" << rate << ") ERROR";
+    }
 }
 
 /* ************************************************************************** */
@@ -219,7 +333,13 @@ void MprisController::media_next()
                              mprisInterface_player);
     remoteApp.call("Next");
 }
-
+void MprisController::media_seek(qint64 offset_us)
+{
+    QDBusInterface remoteApp(m_player_selected,
+                             mprisObjectPath,
+                             mprisInterface_player);
+    remoteApp.call("Seek", offset_us);
+}
 /* ************************************************************************** */
 
 void MprisController::getMetadata()
@@ -250,7 +370,7 @@ void MprisController::getMetadata()
     else
     {
         QVariantHash map = qdbus_cast<QVariantHash>(response.arguments()
-                                                    .first()
+                                                    .constFirst()
                                                     .value<QDBusVariant>()
                                                     .variant()
                                                     .value<QDBusArgument>());

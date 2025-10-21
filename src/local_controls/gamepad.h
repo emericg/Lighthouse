@@ -35,7 +35,7 @@ class Gamepad: public QObject
     Q_OBJECT
 
 public:
-    Gamepad(QObject *parent = nullptr);
+    Gamepad(QObject *parent = nullptr) : QObject(parent) { }
     virtual ~Gamepad() = default;
 
     virtual void setup() = 0;

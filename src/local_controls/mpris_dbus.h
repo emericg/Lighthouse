@@ -46,8 +46,10 @@ class MprisController: public QObject
 
     Q_PROPERTY(QString playerName READ getPlayerName NOTIFY playerUpdated)
     Q_PROPERTY(QString playbackStatus READ getPlaybackStatus NOTIFY statusUpdated)
-    Q_PROPERTY(qint64 position READ getPosition WRITE setPosition NOTIFY statusUpdated)
+    Q_PROPERTY(qint64 position_us READ getPosition_us WRITE setPosition_us NOTIFY statusUpdated)
+    Q_PROPERTY(float position READ getPosition WRITE setPosition NOTIFY statusUpdated)
     Q_PROPERTY(float volume READ getVolume WRITE setVolume NOTIFY volumeUpdated)
+    Q_PROPERTY(float rate READ getRate WRITE setRate NOTIFY rateUpdated)
 
     Q_PROPERTY(QString metaTitle READ getTitle NOTIFY metadataUpdated)
     Q_PROPERTY(QString metaArtist READ getArtist NOTIFY metadataUpdated)
@@ -63,14 +65,19 @@ class MprisController: public QObject
 
     bool m_canControl = false;
     bool m_canPlayPause = false;
-    bool m_canSeek = false;
     bool m_canGoPrevious = false;
     bool m_canGoNext = false;
+    bool m_canSeek = false;
+    bool m_canControlRate = false;
+    bool m_canControlVolume = false;
 
+    QString m_serviceName;
     QString m_playerName;
-    QString m_playbackStatus;
-    int64_t m_position;
-    double m_volume;
+    QString m_playbackStatus; // Playing // Paused
+    int64_t m_position_us = -1; // in µs
+    double m_position = -1.f; // in %
+    double m_volume = -1.f; // in %
+    double m_rate = -1.f; // in %
 
     QString m_metadata; // raw
 
@@ -92,15 +99,15 @@ signals:
     void playerUpdated();
     void statusUpdated();
     void volumeUpdated();
+    void rateUpdated();
     void positionUpdated();
     void metadataUpdated();
-/*
+
 private slots:
-    void playbackStatusChanged();
-    void metadataChanged();
-    void positionChanged();
-    void volumeChanged();
-*/
+    void onPropertiesChanged(const QString &interfaceName,
+                             const QVariantMap &changedProps,
+                             const QStringList &invalidatedProps);
+
 public:
     static MprisController *getInstance();
 
@@ -111,12 +118,21 @@ public:
     bool canGoNext() const { return m_canGoNext; }
 
     QString getPlayerName() const { return m_playerName; }
-    QString getPlaybackStatus() const  { return m_playbackStatus; }
 
-    qint64 getPosition() const { return m_position; }
-    void setPosition(int64_t pos);
+    QString getPlaybackStatus() const { return m_playbackStatus; }
+    void setPlaybackStatus(const QString &status);
+
+    qint64 getPosition_us() const { return m_position_us; }
+    void setPosition_us(int64_t pos);
+
+    float getPosition() const { return m_position; }
+    void setPosition(float pos);
+
     float getVolume() const { return m_volume; }
     void setVolume(float vol);
+
+    float getRate() const { return m_rate; }
+    void setRate(float vol);
 
     QString getTitle() const { return m_metaTitle; }
     QString getArtist() const { return m_metaArtist; }
@@ -134,6 +150,7 @@ public:
     Q_INVOKABLE void media_stop();
     Q_INVOKABLE void media_next();
     Q_INVOKABLE void media_prev();
+    Q_INVOKABLE void media_seek(qint64 offset_us);
 };
 
 /* ************************************************************************** */

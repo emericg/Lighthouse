@@ -28,7 +28,9 @@ Item {
         running: (appContent.state === "VirtualInputs" && virtualInput_gamepad.visible)
         repeat: true
         onTriggered: {
-            networkControls.sendGamepad(x1, y1, x2, y2, ba, bb, bx, by)
+            if (networkControls) {
+                networkControls.sendGamepad(x1, y1, x2, y2, ba, bb, bx, by)
+            }
         }
     }
 
