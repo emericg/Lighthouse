@@ -76,9 +76,10 @@ if(NOT IOS AND NOT ANDROID)
     set(SOURCES_DESKTOP
         src/MenubarManager.cpp src/MenubarManager.h
         src/SystrayManager.cpp src/SystrayManager.h
-        src/local_controls/mouse.cpp src/local_controls/mouse.h
-        src/local_controls/keyboard.cpp src/local_controls/keyboard.h
-        src/local_controls/gamepad.cpp src/local_controls/gamepad.h
+        src/local_controls/volume.h
+        src/local_controls/mouse.h
+        src/local_controls/keyboard.h
+        src/local_controls/gamepad.h
     )
     if(LINUX)
         set(SOURCES_DESKTOP ${SOURCES_DESKTOP}
