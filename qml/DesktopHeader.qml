@@ -178,8 +178,12 @@ Rectangle {
         ButtonOutline {
             anchors.verticalCenter: parent.verticalCenter
 
-            visible: networkServer.clientConnected
-            text: qsTr("CLIENT CONNECTED")
+            visible: (networkServer.running || networkServer.clientConnected)
+            text: {
+                if (networkServer.running) return qsTr("SERVER RUNNING")
+                if (networkServer.clientConnected) return qsTr("CLIENT CONNECTED")
+                return ""
+            }
             color: Theme.colorHeaderContent
         }
 

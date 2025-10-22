@@ -33,6 +33,12 @@ Loader {
     sourceComponent: Item {
         anchors.fill: parent
 
+        ////////////////
+
+        function backAction() {
+            screenDeviceList.loadScreen()
+        }
+
         Rectangle { // hide the space between the top of the screen and the top of scanWidget
             anchors.top: parent.top
             anchors.left: parent.left
@@ -42,9 +48,7 @@ Loader {
             z: -1
         }
 
-        function backAction() {
-            screenDeviceList.loadScreen()
-        }
+        ////////////////
 
         Flickable {
             id: contentFlickable
@@ -58,8 +62,11 @@ Loader {
 
             Column {
                 id: contentColumn
+
                 anchors.left: parent.left
+                anchors.leftMargin: ((singleColumn || isPhone) ? 0 : parent.width * 0.12)
                 anchors.right: parent.right
+                anchors.rightMargin: ((singleColumn || isPhone) ? 0 : parent.width * 0.12)
 
                 ////////////////
 
@@ -444,4 +451,6 @@ Loader {
             }
         }
     }
+
+    ////////////////////////////////////////////////////////////////////////////
 }

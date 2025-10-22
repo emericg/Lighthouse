@@ -144,6 +144,7 @@ class SettingsManager: public QObject
     QString m_mqttTopics = "lighthouse";
 
     bool m_netctrl = true;
+    bool m_netctrl_secure = true;
     QString m_netctrlSSID;
     QString m_netctrlHost;
     int m_netctrlPort = 5555;
@@ -186,6 +187,7 @@ Q_SIGNALS:
     void mysqlChanged();
     void mqttChanged();
     void netctrlChanged();
+    void netctrlSecureChanged();
     void fakeitChanged();
 
 public:
@@ -320,6 +322,9 @@ public:
 
     bool getNetCtrl() const { return m_netctrl; }
     void setNetCtrl(const bool value);
+
+    bool getNetCtrlSecure() const { return m_netctrl_secure; }
+    void setNetCtrlSecure(const bool value);
 
     QString getNetCtrlSSID() const { return m_netctrlSSID; }
     void setNetCtrlSSID(const QString &value);

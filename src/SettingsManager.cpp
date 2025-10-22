@@ -770,13 +770,23 @@ void SettingsManager::setNetCtrl(const bool value)
     }
 }
 
+void SettingsManager::setNetCtrlSecure(const bool value)
+{
+    if (m_netctrl_secure != value)
+    {
+        m_netctrl_secure = value;
+        writeSettings();
+        Q_EMIT netctrlSecureChanged();
+    }
+}
+
 void SettingsManager::setNetCtrlSSID(const QString &value)
 {
     if (m_netctrlSSID != value)
     {
         m_netctrlSSID = value;
         writeSettings();
-        Q_EMIT netctrlChanged();
+        Q_EMIT netctrlSecureChanged();
     }
 }
 
