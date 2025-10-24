@@ -19,7 +19,7 @@
  * \author    Emeric Grange <emeric.grange@gmail.com>
  */
 
-#ifdef ENABLE_UINPUT
+#ifdef ENABLE_KEYBOARD_UINPUT
 #ifndef GAMEPAD_UINPUT_H
 #define GAMEPAD_UINPUT_H
 /* ************************************************************************** */
@@ -59,4 +59,4 @@ public:
 
 /* ************************************************************************** */
 #endif // GAMEPAD_UINPUT_H
-#endif // ENABLE_UINPUT
+#endif // ENABLE_KEYBOARD_UINPUT

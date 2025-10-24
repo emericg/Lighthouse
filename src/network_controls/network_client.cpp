@@ -28,7 +28,7 @@
 
 /* ************************************************************************** */
 
-NetworkClient::NetworkClient(QObject *parent): QObject(parent)
+NetworkClient::NetworkClient(QObject *parent) : QObject(parent)
 {
     m_tcpSocket = new QTcpSocket(this);
 

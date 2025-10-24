@@ -35,7 +35,7 @@
 
 /* ************************************************************************** */
 
-Mouse_uinput::Mouse_uinput(QObject *parent): Mouse(parent)
+Mouse_uinput::Mouse_uinput(QObject *parent) : Mouse(parent)
 {
     //
 }
@@ -105,7 +105,6 @@ void Mouse_uinput::setup()
         if (err < 0) { qWarning() << "ioctl(UI_SET_EVBIT, EV_SYN) error"; }
 
         // setup mouse buttons
-
         ioctl(m_fd, UI_SET_RELBIT, REL_X);
         ioctl(m_fd, UI_SET_RELBIT, REL_Y);
         ioctl(m_fd, UI_SET_KEYBIT, BTN_LEFT);

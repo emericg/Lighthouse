@@ -35,7 +35,7 @@
 
 /* ************************************************************************** */
 
-Gamepad_uinput::Gamepad_uinput(QObject *parent): Gamepad(parent)
+Gamepad_uinput::Gamepad_uinput(QObject *parent) : Gamepad(parent)
 {
     //
 }

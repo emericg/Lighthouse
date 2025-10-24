@@ -15,43 +15,37 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * \date      2023
+ * \date      2025
  * \author    Emeric Grange <emeric.grange@gmail.com>
  */
 
-#ifdef ENABLE_KEYBOARD_UINPUT
-#ifndef MOUSE_UINPUT_H
-#define MOUSE_UINPUT_H
+#ifndef MEDIA_H
+#define MEDIA_H
 /* ************************************************************************** */
-
-#include "mouse.h"
-
-#include <linux/input.h>
-#include <linux/uinput.h>
 
 #include <QObject>
 
+/* ************************************************************************** */
+
 /*!
- * Virtual mouse (Linux uinput version)
+ * Minimal API to create virtual media controllers.
  */
-class Mouse_uinput: public Mouse
+class Media: public QObject
 {
     Q_OBJECT
 
-    int m_fd = -1;
-    struct uinput_user_dev m_uidev;
-
-    void emitevent(int type, int code, int val);
-
 public:
-    Mouse_uinput(QObject *parent = nullptr);
-    virtual ~Mouse_uinput();
+    Media(QObject *parent = nullptr) : QObject(parent) { }
+    virtual ~Media() = default;
 
-    virtual void setup();
-    virtual void action(int action_code);
-    virtual void action(int x, int y, int btn_left, int btn_right, int btn_middle);
+    virtual void setup() = 0;
+
+    virtual float getVolume() = 0;
+    virtual void setVolume(float volume) = 0;
+
+    virtual void mute() = 0;
+    virtual void unmute() = 0;
 };
 
 /* ************************************************************************** */
-#endif // MOUSE_UINPUT_H
-#endif // ENABLE_KEYBOARD_UINPUT
+#endif // MEDIA_H

@@ -50,7 +50,7 @@ Grid {
             Image { // actual thumbnail
                 anchors.fill: parent
 
-                source: mprisControls.metaThumbnail
+                source: mediaControls.metaThumbnail
                 sourceSize: Qt.size(width, height)
                 fillMode: Image.PreserveAspectCrop
             }

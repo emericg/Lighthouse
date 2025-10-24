@@ -23,10 +23,13 @@
 #define DEVICE_LOCAL_CONTROLS_H
 /* ************************************************************************** */
 
-#include "mpris_dbus.h"
 #include "mouse.h"
 #include "keyboard.h"
 #include "gamepad.h"
+
+#include "media.h"
+#include "volume.h"
+#include "mpris_dbus.h"
 
 #include <QObject>
 #include <QString>
@@ -49,8 +52,11 @@ class LocalControls: public QObject
     Keyboard *keyboard = nullptr;
     Gamepad *gamepad = nullptr;
 
-#if defined(ENABLE_MPRIS)
-    MprisController *mpris = nullptr;
+    Media *media = nullptr;
+    Volume *volume = nullptr;
+
+#if defined(ENABLE_MEDIA_MPRIS)
+    Media_MPRIS *mpris = nullptr;
 #endif
 
     QMediaPlayer *player = nullptr;
@@ -63,6 +69,8 @@ class LocalControls: public QObject
 
 public:
     static LocalControls *getInstance();
+
+    Media *getMediaController() const { return media; }
 
     Q_INVOKABLE void action(int action_code, const QString &action_params = QString());
 

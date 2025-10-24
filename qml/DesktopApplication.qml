@@ -187,7 +187,7 @@ ApplicationWindow {
                     // Check Bluetooth anyway (on macOS)
                     //if (Qt.platform.os === "osx") deviceManager.checkBluetooth()
 
-                    mprisControls.select_player()
+                    mediaControls.select_player()
 
                     break
             }

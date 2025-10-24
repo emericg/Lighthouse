@@ -96,6 +96,7 @@ int main(int argc, char *argv[])
     app.setApplicationDisplayName("Lighthouse");
     app.setOrganizationName("Lighthouse");
     app.setOrganizationDomain("Lighthouse");
+    app.setWindowIcon(QIcon(":/assets/gfx/logos/logo.svg"));
 
     // Init app components
     SettingsManager *sm = SettingsManager::getInstance();
@@ -111,27 +112,21 @@ int main(int argc, char *argv[])
     NetworkServer *networkServer = nullptr;
     NetworkClient *networkClient = nullptr;
 
-#if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS) // desktop section
-    app.setWindowIcon(QIcon(":/assets/gfx/logos/logo.svg"));
-
+#if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
+    // desktop section
     SystrayManager *st = SystrayManager::getInstance();
     MenubarManager *mb = MenubarManager::getInstance();
     LocalControls *localControls = LocalControls::getInstance();
 
-#if defined(ENABLE_MPRIS)
-    MprisController *mprisControls = MprisController::getInstance();
-    mprisControls->select_player();
+    dm->listenDevices_start();
+    networkServer = new NetworkServer();
 #endif
-#endif // desktop section
 
-#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS) // mobile section
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+    // mobile section
     networkClient = new NetworkClient();
     networkClient->connectToServer();
-#else
-    networkServer = new NetworkServer();
-
-    dm->listenDevices_start();
-#endif // mobile section
+#endif
 
     // Init generic utils
     UtilsApp *utilsApp = UtilsApp::getInstance();
@@ -153,8 +148,6 @@ int main(int argc, char *argv[])
 
     // Then we start the UI
     QQmlApplicationEngine engine;
-    engine.addImportPath(":/Lighthouse");
-    engine.addImportPath(":/ComponentLibrary");
 
     QQmlContext *engine_context = engine.rootContext();
     engine_context->setContextProperty("settingsManager", sm);
@@ -184,8 +177,9 @@ int main(int argc, char *argv[])
     engine_context->setContextProperty("systrayManager", st);
     engine_context->setContextProperty("menubarManager", mb);
     engine_context->setContextProperty("localControls", localControls);
-#if defined(ENABLE_MPRIS)
-    engine_context->setContextProperty("mprisControls", mprisControls);
+#if defined(ENABLE_MEDIA_MPRIS)
+    Media_MPRIS *mprisControls = Media_MPRIS::getInstance();
+    engine_context->setContextProperty("mediaControls", mprisControls);
 #endif
 
     // Load the main view

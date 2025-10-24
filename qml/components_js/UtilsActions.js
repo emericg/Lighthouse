@@ -27,8 +27,8 @@ function getActionIcon(action) {
         action < LocalActions.LocalActions.ACTION_KEYBOARD_STOP)
         return "qrc:/assets/gfx/icons/keyboard-variant.svg"
 
-    if (action > LocalActions.LocalActions.ACTION_MPRIS_START &&
-        action < LocalActions.LocalActions.ACTION_MPRIS_STOP)
+    if (action > LocalActions.LocalActions.ACTION_MEDIA_START &&
+        action < LocalActions.LocalActions.ACTION_MEDIA_STOP)
         return "qrc:/IconLibrary/material-symbols/media/slideshow.svg"
 
     return ""
@@ -47,8 +47,8 @@ function getActionCategory(action) {
     if (action > LocalActions.LocalActions.ACTION_KEYBOARD_START &&
         action < LocalActions.LocalActions.ACTION_KEYBOARD_STOP)
         name = qsTr("keyboard action")
-    if (action > LocalActions.LocalActions.ACTION_MPRIS_START &&
-        action < LocalActions.LocalActions.ACTION_MPRIS_STOP)
+    if (action > LocalActions.LocalActions.ACTION_MEDIA_START &&
+        action < LocalActions.LocalActions.ACTION_MEDIA_STOP)
         name = qsTr("media action")
 
     return name

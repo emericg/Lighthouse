@@ -22,11 +22,12 @@
 #include "local_controls.h"
 #include "local_actions.h"
 
-#include "keyboard_xtest.h"
 #include "mouse_uinput.h"
 #include "keyboard_uinput.h"
 #include "gamepad_uinput.h"
+#include "keyboard_xtest.h"
 #include "mpris_dbus.h"
+#include "volume_pulseaudio.h"
 
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
 #include <QMediaPlayer>
@@ -53,21 +54,35 @@ LocalControls::LocalControls()
 {
 #if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
 
-    // nothing to control there...
+    return; // nothing to control there...
 
-#elif defined(Q_OS_LINUX)
+#endif
 
-    //keyboard = new Keyboard_xtest(); // only works with X11
+#if defined(Q_OS_LINUX)
+
+#if defined(ENABLE_KEYBOARD_UINPUT)
     mouse = new Mouse_uinput();
     keyboard = new Keyboard_uinput();
     gamepad = new Gamepad_uinput();
-    mpris = MprisController::getInstance();
-
-#else
-
-    qWarning() << "No backends available for LocalControls()";
-
+#elif defined(ENABLE_KEYBOARD_XTEST)
+    // only works with X11
+    keyboard = new Keyboard_xtest();
 #endif
+
+#if defined(ENABLE_MEDIA_MPRIS)
+    mpris = Media_MPRIS::getInstance();
+    mpris->select_player();
+#endif
+
+#if defined(ENABLE_VOLUME_PIPEWIRE)
+    //volume = new Volume_pipewire();
+#elif defined(ENABLE_VOLUME_PULSEAUDIO)
+    //volume = new Volume_pulseaudio();
+#endif
+
+#endif // Q_OS_LINUX
+
+
 }
 
 LocalControls::~LocalControls()
@@ -139,10 +154,10 @@ void LocalControls::action(int action_code, const QString &action_params)
             keyboard->action(action_code);
         }
     }
-    else if (action_code > LocalActions::ACTION_MPRIS_START &&
-             action_code < LocalActions::ACTION_MPRIS_STOP)
+    else if (action_code > LocalActions::ACTION_MEDIA_START &&
+             action_code < LocalActions::ACTION_MEDIA_STOP)
     {
-#if defined(ENABLE_MPRIS)
+#if defined(ENABLE_MEDIA_MPRIS)
         if (mpris)
         {
             mpris->action(action_code);

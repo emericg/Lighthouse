@@ -19,7 +19,7 @@
  * \author    Emeric Grange <emeric.grange@gmail.com>
  */
 
-#ifdef ENABLE_MPRIS
+#ifdef ENABLE_MEDIA_MPRIS
 #ifndef MPRIS_DBUS_H
 #define MPRIS_DBUS_H
 /* ************************************************************************** */
@@ -32,7 +32,7 @@
 /*!
  * MPRIS interface
  */
-class MprisController: public QObject
+class Media_MPRIS: public QObject
 {
     Q_OBJECT
 
@@ -58,7 +58,7 @@ class MprisController: public QObject
     Q_PROPERTY(qint64 metaPosition READ getMetaPosition NOTIFY metadataUpdated)
     Q_PROPERTY(qint64 metaDuration READ getMetaDuration NOTIFY metadataUpdated)
 
-    QStringList m_player_registered;
+    //QStringList m_player_registered;
     QString m_player_selected;
 
     bool isMprisAvailable() const { return !m_player_selected.isEmpty(); }
@@ -71,10 +71,9 @@ class MprisController: public QObject
     bool m_canControlRate = false;
     bool m_canControlVolume = false;
 
-    QString m_serviceName;
     QString m_playerName;
     QString m_playbackStatus; // Playing // Paused
-    int64_t m_position_us = -1; // in µs
+    int64_t m_position_us = -1; // µs
     double m_position = -1.f; // in %
     double m_volume = -1.f; // in %
     double m_rate = -1.f; // in %
@@ -86,14 +85,14 @@ class MprisController: public QObject
     QString m_metaAlbum;
     QString m_metaThumbnail;
     int64_t m_metaPosition;
-    int64_t m_metaDuration;
+    int64_t m_metaDuration; // µs
 
     void getMetadata();
 
     // Singleton
-    static MprisController *instance;
-    MprisController();
-    ~MprisController();
+    static Media_MPRIS *instance;
+    Media_MPRIS();
+    ~Media_MPRIS();
 
 signals:
     void playerUpdated();
@@ -109,7 +108,7 @@ private slots:
                              const QStringList &invalidatedProps);
 
 public:
-    static MprisController *getInstance();
+    static Media_MPRIS *getInstance();
 
     bool canControl() const { return m_canControl; }
     bool canPlayPause() const { return m_canPlayPause; }
@@ -155,4 +154,4 @@ public:
 
 /* ************************************************************************** */
 #endif // MPRIS_DBUS_H
-#endif // ENABLE_MPRIS
+#endif // ENABLE_MEDIA_MPRIS

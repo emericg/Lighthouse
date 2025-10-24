@@ -216,7 +216,7 @@ Item {
                     height: 128
                     radius: 4
 
-                    visible: mprisControls && mprisControls.available
+                    visible: mediaControls && mediaControls.available
 
                     color: Theme.colorDeviceWidget
                     border.width: 2
@@ -234,7 +234,7 @@ Item {
                             anchors.left: parent.left
                             anchors.right: parent.right
 
-                            text: mprisControls.playerName + " / " + mprisControls.playbackStatus
+                            text: mediaControls.playerName + " / " + mediaControls.playbackStatus
                             font.pixelSize: Theme.fontSizeContentSmall
                             color: Theme.colorSubText
                             elide: Text.ElideRight
@@ -246,7 +246,7 @@ Item {
 
                             visible: (text.length > 1)
 
-                            text: mprisControls.metaTitle + " " + mprisControls.metaAlbum
+                            text: mediaControls.metaTitle + " " + mediaControls.metaAlbum
                             font.pixelSize: Theme.fontSizeContentBig
                             color: Theme.colorText
                             elide: Text.ElideRight
@@ -254,20 +254,20 @@ Item {
 
                         MediaButtonRow {
                             btnSize: 36
-                            //visible: mprisControls.canControl
-                            onMediaPrevious: mprisControls.media_prev()
-                            onMediaPlayPause: mprisControls.media_playpause()
-                            onMediaNext: mprisControls.media_next()
+                            //visible: mediaControls.canControl
+                            onMediaPrevious: mediaControls.media_prev()
+                            onMediaPlayPause: mediaControls.media_playpause()
+                            onMediaNext: mediaControls.media_next()
                         }
 
                         SliderThemed {
                             anchors.left: parent.left
                             anchors.right: parent.right
-                            visible: (mprisControls.position > 0 && mprisControls.metaDuration > 0)
+                            visible: (mediaControls.position > 0 && mediaControls.metaDuration > 0)
 
                             from: 0
-                            to: mprisControls.metaDuration
-                            value: mprisControls.position
+                            to: mediaControls.metaDuration
+                            value: mediaControls.position
                         }
                     }
 
@@ -281,7 +281,7 @@ Item {
                         width: height
 
                         source: {
-                            if (mprisControls.playbackStatus === "paused")
+                            if (mediaControls.playbackStatus === "paused")
                                 return "qrc:/IconLibrary/material-symbols/media/slideshow.svg"
                             else
                                 return "qrc:/IconLibrary/material-symbols/media/slideshow.svg"
@@ -300,7 +300,7 @@ Item {
                         anchors.bottomMargin: 8
                         width: height
 
-                        source: mprisControls.metaThumbnail
+                        source: mediaControls.metaThumbnail
                         sourceSize: Qt.size(width, height)
                         fillMode: Image.PreserveAspectCrop
                     }

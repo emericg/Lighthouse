@@ -7,10 +7,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-string(TIMESTAMP CURRENT_TIMESTAMP "%s" UTC)
 set(APP_NAME ${CMAKE_PROJECT_NAME})
 set(APP_VERSION ${CMAKE_PROJECT_VERSION})
-set(APP_VERSION_CODE ${TIMESTAMP})
+
+option(ENABLE_MBEDTLS "mbedTLS for PoGo+" ON)
+option(ENABLE_MEDIA_MPRIS "MPRIS media controller" ON)
+option(ENABLE_VOLUME_PIPEWIRE "Pipewire volume controller" OFF)
+option(ENABLE_VOLUME_PULSEAUDIO "Pulseaudio volume controller" ON)
+option(ENABLE_KEYBOARD_XTEST "Virtual keyboard using XTEST" OFF)
+option(ENABLE_KEYBOARD_UINPUT "Virtual keyboard using UInput" ON)
 
 ################################################################################
 
@@ -71,6 +76,7 @@ set(SOURCES
 if(IOS OR ANDROID)
     set(QAPPLICATION_CLASS QGuiApplication)
 endif()
+
 if(NOT IOS AND NOT ANDROID)
     set(QAPPLICATION_CLASS QApplication)
     set(SOURCES_DESKTOP
@@ -202,14 +208,10 @@ if(NOT IOS AND NOT ANDROID)
     target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt6::Widgets)
 endif()
 
-if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    option(ENABLE_MBEDTLS "" ON)
-    option(ENABLE_XTEST "" OFF)
-    option(ENABLE_UINPUT "" ON)
-    option(ENABLE_MPRIS "" ON)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_definitions(-DENABLE_MBEDTLS)
-    add_definitions(-DENABLE_UINPUT)
-    add_definitions(-DENABLE_MPRIS)
+    add_definitions(-DENABLE_KEYBOARD_UINPUT)
+    add_definitions(-DENABLE_MEDIA_MPRIS)
     target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC "-lmbedtls -lmbedx509 -lmbedcrypto")
 endif()
 
@@ -245,7 +247,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ZXingQt)
 ################################################################################
 
 ## Android
-if (CMAKE_SYSTEM_NAME STREQUAL "Android")
+if(CMAKE_SYSTEM_NAME STREQUAL "Android")
     set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
         #QT_ANDROID_ABIS "armeabi-v7a;arm64-v8a;x86;x86_64"
         #QT_ANDROID_BUILD_ALL_ABIS ON
@@ -256,7 +258,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Android")
 endif()
 
 ## macOS
-if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     #set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64")
     set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0")
 
@@ -274,7 +276,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 endif()
 
 ## iOS
-if (CMAKE_SYSTEM_NAME STREQUAL "iOS")
+if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
     #set(assets_catalog_path "${CMAKE_SOURCE_DIR}/assets/ios/Assets.xcassets")
     #target_sources(${CMAKE_PROJECT_NAME} PRIVATE ${assets_catalog_path})
     #set_source_files_properties(${assets_catalog_path} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
@@ -304,7 +306,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 endif()
 
 ## Release build? Set "no debug" macros
-if (CMAKE_BUILD_TYPE STREQUAL Release)
+if(CMAKE_BUILD_TYPE STREQUAL Release)
     target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
         NDEBUG
         QT_NO_DEBUG
@@ -324,7 +326,7 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
 # Output?
 install(TARGETS ${CMAKE_PROJECT_NAME}
     BUNDLE DESTINATION bin/
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    #LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
 ################################################################################

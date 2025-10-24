@@ -73,8 +73,8 @@ Popup {
             //name = "keyboard action"
             menuArea.mode = qsTr("actions")
         }
-        if (currentButtonAction > LocalActions.ACTION_MPRIS_START &&
-            currentButtonAction < LocalActions.ACTION_MPRIS_STOP) {
+        if (currentButtonAction > LocalActions.ACTION_MEDIA_START &&
+            currentButtonAction < LocalActions.ACTION_MEDIA_STOP) {
             //name = "media action"
             menuArea.mode = qsTr("actions")
         }

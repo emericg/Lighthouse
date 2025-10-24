@@ -34,18 +34,24 @@ class Volume: public QObject
 {
     Q_OBJECT
 
+    float m_volume = -1.f;
+
+    bool m_mute = false;
+
 public:
     Volume(QObject *parent = nullptr) : QObject(parent) { }
     virtual ~Volume() = default;
 
     virtual void setup() = 0;
 
-    virtual QStringList listSinks() = 0;
-    virtual void selectSink(const QString &sink) = 0;
+    //virtual QStringList listSinks() = 0;
+    //virtual void selectSink(const QString &sink) = 0;
 
-    virtual float getVolume() = 0;
+    virtual float getVolume() const = 0;
     virtual void setVolume(float volume) = 0;
 
+    virtual float getMute() const = 0;
+    virtual void setMute(bool mute) = 0;
     virtual void mute() = 0;
     virtual void unmute() = 0;
 };

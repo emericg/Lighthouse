@@ -35,7 +35,7 @@
 
 /* ************************************************************************** */
 
-Keyboard_uinput::Keyboard_uinput(QObject *parent): Keyboard(parent)
+Keyboard_uinput::Keyboard_uinput(QObject *parent) : Keyboard(parent)
 {
     //
 }
