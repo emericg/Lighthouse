@@ -85,8 +85,11 @@ Starting with macOS 11, the application will ask you for permission to use Bluet
 #### Third party projects used by Lighthouse
 
 * [Qt6](https://www.qt.io) ([LGPL v3](https://www.gnu.org/licenses/lgpl-3.0.txt))
+* [AppUtils](thirdparty/AppUtils/README.md) ([MIT](https://opensource.org/licenses/MIT))
 * [MobileUI](src/thirdparty/MobileUI/README.md) ([MIT](https://opensource.org/licenses/MIT))
 * [SingleApplication](https://github.com/itay-grudev/SingleApplication) ([MIT](https://opensource.org/licenses/MIT))
+* [ComponentLibrary](thirdparty/ComponentLibrary/) ([MIT](https://opensource.org/licenses/MIT))
+* [IconLibrary](thirdparty/IconLibrary/) uses a combinaison of licenses, see [COPYING](thirdparty/IconLibrary/COPYING)
 * RC4 code from Christophe Devine ([GPL v2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt))
 * Graphical resources: [assets/COPYING](assets/COPYING)
 

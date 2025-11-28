@@ -4,6 +4,7 @@ project(Lighthouse VERSION 0.7 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
@@ -19,12 +20,12 @@ option(ENABLE_KEYBOARD_UINPUT "Virtual keyboard using UInput" ON)
 
 ################################################################################
 
-message(STATUS "[CMAKE] CMAKE_VERSION               = ${CMAKE_VERSION}")
-message(STATUS "[CMAKE] CMAKE_PREFIX_PATH           = ${CMAKE_PREFIX_PATH}")
-message(STATUS "[SYSTEM] (HOST) SYSTEM NAME         = ${CMAKE_HOST_SYSTEM_NAME}")
-message(STATUS "[SYSTEM] (HOST) SYSTEM VERSION      = ${CMAKE_HOST_SYSTEM_VERSION}")
-message(STATUS "[SYSTEM] (TARGET) SYSTEM NAME       = ${CMAKE_SYSTEM_NAME}")
-message(STATUS "[SYSTEM] (TARGET) SYSTEM VERSION    = ${CMAKE_SYSTEM_VERSION}")
+message(STATUS "[CMAKE]   CMAKE_VERSION             = ${CMAKE_VERSION}")
+message(STATUS "[CMAKE]   CMAKE_PREFIX_PATH         = ${CMAKE_PREFIX_PATH}")
+message(STATUS "[SYSTEM]  (HOST) SYSTEM NAME        = ${CMAKE_HOST_SYSTEM_NAME}")
+message(STATUS "[SYSTEM]  (HOST) SYSTEM VERSION     = ${CMAKE_HOST_SYSTEM_VERSION}")
+message(STATUS "[SYSTEM]  (TARGET) SYSTEM NAME      = ${CMAKE_SYSTEM_NAME}")
+message(STATUS "[SYSTEM]  (TARGET) SYSTEM VERSION   = ${CMAKE_SYSTEM_VERSION}")
 message(STATUS "[PROJECT] SOURCE_DIR                = ${CMAKE_SOURCE_DIR}")
 message(STATUS "[PROJECT] BUILD_TYPE                = ${CMAKE_BUILD_TYPE}")
 message(STATUS "[PROJECT] TOOLCHAIN_FILE            = ${CMAKE_TOOLCHAIN_FILE}")
@@ -32,16 +33,25 @@ message(STATUS "[PROJECT] QT_HOST_PATH              = ${QT_HOST_PATH}")
 
 ################################################################################
 
-find_package(Qt6 REQUIRED COMPONENTS Core Bluetooth Network Sql Multimedia)
-find_package(Qt6 REQUIRED COMPONENTS Gui Svg Qml Quick QuickControls2 Quick3D)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Svg Qml Quick QuickControls2)
+find_package(Qt6 REQUIRED COMPONENTS Sql Bluetooth Network Multimedia Quick3D)
 find_package(Qt6 REQUIRED COMPONENTS LinguistTools)
 
-qt_standard_project_setup(REQUIRES 6.8)
+qt_standard_project_setup(REQUIRES 6.8
+                          I18N_SOURCE_LANGUAGE en
+                          I18N_TRANSLATED_LANGUAGES en)
 
 qt_policy(SET QTP0001 NEW)
 qt_policy(SET QTP0002 NEW)
 qt_policy(SET QTP0003 NEW)
 qt_policy(SET QTP0004 NEW)
+
+# Set app desktop icons
+#if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+#    set(app_icon_windows "${CMAKE_SOURCE_DIR}/assets/windows/${CMAKE_PROJECT_NAME}.rc")
+#elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+#    set(app_icon_macos "${CMAKE_SOURCE_DIR}/assets/macos/${CMAKE_PROJECT_NAME}.icns")
+#endif()
 
 set(SOURCES
     src/main.cpp
@@ -70,6 +80,8 @@ set(SOURCES
     src/crypto/pgp/secrets.c
 
     assets/assets.qrc
+    ${app_icon_windows}
+    ${app_icon_macos}
     thirdparty/IconLibrary/IconLibrary_material.qrc
 )
 
@@ -103,15 +115,18 @@ qt_add_ios_ffmpeg_libraries(${CMAKE_PROJECT_NAME})
 
 qt_add_qml_module(${CMAKE_PROJECT_NAME}
     URI ${CMAKE_PROJECT_NAME}
+    NO_PLUGIN
     QML_FILES
         qml/MobileApplication.qml
         qml/MobileHeader.qml
         qml/MobileDrawer.qml
+        qml/MobilePermissions.qml
         qml/MobileMenu.qml
         qml/MobileExit.qml
-        qml/MobilePermissions.qml
+
         qml/DesktopApplication.qml
         qml/DesktopHeader.qml
+
         qml/ScreenTutorial.qml
         qml/ScreenDeviceList.qml
         qml/ScreenSettings.qml
@@ -165,14 +180,6 @@ qt_add_qml_module(${CMAKE_PROJECT_NAME}
         qml/components_js/UtilsDeviceSensors.js
 )
 
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE src/)
-
-################################################################################
-
-qt_standard_project_setup(
-    I18N_SOURCE_LANGUAGE en
-    I18N_TRANSLATED_LANGUAGES fr
-)
 qt_add_translations(${CMAKE_PROJECT_NAME}
     TS_FILE_BASE ${CMAKE_PROJECT_NAME}
     TS_FILE_DIR ${CMAKE_SOURCE_DIR}/i18n/
@@ -181,20 +188,20 @@ qt_add_translations(${CMAKE_PROJECT_NAME}
 
 ################################################################################
 
-# Qt libraries
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
-    Qt6::Core
-    Qt6::Multimedia
-    Qt6::Bluetooth
-    Qt6::Network
-    Qt6::Sql
-    Qt6::Gui
-    Qt6::Svg
-    Qt6::Qml
-    Qt6::Quick
-    Qt6::QuickControls2
-    Qt6::Quick3D
+# 'Other Files" macro
+function(add_other_files target)
+    foreach(file IN LISTS ARGN)
+        target_sources(${target} PRIVATE ${file})
+        source_group("Other Files" FILES ${file})
+    endforeach()
+endfunction()
+
+add_other_files(${CMAKE_PROJECT_NAME}
+    README.md LICENSE.md
+    .gitignore
 )
+
+################################################################################
 
 if(IOS OR ANDROID)
     # why
@@ -244,7 +251,45 @@ add_definitions(-DENABLE_ZXING)
 add_subdirectory(thirdparty/zxing-cpp/wrappers/qt/)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ZXingQt)
 
+# Qt libraries
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Svg
+    Qt6::Qml
+    Qt6::Quick
+    Qt6::QuickControls2
+    Qt6::Sql
+    Qt6::Bluetooth
+    Qt6::Network
+    Qt6::Multimedia
+    Qt6::Quick3D
+)
+
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE src/)
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE thirdparty/)
+
 ################################################################################
+
+## Release build? Set "no debug" macros
+if(CMAKE_BUILD_TYPE STREQUAL Release)
+    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
+        NDEBUG
+        QT_NO_DEBUG
+        QT_NO_DEBUG_OUTPUT
+    )
+endif()
+
+## Linux
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    # System install rules
+    install(TARGETS ${CMAKE_PROJECT_NAME} RUNTIME DESTINATION bin/)
+    install(FILES ${CMAKE_SOURCE_DIR}/assets/linux/${CMAKE_PROJECT_NAME}.desktop DESTINATION share/applications/)
+    #install(FILES ${CMAKE_SOURCE_DIR}/assets/linux/${CMAKE_PROJECT_NAME}.appdata.xml DESTINATION share/appdata/)
+    #install(FILES ${CMAKE_SOURCE_DIR}/assets/linux/${CMAKE_PROJECT_NAME}.svg DESTINATION share/pixmaps/)
+    #install(FILES ${CMAKE_SOURCE_DIR}/assets/linux/${CMAKE_PROJECT_NAME}.svg DESTINATION share/icons/hicolor/scalable/apps/)
+    #install(FILES ${CMAKE_SOURCE_DIR}/LICENSE.md DESTINATION share/licenses/${CMAKE_PROJECT_NAME}/)
+endif()
 
 ## Android
 if(CMAKE_SYSTEM_NAME STREQUAL "Android")
@@ -262,6 +307,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     #set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64")
     set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0")
 
+    #set(app_icon_macos "${CMAKE_SOURCE_DIR}/assets/macos/${CMAKE_PROJECT_NAME}.icns")
+    #set_source_files_properties(${app_icon_macos} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+
     set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
         MACOSX_BUNDLE ON
         MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/assets/macos/Info.plist"
@@ -270,16 +318,16 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         XCODE_ATTRIBUTE_PRODUCT_NAME                        ${CMAKE_PROJECT_NAME}
         XCODE_ATTRIBUTE_CURRENT_PROJECT_VERSION             ${CMAKE_PROJECT_VERSION}
         XCODE_ATTRIBUTE_MARKETING_VERSION                   ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-        XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS              "${CMAKE_SOURCE_DIR}/assets/macos/${CMAKE_PROJECT_NAME}.entitlements"
+        XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS             "${CMAKE_SOURCE_DIR}/assets/macos/${CMAKE_PROJECT_NAME}.entitlements"
         XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME  AppIcon
     )
 endif()
 
 ## iOS
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
-    #set(assets_catalog_path "${CMAKE_SOURCE_DIR}/assets/ios/Assets.xcassets")
-    #target_sources(${CMAKE_PROJECT_NAME} PRIVATE ${assets_catalog_path})
-    #set_source_files_properties(${assets_catalog_path} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+    #set(app_icon_ios "${CMAKE_SOURCE_DIR}/assets/ios/Assets.xcassets")
+    #target_sources(${CMAKE_PROJECT_NAME} PRIVATE ${app_icon_ios})
+    #set_source_files_properties(${app_icon_ios} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
     set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
         MACOSX_BUNDLE ON
@@ -305,28 +353,13 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     )
 endif()
 
-## Release build? Set "no debug" macros
-if(CMAKE_BUILD_TYPE STREQUAL Release)
-    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
-        NDEBUG
-        QT_NO_DEBUG
-        QT_NO_DEBUG_OUTPUT
-    )
-endif()
-
 ################################################################################
 
-# Output?
+# Output (build)
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/lib"
+    #ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/lib"
+    #LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/lib"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin"
-)
-
-# Output?
-install(TARGETS ${CMAKE_PROJECT_NAME}
-    BUNDLE DESTINATION bin/
-    #LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
 ################################################################################
