@@ -15,6 +15,8 @@ ZXingQtVideoFilter::ZXingQtVideoFilter(QObject *parent) : QObject(parent)
 {
     m_readerOptions.setMinLineCount(4); // default is 2
     m_readerOptions.setMaxNumberOfSymbols(4); // default is 255
+    m_readerOptions.setFormats(ZXing::BarcodeFormat::AllReadable); // default is
+    m_readerOptions.setTextMode(ZXing::TextMode::HRI); // default is
     //m_readerOptions.setBinarizer(ZXing::Binarizer::GlobalHistogram); // default is LocalAverage
 }
 
@@ -96,8 +98,8 @@ void ZXingQtVideoFilter::setFormats(int newVal)
 {
     if (formats() != newVal)
     {
-        m_readerOptions.setFormats(static_cast<ZXing::BarcodeFormat>(newVal));
-        emit formatsChanged();
+        //m_readerOptions.setFormats(static_cast<ZXing::BarcodeFormat>(newVal));
+        //emit formatsChanged();
     }
 }
 
@@ -109,7 +111,7 @@ void ZXingQtVideoFilter::setCaptureRect(const QRect &captureRect)
     emit captureRectChanged();
 }
 
-Result ZXingQtVideoFilter::process(const QVideoFrame &frame)
+BarcodeQml ZXingQtVideoFilter::process(const QVideoFrame &frame)
 {
     if (m_active && m_videoSink && m_processThread.isFinished())
     {
@@ -130,6 +132,10 @@ Result ZXingQtVideoFilter::process(const QVideoFrame &frame)
                     r.runTime = t.elapsed();
                     emit tagFound(r);
                 }
+                else
+                {
+                    qWarning() << ">>> ZXingQtVideoFilter::process() >>> INVALID RESULTS";
+                }
             }
 
             if (results.size())
@@ -140,7 +146,7 @@ Result ZXingQtVideoFilter::process(const QVideoFrame &frame)
             }
             else
             {
-                Result r;
+                BarcodeQml r;
                 r.runTime = t.elapsed();
                 emit decodingFinished(r);
                 return r;
@@ -148,5 +154,5 @@ Result ZXingQtVideoFilter::process(const QVideoFrame &frame)
         });
     }
 
-    return Result();
+    return BarcodeQml();
 }

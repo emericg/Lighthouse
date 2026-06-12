@@ -6,27 +6,29 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "PDFReader.h"
-#include "PDFDetector.h"
-#include "PDFScanningDecoder.h"
-#include "PDFCodewordDecoder.h"
-#include "ReaderOptions.h"
-#include "DecoderResult.h"
-#include "Result.h"
 
-#include "BitMatrixCursor.h"
+#include "BarcodeData.h"
 #include "BinaryBitmap.h"
 #include "BitArray.h"
+#include "BitMatrixCursor.h"
+#include "DecoderResult.h"
+#include "DetectorResult.h"
+#include "PDFCodewordDecoder.h"
+#include "PDFCustomData.h"
+#include "PDFDetector.h"
+#include "PDFScanningDecoder.h"
 #include "Pattern.h"
+#include "ReaderOptions.h"
 
-#include <vector>
-#include <cstdlib>
 #include <algorithm>
+#include <cstdlib>
 #include <limits>
 #include <utility>
+#include <vector>
 
 #ifdef PRINT_DEBUG
 #include "BitMatrixIO.h"
-#include <iostream>
+#include <cstdio>
 #endif
 
 namespace ZXing {
@@ -63,7 +65,7 @@ static int GetMaxCodewordWidth(const std::array<Nullable<ResultPoint>, 8>& p)
 					std::max(GetMaxWidth(p[1], p[5]), GetMaxWidth(p[7], p[3]) * CodewordDecoder::MODULES_IN_CODEWORD / MODULES_IN_STOP_PATTERN));
 }
 
-static Results DoDecode(const BinaryBitmap& image, bool multiple, bool tryRotate, bool returnErrors)
+static BarcodesData DoDecode(const BinaryBitmap& image, bool multiple, bool tryRotate, bool returnErrors)
 {
 	Detector::Result detectorResult = Detector::Detect(image, multiple, tryRotate);
 	if (detectorResult.points.empty())
@@ -78,20 +80,40 @@ static Results DoDecode(const BinaryBitmap& image, bool multiple, bool tryRotate
 		return p;
 	};
 
-	Results results;
+	BarcodesData res;
 	for (const auto& points : detectorResult.points) {
 		DecoderResult decoderResult =
 			ScanningDecoder::Decode(*detectorResult.bits, points[4], points[5], points[6], points[7],
 									GetMinCodewordWidth(points), GetMaxCodewordWidth(points));
 		if (decoderResult.isValid(returnErrors)) {
-			auto point = [&](int i) { return rotate(PointI(points[i].value())); };
-			Result result(std::move(decoderResult), {point(0), point(2), point(3), point(1)}, BarcodeFormat::PDF417);
-			results.push_back(result);
+			auto customData = std::static_pointer_cast<PDF417CustomData>(decoderResult.customData());
+			auto point = [&](int i) {
+				if (points[i].hasValue() || i < 2 || !customData)
+					return rotate(PointI(points[i].value()));
+				else {
+					auto p = rotate(PointI(points[i - 2].value()) + PointI(customData->approxSymbolWidth, 0));
+					p.x = std::clamp(p.x, 0, image.width() - 1);
+					p.y = std::clamp(p.y, 0, image.height() - 1);
+					return p;
+				}
+			};
+			if (customData) // might be nullptr if e.g. in case of a FormatError
+				decoderResult
+					.addExtra("Sender", customData->sender)
+					.addExtra("Addressee", customData->addressee)
+					.addExtra("FileId", customData->fileId)
+					.addExtra("FileName", customData->fileName)
+					.addExtra("FileSize", customData->fileSize, int64_t(-1))
+					.addExtra("Timestamp", customData->timestamp, int64_t(-1))
+					.addExtra("Checksum", customData->checksum, -1)
+				;
+			res.emplace_back(MatrixBarcode(std::move(decoderResult), DetectorResult{{}, {point(0), point(2), point(3), point(1)}},
+										   BarcodeFormat::PDF417));
 			if (!multiple)
-				return results;
+				return res;
 		}
 	}
-	return results;
+	return res;
 }
 
 // new implementation (only for isPure use case atm.)
@@ -254,7 +276,7 @@ std::vector<int> ReadCodeWords(BitMatrixCursor<POINT> topCur, SymbolInfo info)
 	return codeWords;
 }
 
-static Result DecodePure(const BinaryBitmap& image_)
+static BarcodeData DecodePure(const BinaryBitmap& image_)
 {
 	auto pimage = image_.getBitMatrix();
 	if (!pimage)
@@ -268,8 +290,6 @@ static Result DecodePure(const BinaryBitmap& image_)
 	int left, top, width, height;
 	if (!image.findBoundingBox(left, top, width, height, 9) || (width < 3 * 17 && height < 3 * 17))
 		return {};
-	int right  = left + width - 1;
-	int bottom = top + height - 1;
 
 	// counter intuitively, using a floating point cursor is about twice as fast an integer one (on an AVX architecture)
 	BitMatrixCursorF cur(image, centered(PointI{left, top}), PointF{1, 0});
@@ -292,25 +312,20 @@ static Result DecodePure(const BinaryBitmap& image_)
 
 	auto res = DecodeCodewords(codeWords, NumECCodeWords(info.ecLevel));
 
-	return Result(std::move(res), {{left, top}, {right, top}, {right, bottom}, {left, bottom}}, BarcodeFormat::PDF417);
+	return MatrixBarcode(std::move(res), {{}, Rectangle<PointI>(left, top, width, height)}, BarcodeFormat::PDF417);
 }
 
-Result
-Reader::decode(const BinaryBitmap& image) const
+BarcodesData Reader::read(const BinaryBitmap& image, [[maybe_unused]] int maxSymbols) const
 {
 	if (_opts.isPure()) {
 		auto res = DecodePure(image);
-		if (res.error() != Error::Checksum)
-			return res;
+		if (res.error != Error::Checksum)
+			return ToVector(std::move(res));
 		// This falls through and tries the non-pure code path if we have a checksum error. This approach is
 		// currently the best option to deal with 'aliased' input like e.g. 03-aliased.png
 	}
-	
-	return FirstOrDefault(DoDecode(image, false, _opts.tryRotate(), _opts.returnErrors()));
-}
 
-Results Reader::decode(const BinaryBitmap& image, [[maybe_unused]] int maxSymbols) const
-{
+	// TODO: respect maxSymbols
 	return DoDecode(image, true, _opts.tryRotate(), _opts.returnErrors());
 }
 

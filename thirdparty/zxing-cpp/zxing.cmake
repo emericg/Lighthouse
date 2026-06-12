@@ -2,10 +2,10 @@
 macro(zxing_add_package_stb)
     unset (STB_FOUND CACHE)
 
-    if (BUILD_DEPENDENCIES STREQUAL "AUTO")
+    if (ZXING_DEPENDENCIES STREQUAL "AUTO")
         find_package(PkgConfig)
         pkg_check_modules (STB IMPORTED_TARGET stb)
-    elseif (BUILD_DEPENDENCIES STREQUAL "LOCAL")
+    elseif (ZXING_DEPENDENCIES STREQUAL "LOCAL")
         find_package(PkgConfig REQUIRED)
         pkg_check_modules (STB REQUIRED IMPORTED_TARGET stb)
     endif()
@@ -25,27 +25,51 @@ endmacro()
 macro(zxing_add_package name depname git_repo git_rev)
     unset(${name}_FOUND CACHE) # see https://github.com/zxing-cpp/zxing-cpp/commit/8db14eeead45e0f1961532f55061d5e4dd0f78be#commitcomment-66464026
 
-    if (BUILD_DEPENDENCIES STREQUAL "AUTO")
+    if (ZXING_DEPENDENCIES STREQUAL "AUTO")
         find_package (${name} CONFIG)
-    elseif (BUILD_DEPENDENCIES STREQUAL "LOCAL")
+    elseif (ZXING_DEPENDENCIES STREQUAL "LOCAL")
         find_package (${name} REQUIRED CONFIG)
     endif()
 
     if (NOT ${name}_FOUND)
         include(FetchContent)
-        FetchContent_Declare (${depname}
-            GIT_REPOSITORY ${git_repo}
-            GIT_TAG ${git_rev})
-        if (${depname} STREQUAL "googletest")
-            # Prevent overriding the parent project's compiler/linker settings on Windows
-            set (gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
+        if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.28")
+            FetchContent_Declare(
+                ${depname}
+                GIT_REPOSITORY ${git_repo}
+                GIT_TAG ${git_rev}
+                EXCLUDE_FROM_ALL
+            )
+
+            if (${depname} STREQUAL "googletest")
+                # Prevent overriding the parent project's compiler/linker settings on Windows
+                set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+            endif()
+
+            FetchContent_MakeAvailable(${depname})
+        else()
+            FetchContent_Declare(
+                ${depname}
+                GIT_REPOSITORY ${git_repo}
+                GIT_TAG ${git_rev}
+            )
+
+            if (${depname} STREQUAL "googletest")
+                # Prevent overriding the parent project's compiler/linker settings on Windows
+                set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+            endif()
+
+            FetchContent_GetProperties(${depname})
+            if (NOT ${depname}_POPULATED)
+                FetchContent_Populate(${depname})
+                add_subdirectory(
+                    ${${depname}_SOURCE_DIR}
+                    ${${depname}_BINARY_DIR}
+                    EXCLUDE_FROM_ALL
+                )
+            endif()
+        # set (${name}_POPULATED TRUE) # this is supposed to be done in MakeAvailable but it seems not to?!?
         endif()
-        #FetchContent_MakeAvailable (${depname})
-        FetchContent_GetProperties(${depname})
-        if(NOT ${depname}_POPULATED)
-            FetchContent_Populate(${depname})
-            add_subdirectory(${${depname}_SOURCE_DIR} ${${depname}_BINARY_DIR} EXCLUDE_FROM_ALL) # prevent installing of dependencies
-        endif()
-        set (${name}_POPULATED TRUE) # this is supposed to be done in MakeAvailable but it seems not to?!?
     endif()
 endmacro()

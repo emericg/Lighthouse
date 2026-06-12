@@ -10,32 +10,35 @@
 #include "ZXAlgorithms.h"
 
 #include <cmath>
-#include <sstream>
+#include <cstring>
+#include <string_view>
 
 namespace ZXing {
 
 struct AiInfo
 {
-	std::string_view aiPrefix;
-	int _fieldSize;	// if negative, the length is variable and abs(length) give the max size
+	const char aiPrefix[5];
+	int8_t _fieldSize;	// if negative, the length is variable and abs(length) give the max size
 
 	bool isVariableLength() const noexcept { return _fieldSize < 0; }
 	int fieldSize() const noexcept { return std::abs(_fieldSize); }
 	int aiSize() const
 	{
-		if ((aiPrefix[0] == '3' && Contains("1234569", aiPrefix[1])) || aiPrefix == "703" || aiPrefix == "723")
+		using namespace std::literals;
+		if ((aiPrefix[0] == '3' && Contains("1234569", aiPrefix[1])) || aiPrefix == "703"sv || aiPrefix == "723"sv)
 			return 4;
 		else
-			return Size(aiPrefix);
+			return narrow_cast<int>(strlen(aiPrefix));
 	}
 };
 
-// https://github.com/gs1/gs1-syntax-dictionary 2023-09-22
+// https://github.com/gs1/gs1-syntax-dictionary 2025-12-08 HEAD [c7e0c5b]
 static const AiInfo aiInfos[] = {
 //TWO_DIGIT_DATA_LENGTH
 	{ "00", 18 },
 	{ "01", 14 },
 	{ "02", 14 },
+	{ "03", 14 },
 
 	{ "10", -20 },
 	{ "11", 6 },
@@ -102,6 +105,8 @@ static const AiInfo aiInfos[] = {
 	{ "713", -20 },
 	{ "714", -20 },
 	{ "715", -20 },
+	{ "716", -20 },
+	{ "717", -20 },
 
 //THREE_DIGIT_PLUS_DIGIT_DATA_LENGTH
 	{ "310", 6 },
@@ -215,9 +220,20 @@ static const AiInfo aiInfos[] = {
 	{ "7022", -20 },
 	{ "7023", -30 },
 	{ "7040", 4 },
+	{ "7041", -4 },
 	{ "7240", -20 },
 	{ "7241", 2 },
 	{ "7242", -25 },
+	{ "7250", 8 },
+	{ "7251", 12 },
+	{ "7252", 1 },
+	{ "7253", -40 },
+	{ "7254", -40 },
+	{ "7255", -10 },
+	{ "7256", -90 },
+	{ "7257", -70 },
+	{ "7258", 3 },
+	{ "7259", -40 },
 
 	{ "8001", 14 },
 	{ "8002", -20 },
@@ -232,12 +248,17 @@ static const AiInfo aiInfos[] = {
 	{ "8011", -12 },
 	{ "8012", -20 },
 	{ "8013", -25 },
+	{ "8014", -25 },
 	{ "8017", 18 },
 	{ "8018", 18 },
 	{ "8019", -10 },
 	{ "8020", -25 },
 	{ "8026", 18 },
 	{ "8030", -90 },
+	{ "8040", 15 },
+	{ "8041", 15 },
+	{ "8042", 32 },
+	{ "8043", -20 },
 	{ "8110", -70 },
 	{ "8111", 4 },
 	{ "8112", -70 },
@@ -246,15 +267,13 @@ static const AiInfo aiInfos[] = {
 
 std::string HRIFromGS1(std::string_view gs1)
 {
-	//TODO: c++20
-	auto starts_with = [](std::string_view str, std::string_view pre) { return str.substr(0, pre.size()) == pre; };
 	constexpr char GS = 29; // GS character (29 / 0x1D)
 
 	std::string_view rem = gs1;
 	std::string res;
 
 	while (rem.size()) {
-		const AiInfo* i = FindIf(aiInfos, [&](const AiInfo& i) { return starts_with(rem, i.aiPrefix); });
+		const AiInfo* i = FindIf(aiInfos, [&](const AiInfo& i) { return rem.starts_with(i.aiPrefix); });
 		if (i == std::end(aiInfos))
 			return {};
 
@@ -292,26 +311,20 @@ std::string HRIFromGS1(std::string_view gs1)
 	return res;
 }
 
-#if __cplusplus > 201703L
-std::ostream& operator<<(std::ostream& os, const char8_t* str)
-{
-	return os << reinterpret_cast<const char*>(str);
-}
-#endif
-
 std::string HRIFromISO15434(std::string_view str)
 {
 	// Use available unicode symbols to simulate sub- and superscript letters as specified in
 	// ISO/IEC 15434:2019(E) 6. Human readable representation
 
-	std::ostringstream oss;
+	std::string res;
+	res.reserve(str.size());
 
 	for (char c : str) {
 #if 1
-		if (0 <= c && c <= 0x20)
-			oss << "\xe2\x90" << char(0x80 + c); // Unicode Block “Control Pictures”: 0x2400
+		if (!((c) & ~0x1f) || c == 0x20)
+			(res += "\xe2\x90") += char(0x80 + c); // Unicode Block “Control Pictures”: 0x2400
 		else
-			oss << c;
+			res += c;
 #else
 		switch (c) {
 		case 4: oss << u8"\u1d31\u1d52\u209c"; break; // EOT
@@ -324,7 +337,7 @@ std::string HRIFromISO15434(std::string_view str)
 #endif
 	}
 
-	return oss.str();
+	return res;
 }
 
 } // namespace ZXing

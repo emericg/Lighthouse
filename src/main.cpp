@@ -40,7 +40,6 @@
 #include "local_controls/local_actions.h"
 #include "local_controls/mpris_dbus.h"
 
-#include <MobileUI>
 #include <SingleApplication>
 #if defined(ENABLE_ZXING)
 #include <ZXingQt>
@@ -135,7 +134,6 @@ int main(int argc, char *argv[])
     // Translate the application
     utilsLanguage->loadLanguage(sm->getAppLanguage());
 
-    MobileUI::registerQML();
     DeviceUtils::registerQML();
     LocalActions::registerQML();
 

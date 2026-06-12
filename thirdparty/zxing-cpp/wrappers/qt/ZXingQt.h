@@ -7,6 +7,8 @@
 #ifndef ZXING_QT_H
 #define ZXING_QT_H
 
+#include "ZXingCpp.h"
+
 #include <QObject>
 #include <QQmlEngine>
 
@@ -17,10 +19,6 @@
 #include <QPoint>
 #include <QImage>
 #include <QVideoFrame>
-
-#include "Result.h"
-#include "Quadrilateral.h"
-#include "ReaderOptions.h"
 
 class Position : public ZXing::Quadrilateral<QPoint>
 {
@@ -37,7 +35,7 @@ public:
     using Base::Base;
 };
 
-class Result : private ZXing::Result
+class BarcodeQml : private ZXing::Barcode
 {
     Q_GADGET
 
@@ -59,24 +57,25 @@ class Result : private ZXing::Result
     Position m_position;
 
 public:
-    Result() = default; // required for qmetatype machinery
+    BarcodeQml() = default; // required for qmetatype machinery
 
-    explicit Result(ZXing::Result &&r) : ZXing::Result(std::move(r)) {
-        m_text = QString::fromStdString(ZXing::Result::text());
-        m_bytes = QByteArray(reinterpret_cast<const char*>(ZXing::Result::bytes().data()), Size(ZXing::Result::bytes()));
-        auto &pos = ZXing::Result::position();
+    explicit BarcodeQml(ZXing::Barcode &&r) : ZXing::Barcode(std::move(r)) {
+        m_text = QString::fromStdString(ZXing::Barcode::text());
+        m_bytes = QByteArray(reinterpret_cast<const char*>(ZXing::Barcode::bytes().data()),
+                             static_cast<qsizetype>(ZXing::Barcode::bytes().size()));
+        auto &pos = ZXing::Barcode::position();
         auto qp = [&pos](int i) { return QPoint(pos[i].x, pos[i].y); };
         m_position = {qp(0), qp(1), qp(2), qp(3)};
     }
 
     int runTime = 0; // for debugging/development
-    using ZXing::Result::isValid;
+    using ZXing::Barcode::isValid;
 
-    bool hasText() const { return (ZXing::Result::contentType() == ZXing::ContentType::Text); }
-    bool hasBinaryData() const { return (ZXing::Result::contentType() == ZXing::ContentType::Binary); }
-    ZXing::BarcodeFormat format() const { return static_cast<ZXing::BarcodeFormat>(ZXing::Result::format()); }
-    ZXing::ContentType contentType() const { return static_cast<ZXing::ContentType>(ZXing::Result::contentType()); }
-    QString formatName() const { return QString::fromStdString(ZXing::ToString(ZXing::Result::format())); }
+    bool hasText() const { return (ZXing::Barcode::contentType() == ZXing::ContentType::Text); }
+    bool hasBinaryData() const { return (ZXing::Barcode::contentType() == ZXing::ContentType::Binary); }
+    ZXing::BarcodeFormat format() const { return static_cast<ZXing::BarcodeFormat>(ZXing::Barcode::format()); }
+    ZXing::ContentType contentType() const { return static_cast<ZXing::ContentType>(ZXing::Barcode::contentType()); }
+    QString formatName() const { return QString::fromStdString(ZXing::ToString(ZXing::Barcode::format())); }
     const QString &text() const { return m_text; }
     const QByteArray &bytes() const { return m_bytes; }
     const Position &position() const { return m_position; }
@@ -87,52 +86,53 @@ class ZXingQt : public QObject
     Q_OBJECT
 
 public:
-    const int AZTEC_ERROR_CORRECTION_0  = 0;
-    const int AZTEC_ERROR_CORRECTION_12 = 1;
-    const int AZTEC_ERROR_CORRECTION_25 = 2;
-    const int AZTEC_ERROR_CORRECTION_37 = 3;
-    const int AZTEC_ERROR_CORRECTION_50 = 4;
-    const int AZTEC_ERROR_CORRECTION_62 = 5;
-    const int AZTEC_ERROR_CORRECTION_75 = 6;
-    const int AZTEC_ERROR_CORRECTION_87 = 7;
-    const int AZTEC_ERROR_CORRECTION_100= 8;
+    const int AZTEC_ERROR_CORRECTION_0      = 0;
+    const int AZTEC_ERROR_CORRECTION_12     = 1;
+    const int AZTEC_ERROR_CORRECTION_25     = 2;
+    const int AZTEC_ERROR_CORRECTION_37     = 3;
+    const int AZTEC_ERROR_CORRECTION_50     = 4;
+    const int AZTEC_ERROR_CORRECTION_62     = 5;
+    const int AZTEC_ERROR_CORRECTION_75     = 6;
+    const int AZTEC_ERROR_CORRECTION_87     = 7;
+    const int AZTEC_ERROR_CORRECTION_100    = 8;
     const int QR_ERROR_CORRECTION_LOW       = 2;
     const int QR_ERROR_CORRECTION_MEDIUM    = 4;
     const int QR_ERROR_CORRECTION_QUARTILE  = 6;
     const int QR_ERROR_CORRECTION_HIGH      = 8;
-    const int PDF417_ERROR_CORRECTION_0 = 0;
-    const int PDF417_ERROR_CORRECTION_1 = 1;
-    const int PDF417_ERROR_CORRECTION_2 = 2;
-    const int PDF417_ERROR_CORRECTION_3 = 3;
-    const int PDF417_ERROR_CORRECTION_4 = 4;
-    const int PDF417_ERROR_CORRECTION_5 = 5;
-    const int PDF417_ERROR_CORRECTION_6 = 6;
-    const int PDF417_ERROR_CORRECTION_7 = 7;
-    const int PDF417_ERROR_CORRECTION_8 = 8;
+    const int PDF417_ERROR_CORRECTION_0     = 0;
+    const int PDF417_ERROR_CORRECTION_1     = 1;
+    const int PDF417_ERROR_CORRECTION_2     = 2;
+    const int PDF417_ERROR_CORRECTION_3     = 3;
+    const int PDF417_ERROR_CORRECTION_4     = 4;
+    const int PDF417_ERROR_CORRECTION_5     = 5;
+    const int PDF417_ERROR_CORRECTION_6     = 6;
+    const int PDF417_ERROR_CORRECTION_7     = 7;
+    const int PDF417_ERROR_CORRECTION_8     = 8;
 
     enum class BarcodeFormat {
         None            = 0,         ///< Used as a return value if no valid barcode has been detected
-        Aztec           = (1 << 0),  ///< Aztec
-        Codabar         = (1 << 1),  ///< Codabar
-        Code39          = (1 << 2),  ///< Code39
-        Code93          = (1 << 3),  ///< Code93
-        Code128         = (1 << 4),  ///< Code128
-        DataBar         = (1 << 5),  ///< GS1 DataBar, formerly known as RSS 14
-        DataBarExpanded = (1 << 6),  ///< GS1 DataBar Expanded, formerly known as RSS EXPANDED
-        DataMatrix      = (1 << 7),  ///< DataMatrix
-        EAN8            = (1 << 8),  ///< EAN-8
-        EAN13           = (1 << 9),  ///< EAN-13
-        ITF             = (1 << 10), ///< ITF (Interleaved Two of Five)
-        MaxiCode        = (1 << 11), ///< MaxiCode
-        PDF417          = (1 << 12), ///< PDF417
-        QRCode          = (1 << 13), ///< QR Code
-        MicroQRCode     = (1 << 14), ///< Micro QR Code
-        RMQRCode        = (1 << 15), ///< rMQR Code
-        UPCA            = (1 << 16), ///< UPC-A
-        UPCE            = (1 << 17), ///< UPC-E
+        AztecCode       = (1 <<  0), ///< AztecCode
+        AztecRune       = (1 <<  1), ///< AztecRune
+        Codabar         = (1 <<  2), ///< Codabar
+        Code39          = (1 <<  3), ///< Code39
+        Code93          = (1 <<  4), ///< Code93
+        Code128         = (1 <<  5), ///< Code128
+        DataBar         = (1 <<  6), ///< GS1 DataBar, formerly known as RSS 14
+        DataBarExpanded = (1 <<  7), ///< GS1 DataBar Expanded, formerly known as RSS EXPANDED
+        DataMatrix      = (1 <<  8), ///< DataMatrix
+        EAN8            = (1 <<  9), ///< EAN-8
+        EAN13           = (1 << 10), ///< EAN-13
+        ITF             = (1 << 11), ///< ITF (Interleaved Two of Five)
+        MaxiCode        = (1 << 12), ///< MaxiCode
+        PDF417          = (1 << 13), ///< PDF417
+        QRCode          = (1 << 14), ///< QR Code
+        MicroQRCode     = (1 << 15), ///< Micro QR Code
+        RMQRCode        = (1 << 16), ///< rMQR Code
+        UPCA            = (1 << 17), ///< UPC-A
+        UPCE            = (1 << 18), ///< UPC-E
 
         LinearCodes = Codabar | Code39 | Code93 | Code128 | EAN8 | EAN13 | ITF | DataBar | DataBarExpanded | UPCA | UPCE,
-        MatrixCodes = Aztec | DataMatrix | MaxiCode | PDF417 | QRCode | RMQRCode | MicroQRCode,
+        MatrixCodes = AztecCode | AztecRune | DataMatrix | MaxiCode | PDF417 | QRCode | RMQRCode | MicroQRCode,
         Any         = LinearCodes | MatrixCodes,
     };
     Q_ENUM(BarcodeFormat)
@@ -178,7 +178,6 @@ public:
         EUC_JP,
         EUC_KR,
         UTF16BE,
-        UnicodeBig [[deprecated]] = UTF16BE,
         UTF8,
         UTF16LE,
         UTF32BE,
@@ -201,41 +200,47 @@ public:
     Q_INVOKABLE static int stringToFormat(const QString &str);
     Q_INVOKABLE static QString formatToString(const int fmt);
 
-    static int qimageFormatToXZingFormat(const QImage &img);
-    static int qvideoframeFormatToXZingFormat(const QVideoFrame &frame);
+    static ZXing::ImageFormat qimageFormatToXZingFormat(const QImage &img);
+    static void qvideoframeFormatToXZingFormat(const QVideoFrame &frame,
+                                               ZXing::ImageFormat &format, int &pixStride, int &pixOffset);
 
     ///
 
-    static Result ReadBarcode(const QImage &img,
-                              const ZXing::ReaderOptions &opts = {});
+    static BarcodeQml ReadBarcode(const QImage &image,
+                                  const ZXing::ReaderOptions &opts = {},
+                                  const QRect captureRect = QRect());
 
-    static Result ReadBarcode(const QVideoFrame &frame,
-                              const ZXing::ReaderOptions &opts = {},
-                              const QRect captureRect = QRect());
-
-    ///
-
-    static QList<Result> ReadBarcodes(const QImage &img,
-                                      const ZXing::ReaderOptions &opts = {},
-                                      const QRect captureRect = QRect());
-
-    static QList<Result> ReadBarcodes(const QVideoFrame &frame,
-                                      const ZXing::ReaderOptions &opts = {},
-                                      const QRect captureRect = QRect());
-
-    static QList<Result> ReadBarcodes2(const QVideoFrame &frame,
-                                       const ZXing::ReaderOptions &opts = {},
-                                       const QRect captureRect = QRect());
+    static BarcodeQml ReadBarcode(const QVideoFrame &frame,
+                                  const ZXing::ReaderOptions &opts = {},
+                                  const QRect captureRect = QRect());
 
     ///
 
-    Q_INVOKABLE static QList<Result> loadImage(const QUrl &fileUrl);
+    static QList<BarcodeQml> ReadBarcodes(const QImage &image,
+                                          const ZXing::ReaderOptions &opts = {},
+                                          const QRect captureRect = QRect());
 
-    Q_INVOKABLE static QList<Result> loadImage(const QImage &img);
+    static QList<BarcodeQml> ReadBarcodes(const QVideoFrame &frame,
+                                          const ZXing::ReaderOptions &opts = {},
+                                          const QRect captureRect = QRect());
+
+    static QList<BarcodeQml> ReadBarcodes2(const QVideoFrame &frame,
+                                           const ZXing::ReaderOptions &opts = {},
+                                           const QRect captureRect = QRect());
+
+    ///
+
+    Q_INVOKABLE static QList<BarcodeQml> loadImage(const QUrl &fileUrl);
+
+    Q_INVOKABLE static QList<BarcodeQml> loadImage(const QImage &img);
 
     Q_INVOKABLE static QImage generateImage(const QString &data, const int width, const int height, const int margins,
                                             const int format, const int encoding, const int eccLevel,
                                             const QColor backgroundColor, const QColor foregroundColor);
+
+    Q_INVOKABLE static QString shareImage(const QString &data, int width, int height, int margins,
+                                      const int format, const int encoding, const int eccLevel,
+                                      const QColor backgroundColor, const QColor foregroundColor);
 
     Q_INVOKABLE static bool saveImage(const QString &data, int width, int height, int margins,
                                       const int format, const int encoding, const int eccLevel,

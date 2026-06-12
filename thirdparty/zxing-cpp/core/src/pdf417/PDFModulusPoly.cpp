@@ -42,21 +42,14 @@ ModulusPoly::ModulusPoly(const ModulusGF& field, const std::vector<int>& coeffic
 int
 ModulusPoly::evaluateAt(int a) const
 {
-	if (a == 0) {
-		// Just return the x^0 coefficient
+	if (a == 0) // return the x^0 coefficient
 		return coefficient(0);
-	}
-	size_t size = _coefficients.size();
-	if (a == 1) {
-		// Just the sum of the coefficients
-		const auto op = [this](auto result, const auto coefficient){ return _field->add(result, coefficient);};
-		return std::accumulate(std::begin(_coefficients), std::end(_coefficients), int{}, op);
-	}
-	int result = _coefficients[0];
-	for (size_t i = 1; i < size; i++) {
-		result = _field->add(_field->multiply(a, result), _coefficients[i]);
-	}
-	return result;
+
+	if (a == 1) // return the sum of the coefficients
+		return Reduce(_coefficients, 0, [this](auto res, auto coef) { return _field->add(res, coef); });
+
+	return std::accumulate(_coefficients.begin(), _coefficients.end(), 0,
+						   [this, a](auto res, auto coef) { return _field->add(_field->multiply(a, res), coef); });
 }
 
 ModulusPoly
@@ -85,7 +78,7 @@ ModulusPoly::add(const ModulusPoly& other) const
 	for (size_t i = lengthDiff; i < largerCoefficients->size(); i++) {
 		sumDiff[i] = _field->add((*smallerCoefficients)[i - lengthDiff], (*largerCoefficients)[i]);
 	}
-	return ModulusPoly(*_field, sumDiff);
+	return {*_field, sumDiff};
 }
 
 ModulusPoly
@@ -120,7 +113,7 @@ ModulusPoly::multiply(const ModulusPoly& other) const
 			product[i + j] = _field->add(product[i + j], _field->multiply(aCoeff, bCoefficients[j]));
 		}
 	}
-	return ModulusPoly(*_field, product);
+	return {*_field, product};
 }
 
 ModulusPoly
@@ -131,7 +124,7 @@ ModulusPoly::negative() const
 	for (size_t i = 0; i < size; i++) {
 		negativeCoefficients[i] = _field->subtract(0, _coefficients[i]);
 	}
-	return ModulusPoly(*_field, negativeCoefficients);
+	return {*_field, negativeCoefficients};
 }
 
 ModulusPoly
@@ -148,7 +141,7 @@ ModulusPoly::multiply(int scalar) const
 	for (size_t i = 0; i < size; i++) {
 		product[i] = _field->multiply(_coefficients[i], scalar);
 	}
-	return ModulusPoly(*_field, product);
+	return {*_field, product};
 }
 
 ModulusPoly
@@ -165,7 +158,7 @@ ModulusPoly::multiplyByMonomial(int degree, int coefficient) const
 	for (size_t i = 0; i < size; i++) {
 		product[i] = _field->multiply(_coefficients[i], coefficient);
 	}
-	return ModulusPoly(*_field, product);
+	return {*_field, product};
 }
 
 void

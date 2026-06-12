@@ -27,7 +27,7 @@ static float CenterFromEnd(const std::array<T, N>& pattern, float end)
 		float b = (pattern[2] + pattern[1] + pattern[0]) / 2.f;
 		return end - (2 * a + b) / 3;
 	} else { // aztec
-		auto a = std::accumulate(pattern.begin() + (N/2 + 1), pattern.end(), pattern[N/2] / 2.f);
+		auto a = Reduce(pattern.begin() + (N/2 + 1), pattern.end(), pattern[N/2] / 2.f);
 		return end - a;
 	}
 }
@@ -100,6 +100,8 @@ int CheckSymmetricPattern(BitMatrixCursorI& cur, PATTERN pattern, int range, boo
 std::optional<PointF> CenterOfRing(const BitMatrix& image, PointI center, int range, int nth, bool requireCircle = true);
 
 std::optional<PointF> FinetuneConcentricPatternCenter(const BitMatrix& image, PointF center, int range, int finderPatternSize);
+
+std::optional<QuadrilateralF> FitSquareToPoints(const BitMatrix& image, PointF center, int range, int lineIndex, bool backup);
 
 std::optional<QuadrilateralF> FindConcentricPatternCorners(const BitMatrix& image, PointF center, int range, int ringIndex);
 

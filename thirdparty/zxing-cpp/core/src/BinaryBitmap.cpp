@@ -63,12 +63,14 @@ void BinaryBitmap::invert()
 		auto matrix = const_cast<BitMatrix*>(_cache->matrix.get());
 		matrix->flipAll();
 	}
-	_inverted = true;
+	_inverted = !_inverted;
 }
 
 template <typename F>
 void SumFilter(const BitMatrix& in, BitMatrix& out, F func)
 {
+	assert(in.height() >= 3);
+
 	const auto* in0 = in.row(0).begin();
 	const auto* in1 = in.row(1).begin();
 	const auto* in2 = in.row(2).begin();

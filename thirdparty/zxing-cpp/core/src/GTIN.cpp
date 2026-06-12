@@ -6,21 +6,21 @@
 
 #include "GTIN.h"
 
-#include "Result.h"
-
 #include <algorithm>
+#ifdef __cpp_lib_format // not available on gcc 12
+#include <format>
+#endif
 #include <iomanip>
 #include <iterator>
-#include <sstream>
 #include <string>
 
 namespace ZXing::GTIN {
 
 struct CountryId
 {
-	int first;
-	int last;
-	const char *id;
+	uint16_t first;
+	uint16_t last;
+	const char id[3];
 };
 
 bool operator<(const CountryId& lhs, const CountryId& rhs)
@@ -32,9 +32,9 @@ bool operator<(const CountryId& lhs, const CountryId& rhs)
 // and https://en.wikipedia.org/wiki/List_of_GS1_country_codes
 static const CountryId COUNTRIES[] = {
 	// clang-format off
-	{1, 19, "US/CA"},
+	{1, 19, "US"},
 	{30, 39, "US"},
-	{60, 99, "US/CA"}, // Note 99 coupon identification
+	{60, 99, "US"}, // Note 99 coupon identification
 	{100, 139, "US"},
 	{300, 379, "FR"}, // France (and Monaco according to Wikipedia)
 	{380, 380, "BG"}, // Bulgaria
@@ -73,7 +73,7 @@ static const CountryId COUNTRIES[] = {
 	{531, 531, "MK"}, // North Macedonia
 	{535, 535, "MT"}, // Malta
 	{539, 539, "IE"}, // Ireland
-	{540, 549, "BE/LU"}, // Belgium & Luxembourg
+	{540, 549, "BE"}, // Belgium & Luxembourg
 	{560, 560, "PT"}, // Portugal
 	{569, 569, "IS"}, // Iceland
 	{570, 579, "DK"}, // Denmark (and Faroe Islands and Greenland according to Wikipedia)
@@ -157,7 +157,7 @@ static const CountryId COUNTRIES[] = {
 	// clang-format on
 };
 
-std::string LookupCountryIdentifier(const std::string& GTIN, const BarcodeFormat format)
+std::string LookupCountryIdentifier(std::string_view GTIN, const BarcodeFormat format)
 {
 	// Ignore add-on if any
 	const auto space = GTIN.find(' ');
@@ -173,40 +173,37 @@ std::string LookupCountryIdentifier(const std::string& GTIN, const BarcodeFormat
 
 	if (size != 8 || format != BarcodeFormat::EAN8) { // Assuming following doesn't apply to EAN-8
 		// 0000000 Restricted Circulation Numbers; 0000001-0000099 unused to avoid collision with GTIN-8
-		int prefix = std::stoi(GTIN.substr(first, 7 - implicitZero));
+		int prefix = FromString<int>(GTIN.substr(first, 7 - implicitZero));
 		if (prefix >= 0 && prefix <= 99)
 			return {};
 
 		// 00001-00009 US
-		prefix = std::stoi(GTIN.substr(first, 5 - implicitZero));
+		prefix = FromString<int>(GTIN.substr(first, 5 - implicitZero));
 		if (prefix >= 1 && prefix <= 9)
 			return "US";
 
 		// 0001-0009 US
-		prefix = std::stoi(GTIN.substr(first, 4 - implicitZero));
+		prefix = FromString<int>(GTIN.substr(first, 4 - implicitZero));
 		if (prefix >= 1 && prefix <= 9)
 			return "US";
 	}
 
-	const int prefix = std::stoi(GTIN.substr(first, 3 - implicitZero));
+	const int prefix = FromString<int>(GTIN.substr(first, 3 - implicitZero));
 
 	// Special case EAN-8 for prefix < 100 (GS1 General Specifications Figure 1.4.3-1)
 	if (size == 8 && format == BarcodeFormat::EAN8 && prefix <= 99) // Restricted Circulation Numbers
 		return {};
 
-	const auto it = std::lower_bound(std::begin(COUNTRIES), std::end(COUNTRIES), CountryId{0, prefix, nullptr});
+	const auto it = std::lower_bound(std::begin(COUNTRIES), std::end(COUNTRIES), CountryId{0, narrow_cast<uint16_t>(prefix), ""});
 
 	return it != std::end(COUNTRIES) && prefix >= it->first && prefix <= it->last ? it->id : std::string();
 }
 
-std::string EanAddOn(const Result& result)
+std::string EanAddOn(const Barcode& barcode)
 {
-	if (!(BarcodeFormat::EAN13 | BarcodeFormat::UPCA | BarcodeFormat::UPCE | BarcodeFormat::EAN8)
-			.testFlag(result.format()))
+	if (barcode.symbologyIdentifier() != "]E3")
 		return {};
-	auto txt = result.bytes().asString();
-	auto pos = txt.find(' ');
-	return pos != std::string::npos ? std::string(txt.substr(pos + 1)) : std::string();
+	return barcode.text().substr(barcode.format() == BarcodeFormat::EAN8 ? 8 : 13);
 }
 
 std::string IssueNr(const std::string& ean2AddOn)
@@ -246,9 +243,11 @@ std::string Price(const std::string& ean5AddOn)
 	}
 
 	int rawAmount = std::stoi(ean5AddOn.substr(1));
-	std::stringstream buf;
-	buf << currency << std::fixed << std::setprecision(2) << (float(rawAmount) / 100);
-	return buf.str();
+#if !defined(__cpp_lib_to_chars) || !defined(__cpp_lib_format) // not available on older macOS / gcc 12
+	return currency + std::to_string(rawAmount / 100) + '.' + std::to_string(rawAmount % 100);
+#else
+	return std::format("{}{:.2f}", currency, float(rawAmount) / 100);
+#endif
 }
 
 } // namespace ZXing::GTIN

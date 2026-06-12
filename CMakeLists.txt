@@ -2,14 +2,15 @@ cmake_minimum_required(VERSION 3.20)
 
 project(Lighthouse VERSION 0.7 LANGUAGES C CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 set(APP_NAME ${CMAKE_PROJECT_NAME})
 set(APP_VERSION ${CMAKE_PROJECT_VERSION})
+
+################################################################################
 
 option(ENABLE_MBEDTLS "mbedTLS for PoGo+" ON)
 option(ENABLE_MEDIA_MPRIS "MPRIS media controller" ON)
@@ -20,16 +21,25 @@ option(ENABLE_KEYBOARD_UINPUT "Virtual keyboard using UInput" ON)
 
 ################################################################################
 
-message(STATUS "[CMAKE]   CMAKE_VERSION             = ${CMAKE_VERSION}")
-message(STATUS "[CMAKE]   CMAKE_PREFIX_PATH         = ${CMAKE_PREFIX_PATH}")
-message(STATUS "[SYSTEM]  (HOST) SYSTEM NAME        = ${CMAKE_HOST_SYSTEM_NAME}")
-message(STATUS "[SYSTEM]  (HOST) SYSTEM VERSION     = ${CMAKE_HOST_SYSTEM_VERSION}")
-message(STATUS "[SYSTEM]  (TARGET) SYSTEM NAME      = ${CMAKE_SYSTEM_NAME}")
-message(STATUS "[SYSTEM]  (TARGET) SYSTEM VERSION   = ${CMAKE_SYSTEM_VERSION}")
-message(STATUS "[PROJECT] SOURCE_DIR                = ${CMAKE_SOURCE_DIR}")
-message(STATUS "[PROJECT] BUILD_TYPE                = ${CMAKE_BUILD_TYPE}")
-message(STATUS "[PROJECT] TOOLCHAIN_FILE            = ${CMAKE_TOOLCHAIN_FILE}")
-message(STATUS "[PROJECT] QT_HOST_PATH              = ${QT_HOST_PATH}")
+message(STATUS ">>> BUILDING ${PROJECT_NAME} v${PROJECT_VERSION} >>>")
+message(STATUS "[CMAKE] CMAKE_VERSION               = ${CMAKE_VERSION}")
+message(STATUS "[CMAKE] CMAKE_PREFIX_PATH           = ${CMAKE_PREFIX_PATH}")
+message(STATUS "[BUILD] QT_HOST_PATH                = ${QT_HOST_PATH}")
+message(STATUS "[BUILD] TOOLCHAIN_FILE              = ${CMAKE_TOOLCHAIN_FILE}")
+message(STATUS "[BUILD] BUILD_TYPE                  = ${CMAKE_BUILD_TYPE}")
+message(STATUS "[SYSTEM] (HOST) SYSTEM NAME         = ${CMAKE_HOST_SYSTEM_NAME}")
+message(STATUS "[SYSTEM] (HOST) SYSTEM VERSION      = ${CMAKE_HOST_SYSTEM_VERSION}")
+message(STATUS "[SYSTEM] (HOST) SYSTEM PROCESSOR    = ${CMAKE_HOST_SYSTEM_PROCESSOR}")
+message(STATUS "[SYSTEM] (TARGET) SYSTEM NAME       = ${CMAKE_SYSTEM_NAME}")
+message(STATUS "[SYSTEM] (TARGET) SYSTEM VERSION    = ${CMAKE_SYSTEM_VERSION}")
+message(STATUS "[SYSTEM] (TARGET) SYSTEM PROCESSOR  = ${CMAKE_SYSTEM_PROCESSOR}")
+message(STATUS "[TOP PROJECT] CMAKE_PROJECT_NAME    = ${CMAKE_PROJECT_NAME}")
+message(STATUS "[TOP PROJECT] CMAKE_PROJECT_VERSION = ${CMAKE_PROJECT_VERSION}")
+message(STATUS "[TOP PROJECT] CMAKE_SOURCE_DIR      = ${CMAKE_SOURCE_DIR}")
+message(STATUS "[PROJECT] PROJECT_NAME              = ${PROJECT_NAME}")
+message(STATUS "[PROJECT] PROJECT_VERSION           = ${PROJECT_VERSION}")
+message(STATUS "[PROJECT] PROJECT_SOURCE_DIR        = ${PROJECT_SOURCE_DIR}")
+message(STATUS "[PROJECT] CMAKE_CURRENT_SOURCE_DIR  = ${CMAKE_CURRENT_SOURCE_DIR}")
 
 ################################################################################
 
@@ -79,9 +89,9 @@ set(SOURCES
     src/crypto/pgp/pgp-cert.c
     src/crypto/pgp/secrets.c
 
-    assets/assets.qrc
-    ${app_icon_windows}
     ${app_icon_macos}
+    ${app_icon_windows}
+    assets/assets.qrc
     thirdparty/IconLibrary/IconLibrary_material.qrc
 )
 
@@ -101,6 +111,7 @@ if(NOT IOS AND NOT ANDROID)
     )
     if(LINUX)
         set(SOURCES_DESKTOP ${SOURCES_DESKTOP}
+            src/local_controls/volume_pulseaudio.cpp src/local_controls/volume_pulseaudio.h
             src/local_controls/mouse_uinput.cpp src/local_controls/mouse_uinput.h
             src/local_controls/keyboard_uinput.cpp src/local_controls/keyboard_uinput.h
             src/local_controls/gamepad_uinput.cpp src/local_controls/gamepad_uinput.h
@@ -188,7 +199,7 @@ qt_add_translations(${CMAKE_PROJECT_NAME}
 
 ################################################################################
 
-# 'Other Files" macro
+# "Other Files" macro
 function(add_other_files target)
     foreach(file IN LISTS ARGN)
         target_sources(${target} PRIVATE ${file})
@@ -219,6 +230,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_definitions(-DENABLE_MBEDTLS)
     add_definitions(-DENABLE_KEYBOARD_UINPUT)
     add_definitions(-DENABLE_MEDIA_MPRIS)
+    add_definitions(-DENABLE_VOLUME_PULSEAUDIO)
     target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC "-lmbedtls -lmbedx509 -lmbedcrypto")
 endif()
 
@@ -236,11 +248,11 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE SingleApplication)
 
 # MobileUI
 add_subdirectory(thirdparty/MobileUI)
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE MobileUI)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE MobileUI MobileUI_plugin)
 
 # ComponentLibrary
 add_subdirectory(thirdparty/ComponentLibrary)
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ComponentLibraryplugin)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ComponentLibrary_plugin)
 
 # zxing-cpp
 add_subdirectory(thirdparty/zxing-cpp)
@@ -269,16 +281,26 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE src/)
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE thirdparty/)
 
+# Qt official hacks...
+set(QML_IMPORT_PATH
+    "${CMAKE_BINARY_DIR}/thirdparty/"
+    "${CMAKE_BINARY_DIR}/thirdparty/MobileUI"
+    "${CMAKE_BINARY_DIR}/thirdparty/ComponentLibrary"
+    CACHE STRING "QML Modules import paths" FORCE)
+
+# Qt official hacks...
+set(QT_QML_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
 ################################################################################
 
 ## Release build? Set "no debug" macros
-if(CMAKE_BUILD_TYPE STREQUAL Release)
-    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
-        NDEBUG
-        QT_NO_DEBUG
-        QT_NO_DEBUG_OUTPUT
-    )
-endif()
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    $<$<CONFIG:Release>:NDEBUG>
+    $<$<CONFIG:Release>:QT_NO_DEBUG>
+    $<$<CONFIG:Release>:QT_NO_DEBUG_OUTPUT>
+)
+
+################################################################################
 
 ## Linux
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -289,17 +311,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     #install(FILES ${CMAKE_SOURCE_DIR}/assets/linux/${CMAKE_PROJECT_NAME}.svg DESTINATION share/pixmaps/)
     #install(FILES ${CMAKE_SOURCE_DIR}/assets/linux/${CMAKE_PROJECT_NAME}.svg DESTINATION share/icons/hicolor/scalable/apps/)
     #install(FILES ${CMAKE_SOURCE_DIR}/LICENSE.md DESTINATION share/licenses/${CMAKE_PROJECT_NAME}/)
-endif()
-
-## Android
-if(CMAKE_SYSTEM_NAME STREQUAL "Android")
-    set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
-        #QT_ANDROID_ABIS "armeabi-v7a;arm64-v8a;x86;x86_64"
-        #QT_ANDROID_BUILD_ALL_ABIS ON
-        QT_ANDROID_MIN_SDK_VERSION 28
-        QT_ANDROID_TARGET_SDK_VERSION 36
-        QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/assets/android/"
-    )
 endif()
 
 ## macOS
@@ -320,6 +331,26 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         XCODE_ATTRIBUTE_MARKETING_VERSION                   ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
         XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS             "${CMAKE_SOURCE_DIR}/assets/macos/${CMAKE_PROJECT_NAME}.entitlements"
         XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME  AppIcon
+    )
+endif()
+
+################################################################################
+
+## Windows
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+        WIN32_EXECUTABLE ON
+    )
+endif()
+
+## Android
+if(CMAKE_SYSTEM_NAME STREQUAL "Android")
+    set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+        #QT_ANDROID_ABIS "armeabi-v7a;arm64-v8a;x86;x86_64"
+        #QT_ANDROID_BUILD_ALL_ABIS ON
+        QT_ANDROID_MIN_SDK_VERSION 28
+        QT_ANDROID_TARGET_SDK_VERSION 36
+        QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/assets/android/"
     )
 endif()
 
@@ -346,20 +377,18 @@ if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
     )
 endif()
 
-## Windows
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
-        WIN32_EXECUTABLE ON
-    )
-endif()
-
 ################################################################################
 
 # Output (build)
-set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
-    #ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/lib"
-    #LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/lib"
+set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin"
+)
+
+# Output (install)
+install(TARGETS ${PROJECT_NAME}
+    BUNDLE DESTINATION ${CMAKE_INSTALL_BINDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
 ################################################################################

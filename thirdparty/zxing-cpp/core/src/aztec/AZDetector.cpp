@@ -9,7 +9,6 @@
 
 #include "AZDetectorResult.h"
 #include "BitArray.h"
-#include "BitHacks.h"
 #include "BitMatrix.h"
 #include "ConcentricFinder.h"
 #include "GenericGF.h"
@@ -20,7 +19,8 @@
 #include "ZXAlgorithms.h"
 
 #include <algorithm>
-#include <cmath>
+#include <bit>
+#include <ranges>
 #include <optional>
 #include <vector>
 
@@ -110,12 +110,26 @@ static std::optional<ConcentricPattern> LocateAztecCenter(const BitMatrix& image
 static std::vector<ConcentricPattern> FindPureFinderPattern(const BitMatrix& image)
 {
 	int left, top, width, height;
-	if (!image.findBoundingBox(left, top, width, height, 11)) // 11 is the size of an Aztec Rune, see ISO/IEC 24778:2008(E) Annex A
-		return {};
+	if (!image.findBoundingBox(left, top, width, height, 11)) {  // 11 is the size of an Aztec Rune, see ISO/IEC 24778:2008(E) Annex A
+		// Runes 68 and 223 have none of their bits set on the bottom row
+		if (image.findBoundingBox(left, top, width, height, 10) && (width == 11) && (height == 10))
+			height = 11;
+		else
+			return {};
+	}	
+
+	// Symbols can have a blank row or column at the edge (in particular, top and left)
+	if (width < height && image.width() >= height) {
+		left = std::max(0, left - (height - width + 1) / 2); // No real net effect if right edge blank
+		width = height;
+	} else if (height < width && image.height() >= width) {
+		top = std::max(0, top - (width - height + 1) / 2); // No real net effect if bottom edge blank
+		height = width;
+	}
 
 	PointF p(left + width / 2, top + height / 2);
 	constexpr auto PATTERN = FixedPattern<7, 7>{1, 1, 1, 1, 1, 1, 1};
-	if (auto pattern = LocateConcentricPattern(image, PATTERN, p, width / 2))
+	if (auto pattern = LocateConcentricPattern(image, PATTERN, p, width))
 		return {*pattern};
 	else
 		return {};
@@ -196,11 +210,11 @@ static std::vector<ConcentricPattern> FindFinderPatterns(const BitMatrix& image,
 
 			// make sure p is not 'inside' an already found pattern area
 			bool found = false;
-			for (auto old = res.rbegin(); old != res.rend(); ++old) {
+			for (auto& old : std::ranges::reverse_view(res)) {
 				// search from back to front, stop once we are out of range due to the y-coordinate
-				if (p.y - old->y > old->size / 2)
+				if (p.y - old.y > old.size / 2)
 					break;
-				if (distance(p, *old) < old->size / 2) {
+				if (distance(p, old) < old.size / 2) {
 					found = true;
 					break;
 				}
@@ -210,7 +224,7 @@ static std::vector<ConcentricPattern> FindFinderPatterns(const BitMatrix& image,
 				++N;
 				log(p, 1);
 
-				auto pattern = LocateAztecCenter(image, p, Reduce(next));
+				auto pattern = LocateAztecCenter(image, p, next.sum());
 				if (pattern) {
 					log(*pattern, 3);
 					assert(image.get(*pattern));
@@ -225,7 +239,7 @@ static std::vector<ConcentricPattern> FindFinderPatterns(const BitMatrix& image,
 #endif
 
 #ifdef PRINT_DEBUG
-	printf("\n# checked centeres: %d, # found centers: %d\n", N, Size(res));
+	printf("\n# checked centers: %d, # found centers: %d\n", N, Size(res));
 #endif
 	return res;
 }
@@ -234,7 +248,7 @@ static int FindRotation(uint32_t bits, bool mirror)
 {
 	const uint32_t mask = mirror ? 0b111'000'001'110 : 0b111'011'100'000;
 	for (int i = 0; i < 4; ++i) {
-		if (BitHacks::CountBitsSet(mask ^ bits) <= 2) // at most 2 bits may be wrong (24778:2008(E) 14.3.3 sais 3 but that is wrong)
+		if (std::popcount(mask ^ bits) <= 2) // at most 2 bits may be wrong (24778:2008(E) 14.3.3 says 3 but that is wrong)
 			return i;
 		bits = ((bits << 3) & 0xfff) | ((bits >> 9) & 0b111); // left shift/rotate, see RotatedCorners(Quadrilateral)
 	}
@@ -262,9 +276,10 @@ static uint32_t SampleOrientationBits(const BitMatrix& image, const PerspectiveT
 	return bits;
 }
 
-static int ModeMessage(const BitMatrix& image, const PerspectiveTransform& mod2Pix, int radius)
+static int ModeMessage(const BitMatrix& image, const PerspectiveTransform& mod2Pix, int radius, bool& isRune)
 {
 	const bool compact = radius == 5;
+	isRune = false;
 
 	// read the bits between the corner bits along the 4 edges
 	uint64_t bits = 0;
@@ -292,7 +307,21 @@ static int ModeMessage(const BitMatrix& image, const PerspectiveTransform& mod2P
 		words[i] = narrow_cast<int>(bits & 0xF);
 		bits >>= 4;
 	}
-	if (!ReedSolomonDecode(GenericGF::AztecParam(), words, numECCodewords))
+
+	bool decodeResult = ReedSolomonDecode(GenericGF::AztecParam(), words, numECCodewords);
+
+	if ((!decodeResult) && compact) {
+		// Is this a Rune?
+		for (auto& word : words)
+			word ^= 0b1010;
+		
+		decodeResult = ReedSolomonDecode(GenericGF::AztecParam(), words, numECCodewords);
+
+		if (decodeResult)
+			isRune = true;
+	}
+
+	if (!decodeResult)
 		return -1;
 
 	int res = 0;
@@ -351,6 +380,7 @@ DetectorResults Detect(const BitMatrix& image, bool isPure, bool tryHarder, int 
 		int mirror; // 0 or 1
 		int rotate; // [0..3]
 		int modeMessage = -1;
+		bool isRune = false;
 		[&]() {
 			// 24778:2008(E) 14.3.3 reads:
 			// In the outer layer of the Core Symbol, the 12 orientation bits at the corners are bitwise compared against the specified
@@ -359,7 +389,7 @@ DetectorResults Detect(const BitMatrix& image, bool isPure, bool tryHarder, int 
 			// decoding fails.
 			// Unfortunately, this seems to be wrong: there are 12-bit patterns in those 8 cases that differ only in 4 bits like
 			// 011'100'000'111 (rot90 && !mirror) and 111'000'001'110 (rot0 && mirror), meaning if two of those are wrong, both cases
-			// have a hamming distance of 2, meaning only 1 bit errors can be relyable recovered from. The following code therefore
+			// have a hamming distance of 2, meaning only 1 bit errors can be reliable recovered from. The following code therefore
 			// incorporates the complete set of mode message bits to help determine the orientation of the symbol. This is still not
 			// sufficient for the ErrorInModeMessageZero test case in AZDecoderTest.cpp but good enough for the author.
 			for (radius = 5; radius <= 7; radius += 2) {
@@ -370,7 +400,7 @@ DetectorResults Detect(const BitMatrix& image, bool isPure, bool tryHarder, int 
 					rotate = FindRotation(bits, mirror);
 					if (rotate == -1)
 						continue;
-					modeMessage = ModeMessage(image, PerspectiveTransform(srcQuad, RotatedCorners(*fpQuad, rotate, mirror)), radius);
+					modeMessage = ModeMessage(image, PerspectiveTransform(srcQuad, RotatedCorners(*fpQuad, rotate, mirror)), radius, isRune);
 					if (modeMessage != -1)
 						return;
 				}
@@ -400,7 +430,9 @@ DetectorResults Detect(const BitMatrix& image, bool isPure, bool tryHarder, int 
 		int nbLayers = 0;
 		int nbDataBlocks = 0;
 		bool readerInit = false;
-		ExtractParameters(modeMessage, radius == 5, nbLayers, nbDataBlocks, readerInit);
+		if (!isRune) {
+			ExtractParameters(modeMessage, radius == 5, nbLayers, nbDataBlocks, readerInit);
+		}
 
 		int dim = radius == 5 ? 4 * nbLayers + 11 : 4 * nbLayers + 2 * ((2 * nbLayers + 6) / 15) + 15;
 		double low = dim / 2.0 + srcQuad[0].x;
@@ -410,7 +442,7 @@ DetectorResults Detect(const BitMatrix& image, bool isPure, bool tryHarder, int 
 		if (!bits.isValid())
 			continue;
 
-		res.emplace_back(std::move(bits), radius == 5, nbDataBlocks, nbLayers, readerInit, mirror != 0);
+		res.emplace_back(std::move(bits), radius == 5, nbDataBlocks, nbLayers, readerInit, mirror != 0, isRune ? modeMessage : -1);
 
 		if (Size(res) == maxSymbols)
 			break;

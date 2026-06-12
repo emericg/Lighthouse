@@ -39,28 +39,6 @@ class ZXingQtVideoFilter : public QObject
     QVideoSink *m_videoSink = nullptr;
     void setVideoSink(QVideoSink *sink);
 
-signals:
-    void tryHarderChanged();
-    void tryRotateChanged();
-    void tryInvertChanged();
-    void tryDownscaleChanged();
-
-    void formatsChanged();
-    void captureRectChanged();
-
-    void decodingStarted();
-    void decodingFinished(Result result);
-    void tagFound(Result result);
-
-public slots:
-    Result process(const QVideoFrame &frame);
-
-public:
-    ZXingQtVideoFilter(QObject *parent = nullptr);
-    virtual ~ZXingQtVideoFilter();
-
-    Q_INVOKABLE void stopFilter();
-
     // capture rectangle
     QRect captureRect() const { return m_captureRect; }
     void setCaptureRect(const QRect &captureRect);
@@ -76,6 +54,28 @@ public:
     void setTryInvert(const bool value);
     bool tryDownscale() const { return m_readerOptions.tryDownscale(); }
     void setTryDownscale(const bool value);
+
+signals:
+    void tryHarderChanged();
+    void tryRotateChanged();
+    void tryInvertChanged();
+    void tryDownscaleChanged();
+
+    void formatsChanged();
+    void captureRectChanged();
+
+    void decodingStarted();
+    void decodingFinished(BarcodeQml result);
+    void tagFound(BarcodeQml result);
+
+public slots:
+    BarcodeQml process(const QVideoFrame &frame);
+
+public:
+    ZXingQtVideoFilter(QObject *parent = nullptr);
+    virtual ~ZXingQtVideoFilter();
+
+    Q_INVOKABLE void stopFilter();
 };
 
 #endif // ZXING_QT_VIDEOFILTER_H

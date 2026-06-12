@@ -8,6 +8,7 @@
 
 #include "Content.h"
 #include "Error.h"
+#include "JSON.h"
 #include "StructuredAppend.h"
 
 #include <memory>
@@ -16,7 +17,10 @@
 
 namespace ZXing {
 
-class CustomData;
+struct CustomData
+{
+	virtual ~CustomData() = default;
+};
 
 class DecoderResult
 {
@@ -28,10 +32,8 @@ class DecoderResult
 	bool _isMirrored = false;
 	bool _readerInit = false;
 	Error _error;
-	std::shared_ptr<CustomData> _extra;
-
-	DecoderResult(const DecoderResult &) = delete;
-	DecoderResult& operator=(const DecoderResult &) = delete;
+	std::string _json;
+	std::shared_ptr<CustomData> _customData;
 
 public:
 	DecoderResult() = default;
@@ -41,9 +43,12 @@ public:
 	DecoderResult(DecoderResult&&) noexcept = default;
 	DecoderResult& operator=(DecoderResult&&) noexcept = default;
 
+	DecoderResult(const DecoderResult&) = delete;
+	DecoderResult& operator=(const DecoderResult&) = delete;
+
 	bool isValid(bool includeErrors = false) const
 	{
-		return includeErrors || (_content.symbology.code != 0 && !_error);
+		return (!_content.bytes.empty() && !_error) || (includeErrors && !!_error);
 	}
 
 	const Content& content() const & { return _content; }
@@ -75,9 +80,13 @@ public:
 	ZX_PROPERTY(Error, error, setError)
 	ZX_PROPERTY(bool, isMirrored, setIsMirrored)
 	ZX_PROPERTY(bool, readerInit, setReaderInit)
-	ZX_PROPERTY(std::shared_ptr<CustomData>, extra, setExtra)
-
+	ZX_PROPERTY(std::string, json, setJson)
+	ZX_PROPERTY(std::shared_ptr<CustomData>, customData, setCustomData)
 #undef ZX_PROPERTY
+
+	template<typename T>
+	DecoderResult&& addExtra(std::string_view key, T val, T ignore = {}) { _json += JsonProp(key, val, ignore); return std::move(*this); }
+
 };
 
 } // ZXing

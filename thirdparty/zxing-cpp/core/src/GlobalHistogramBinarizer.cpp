@@ -8,11 +8,10 @@
 
 #include "BitMatrix.h"
 #include "Pattern.h"
+#include "ZXConfig.h"
 
 #include <algorithm>
 #include <array>
-#include <cassert>
-#include <functional>
 #include <utility>
 
 namespace ZXing {
@@ -48,6 +47,8 @@ static void ThresholdSharpened(const ImageLineView in, int threshold, std::vecto
 
 static auto GenHistogram(const ImageLineView line)
 {
+	// This code causes about 20% of the total runtime on an AVX2 system for a EAN13 search on Lum input data.
+	// Trying to increase the performance by performing 2 or 4 "parallel" histograms helped nothing.
 	Histogram res = {};
 	for (auto pix : line)
 		res[pix >> LUMINANCE_SHIFT]++;
@@ -110,12 +111,12 @@ bool GlobalHistogramBinarizer::getPatternRow(int row, int rotation, PatternRow& 
 	if (buffer.width() < 3)
 		return false; // special casing the code below for a width < 3 makes no sense
 
-#ifdef __AVX__
+#if defined(__AVX__) // or defined(__ARM_NEON)
 	// If we are extracting a column (instead of a row), we run into cache misses on every pixel access both
-	// during the histogram caluculation and during the sharpen+threshold operation. Additionally, if we
+	// during the histogram calculation and during the sharpen+threshold operation. Additionally, if we
 	// perform the ThresholdSharpened function on pixStride==1 data, the auto-vectorizer makes that part
 	// 8x faster on an AVX2 cpu which easily recovers the extra cost that we pay for the copying.
-	thread_local std::vector<uint8_t> line;
+	ZX_THREAD_LOCAL std::vector<uint8_t> line;
 	if (std::abs(buffer.pixStride()) > 4) {
 		line.resize(lineView.size());
 		std::copy(lineView.begin(), lineView.end(), line.begin());
@@ -127,7 +128,7 @@ bool GlobalHistogramBinarizer::getPatternRow(int row, int rotation, PatternRow& 
 	if (threshold <= 0)
 		return false;
 
-	thread_local std::vector<uint8_t> binarized;
+	ZX_THREAD_LOCAL std::vector<uint8_t> binarized;
 	// the optimizer can generate a specialized version for pixStride==1 (non-rotated input) that is about 8x faster on AVX2 hardware
 	if (lineView.begin().stride == 1)
 		ThresholdSharpened(lineView, threshold, binarized);
