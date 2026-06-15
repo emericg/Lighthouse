@@ -25,28 +25,33 @@
 #include "devices/device_pokemongoplus.h"
 
 #include <QBluetoothDeviceInfo>
-#include <QList>
 #include <QDebug>
 
 /* ************************************************************************** */
 
-void DeviceManager::updateBleDevice_simple(const QBluetoothDeviceInfo &info)
+void DeviceManager::bleDevice_discovered(const QBluetoothDeviceInfo &info)
 {
-    updateBleDevice(info, QBluetoothDeviceInfo::Field::None);
+    //qDebug() << "bleDevice_discovered() " << info.name() << info.address(); // << info.deviceUuid();
+
+    bleDevice_updated(info, QBluetoothDeviceInfo::Field::None);
 }
 
-void DeviceManager::updateBleDevice(const QBluetoothDeviceInfo &info,
-                                    QBluetoothDeviceInfo::Fields updatedFields)
-{
-    //qDebug() << "updateBleDevice() " << info.name() << info.address(); // << info.deviceUuid(); // << " updatedFields: " << updatedFields;
+/* ************************************************************************** */
 
+void DeviceManager::bleDevice_updated(const QBluetoothDeviceInfo &info, QBluetoothDeviceInfo::Fields updatedFields)
+{
+    //qDebug() << "bleDevice_updated() " << info.name() << info.address(); // << info.deviceUuid() // << " updatedFields: " << updatedFields
     Q_UNUSED(updatedFields) // We don't use QBluetoothDeviceInfo::Fields, it's unreliable
 
     //if (!info.isValid()) return; // skip invalid devices
     //if (info.isCached()) return; // we probably just hit the device cache
     if (info.rssi() >= 0) return; // we probably just hit the device cache
+    //if ((info.coreConfigurations() & QBluetoothDeviceInfo::LowEnergyCoreConfiguration) == false) return; // not a BLE device
     if (info.name().isEmpty()) return; // skip beacons
     if (info.name().replace('-', ':') == info.address().toString()) return; // skip beacons
+
+    //if (m_devices_blacklist.contains(info.address().toString())) return; // device is blacklisted
+    //if (m_devices_blacklist.contains(info.deviceUuid().toString())) return; // device is blacklisted
 
     // Supported devices ///////////////////////////////////////////////////////
 
@@ -82,7 +87,7 @@ void DeviceManager::updateBleDevice(const QBluetoothDeviceInfo &info,
 
             // Handle advertisement //
 
-            const QList<quint16> &manufacturerIds = info.manufacturerIds();
+            const QList <quint16> &manufacturerIds = info.manufacturerIds();
             for (const auto id: manufacturerIds)
             {
                 //qDebug() << info.name() << info.address() << Qt::hex
@@ -94,7 +99,7 @@ void DeviceManager::updateBleDevice(const QBluetoothDeviceInfo &info,
                     dd->parseAdvertisementData(DeviceUtils::BLE_ADV_MANUFACTURERDATA, id, info.manufacturerData(id));
             }
 
-            const QList<QBluetoothUuid> &serviceIds = info.serviceIds();
+            const QList <QBluetoothUuid> &serviceIds = info.serviceIds();
             for (const auto id: serviceIds)
             {
                 //qDebug() << info.name() << info.address() << Qt::hex
@@ -107,6 +112,7 @@ void DeviceManager::updateBleDevice(const QBluetoothDeviceInfo &info,
             }
 
             // Dynamic updates //
+
             if (m_listening && dd->hasBluetoothConnection())
             {
                 //
@@ -116,10 +122,13 @@ void DeviceManager::updateBleDevice(const QBluetoothDeviceInfo &info,
         }
     }
 
-    // Dynamic scanning ////////////////////////////////////////////////////////
+    /// Dynamic scanning ///////////////////////////////////////////////////////
+
+    if (m_scanning)
     {
         //qDebug() << "addBleDevice(" << info.name() << ") FROM DYNAMIC SCANNING";
         addBleDevice(info);
+        return;
     }
 }
 

@@ -23,7 +23,6 @@
 
 #include <QBluetoothDeviceInfo>
 #include <QBluetoothDeviceDiscoveryAgent>
-
 #include <QDebug>
 
 /* ************************************************************************** */
@@ -40,12 +39,17 @@ void DeviceManager::scanNearby_stop()
 
 /* ************************************************************************** */
 
-void DeviceManager::addNearbyBleDevice(const QBluetoothDeviceInfo &)
+void DeviceManager::addBleDeviceNearby(const QBluetoothDeviceInfo &info)
 {
     //
 }
 
-void DeviceManager::updateNearbyBleDevice(const QBluetoothDeviceInfo &, QBluetoothDeviceInfo::Fields)
+void DeviceManager::bleDeviceNearby_discovered(const QBluetoothDeviceInfo &info)
+{
+    //
+}
+
+void DeviceManager::bleDeviceNearby_updated(const QBluetoothDeviceInfo &info, QBluetoothDeviceInfo::Fields updatedFields)
 {
     //
 }

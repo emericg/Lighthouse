@@ -35,6 +35,7 @@
 
 class QBluetoothDeviceInfo;
 class QLowEnergyController;
+class QPermission;
 
 /* ************************************************************************** */
 
@@ -45,10 +46,11 @@ class DeviceManager: public QObject
 {
     Q_OBJECT
 
+    ////////
+
     Q_PROPERTY(bool hasDevices READ areDevicesAvailable NOTIFY devicesListUpdated)
     Q_PROPERTY(int deviceCount READ getDeviceCount NOTIFY devicesListUpdated)
     Q_PROPERTY(DeviceFilter *devicesList READ getDevicesFiltered NOTIFY devicesListUpdated)
-
     Q_PROPERTY(DeviceFilter *devicesNearby READ getDevicesNearby NOTIFY devicesNearbyUpdated)
 
     ////////
@@ -56,44 +58,51 @@ class DeviceManager: public QObject
     Q_PROPERTY(bool advertising READ isAdvertising NOTIFY advertisingChanged)
     Q_PROPERTY(bool listening READ isListening NOTIFY listeningChanged)
     Q_PROPERTY(bool scanning READ isScanning NOTIFY scanningChanged)
+    Q_PROPERTY(bool scanningNearby READ isScanningNearby NOTIFY scanningNearbyChanged)
     Q_PROPERTY(bool updating READ isUpdating NOTIFY updatingChanged)
     Q_PROPERTY(bool syncing READ isSyncing NOTIFY syncingChanged)
 
     Q_PROPERTY(bool bluetooth READ hasBluetooth NOTIFY bluetoothChanged)
     Q_PROPERTY(bool bluetoothAdapter READ hasBluetoothAdapter NOTIFY bluetoothChanged)
     Q_PROPERTY(bool bluetoothEnabled READ hasBluetoothEnabled NOTIFY bluetoothChanged)
-    Q_PROPERTY(bool bluetoothPermissions READ hasBluetoothPermissions NOTIFY bluetoothChanged)
+    Q_PROPERTY(bool bluetoothPermissions READ hasBluetoothPermissions NOTIFY permissionsChanged)
 
-    Q_PROPERTY(bool permissionOS READ hasPermissionOS NOTIFY permissionsChanged)
-    Q_PROPERTY(bool permissionLocationBLE READ hasPermissionLocationBLE NOTIFY permissionsChanged)
+    Q_PROPERTY(bool permissionBluetooth READ hasPermissionBluetooth NOTIFY permissionsChanged)
+    Q_PROPERTY(bool permissionLocationForeground READ hasPermissionLocationForeground NOTIFY permissionsChanged)
     Q_PROPERTY(bool permissionLocationBackground READ hasPermissionLocationBackground NOTIFY permissionsChanged)
-    Q_PROPERTY(bool permissionLocationGPS READ hasPermissionGPS NOTIFY permissionsChanged)
+    Q_PROPERTY(bool gpsEnabled READ hasGpsEnabled NOTIFY permissionsChanged)
 
     Q_PROPERTY(int bluetoothHostMode READ getBluetoothHostMode NOTIFY hostModeChanged)
 
-    static const int ble_scanning_duration = 30;
-    static const int ble_listening_duration_desktop = 300;
-    static const int ble_listening_duration_mobile = 0;
+    ////
+
+    static const int ble_scanning_duration = 60;
+    static const int ble_listening_duration = 0;
+    static const int ble_listening_duration_nearby = 0;
+    static const int ble_listening_duration_background = 60;
 
     bool m_dbInternal = false;  //!< do we have an internal SQLite database?
     bool m_dbExternal = false;  //!< do we have a remote MySQL database?
 
-    bool m_daemonMode = false;  //!< did we start without UI?
+    bool m_daemonMode = false;  //!< did we start without an UI?
+
+    ////
 
     bool m_bleAdapter = false;      //!< do we have a BLE adapter?
     bool m_bleEnabled = false;      //!< is the BLE adapter enabled?
-    bool m_blePermissions = false;  //!< do we have necessary BLE permissions? (brings together all other permsissions)
+    bool m_blePermission = false;   //!< do we have necessary BLE permission(s)?
 
-    bool m_permOS = false;          //!< do we have OS permissions for BLE? (macOS, iOS, Android)
-    bool m_permLocationBLE = false; //!< do we location permission? (Android)
-    bool m_permLocationBKG = false; //!< do we background location permission? (Android)
-    bool m_permGPS = false;         //!< is the GPS enabled? (Android)
+    bool m_locPermission_foreground = false;    //!< do we have location permission? (Android)
+    bool m_locPermission_background = false;    //!< do we have background location permission? (Android)
+    bool m_gpsEnabled = false;                  //!< is the GPS enabled? (Android)
 
     QBluetoothLocalDevice *m_bluetoothAdapter = nullptr;
-    QBluetoothDeviceDiscoveryAgent *m_discoveryAgent = nullptr;
-    QBluetoothLocalDevice::HostMode m_ble_hostmode = QBluetoothLocalDevice::HostPoweredOff;
+    QBluetoothDeviceDiscoveryAgent *m_bluetoothDiscoveryAgent = nullptr;
+    QBluetoothLocalDevice::HostMode m_bluetoothHostMode = QBluetoothLocalDevice::HostPoweredOff;
 
     QList <QObject *> m_bluetoothAdapters;
+
+    ////
 
     QList <QString> m_devices_blacklist;
 
@@ -109,6 +118,8 @@ class DeviceManager: public QObject
     QList <QObject *> m_devices_syncing_queue;
     QList <QObject *> m_devices_syncing;
 
+    ////
+
     bool m_advertising = false;
     bool isAdvertising() const { return m_advertising; }
 
@@ -118,23 +129,30 @@ class DeviceManager: public QObject
     bool m_scanning = false;
     bool isScanning() const { return m_scanning; }
 
+    bool m_scanning_nearby = false;
+    bool isScanningNearby() const { return m_scanning_nearby; }
+
     bool m_updating = false;
     bool isUpdating() const { return m_updating; }
 
     bool m_syncing = false;
     bool isSyncing() const { return m_syncing; }
 
-    bool hasBluetooth() const { return (m_bleAdapter && m_bleEnabled && m_blePermissions); }
     bool hasBluetoothAdapter() const { return m_bleAdapter; }
     bool hasBluetoothEnabled() const { return m_bleEnabled; }
-    bool hasBluetoothPermissions() const { return m_blePermissions; }
+    bool hasBluetoothPermissions() const;
+    bool hasBluetooth() const;
 
-    bool hasPermissionOS() const { return m_permOS; }
-    bool hasPermissionLocationBLE() const { return m_permLocationBLE; }
-    bool hasPermissionLocationBackground() const { return m_permLocationBKG; }
-    bool hasPermissionGPS() const { return m_permGPS; }
+    bool hasPermissionBluetooth() const { return m_blePermission; }
+    bool hasPermissionLocationForeground() const { return m_locPermission_foreground; }
+    bool hasPermissionLocationBackground() const { return m_locPermission_background; }
+    bool hasGpsEnabled() const { return m_gpsEnabled; }
 
-    int getBluetoothHostMode() const { return m_ble_hostmode; }
+    void setBluetoothPermission(bool perm);
+    void setLocationPermission_foreground(bool perm);
+    void setLocationPermission_background(bool perm);
+
+    int getBluetoothHostMode() const { return m_bluetoothHostMode; }
 
     void startBleAgent();
 
@@ -161,6 +179,7 @@ Q_SIGNALS:
     void advertisingChanged();
     void listeningChanged();
     void scanningChanged();
+    void scanningNearbyChanged();
     void updatingChanged();
     void syncingChanged();
 
@@ -171,15 +190,20 @@ private slots:
     void bluetoothPermissionsChanged();
 
     // QBluetoothDeviceDiscoveryAgent related
-    void addNearbyBleDevice(const QBluetoothDeviceInfo &info);
-    void updateNearbyBleDevice(const QBluetoothDeviceInfo &info, QBluetoothDeviceInfo::Fields updatedFields);
-    void addBleDevice(const QBluetoothDeviceInfo &info);
-    void updateBleDevice(const QBluetoothDeviceInfo &info, QBluetoothDeviceInfo::Fields updatedFields);
-    void updateBleDevice_simple(const QBluetoothDeviceInfo &info);
     void deviceDiscoveryError(QBluetoothDeviceDiscoveryAgent::Error);
     void deviceDiscoveryErrorIOS();
     void deviceDiscoveryFinished();
     void deviceDiscoveryStopped();
+
+    //
+    void addBleDeviceNearby(const QBluetoothDeviceInfo &info);
+    void bleDeviceNearby_updated(const QBluetoothDeviceInfo &info, QBluetoothDeviceInfo::Fields updatedFields);
+    void bleDeviceNearby_discovered(const QBluetoothDeviceInfo &info);
+
+    //
+    void addBleDevice(const QBluetoothDeviceInfo &info);
+    void bleDevice_discovered(const QBluetoothDeviceInfo &info);
+    void bleDevice_updated(const QBluetoothDeviceInfo &info, QBluetoothDeviceInfo::Fields updatedFields);
 
 public:
     DeviceManager(bool daemon = false);
@@ -195,9 +219,16 @@ public:
     // Bluetooth management
     Q_INVOKABLE bool checkBluetooth();
     Q_INVOKABLE bool checkBluetoothPermissions();
-    Q_INVOKABLE bool enableBluetooth(bool enforceUserPermissionCheck = false);
     Q_INVOKABLE bool requestBluetoothPermissions();
-    void requestBluetoothPermissions_results();
+    Q_INVOKABLE bool enableBluetooth(bool enforceUserPermissionCheck = false);
+
+    Q_INVOKABLE bool checkBluetoothPermission();
+    Q_INVOKABLE bool requestBluetoothPermission();
+    void requestBluetoothPermission_results(const QPermission &permission);
+
+    Q_INVOKABLE bool checkLocationPermission();
+    Q_INVOKABLE bool requestLocationPermission();
+    void requestLocationPermission_results(const QPermission &permission);
 
     // Scanning management
     static int getLastRun();
@@ -224,7 +255,9 @@ public:
 
     // Devices list management
     Q_INVOKABLE bool areDevicesAvailable() const { return m_devices_model->hasDevices(); }
-    Q_INVOKABLE void disconnectDevices();
+    Q_INVOKABLE bool areDevicesConnected() const;
+    Q_INVOKABLE void disconnectDevices() const;
+    Q_INVOKABLE void disconnectAndExit() const;
 
     int getDeviceCount() const { return m_devices_model->getDeviceCount(); }
     DeviceFilter *getDevicesFiltered() const { return m_devices_filter; }
