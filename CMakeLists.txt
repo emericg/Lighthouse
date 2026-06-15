@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(APP_NAME ${CMAKE_PROJECT_NAME})
+set(APP_NAME ${PROJECT_NAME})
 set(APP_VERSION ${CMAKE_PROJECT_VERSION})
 
 ################################################################################
@@ -58,9 +58,9 @@ qt_policy(SET QTP0004 NEW)
 
 # Set app desktop icons
 #if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-#    set(app_icon_windows "${CMAKE_SOURCE_DIR}/assets/windows/${CMAKE_PROJECT_NAME}.rc")
+#    set(app_icon_windows "${PROJECT_SOURCE_DIR}/assets/windows/${PROJECT_NAME}.rc")
 #elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-#    set(app_icon_macos "${CMAKE_SOURCE_DIR}/assets/macos/${CMAKE_PROJECT_NAME}.icns")
+#    set(app_icon_macos "${PROJECT_SOURCE_DIR}/assets/macos/${PROJECT_NAME}.icns")
 #endif()
 
 set(SOURCES
@@ -120,12 +120,12 @@ if(NOT IOS AND NOT ANDROID)
     endif()
 endif()
 
-qt_add_executable(${CMAKE_PROJECT_NAME} ${SOURCES} ${SOURCES_DESKTOP} ${SOURCES_MOBILE})
+qt_add_executable(${PROJECT_NAME} ${SOURCES} ${SOURCES_DESKTOP} ${SOURCES_MOBILE})
 
-qt_add_ios_ffmpeg_libraries(${CMAKE_PROJECT_NAME})
+qt_add_ios_ffmpeg_libraries(${PROJECT_NAME})
 
-qt_add_qml_module(${CMAKE_PROJECT_NAME}
-    URI ${CMAKE_PROJECT_NAME}
+qt_add_qml_module(${PROJECT_NAME}
+    URI ${PROJECT_NAME}
     NO_PLUGIN
     QML_FILES
         qml/MobileApplication.qml
@@ -191,9 +191,9 @@ qt_add_qml_module(${CMAKE_PROJECT_NAME}
         qml/components_js/UtilsDeviceSensors.js
 )
 
-qt_add_translations(${CMAKE_PROJECT_NAME}
-    TS_FILE_BASE ${CMAKE_PROJECT_NAME}
-    TS_FILE_DIR ${CMAKE_SOURCE_DIR}/i18n/
+qt_add_translations(${PROJECT_NAME}
+    TS_FILE_BASE ${PROJECT_NAME}
+    TS_FILE_DIR ${PROJECT_SOURCE_DIR}/i18n/
     RESOURCE_PREFIX "/i18n"
 )
 
@@ -207,7 +207,7 @@ function(add_other_files target)
     endforeach()
 endfunction()
 
-add_other_files(${CMAKE_PROJECT_NAME}
+add_other_files(${PROJECT_NAME}
     README.md LICENSE.md
     .gitignore
 )
@@ -217,13 +217,13 @@ add_other_files(${CMAKE_PROJECT_NAME}
 if(IOS OR ANDROID)
     # why
     find_package(Qt6 REQUIRED COMPONENTS Location)
-    target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt6::Location)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Location)
 endif()
 
 if(NOT IOS AND NOT ANDROID)
     # for proper systray and menubar support
     find_package(Qt6 REQUIRED COMPONENTS Widgets)
-    target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt6::Widgets)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets)
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -231,7 +231,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_definitions(-DENABLE_KEYBOARD_UINPUT)
     add_definitions(-DENABLE_MEDIA_MPRIS)
     add_definitions(-DENABLE_VOLUME_PULSEAUDIO)
-    target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC "-lmbedtls -lmbedx509 -lmbedcrypto")
+    target_link_libraries(${PROJECT_NAME} PUBLIC "-lmbedtls -lmbedx509 -lmbedcrypto")
 endif()
 
 ################################################################################
@@ -240,31 +240,31 @@ endif()
 set(UTILS_DOCK_ENABLED true)
 set(UTILS_WIFI_ENABLED true)
 add_subdirectory(thirdparty/AppUtils)
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE AppUtils)
+target_link_libraries(${PROJECT_NAME} PRIVATE AppUtils)
 
 # SingleApplication
 add_subdirectory(thirdparty/SingleApplication)
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE SingleApplication)
+target_link_libraries(${PROJECT_NAME} PRIVATE SingleApplication)
 
 # MobileUI
 add_subdirectory(thirdparty/MobileUI)
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE MobileUI MobileUI_plugin)
+target_link_libraries(${PROJECT_NAME} PRIVATE MobileUI MobileUI_plugin)
 
 # ComponentLibrary
 add_subdirectory(thirdparty/ComponentLibrary)
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ComponentLibrary_plugin)
+target_link_libraries(${PROJECT_NAME} PRIVATE ComponentLibrary_plugin)
 
 # zxing-cpp
 add_subdirectory(thirdparty/zxing-cpp)
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ZXing)
+target_link_libraries(${PROJECT_NAME} PRIVATE ZXing)
 
 # zxing-cpp Qt wrapper
 add_definitions(-DENABLE_ZXING)
 add_subdirectory(thirdparty/zxing-cpp/wrappers/qt/)
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ZXingQt)
+target_link_libraries(${PROJECT_NAME} PRIVATE ZXingQt)
 
 # Qt libraries
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
+target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Core
     Qt6::Gui
     Qt6::Svg
@@ -278,8 +278,8 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
     Qt6::Quick3D
 )
 
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE src/)
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE thirdparty/)
+target_include_directories(${PROJECT_NAME} PRIVATE src/)
+target_include_directories(${PROJECT_NAME} PRIVATE thirdparty/)
 
 # Qt official hacks...
 set(QML_IMPORT_PATH
@@ -305,12 +305,12 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 ## Linux
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     # System install rules
-    install(TARGETS ${CMAKE_PROJECT_NAME} RUNTIME DESTINATION bin/)
-    install(FILES ${CMAKE_SOURCE_DIR}/assets/linux/${CMAKE_PROJECT_NAME}.desktop DESTINATION share/applications/)
-    #install(FILES ${CMAKE_SOURCE_DIR}/assets/linux/${CMAKE_PROJECT_NAME}.appdata.xml DESTINATION share/appdata/)
-    #install(FILES ${CMAKE_SOURCE_DIR}/assets/linux/${CMAKE_PROJECT_NAME}.svg DESTINATION share/pixmaps/)
-    #install(FILES ${CMAKE_SOURCE_DIR}/assets/linux/${CMAKE_PROJECT_NAME}.svg DESTINATION share/icons/hicolor/scalable/apps/)
-    #install(FILES ${CMAKE_SOURCE_DIR}/LICENSE.md DESTINATION share/licenses/${CMAKE_PROJECT_NAME}/)
+    install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin/)
+    install(FILES ${PROJECT_SOURCE_DIR}/assets/linux/${PROJECT_NAME}.desktop DESTINATION share/applications/)
+    #install(FILES ${PROJECT_SOURCE_DIR}/assets/linux/${PROJECT_NAME}.appdata.xml DESTINATION share/appdata/)
+    #install(FILES ${PROJECT_SOURCE_DIR}/assets/linux/${PROJECT_NAME}.svg DESTINATION share/pixmaps/)
+    #install(FILES ${PROJECT_SOURCE_DIR}/assets/linux/${PROJECT_NAME}.svg DESTINATION share/icons/hicolor/scalable/apps/)
+    #install(FILES ${PROJECT_SOURCE_DIR}/LICENSE.md DESTINATION share/licenses/${PROJECT_NAME}/)
 endif()
 
 ## macOS
@@ -318,18 +318,18 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     #set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64")
     set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0")
 
-    #set(app_icon_macos "${CMAKE_SOURCE_DIR}/assets/macos/${CMAKE_PROJECT_NAME}.icns")
+    #set(app_icon_macos "${PROJECT_SOURCE_DIR}/assets/macos/${PROJECT_NAME}.icns")
     #set_source_files_properties(${app_icon_macos} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
-    set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+    set_target_properties(${PROJECT_NAME} PROPERTIES
         MACOSX_BUNDLE ON
-        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/assets/macos/Info.plist"
+        MACOSX_BUNDLE_INFO_PLIST "${PROJECT_SOURCE_DIR}/assets/macos/Info.plist"
         # New Xcode attributes (???)
         XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER           "io.emeric.lighthouse"
-        XCODE_ATTRIBUTE_PRODUCT_NAME                        ${CMAKE_PROJECT_NAME}
-        XCODE_ATTRIBUTE_CURRENT_PROJECT_VERSION             ${CMAKE_PROJECT_VERSION}
+        XCODE_ATTRIBUTE_PRODUCT_NAME                        ${PROJECT_NAME}
+        XCODE_ATTRIBUTE_CURRENT_PROJECT_VERSION             ${PROJECT_VERSION}
         XCODE_ATTRIBUTE_MARKETING_VERSION                   ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-        XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS             "${CMAKE_SOURCE_DIR}/assets/macos/${CMAKE_PROJECT_NAME}.entitlements"
+        XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS             "${PROJECT_SOURCE_DIR}/assets/macos/${PROJECT_NAME}.entitlements"
         XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME  AppIcon
     )
 endif()
@@ -338,37 +338,37 @@ endif()
 
 ## Windows
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+    set_target_properties(${PROJECT_NAME} PROPERTIES
         WIN32_EXECUTABLE ON
     )
 endif()
 
 ## Android
 if(CMAKE_SYSTEM_NAME STREQUAL "Android")
-    set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+    set_target_properties(${PROJECT_NAME} PROPERTIES
         #QT_ANDROID_ABIS "armeabi-v7a;arm64-v8a;x86;x86_64"
         #QT_ANDROID_BUILD_ALL_ABIS ON
         QT_ANDROID_MIN_SDK_VERSION 28
         QT_ANDROID_TARGET_SDK_VERSION 36
-        QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/assets/android/"
+        QT_ANDROID_PACKAGE_SOURCE_DIR "${PROJECT_SOURCE_DIR}/assets/android/"
     )
 endif()
 
 ## iOS
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
-    #set(app_icon_ios "${CMAKE_SOURCE_DIR}/assets/ios/Assets.xcassets")
-    #target_sources(${CMAKE_PROJECT_NAME} PRIVATE ${app_icon_ios})
+    #set(app_icon_ios "${PROJECT_SOURCE_DIR}/assets/ios/Assets.xcassets")
+    #target_sources(${PROJECT_NAME} PRIVATE ${app_icon_ios})
     #set_source_files_properties(${app_icon_ios} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
-    set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+    set_target_properties(${PROJECT_NAME} PROPERTIES
         MACOSX_BUNDLE ON
-        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/assets/ios/Info.plist"
+        MACOSX_BUNDLE_INFO_PLIST "${PROJECT_SOURCE_DIR}/assets/ios/Info.plist"
         # Qt
-        QT_IOS_LAUNCH_SCREEN "${CMAKE_SOURCE_DIR}/assets/ios/LaunchScreen.storyboard"
+        QT_IOS_LAUNCH_SCREEN "${PROJECT_SOURCE_DIR}/assets/ios/LaunchScreen.storyboard"
         # New Xcode attributes (???)
         XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER           "io.emeric.lighthouse"
-        XCODE_ATTRIBUTE_PRODUCT_NAME                        ${CMAKE_PROJECT_NAME}
-        XCODE_ATTRIBUTE_CURRENT_PROJECT_VERSION             ${CMAKE_PROJECT_VERSION}
+        XCODE_ATTRIBUTE_PRODUCT_NAME                        ${PROJECT_NAME}
+        XCODE_ATTRIBUTE_CURRENT_PROJECT_VERSION             ${PROJECT_VERSION}
         XCODE_ATTRIBUTE_MARKETING_VERSION                   ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
         XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET          "16.0"
         XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY              "1,2"   # iPhone,iPad
