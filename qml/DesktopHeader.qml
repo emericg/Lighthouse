@@ -173,22 +173,6 @@ Rectangle {
         spacing: isHdpi ? 4 : 12
         visible: true
 
-        // MAIN MENU ACTIONS //////////
-
-        ButtonOutline {
-            anchors.verticalCenter: parent.verticalCenter
-
-            visible: (networkServer.running || networkServer.clientConnected)
-            text: {
-                if (networkServer.running) return qsTr("SERVER RUNNING")
-                if (networkServer.clientConnected) return qsTr("CLIENT CONNECTED")
-                return ""
-            }
-            color: Theme.colorHeaderContent
-        }
-
-        Item { width: 12; height: 12; } // spacer
-
         // DEVICE ACTIONS //////////
 
         ButtonCompactable {
@@ -242,7 +226,7 @@ Rectangle {
                 }
             }
         }
-
+/*
         Rectangle { // separator
             anchors.verticalCenter: parent.verticalCenter
             height: 40
@@ -250,6 +234,24 @@ Rectangle {
             color: Theme.colorHeaderHighlight
             visible: (deviceManager.bluetooth && appContent.state === "ScreenDeviceList")
         }
+*/
+        // SERVER STATUS //////////
+
+        Item { width: 12; height: 12; } // spacer
+
+        ButtonOutline {
+            anchors.verticalCenter: parent.verticalCenter
+
+            visible: (networkServer.running || networkServer.clientConnected)
+            text: {
+                if (networkServer.running) return qsTr("SERVER RUNNING")
+                if (networkServer.clientConnected) return qsTr("CLIENT CONNECTED")
+                return ""
+            }
+            color: Theme.colorHeaderContent
+        }
+
+        Item { width: 12; height: 12; } // spacer
 
         // DEVICE MENU //////////
 

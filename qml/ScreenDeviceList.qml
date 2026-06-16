@@ -407,7 +407,7 @@ Item {
 
             Rectangle { // NETWORK
                 width: singleColumn ? parent.width : 480
-                height: singleColumn ? 112 : 128
+                height: visible ? (singleColumn ? 112 : 128) : 0
                 radius: 4
 
                 visible: (isMobile && networkClient.connected) || (settingsManager.fakeIt)

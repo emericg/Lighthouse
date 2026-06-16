@@ -160,10 +160,26 @@ Rectangle {
 
             ////
 
-            Item { // network status
+            MouseArea { // network status
                 width: headerHeight
                 height: headerHeight
+
                 visible: (appContent.state === "ScreenDeviceList")
+
+                onClicked: {
+                    if (!networkClient.connected) {
+                        networkClient.connectToServer()
+                    }
+                }
+
+                RippleThemed {
+                    anchors.fill: parent
+                    anchor: parent
+
+                    pressed: parent.pressed
+                    //active: enabled && parent.containsPress
+                    color: Qt.rgba(Theme.colorForeground.r, Theme.colorForeground.g, Theme.colorForeground.b, 0.33)
+                }
 
                 IconSvg {
                     width: 26; height: 26;
@@ -191,10 +207,30 @@ Rectangle {
 
             ////
 
-            Item { // bluetooth status
+            MouseArea { // bluetooth status
                 width: headerHeight
                 height: headerHeight
+
                 visible: (appContent.state === "ScreenDeviceList")
+
+                onClicked: {
+                    if (!deviceManager.bluetoothPermissions) {
+                        deviceManager.requestBluetoothPermissions()
+                    }
+                    if (!deviceManager.bluetoothEnabled) {
+                        deviceManager.enableBluetooth(settingsManager.bluetoothControl)
+                    }
+                    deviceManager.checkBluetooth()
+                }
+
+                RippleThemed {
+                    anchors.fill: parent
+                    anchor: parent
+
+                    pressed: parent.pressed
+                    //active: enabled && parent.containsPress
+                    color: Qt.rgba(Theme.colorForeground.r, Theme.colorForeground.g, Theme.colorForeground.b, 0.33)
+                }
 
                 IconSvg {
                     width: 26; height: 26;
@@ -228,8 +264,7 @@ Rectangle {
                 width: headerHeight
                 height: headerHeight
 
-                visible: (deviceManager.bluetooth &&
-                          (appContent.state === "DeviceLight"))
+                visible: (deviceManager.bluetooth && appContent.state === "DeviceLight")
 
                 onClicked: {
                     rightMenuClicked()

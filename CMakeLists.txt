@@ -152,7 +152,6 @@ qt_add_qml_module(${PROJECT_NAME}
         qml/ScreenDeviceList.qml
         qml/ScreenSettings.qml
         qml/ScreenAbout.qml
-        qml/DeviceWidget.qml
         qml/DeviceBeacon.qml
         qml/DevicePBP.qml
         qml/DevicePGP.qml
@@ -163,6 +162,9 @@ qt_add_qml_module(${PROJECT_NAME}
         qml/VirtualInput_gamepad.qml
         qml/VirtualInput_remote.qml
         qml/VirtualInput_media.qml
+
+        qml/widgets/DeviceWidget.qml
+        qml/widgets/NetworkClientWidget.qml
 
         qml/popups/PopupActions.qml
         qml/popups/PopupBeaconKey.qml

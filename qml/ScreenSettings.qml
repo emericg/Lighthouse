@@ -568,6 +568,8 @@ Loader {
                 ListTitle {
                     text: qsTr("Controls")
                     source: "qrc:/IconLibrary/material-symbols/settings.svg"
+
+                    visible: isDesktop
                 }
 
                 ////////////////
@@ -701,7 +703,7 @@ Loader {
                         width: 24
                         height: 24
                         color: Theme.colorIcon
-                        source: ""
+                        source: "qrc:/IconLibrary/material-symbols/lock-fill.svg"
                     }
 
                     Text {
