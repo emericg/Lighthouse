@@ -3,7 +3,7 @@
 
 .pragma library
 
-//.import ComponentLibrary 1.0 as ThemeEngine
+.import ComponentLibrary 1.0 as ThemeEngine
 .import LocalActions 1.0 as LocalActions
 
 /* ************************************************************************** */

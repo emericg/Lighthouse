@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 
 import ComponentLibrary
+import LocalActions
 
 Grid {
     id: virtualInput_touchpad

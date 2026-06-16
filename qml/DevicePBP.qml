@@ -325,17 +325,16 @@ Loader {
 
             ////
 
-            Row {
-                width: parent.width*0.5
-
+            Item {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                anchors.horizontalCenter: parent.horizontalCenter
+                width: parent.width*0.5
+
 
                 SchematicPokeball { // pokeball 2d
                     id: pokeball_2d
                     width: parent.width * 0.5
-                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.centerIn: parent
 
                     visible: (selectorPbpView.currentSelection === 1)
                 }
@@ -343,7 +342,7 @@ Loader {
                 Pokeball3dView { // pokeball 3d
                     id: pokeball_3d
                     width: parent.width * 0.66
-                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.centerIn: parent
 
                     visible: (selectorPbpView.currentSelection === 2)
 

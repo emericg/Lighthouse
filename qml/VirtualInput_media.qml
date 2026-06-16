@@ -50,7 +50,7 @@ Grid {
             Image { // actual thumbnail
                 anchors.fill: parent
 
-                source: mediaControls.metaThumbnail
+                source: networkControls.metaThumbnail
                 sourceSize: Qt.size(width, height)
                 fillMode: Image.PreserveAspectCrop
             }
@@ -84,9 +84,52 @@ Grid {
 
         ////
 
+        Column {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            spacing: 2
+
+            Text {
+                anchors.left: parent.left
+                anchors.right: parent.right
+
+                visible: (text.length > 0)
+                text: networkControls.metaTitle
+                font.pixelSize: Theme.fontSizeContentBig
+                font.bold: true
+                color: Theme.colorText
+                elide: Text.ElideRight
+            }
+
+            Text {
+                anchors.left: parent.left
+                anchors.right: parent.right
+
+                visible: (text.length > 0)
+                text: {
+                    var sub = networkControls.metaArtist
+                    if (networkControls.metaAlbum.length > 0)
+                        sub += (sub.length > 0 ? " — " : "") + networkControls.metaAlbum
+                    return sub
+                }
+                font.pixelSize: Theme.fontSizeContentSmall
+                color: Theme.colorSubText
+                elide: Text.ElideRight
+            }
+        }
+
+        ////
+
         SliderValueSolid {
             anchors.left: parent.left
             anchors.right: parent.right
+
+            // read-only playback progress (seeking over the network is not supported)
+            enabled: false
+
+            from: 0
+            to: 100
+            value: networkControls.position >= 0 ? networkControls.position : 0
         }
 
         ////

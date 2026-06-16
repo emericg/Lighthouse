@@ -164,7 +164,8 @@ Rectangle {
                 width: headerHeight
                 height: headerHeight
 
-                visible: (appContent.state === "ScreenDeviceList")
+                visible: (appContent.state === "ScreenDeviceList" ||
+                          appContent.state === "VirtualInputs")
 
                 onClicked: {
                     if (!networkClient.connected) {
@@ -211,7 +212,8 @@ Rectangle {
                 width: headerHeight
                 height: headerHeight
 
-                visible: (appContent.state === "ScreenDeviceList")
+                visible: (appContent.state === "ScreenDeviceList" ||
+                          appContent.state === "VirtualInputs")
 
                 onClicked: {
                     if (!deviceManager.bluetoothPermissions) {

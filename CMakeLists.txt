@@ -86,6 +86,7 @@ set(SOURCES
     src/local_controls/local_controls.cpp src/local_controls/local_controls.h
     src/network_controls/network_server.cpp src/network_controls/network_server.h
     src/network_controls/network_client.cpp src/network_controls/network_client.h
+    src/network_controls/network_art_provider.h
 
     ${app_icon_macos}
     ${app_icon_windows}
@@ -166,6 +167,7 @@ qt_add_qml_module(${PROJECT_NAME}
 
         qml/popups/PopupActions.qml
         qml/popups/PopupBeaconKey.qml
+        qml/popups/PopupConfirmation.qml
         qml/popups/PopupDeleteDevice.qml
 
         qml/components/SettingsQrReader.qml
@@ -218,7 +220,7 @@ function(add_other_files target)
 endfunction()
 
 add_other_files(${PROJECT_NAME}
-    README.md LICENSE.md
+    README.md TODO.md LICENSE.md
     .gitignore
 )
 

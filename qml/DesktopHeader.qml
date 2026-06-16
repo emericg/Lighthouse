@@ -260,7 +260,10 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 0
 
-            visible: (deviceManager.bluetooth && selectedDevice)
+            visible: (deviceManager.bluetooth && selectedDevice &&
+                      (appContent.state === "DeviceLight" ||
+                       appContent.state === "DevicePGP" ||
+                       appContent.state === "DevicePBP"))
 
             ButtonCompactable {
                 id: buttonDisConnect
@@ -302,12 +305,7 @@ Rectangle {
                 }
             }
 
-            Item { // spacer
-                anchors.verticalCenter: parent.verticalCenter
-                width: 16
-                height: 16
-                visible: !menuMain.visible
-            }
+            Item { width: 32; height: 32; } // spacer
         }
 
         // MAIN MENU //////////

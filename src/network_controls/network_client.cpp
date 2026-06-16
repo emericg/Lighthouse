@@ -302,6 +302,8 @@ void NetworkClient::key_escape()
     sendAction(LocalActions::ACTION_KEYBOARD_escape);
 }
 
+/* ************************************************************************** */
+
 void NetworkClient::media_prev()
 {
     sendAction(LocalActions::ACTION_KEYBOARD_media_prev);
@@ -318,6 +320,8 @@ void NetworkClient::media_next()
 {
     sendAction(LocalActions::ACTION_KEYBOARD_media_next);
 }
+
+/* ************************************************************************** */
 
 // Volume goes through the real desktop Volume backend (not the keyboard fake),
 // so the desktop pushes its actual level/mute state back to us via "volume:state:".

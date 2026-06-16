@@ -36,6 +36,7 @@
 
 #include "network_controls/network_server.h"
 #include "network_controls/network_client.h"
+#include "network_controls/network_art_provider.h"
 #include "local_controls/local_controls.h"
 #include "local_controls/local_actions.h"
 #include "local_controls/mpris_dbus.h"
@@ -153,6 +154,11 @@ int main(int argc, char *argv[])
     engine_context->setContextProperty("networkServer", networkServer);
     engine_context->setContextProperty("networkClient", networkClient);
     engine_context->setContextProperty("networkControls", networkClient);
+    if (networkClient)
+    {
+        // serve the remote media artwork received by the network client (engine takes ownership)
+        engine.addImageProvider(QStringLiteral("networkArt"), new NetworkArtProvider(networkClient));
+    }
 
 #if defined(ENABLE_ZXING)
     // Barcode (zxing-cpp Qt wrapper)

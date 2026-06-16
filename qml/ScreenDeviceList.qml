@@ -350,7 +350,7 @@ Item {
 
                 Rectangle { // VIRTUAL INPUTS
                     width: singleColumn ? parent.width : 420
-                    height: 128
+                    height: visible ? 128 : 0
                     radius: 4
 
                     visible: isDesktop
@@ -446,7 +446,7 @@ Item {
 
             Rectangle { // VIRTUAL INPUTS
                 width: singleColumn ? parent.width : 480
-                height: singleColumn ? 96 : 96
+                height: visible ? (singleColumn ? 96 : 96) : 0
                 radius: 4
 
                 visible: (isMobile && networkClient.connected) || (settingsManager.fakeIt)
