@@ -108,12 +108,14 @@ if(NOT IOS AND NOT ANDROID)
         src/local_controls/mouse.h
         src/local_controls/keyboard.h
         src/local_controls/gamepad.h
+        src/local_controls/os_commander.h
     )
     if(LINUX)
         set(SOURCES_DESKTOP ${SOURCES_DESKTOP}
             src/local_controls/mouse_uinput.cpp src/local_controls/mouse_uinput.h
             src/local_controls/keyboard_uinput.cpp src/local_controls/keyboard_uinput.h
             src/local_controls/gamepad_uinput.cpp src/local_controls/gamepad_uinput.h
+            src/local_controls/os_commander_logind.cpp src/local_controls/os_commander_logind.h
             src/local_controls/mpris_dbus.cpp src/local_controls/mpris_dbus.h
         )
         if(ENABLE_VOLUME_PIPEWIRE)

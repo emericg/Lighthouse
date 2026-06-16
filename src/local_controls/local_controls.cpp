@@ -27,6 +27,7 @@
 #include "keyboard_uinput.h"
 #include "gamepad_uinput.h"
 #include "keyboard_xtest.h"
+#include "os_commander_logind.h"
 #include "mpris_dbus.h"
 #include "volume_keyboard.h"
 #if defined(ENABLE_VOLUME_PIPEWIRE)
@@ -74,6 +75,9 @@ LocalControls::LocalControls()
     // only works with X11
     keyboard = new Keyboard_xtest();
 #endif
+
+    // session/power actions through systemd-logind (DE-independent)
+    oscommander = new OsCommander_logind();
 
 #if defined(ENABLE_MEDIA_MPRIS)
     mpris = Media_MPRIS::getInstance();
@@ -180,6 +184,15 @@ void LocalControls::action(int action_code, const QString &action_params)
                 player->play();
             }
 #endif
+            if (oscommander) { oscommander->lock(); return; }
+        }
+        else if (action_code == LocalActions::ACTION_KEYBOARD_computer_sleep)
+        {
+            if (oscommander) { oscommander->sleep(); return; }
+        }
+        else if (action_code == LocalActions::ACTION_KEYBOARD_computer_poweroff)
+        {
+            if (oscommander) { oscommander->poweroff(); return; }
         }
 
         // fall back to the virtual keyboard (ex: no logind backend, or a real key)

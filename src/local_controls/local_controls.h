@@ -26,6 +26,7 @@
 #include "mouse.h"
 #include "keyboard.h"
 #include "gamepad.h"
+#include "os_commander.h"
 
 #include "media.h"
 #include "volume.h"
@@ -51,6 +52,7 @@ class LocalControls: public QObject
     Mouse *mouse = nullptr;
     Keyboard *keyboard = nullptr;
     Gamepad *gamepad = nullptr;
+    OsCommander *oscommander = nullptr;
 
     Media *media = nullptr;
     Volume *volume = nullptr;       //!< audio-server backend: absolute level + state + cap
