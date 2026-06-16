@@ -20,11 +20,17 @@
  */
 
 #include "SettingsManager.h"
+
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+#include "utils_app.h"
+#else
 #include "SystrayManager.h"
+#endif
 
 #include <QCoreApplication>
 #include <QSettings>
 #include <QLocale>
+#include <QSysInfo>
 #include <QDebug>
 
 /* ************************************************************************** */
@@ -204,6 +210,8 @@ bool SettingsManager::readSettings()
 
         if (settings.contains("netctrl/enabled"))
             m_netctrl = settings.value("netctrl/enabled").toBool();
+        if (settings.contains("netctrl/secure"))
+            m_netctrlSecure = settings.value("netctrl/secure").toBool();
         if (settings.contains("netctrl/SSID"))
             m_netctrlSSID = settings.value("netctrl/SSID").toString();
         if (settings.contains("netctrl/host"))
@@ -212,6 +220,28 @@ bool SettingsManager::readSettings()
             m_netctrlPort = settings.value("netctrl/port").toInt();
         if (settings.contains("netctrl/password"))
             m_netctrlPassword = settings.value("netctrl/password").toString();
+
+        m_netctrlClients.clear();
+        int clientCount = settings.beginReadArray("netctrl/clients");
+        for (int i = 0; i < clientCount; ++i)
+        {
+            settings.setArrayIndex(i);
+            NetworkClientSettings c;
+            c.name = settings.value("name").toString();
+            c.token = settings.value("token").toString();
+            c.enabled = settings.value("enabled", true).toBool();
+            c.firstSeen = settings.value("firstSeen").toDateTime();
+            c.lastSeen = settings.value("lastSeen").toDateTime();
+            if (!c.token.isEmpty()) m_netctrlClients.push_back(c);
+        }
+        settings.endArray();
+
+        if (settings.contains("netclient/name"))
+            m_netclientName = settings.value("netclient/name").toString();
+        if (m_netclientName.isEmpty())
+            m_netclientName = QSysInfo::machineUniqueId();
+        if (settings.contains("netclient/token"))
+            m_netclientToken = settings.value("netclient/token").toString();
 
         status = true;
     }
@@ -274,10 +304,27 @@ bool SettingsManager::writeSettings()
         settings.setValue("mqtt/password", m_mqttPassword);
 
         settings.setValue("netctrl/enabled", m_netctrl);
+        settings.setValue("netctrl/secure", m_netctrlSecure);
         settings.setValue("netctrl/SSID", m_netctrlSSID);
         settings.setValue("netctrl/host", m_netctrlHost);
         settings.setValue("netctrl/port", m_netctrlPort);
         settings.setValue("netctrl/password", m_netctrlPassword);
+
+        settings.remove("netctrl/clients");
+        settings.beginWriteArray("netctrl/clients");
+        for (int i = 0; i < m_netctrlClients.size(); ++i)
+        {
+            settings.setArrayIndex(i);
+            settings.setValue("name", m_netctrlClients.at(i).name);
+            settings.setValue("token", m_netctrlClients.at(i).token);
+            settings.setValue("enabled", m_netctrlClients.at(i).enabled);
+            settings.setValue("firstSeen", m_netctrlClients.at(i).firstSeen);
+            settings.setValue("lastSeen", m_netctrlClients.at(i).lastSeen);
+        }
+        settings.endArray();
+
+        settings.setValue("netclient/name", m_netclientName);
+        settings.setValue("netclient/token", m_netclientToken);
 
         if (settings.status() == QSettings::NoError)
         {
@@ -383,11 +430,19 @@ void SettingsManager::resetSettings()
     Q_EMIT mqttChanged();
 
     m_netctrl = false;
+    m_netctrlSecure = false;
     m_netctrlSSID = "";
     m_netctrlHost = "";
     m_netctrlPort = 5555;
     m_netctrlPassword = "lighthouse";
     Q_EMIT netctrlChanged();
+
+    m_netctrlClients.clear();
+    Q_EMIT netctrlClientsChanged();
+
+    m_netclientName.clear();
+    m_netclientToken.clear();
+    Q_EMIT netclientChanged();
 }
 
 /* ************************************************************************** */
@@ -789,9 +844,9 @@ void SettingsManager::setNetCtrl(const bool value)
 
 void SettingsManager::setNetCtrlSecure(const bool value)
 {
-    if (m_netctrl_secure != value)
+    if (m_netctrlSecure != value)
     {
-        m_netctrl_secure = value;
+        m_netctrlSecure = value;
         writeSettings();
         Q_EMIT netctrlSecureChanged();
     }
@@ -837,6 +892,8 @@ void SettingsManager::setNetCtrlPassword(const QString &value)
     }
 }
 
+/* ************************************************************************** */
+
 bool SettingsManager::setNetCtrlSettings(const QString &value)
 {
     bool status = false;
@@ -865,6 +922,54 @@ bool SettingsManager::setNetCtrlSettings(const QString &value)
     }
 
     return status;
+}
+
+/* ************************************************************************** */
+
+void SettingsManager::saveNetCtrlClients()
+{
+    QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
+
+    if (!settings.isWritable())
+    {
+        qWarning() << "SettingsManager::saveNetClients() error: read only file?";
+        return;
+    }
+
+    settings.remove("netctrl/clients");
+    settings.beginWriteArray("netctrl/clients");
+    for (int i = 0; i < m_netctrlClients.size(); ++i)
+    {
+        settings.setArrayIndex(i);
+        settings.setValue("name", m_netctrlClients.at(i).name);
+        settings.setValue("token", m_netctrlClients.at(i).token);
+        settings.setValue("enabled", m_netctrlClients.at(i).enabled);
+        settings.setValue("firstSeen", m_netctrlClients.at(i).firstSeen);
+        settings.setValue("lastSeen", m_netctrlClients.at(i).lastSeen);
+    }
+    settings.endArray();
+}
+
+/* ************************************************************************** */
+
+void SettingsManager::setNetClientName(const QString &value)
+{
+    if (m_netclientName != value)
+    {
+        m_netclientName = value;
+        writeSettings();
+        Q_EMIT netclientChanged();
+    }
+}
+
+void SettingsManager::setNetClientToken(const QString &value)
+{
+    if (m_netclientToken != value)
+    {
+        m_netclientToken = value;
+        writeSettings();
+        Q_EMIT netclientChanged();
+    }
 }
 
 /* ************************************************************************** */

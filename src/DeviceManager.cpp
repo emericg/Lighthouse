@@ -309,6 +309,14 @@ bool DeviceManager::enableBluetooth(bool enforceUserPermissionCheck)
             // On some platform, this can only inform us about disconnection, not reconnection
             connect(m_bluetoothAdapter, &QBluetoothLocalDevice::hostModeStateChanged,
                     this, &DeviceManager::bluetoothHostModeStateChanged);
+
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+            if (!m_bluetoothAdapter->name().isEmpty())
+            {
+                qDebug() << "Bluetooth adapter name:" << m_bluetoothAdapter->name();
+                SettingsManager::getInstance()->setNetClientName(m_bluetoothAdapter->name());
+            }
+#endif
         }
     }
 

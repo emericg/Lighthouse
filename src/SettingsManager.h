@@ -26,6 +26,23 @@
 #include <QObject>
 #include <QString>
 #include <QSize>
+#include <QList>
+#include <QDateTime>
+#include <QVariantList>
+
+/* ************************************************************************** */
+
+/*!
+ * \brief A network control client known to the server (name + token + state)
+ */
+struct NetworkClientSettings
+{
+    QString name;
+    QString token;
+    bool enabled = true;
+    QDateTime firstSeen;
+    QDateTime lastSeen;
+};
 
 /* ************************************************************************** */
 
@@ -84,10 +101,14 @@ class SettingsManager: public QObject
     Q_PROPERTY(QString mqttTopics READ getMqttTopics WRITE setMqttTopics NOTIFY mqttChanged)
 
     Q_PROPERTY(bool netctrl READ getNetCtrl WRITE setNetCtrl NOTIFY netctrlChanged)
+    Q_PROPERTY(bool netctrlSecure READ getNetCtrlSecure WRITE setNetCtrlSecure NOTIFY netctrlChanged)
     Q_PROPERTY(QString netctrlSSID READ getNetCtrlSSID WRITE setNetCtrlSSID NOTIFY netctrlChanged)
     Q_PROPERTY(QString netctrlHost READ getNetCtrlHost WRITE setNetCtrlHost NOTIFY netctrlChanged)
     Q_PROPERTY(uint netctrlPort READ getNetCtrlPort WRITE setNetCtrlPort NOTIFY netctrlChanged)
     Q_PROPERTY(QString netctrlPassword READ getNetCtrlPassword WRITE setNetCtrlPassword NOTIFY netctrlChanged)
+
+    Q_PROPERTY(QString netclientName READ getNetClientName WRITE setNetClientName NOTIFY netclientChanged)
+    Q_PROPERTY(QString netclientToken READ getNetClientToken WRITE setNetClientToken NOTIFY netclientChanged)
 
     bool m_firstlaunch = true;
 
@@ -145,12 +166,16 @@ class SettingsManager: public QObject
     QString m_mqttPassword = "lighthouse";
     QString m_mqttTopics = "lighthouse";
 
-    bool m_netctrl = true;
-    bool m_netctrl_secure = true;
+    bool m_netctrl = false;
+    bool m_netctrlSecure = false;
     QString m_netctrlSSID;
     QString m_netctrlHost;
     int m_netctrlPort = 5555;
     QString m_netctrlPassword = "lighthouse";
+    QList <NetworkClientSettings> m_netctrlClients; //!< clients known (not necessarly connected) to the server
+
+    QString m_netclientName;
+    QString m_netclientToken;
 
     // Singleton
     static SettingsManager *instance;
@@ -190,8 +215,10 @@ Q_SIGNALS:
     void mqttChanged();
     void netctrlChanged();
     void netctrlSecureChanged();
+    void netctrlClientsChanged();
     void fakeitChanged();
     void volumeLimitChanged();
+    void netclientChanged();
 
 public:
     static const unsigned s_intervalBackgroundUpdate = 60;
@@ -341,7 +368,7 @@ public:
     bool getNetCtrl() const { return m_netctrl; }
     void setNetCtrl(const bool value);
 
-    bool getNetCtrlSecure() const { return m_netctrl_secure; }
+    bool getNetCtrlSecure() const { return m_netctrlSecure; }
     void setNetCtrlSecure(const bool value);
 
     QString getNetCtrlSSID() const { return m_netctrlSSID; }
@@ -356,12 +383,25 @@ public:
     QString getNetCtrlPassword() const { return m_netctrlPassword; }
     void setNetCtrlPassword(const QString &value);
 
+    const QList <NetworkClientSettings> &getNetCtrlClients() const { return m_netctrlClients; }
+    QList <NetworkClientSettings> &getNetCtrlClients() { return m_netctrlClients; }
+    void saveNetCtrlClients();
+
+    ////
+
+    QString getNetClientName() const { return m_netclientName; }
+    void setNetClientName(const QString &value);
+
+    QString getNetClientToken() const { return m_netclientToken; }
+    void setNetClientToken(const QString &value);
+
     // Utils
+
+    //! Set the server settings, all at once
+    Q_INVOKABLE bool setNetCtrlSettings(const QString &value);
 
     Q_INVOKABLE void reloadSettings();
     Q_INVOKABLE void resetSettings();
-
-    Q_INVOKABLE bool setNetCtrlSettings(const QString &value);
 };
 
 /* ************************************************************************** */

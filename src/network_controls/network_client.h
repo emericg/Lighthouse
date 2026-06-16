@@ -34,6 +34,7 @@ class NetworkClient: public QObject
 
     Q_PROPERTY(bool wifi READ isWifiConnected NOTIFY wifiEvent)
     Q_PROPERTY(bool connected READ isClientConnected NOTIFY connectionEvent)
+    Q_PROPERTY(bool authenticated READ isAuthenticated NOTIFY connectionEvent)
 
     Q_PROPERTY(float volume READ getVolume NOTIFY volumeStateChanged)
     Q_PROPERTY(bool volumeMuted READ isVolumeMuted NOTIFY volumeStateChanged)
@@ -47,6 +48,7 @@ class NetworkClient: public QObject
 
     bool m_wifi = false;
     bool m_connected = false;
+    bool m_authenticated = false;   //!< secure handshake completed (always true in non-secure mode)
 
     float m_volume = -1.f;   //!< desktop volume, normalized [0.0 ; 1.0], -1.0 if unknown
     bool m_volumeMuted = false;
@@ -60,12 +62,14 @@ signals:
     void wifiEvent();
     void connectionEvent();
     void volumeStateChanged();
+    void authError();   //!< the server refused our token/enrollment
 
 public:
     explicit NetworkClient(QObject *parent = nullptr);
 
     bool isClientConnected() const { return m_connected; }
     bool isWifiConnected() const { return m_wifi; }
+    bool isAuthenticated() const { return m_authenticated; }
 
     float getVolume() const { return m_volume; }
     bool isVolumeMuted() const { return m_volumeMuted; }

@@ -679,9 +679,6 @@ Loader {
                         checked: settingsManager.netctrl
                         onClicked: {
                             settingsManager.netctrl = checked
-
-                            if (!networkServer.running && settingsManager.netctrl) networkServer.startServer()
-                            if (networkServer.running && !settingsManager.netctrl) networkServer.stopServer()
                         }
                     }
                 }
@@ -728,12 +725,9 @@ Loader {
                         anchors.verticalCenter: parent.verticalCenter
                         z: 1
 
-                        checked: settingsManager.netctrl
+                        checked: settingsManager.netctrlSecure
                         onClicked: {
-                            settingsManager.netctrl = checked
-
-                            if (!networkServer.running && settingsManager.netctrl) networkServer.startServer()
-                            if (networkServer.running && !settingsManager.netctrl) networkServer.stopServer()
+                            settingsManager.netctrlSecure = checked
                         }
                     }
                 }
@@ -777,9 +771,78 @@ Loader {
                     anchors.left: parent.left
                     anchors.leftMargin: contentColumn.padText
 
+                    visible: isDesktop && networkServer && networkServer.running
+
                     active: isDesktop && networkServer && networkServer.running
                     asynchronous: true
                     source: "components/SettingsQrGenerator.qml"
+                }
+
+                ////////////////
+
+                Item { // element_paired_clients
+                    anchors.left: parent.left
+                    anchors.leftMargin: contentColumn.paddingLeft
+                    anchors.right: parent.right
+                    anchors.rightMargin: contentColumn.paddingRight
+                    height: Theme.componentHeight
+
+                    IconSvg {
+                        anchors.left: parent.left
+                        anchors.leftMargin: contentColumn.padIcon
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        width: 24
+                        height: 24
+                        color: Theme.colorIcon
+                        source: "qrc:/IconLibrary/material-symbols/supervisor_account.svg"
+                    }
+
+                    Text {
+                        anchors.left: parent.left
+                        anchors.leftMargin: contentColumn.padText
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.componentMargin
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        text: qsTr("Known clients:")
+                        textFormat: Text.PlainText
+                        elide: Text.ElideRight
+                        font.pixelSize: Theme.fontSizeContent
+                        color: Theme.colorText
+                    }
+                }
+
+                Column { // paired clients
+                    id: clientsColumn
+
+                    anchors.left: parent.left
+                    anchors.leftMargin: contentColumn.paddingLeft +  contentColumn.padText
+                    anchors.right: parent.right
+                    anchors.rightMargin: contentColumn.paddingRight
+
+                    visible: isDesktop
+                    spacing: 8
+
+                    Repeater {
+                        model: networkServer ? networkServer.clients : []
+
+                        delegate: NetworkClientWidget {
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                        }
+                    }
+                    Text { // empty clients list
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+
+                        visible: !networkServer || networkServer.clients.length === 0
+                        text: qsTr("No clients paired yet...")
+                        textFormat: Text.PlainText
+                        wrapMode: Text.WordWrap
+                        color: Theme.colorSubText
+                        font.pixelSize: Theme.fontSizeContentSmall
+                    }
                 }
 
                 ////////////////

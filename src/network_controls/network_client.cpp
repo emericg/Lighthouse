@@ -25,6 +25,7 @@
 #include "utils_wifi.h"
 
 #include <QtNetwork>
+#include <QSysInfo>
 
 /* ************************************************************************** */
 
@@ -85,6 +86,22 @@ void NetworkClient::disconnectFromServer()
 void NetworkClient::connected()
 {
     m_connected = true;
+    m_authenticated = false;
+
+    SettingsManager *sm = SettingsManager::getInstance();
+
+    // Send greetings + name + token + password every time and wait for the "auth:ok" reply
+    const QString hello = QStringLiteral("hello:")
+                           + sm->getNetClientName() + " (" + QSysInfo::productType() + ")"
+                           + ":" + sm->getNetClientToken()
+                           + ":" + sm->getNetCtrlPassword();
+
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_6_0);
+    out << hello;
+    m_tcpSocket->write(block);
+
     Q_EMIT connectionEvent();
 }
 
@@ -92,6 +109,7 @@ void NetworkClient::disconnected()
 {
     //qDebug() << "NetworkClient::disconnected()";
     m_connected = false;
+    m_authenticated = false;
     Q_EMIT connectionEvent();
 }
 
@@ -118,9 +136,9 @@ void NetworkClient::displayError(QAbstractSocket::SocketError socketError)
 
 void NetworkClient::readMetadata()
 {
-    // Drain every complete message currently buffered: a single readyRead can cover
-    // several messages, and reading just one would leave the rest queued until the
-    // next message arrives, lagging the UI one update behind (the "one click latency").
+    // Drain every complete message currently buffered:
+    // A single readyRead can cover several messages, and reading just one would leave
+    // the rest queued until the next message arrives, lagging the UI one update behind...
     while (true)
     {
         m_dataInput.startTransaction();
@@ -132,7 +150,28 @@ void NetworkClient::readMetadata()
 
         qDebug() << "NetworkClient::readMetadata() >" << metadata;
 
-        if (metadata.startsWith("volume:state:"))
+        if (metadata.startsWith("auth:ok:"))
+        {
+            // Enrolled: the server issued us a token, persist it for next time
+            SettingsManager::getInstance()->setNetClientToken(metadata.mid(8));
+            m_authenticated = true;
+            Q_EMIT connectionEvent();
+        }
+        else if (metadata == "auth:ok")
+        {
+            m_authenticated = true;
+            Q_EMIT connectionEvent();
+        }
+        else if (metadata == "auth:denied")
+        {
+            // We were denied (token disabled by the server, or a wrong password).
+            // Keep our token: if the server re-enables us, the same token works again.
+            // Clearing it here would let a disabled client re-enroll as a brand-new entry, defeating the revocation.
+            m_authenticated = false;
+            Q_EMIT authError();
+            Q_EMIT connectionEvent();
+        }
+        else if (metadata.startsWith("volume:state:"))
         {
             const QStringList p = metadata.mid(13).split(';');
             if (p.size() >= 2)
@@ -147,7 +186,7 @@ void NetworkClient::readMetadata()
 
 void NetworkClient::sendCommand(const QString &cmd)
 {
-    if (m_tcpSocket->isOpen())
+    if (m_tcpSocket->isOpen() && m_authenticated)
     {
         QByteArray block;
         QDataStream dataOutput(&block, QIODevice::WriteOnly);
@@ -163,7 +202,7 @@ void NetworkClient::sendAction(int action)
 {
     //qDebug() << "NetworkClient::sendAction()";
 
-    if (m_tcpSocket->isOpen())
+    if (m_tcpSocket->isOpen() && m_authenticated)
     {
         QByteArray block;
         QDataStream dataOutput(&block, QIODevice::WriteOnly);
@@ -203,7 +242,7 @@ void NetworkClient::sendKey(QChar key)
 {
     //qDebug() << "NetworkClient::sendKey(" << key << ")";
 
-    if (m_tcpSocket->isOpen())
+    if (m_tcpSocket->isOpen() && m_authenticated)
     {
         QByteArray block;
         QDataStream dataOutput(&block, QIODevice::WriteOnly);
@@ -220,7 +259,7 @@ void NetworkClient::sendGamepad(float x1, float y1, float x2, float y2,
 {
     //qDebug() << "NetworkClient::sendGamepad(" << key << ")";
 
-    if (m_tcpSocket->isOpen())
+    if (m_tcpSocket->isOpen() && m_authenticated)
     {
         QByteArray block;
         QDataStream dataOutput(&block, QIODevice::WriteOnly);
