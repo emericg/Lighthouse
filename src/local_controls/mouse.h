@@ -40,7 +40,17 @@ public:
 
     virtual void setup() = 0;
     virtual void action(int action_code) = 0;
-    virtual void action(int x, int y, int btn_left, int btn_right, int btn_middle) = 0;
+
+    virtual void action_abs(int x, int y, int btn_left,
+                            int btn_right, int btn_middle) = 0;
+
+    virtual void action_rel(int dx, int dy, int btn_left,
+                            int btn_right, int btn_middle) = 0;
+
+    virtual void button(int code, bool pressed) = 0;
+    virtual void move_abs(int x, int y) = 0;              //!< absolute pointer motion
+    virtual void move_rel(int dx, int dy) = 0;              //!< relative pointer motion
+    virtual void scroll(int dx, int dy) = 0;
 };
 
 /* ************************************************************************** */

@@ -105,8 +105,12 @@ void Mouse_uinput::setup()
         if (err < 0) { qWarning() << "ioctl(UI_SET_EVBIT, EV_SYN) error"; }
 
         // setup mouse buttons
+        ioctl(m_fd, UI_SET_RELBIT, ABS_X);
+        ioctl(m_fd, UI_SET_RELBIT, ABS_Y);
         ioctl(m_fd, UI_SET_RELBIT, REL_X);
         ioctl(m_fd, UI_SET_RELBIT, REL_Y);
+        ioctl(m_fd, UI_SET_RELBIT, REL_WHEEL);
+        ioctl(m_fd, UI_SET_RELBIT, REL_HWHEEL);
         ioctl(m_fd, UI_SET_KEYBIT, BTN_LEFT);
         ioctl(m_fd, UI_SET_KEYBIT, BTN_RIGHT);
         ioctl(m_fd, UI_SET_KEYBIT, BTN_MIDDLE);
@@ -150,18 +154,94 @@ void Mouse_uinput::action(int action_code)
     }
 }
 
-void Mouse_uinput::action(int x, int y, int btn_left, int btn_right, int btn_middle)
+void Mouse_uinput::action_abs(int x, int y,
+                              int btn_left, int btn_right, int btn_middle)
 {
     if (m_fd < 0) setup(); // setup?
 
-    // simulate mouse
+    // simulate mouse, absolute positions
     if (m_fd >= 0)
     {
-        emitevent(EV_REL, REL_X, x);
-        emitevent(EV_REL, REL_Y, y);
+        emitevent(EV_ABS, ABS_X, x);
+        emitevent(EV_ABS, ABS_Y, y);
         emitevent(EV_KEY, BTN_LEFT, btn_left);
         emitevent(EV_KEY, BTN_MIDDLE, btn_middle);
         emitevent(EV_KEY, BTN_RIGHT, btn_right);
+        emitevent(EV_SYN, SYN_REPORT, 0);
+    }
+}
+
+void Mouse_uinput::action_rel(int dx, int dy,
+                              int btn_left, int btn_right, int btn_middle)
+{
+    if (m_fd < 0) setup(); // setup?
+
+    // simulate mouse, relative motion
+    if (m_fd >= 0)
+    {
+        emitevent(EV_REL, REL_X, dx);
+        emitevent(EV_REL, REL_Y, dy);
+        emitevent(EV_KEY, BTN_LEFT, btn_left);
+        emitevent(EV_KEY, BTN_MIDDLE, btn_middle);
+        emitevent(EV_KEY, BTN_RIGHT, btn_right);
+        emitevent(EV_SYN, SYN_REPORT, 0);
+    }
+}
+
+/* ************************************************************************** */
+
+static unsigned mouseClickMacro(int code)
+{
+    // map a touchpad button code (0=left, 1=right, 2=middle) to a uinput BTN_*
+    if (code == 0) return BTN_LEFT;
+    if (code == 1) return BTN_RIGHT;
+    if (code == 2) return BTN_MIDDLE;
+    return BTN_MOUSE;
+}
+
+void Mouse_uinput::button(int code, bool pressed)
+{
+    if (m_fd < 0) setup(); // setup?
+
+    if (m_fd >= 0)
+    {
+        emitevent(EV_KEY, mouseClickMacro(code), pressed ? 1 : 0);
+        emitevent(EV_SYN, SYN_REPORT, 0);
+    }
+}
+
+void Mouse_uinput::move_abs(int x, int y)
+{
+    if (m_fd < 0) setup(); // setup?
+
+    if (m_fd >= 0)
+    {
+        emitevent(EV_REL, ABS_X, x);
+        emitevent(EV_REL, ABS_Y, y);
+        emitevent(EV_SYN, SYN_REPORT, 0);
+    }
+}
+
+void Mouse_uinput::move_rel(int dx, int dy)
+{
+    if (m_fd < 0) setup(); // setup?
+
+    if (m_fd >= 0)
+    {
+        emitevent(EV_REL, REL_X, dx);
+        emitevent(EV_REL, REL_Y, dy);
+        emitevent(EV_SYN, SYN_REPORT, 0);
+    }
+}
+
+void Mouse_uinput::scroll(int dx, int dy)
+{
+    if (m_fd < 0) setup(); // setup?
+
+    if (m_fd >= 0)
+    {
+        if (dy) emitevent(EV_REL, REL_WHEEL, dy);
+        if (dx) emitevent(EV_REL, REL_HWHEEL, dx);
         emitevent(EV_SYN, SYN_REPORT, 0);
     }
 }

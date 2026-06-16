@@ -182,6 +182,7 @@ void LocalControls::action(int action_code, const QString &action_params)
 #endif
         }
 
+        // fall back to the virtual keyboard (ex: no logind backend, or a real key)
         if (keyboard)
         {
             keyboard->action(action_code);
@@ -218,12 +219,22 @@ void LocalControls::keyboard_key(QChar key)
 
 /* ************************************************************************** */
 
-void LocalControls::mouse_action(int x, int y, int btn_left, int btn_right, int btn_middle)
+void LocalControls::mouse_action(int dx, int dy, int btn_left, int btn_right, int btn_middle)
 {
-    if (mouse)
-    {
-        mouse->action(x, y, btn_left, btn_right, btn_middle);
-    }
+    if (mouse) mouse->action_rel(dx, dy, btn_left, btn_right, btn_middle);
+}
+
+void LocalControls::mouse_move(int dx, int dy)
+{
+    if (mouse) mouse->move_rel(dx, dy);
+}
+void LocalControls::mouse_button(int code, bool pressed)
+{
+    if (mouse) mouse->button(code, pressed);
+}
+void LocalControls::mouse_scroll(int dx, int dy)
+{
+    if (mouse) mouse->scroll(dx, dy);
 }
 
 /* ************************************************************************** */

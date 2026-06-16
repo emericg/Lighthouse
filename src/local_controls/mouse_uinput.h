@@ -49,7 +49,17 @@ public:
 
     virtual void setup();
     virtual void action(int action_code);
-    virtual void action(int x, int y, int btn_left, int btn_right, int btn_middle);
+
+    virtual void action_abs(int x, int y,
+                            int btn_left, int btn_right, int btn_middle);
+    virtual void action_rel(int dx, int dy,
+                            int btn_left, int btn_right, int btn_middle);
+
+    virtual void button(int code, bool pressed);
+
+    virtual void move_abs(int x, int y);
+    virtual void move_rel(int dx, int dy);
+    virtual void scroll(int dx, int dy);
 };
 
 /* ************************************************************************** */

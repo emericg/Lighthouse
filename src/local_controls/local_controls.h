@@ -88,7 +88,10 @@ public:
 
     Q_INVOKABLE void keyboard_key(QChar key);
 
-    Q_INVOKABLE void mouse_action(int x, int y, int btn_left, int btn_right, int btn_middle);
+    Q_INVOKABLE void mouse_action(int dx, int dy, int btn_left, int btn_right, int btn_middle);
+    void mouse_move(int dx, int dy);
+    void mouse_button(int code, bool pressed);
+    void mouse_scroll(int dx, int dy);
 
     Q_INVOKABLE void gamepad_action(float x1, float y1, float x2, float y2,
                                     int a, int b, int x, int y);
