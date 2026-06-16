@@ -68,6 +68,7 @@ set(SOURCES
     src/SettingsManager.cpp src/SettingsManager.h
     src/DatabaseManager.cpp src/DatabaseManager.h
     src/NotificationManager.cpp src/NotificationManager.h
+
     src/DeviceManager.cpp src/DeviceManager.h
     src/DeviceManager_advertisement.cpp src/DeviceManager_nearby.cpp
     src/DeviceFilter.cpp src/DeviceFilter.h
@@ -80,14 +81,11 @@ set(SOURCES
         src/devices/device_ylai003.cpp src/devices/device_ylai003.h
         src/devices/device_ylkg07yl.cpp src/devices/device_ylkg07yl.h
         src/devices/device_ylyk01yl.cpp src/devices/device_ylyk01yl.h
+
     src/local_controls/local_actions.h
     src/local_controls/local_controls.cpp src/local_controls/local_controls.h
     src/network_controls/network_server.cpp src/network_controls/network_server.h
     src/network_controls/network_client.cpp src/network_controls/network_client.h
-    src/crypto/RC4/rc4.cpp
-    src/crypto/pgp/aes.c
-    src/crypto/pgp/pgp-cert.c
-    src/crypto/pgp/secrets.c
 
     ${app_icon_macos}
     ${app_icon_windows}
@@ -283,6 +281,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ZXing)
 add_definitions(-DENABLE_ZXING)
 add_subdirectory(thirdparty/zxing-cpp/wrappers/qt/)
 target_link_libraries(${PROJECT_NAME} PRIVATE ZXingQt)
+
+# RC4
+add_subdirectory(thirdparty/RC4)
+target_link_libraries(${PROJECT_NAME} PRIVATE RC4)
 
 # Qt libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE
