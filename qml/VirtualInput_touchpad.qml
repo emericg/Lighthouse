@@ -137,24 +137,49 @@ Grid {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
 
+                PopupConfirmation {
+                    id: confirmAction
+
+                    property int action: 0
+
+                    onConfirmed: {
+                        if (action > 0) {
+                            networkControls.sendAction(action)
+                            confirmAction.action = 0
+                        }
+                    }
+                    onClosed: {
+                        confirmAction.action = 0
+                    }
+                }
+
                 text: qsTr("Lock")
-                onPressAndHold: networkControls.sendAction(LocalActions.ACTION_KEYBOARD_computer_lock)
+                onPressAndHold: {
+                    confirmAction.action = LocalActions.ACTION_KEYBOARD_computer_lock
+                    confirmAction.open()
+                }
             }
-/*
+
             ButtonClear {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
 
                 text: qsTr("Sleep")
-                onPressAndHold: networkControls.sendAction(LocalActions.ACTION_KEYBOARD_computer_sleep)
+                onPressAndHold: {
+                    confirmAction.action = LocalActions.ACTION_KEYBOARD_computer_sleep
+                    confirmAction.open()
+                }
             }
-*/
+
             ButtonClear {
                 Layout.preferredWidth: 1
                 Layout.fillWidth: true
 
                 text: qsTr("Shutdown")
-                onPressAndHold: networkControls.sendAction(LocalActions.ACTION_KEYBOARD_computer_poweroff)
+                onPressAndHold: {
+                    confirmAction.action = LocalActions.ACTION_KEYBOARD_computer_poweroff
+                    confirmAction.open()
+                }
             }
         }
     }
