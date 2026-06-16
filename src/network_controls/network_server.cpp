@@ -488,8 +488,30 @@ void NetworkServer::processClientMessage(Client *client, const QString &cData)
     }
     else if (cData.startsWith("mouse:"))
     {
-        //LocalControls *ctrls = LocalControls::getInstance();
-        //ctrls->mouse_action(int x, int y, int btn_left, int btn_right, int btn_middle);
+        QStringList p = cData.mid(6).split(';');
+        const QString sub = p.isEmpty() ? QString() : p.at(0);
+
+        LocalControls *ctrls = LocalControls::getInstance();
+
+        if (sub == "m" && p.size() >= 3) // relative move
+        {
+            ctrls->mouse_move(p.at(1).toInt(), p.at(2).toInt());
+        }
+        else if (sub == "s" && p.size() >= 3) // scroll
+        {
+            ctrls->mouse_scroll(p.at(1).toInt(), p.at(2).toInt());
+        }
+        else if (sub == "c" && p.size() >= 2) // click (press + release)
+        {
+            int btn = p.at(1).toInt();
+            if (btn == 1) ctrls->action(LocalActions::ACTION_MOUSE_click_right);
+            else if (btn == 2) ctrls->action(LocalActions::ACTION_MOUSE_click_middle);
+            else ctrls->action(LocalActions::ACTION_MOUSE_click_left);
+        }
+        else if (sub == "b" && p.size() >= 3) // button hold/release (drag)
+        {
+            ctrls->mouse_button(p.at(1).toInt(), p.at(2).toInt() != 0);
+        }
     }
     else if (cData.startsWith("pad:"))
     {

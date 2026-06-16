@@ -87,6 +87,11 @@ public slots:
     void sendGamepad(float x1, float y1, float x2, float y2,
                      int a, int b, int x, int y);
 
+    void sendMouseMove(int dx, int dy);
+    void sendMouseScroll(int dx, int dy);
+    void sendMouseClick(int btn);
+    void sendMouseButton(int btn, bool down);
+
     void key_up();
     void key_down();
     void key_left();

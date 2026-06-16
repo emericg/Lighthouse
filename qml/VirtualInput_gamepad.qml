@@ -24,9 +24,10 @@ Item {
     property bool by: false
 
     Timer {
-        interval: 12
         running: (appContent.state === "VirtualInputs" && virtualInput_gamepad.visible)
+        interval: 12 // ~90 Hz, coalesce moves so we don't flood TCP
         repeat: true
+
         onTriggered: {
             if (networkControls) {
                 networkControls.sendGamepad(x1, y1, x2, y2, ba, bb, bx, by)

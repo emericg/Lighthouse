@@ -120,7 +120,7 @@ bool DeviceBeacon::getSqlButtons()
         }
         else
         {
-            qWarning() << "> getButtons.exec(plant) ERROR"
+            qWarning() << "> getButtons.exec(beacon) ERROR"
                        << getButtons.lastError().type() << ":" << getButtons.lastError().text();
         }
     }
@@ -174,7 +174,7 @@ bool DeviceBeacon::setSqlButtons(int button)
             status = updateButtons.exec();
             if (status == false)
             {
-                qWarning() << "> updateButtons.exec(plant) ERROR"
+                qWarning() << "> updateButtons.exec(beacon) ERROR"
                            << updateButtons.lastError().type() << ":" << updateButtons.lastError().text();
             }
         }
@@ -212,7 +212,7 @@ bool ButtonParameters::setSqlButton()
     status = updateButton.exec();
     if (status == false)
     {
-        qWarning() << "> updateButton.exec(plant) ERROR"
+        qWarning() << "> updateButton.exec(beacon) ERROR"
                    << updateButton.lastError().type() << ":" << updateButton.lastError().text() << updateButton.lastQuery();
     }
 

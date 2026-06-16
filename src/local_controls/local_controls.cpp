@@ -237,13 +237,13 @@ void LocalControls::mouse_action(int dx, int dy, int btn_left, int btn_right, in
     if (mouse) mouse->action_rel(dx, dy, btn_left, btn_right, btn_middle);
 }
 
-void LocalControls::mouse_move(int dx, int dy)
-{
-    if (mouse) mouse->move_rel(dx, dy);
-}
 void LocalControls::mouse_button(int code, bool pressed)
 {
     if (mouse) mouse->button(code, pressed);
+}
+void LocalControls::mouse_move(int dx, int dy)
+{
+    if (mouse) mouse->move_rel(dx, dy);
 }
 void LocalControls::mouse_scroll(int dx, int dy)
 {

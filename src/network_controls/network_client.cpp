@@ -275,6 +275,62 @@ void NetworkClient::sendGamepad(float x1, float y1, float x2, float y2,
     }
 }
 
+void NetworkClient::sendMouseMove(int dx, int dy)
+{
+    if (m_tcpSocket->isOpen() && m_authenticated)
+    {
+        QByteArray block;
+        QDataStream dataOutput(&block, QIODevice::WriteOnly);
+        dataOutput.setVersion(QDataStream::Qt_6_0);
+
+        dataOutput << QString("mouse:m;") + QString::number(dx) + ";" + QString::number(dy);
+
+        m_tcpSocket->write(block);
+    }
+}
+
+void NetworkClient::sendMouseScroll(int dx, int dy)
+{
+    if (m_tcpSocket->isOpen() && m_authenticated)
+    {
+        QByteArray block;
+        QDataStream dataOutput(&block, QIODevice::WriteOnly);
+        dataOutput.setVersion(QDataStream::Qt_6_0);
+
+        dataOutput << QString("mouse:s;") + QString::number(dx) + ";" + QString::number(dy);
+
+        m_tcpSocket->write(block);
+    }
+}
+
+void NetworkClient::sendMouseClick(int btn)
+{
+    if (m_tcpSocket->isOpen() && m_authenticated)
+    {
+        QByteArray block;
+        QDataStream dataOutput(&block, QIODevice::WriteOnly);
+        dataOutput.setVersion(QDataStream::Qt_6_0);
+
+        dataOutput << QString("mouse:c;") + QString::number(btn);
+
+        m_tcpSocket->write(block);
+    }
+}
+
+void NetworkClient::sendMouseButton(int btn, bool down)
+{
+    if (m_tcpSocket->isOpen() && m_authenticated)
+    {
+        QByteArray block;
+        QDataStream dataOutput(&block, QIODevice::WriteOnly);
+        dataOutput.setVersion(QDataStream::Qt_6_0);
+
+        dataOutput << QString("mouse:b;") + QString::number(btn) + ";" + QString::number(down ? 1 : 0);
+
+        m_tcpSocket->write(block);
+    }
+}
+
 /* ************************************************************************** */
 
 void NetworkClient::key_up()

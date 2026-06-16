@@ -20,7 +20,6 @@
  */
 
 #include "gamepad_uinput.h"
-#include "local_actions.h"
 
 // uinput
 #include <stdio.h>
@@ -57,7 +56,7 @@ Gamepad_uinput::~Gamepad_uinput()
 
 void Gamepad_uinput::emitevent(int type, int code, int val)
 {
-    if (m_fd)
+    if (m_fd >= 0)
     {
         struct input_event event;
         memset(&event, 0, sizeof(event));
@@ -114,7 +113,7 @@ void Gamepad_uinput::setup()
         ioctl(m_fd, UI_SET_KEYBIT, BTN_X);
         ioctl(m_fd, UI_SET_KEYBIT, BTN_Y);
 
-        // init virtual keyboard
+        // init virtual gamepad
         memset(&m_uidev, 0, sizeof(m_uidev));
         snprintf(m_uidev.name, UINPUT_MAX_NAME_SIZE, "Lighthouse virtual gamepad");
         m_uidev.id.bustype = BUS_VIRTUAL;
@@ -188,13 +187,20 @@ void Gamepad_uinput::setup_pbp()
         ioctl(m_fd, UI_SET_KEYBIT, BTN_A);
         ioctl(m_fd, UI_SET_KEYBIT, BTN_B);
 
-        // init virtual keyboard
+        // init virtual gamepad
         memset(&m_uidev, 0, sizeof(m_uidev));
         snprintf(m_uidev.name, UINPUT_MAX_NAME_SIZE, "Pokéball Plus");
         m_uidev.id.bustype = BUS_BLUETOOTH;
         m_uidev.id.version = 1;
         m_uidev.id.vendor = 0x057E;
         m_uidev.id.product = 0x9876;
+
+        for (int axis : {ABS_X, ABS_Y})
+        {
+            m_uidev.absmin[axis] = -32767;
+            m_uidev.absmax[axis] = 32767;
+            m_uidev.absflat[axis] = 128;
+        }
 
         err = write(m_fd, &m_uidev, sizeof(m_uidev));
         if (err < 0) { qWarning() << "Unable to write /dev/uinput device"; }
