@@ -54,6 +54,8 @@ class NetworkServer : public QObject
     QString getServerAddress() const { return m_serverAddress; }
     int getServerPort() const { return m_tcpServerPort; }
 
+    void processClientMessage(const QString &cData);
+
 signals:
     void serverEvent();
     void connectionEvent();
@@ -63,6 +65,8 @@ private slots:
     void closeClientConnection();
 
     void readClientData();
+
+    void sendVolumeState();   //!< push the desktop volume/mute state to the connected client
 
 public:
     explicit NetworkServer(QObject *parent = nullptr);

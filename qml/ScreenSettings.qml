@@ -566,6 +566,65 @@ Loader {
                 ////////////////
 
                 ListTitle {
+                    text: qsTr("Controls")
+                    source: "qrc:/IconLibrary/material-symbols/settings.svg"
+                }
+
+                ////////////////
+
+                Item { // element_volumeLimit
+                    anchors.left: parent.left
+                    anchors.leftMargin: contentColumn.paddingLeft
+                    anchors.right: parent.right
+                    anchors.rightMargin: contentColumn.paddingRight
+                    height: Theme.componentHeight
+
+                    visible: isDesktop
+
+                    IconSvg {
+                        anchors.left: parent.left
+                        anchors.leftMargin: contentColumn.padIcon
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        width: 24
+                        height: 24
+                        color: Theme.colorIcon
+                        source: "qrc:/IconLibrary/material-icons/duotone/volume_up_1.svg"
+                    }
+
+                    Text {
+                        anchors.left: parent.left
+                        anchors.leftMargin: contentColumn.padText
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        text: qsTr("Maximum volume")
+                        textFormat: Text.PlainText
+                        font.pixelSize: Theme.fontSizeContent
+                        color: Theme.colorText
+                        verticalAlignment: Text.AlignVCenter
+                    }
+
+                    SliderValueSolid {
+                        id: slider_volumeLimit
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.componentMargin
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 200
+
+                        from: 0
+                        to: 100
+                        stepSize: 1
+                        unit: "%"
+                        floatprecision: 0
+
+                        value: settingsManager.volumeLimit
+                        onMoved: settingsManager.volumeLimit = Math.round(value)
+                    }
+                }
+
+                ////////////////
+
+                ListTitle {
                     visible: isDesktop
                     text: qsTr("Network server")
                     source: "qrc:/IconLibrary/material-icons/duotone/list.svg"

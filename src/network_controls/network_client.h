@@ -35,6 +35,9 @@ class NetworkClient: public QObject
     Q_PROPERTY(bool wifi READ isWifiConnected NOTIFY wifiEvent)
     Q_PROPERTY(bool connected READ isClientConnected NOTIFY connectionEvent)
 
+    Q_PROPERTY(float volume READ getVolume NOTIFY volumeStateChanged)
+    Q_PROPERTY(bool volumeMuted READ isVolumeMuted NOTIFY volumeStateChanged)
+
     QTcpSocket *m_tcpSocket = nullptr;
     QDataStream m_dataInput;
 
@@ -45,18 +48,27 @@ class NetworkClient: public QObject
     bool m_wifi = false;
     bool m_connected = false;
 
+    float m_volume = -1.f;   //!< desktop volume, normalized [0.0 ; 1.0], -1.0 if unknown
+    bool m_volumeMuted = false;
+
     void connected();
     void disconnected();
+
+    void sendCommand(const QString &cmd);
 
 signals:
     void wifiEvent();
     void connectionEvent();
+    void volumeStateChanged();
 
 public:
     explicit NetworkClient(QObject *parent = nullptr);
 
     bool isClientConnected() const { return m_connected; }
     bool isWifiConnected() const { return m_wifi; }
+
+    float getVolume() const { return m_volume; }
+    bool isVolumeMuted() const { return m_volumeMuted; }
 
 public slots:
     void connectToServer();
@@ -86,6 +98,8 @@ public slots:
     void volume_mute();
     void volume_down();
     void volume_up();
+    void volume_set(int pct);   //!< set an absolute level, pct in [0 ; 100]
+    void volume_get();          //!< request the current desktop volume state
 };
 
 /* ************************************************************************** */

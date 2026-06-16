@@ -17,6 +17,7 @@ Rectangle {
     // settings
     property int btnSize: 64
     property bool btnSeparator: false
+    property bool muted: false
 
     // colors
     property color colorBackground: Theme.colorBackground
@@ -39,7 +40,7 @@ Rectangle {
             height: btnSize
 
             checkable: true
-            checked: false
+            checked: control.muted
 
             colorBackground: control.colorBackground
             colorHighlight: control.colorHighlight

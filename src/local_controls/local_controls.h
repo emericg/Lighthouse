@@ -53,7 +53,8 @@ class LocalControls: public QObject
     Gamepad *gamepad = nullptr;
 
     Media *media = nullptr;
-    Volume *volume = nullptr;
+    Volume *volume = nullptr;       //!< audio-server backend: absolute level + state + cap
+    Volume *volume_keys = nullptr;  //!< media-key backend: relative up/down/mute with desktop OSD
 
 #if defined(ENABLE_MEDIA_MPRIS)
     Media_MPRIS *mpris = nullptr;
@@ -71,8 +72,19 @@ public:
     static LocalControls *getInstance();
 
     Media *getMediaController() const { return media; }
+    Volume *getVolumeController() const { return volume; }
 
     Q_INVOKABLE void action(int action_code, const QString &action_params = QString());
+
+    // volume (routed to the active Volume backend, when available)
+    Q_INVOKABLE void volume_set(float level);
+    Q_INVOKABLE void volume_up();
+    Q_INVOKABLE void volume_down();
+    Q_INVOKABLE void volume_mute();
+    Q_INVOKABLE void volume_unmute();
+    Q_INVOKABLE void volume_toggle_mute();
+    Q_INVOKABLE float getVolumeLevel() const;
+    Q_INVOKABLE bool isMuted() const;
 
     Q_INVOKABLE void keyboard_key(QChar key);
 
@@ -92,6 +104,10 @@ public:
     Q_INVOKABLE void keyboard_volume_up();
     Q_INVOKABLE void keyboard_volume_down();
     Q_INVOKABLE void keyboard_volume_mute();
+
+signals:
+    void volumeChanged();
+    void muteChanged();
 };
 
 /* ************************************************************************** */

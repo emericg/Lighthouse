@@ -81,13 +81,14 @@ int main(int argc, char *argv[])
 
     // GUI application /////////////////////////////////////////////////////////
 
-    SingleApplication app(argc, argv, true);
+    SingleApplication app(argc, argv, false);
 
     // Application name
     app.setApplicationName("Lighthouse");
     app.setApplicationDisplayName("Lighthouse");
     app.setOrganizationName("Lighthouse");
     app.setOrganizationDomain("Lighthouse");
+
     app.setWindowIcon(QIcon(":/assets/gfx/logos/logo.svg"));
 
     // Init app components
@@ -168,6 +169,7 @@ int main(int argc, char *argv[])
     engine_context->setContextProperty("systrayManager", st);
     engine_context->setContextProperty("menubarManager", mb);
     engine_context->setContextProperty("localControls", localControls);
+    engine_context->setContextProperty("volumeControls", localControls->getVolumeController());
 #if defined(ENABLE_MEDIA_MPRIS)
     Media_MPRIS *mprisControls = Media_MPRIS::getInstance();
     engine_context->setContextProperty("mediaControls", mprisControls);

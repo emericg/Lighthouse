@@ -14,8 +14,8 @@ set(APP_VERSION ${CMAKE_PROJECT_VERSION})
 
 option(ENABLE_MBEDTLS "mbedTLS for PoGo+" ON)
 option(ENABLE_MEDIA_MPRIS "MPRIS media controller" ON)
-option(ENABLE_VOLUME_PIPEWIRE "Pipewire volume controller" OFF)
-option(ENABLE_VOLUME_PULSEAUDIO "Pulseaudio volume controller" ON)
+option(ENABLE_VOLUME_PIPEWIRE "Pipewire volume controller" ON)
+option(ENABLE_VOLUME_PULSEAUDIO "Pulseaudio volume controller" OFF)
 option(ENABLE_KEYBOARD_XTEST "Virtual keyboard using XTEST" OFF)
 option(ENABLE_KEYBOARD_UINPUT "Virtual keyboard using UInput" ON)
 
@@ -105,18 +105,28 @@ if(NOT IOS AND NOT ANDROID)
         src/MenubarManager.cpp src/MenubarManager.h
         src/SystrayManager.cpp src/SystrayManager.h
         src/local_controls/volume.h
+        src/local_controls/volume_keyboard.cpp src/local_controls/volume_keyboard.h
         src/local_controls/mouse.h
         src/local_controls/keyboard.h
         src/local_controls/gamepad.h
     )
     if(LINUX)
         set(SOURCES_DESKTOP ${SOURCES_DESKTOP}
-            src/local_controls/volume_pulseaudio.cpp src/local_controls/volume_pulseaudio.h
             src/local_controls/mouse_uinput.cpp src/local_controls/mouse_uinput.h
             src/local_controls/keyboard_uinput.cpp src/local_controls/keyboard_uinput.h
             src/local_controls/gamepad_uinput.cpp src/local_controls/gamepad_uinput.h
             src/local_controls/mpris_dbus.cpp src/local_controls/mpris_dbus.h
         )
+        if(ENABLE_VOLUME_PIPEWIRE)
+            set(SOURCES_DESKTOP ${SOURCES_DESKTOP}
+                src/local_controls/volume_pipewire.cpp src/local_controls/volume_pipewire.h
+            )
+        endif()
+        if(ENABLE_VOLUME_PULSEAUDIO)
+            set(SOURCES_DESKTOP ${SOURCES_DESKTOP}
+                src/local_controls/volume_pulseaudio.cpp src/local_controls/volume_pulseaudio.h
+            )
+        endif()
     endif()
 endif()
 
@@ -230,7 +240,16 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_definitions(-DENABLE_MBEDTLS)
     add_definitions(-DENABLE_KEYBOARD_UINPUT)
     add_definitions(-DENABLE_MEDIA_MPRIS)
-    add_definitions(-DENABLE_VOLUME_PULSEAUDIO)
+    if(ENABLE_VOLUME_PIPEWIRE)
+        add_definitions(-DENABLE_VOLUME_PIPEWIRE)
+    elseif(ENABLE_VOLUME_PULSEAUDIO)
+        add_definitions(-DENABLE_VOLUME_PULSEAUDIO)
+    endif()
+
+    # D-Bus is used by the MPRIS media controller and the PulseAudio volume controller
+    find_package(Qt6 REQUIRED COMPONENTS DBus)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::DBus)
+
     target_link_libraries(${PROJECT_NAME} PUBLIC "-lmbedtls -lmbedx509 -lmbedcrypto")
 endif()
 

@@ -118,18 +118,44 @@ void NetworkClient::displayError(QAbstractSocket::SocketError socketError)
 
 void NetworkClient::readMetadata()
 {
-    m_dataInput.startTransaction();
-
-    QString metadata;
-    m_dataInput >> metadata;
-
-    if (m_dataInput.commitTransaction())
+    // Drain every complete message currently buffered: a single readyRead can cover
+    // several messages, and reading just one would leave the rest queued until the
+    // next message arrives, lagging the UI one update behind (the "one click latency").
+    while (true)
     {
+        m_dataInput.startTransaction();
+
+        QString metadata;
+        m_dataInput >> metadata;
+
+        if (!m_dataInput.commitTransaction()) break;
+
         qDebug() << "NetworkClient::readMetadata() >" << metadata;
+
+        if (metadata.startsWith("volume:state:"))
+        {
+            const QStringList p = metadata.mid(13).split(';');
+            if (p.size() >= 2)
+            {
+                m_volume = qBound(0, p.at(0).toInt(), 100) / 100.f;
+                m_volumeMuted = (p.at(1).toInt() != 0);
+                Q_EMIT volumeStateChanged();
+            }
+        }
     }
-    else
+}
+
+void NetworkClient::sendCommand(const QString &cmd)
+{
+    if (m_tcpSocket->isOpen())
     {
-        qWarning() << "NetworkClient::readMetadata() m_dataInput commit failed";
+        QByteArray block;
+        QDataStream dataOutput(&block, QIODevice::WriteOnly);
+        dataOutput.setVersion(QDataStream::Qt_6_0);
+
+        dataOutput << cmd;
+
+        m_tcpSocket->write(block);
     }
 }
 
@@ -254,17 +280,28 @@ void NetworkClient::media_next()
     sendAction(LocalActions::ACTION_KEYBOARD_media_next);
 }
 
+// Volume goes through the real desktop Volume backend (not the keyboard fake),
+// so the desktop pushes its actual level/mute state back to us via "volume:state:".
+
 void NetworkClient::volume_mute()
 {
-    sendAction(LocalActions::ACTION_KEYBOARD_volume_mute);
+    sendCommand(QStringLiteral("volume:toggle"));
 }
 void NetworkClient::volume_down()
 {
-    sendAction(LocalActions::ACTION_KEYBOARD_volume_down);
+    sendCommand(QStringLiteral("volume:down"));
 }
 void NetworkClient::volume_up()
 {
-    sendAction(LocalActions::ACTION_KEYBOARD_volume_up);
+    sendCommand(QStringLiteral("volume:up"));
+}
+void NetworkClient::volume_set(int pct)
+{
+    sendCommand(QStringLiteral("volume:set:") + QString::number(qBound(0, pct, 100)));
+}
+void NetworkClient::volume_get()
+{
+    sendCommand(QStringLiteral("volume:get"));
 }
 
 /* ************************************************************************** */

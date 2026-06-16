@@ -150,10 +150,8 @@ bool SettingsManager::readSettings()
 
         if (settings.contains("settings/graphHistory"))
             m_graphHistogram = settings.value("settings/graphHistory").toString();
-
         if (settings.contains("settings/graphThermometer"))
             m_graphThermometer = settings.value("settings/graphThermometer").toString();
-
         if (settings.contains("settings/graphShowDots"))
             m_graphShowDots = settings.value("settings/graphShowDots").toBool();
 
@@ -168,15 +166,15 @@ bool SettingsManager::readSettings()
             m_compactView = false;
 #endif
         }
-
         if (settings.contains("settings/bigIndicator"))
             m_bigIndicator = settings.value("settings/bigIndicator").toBool();
-
         if (settings.contains("settings/dynaScale"))
             m_dynaScale = settings.value("settings/dynaScale").toBool();
-
         if (settings.contains("settings/orderBy"))
             m_orderBy = settings.value("settings/orderBy").toString();
+
+        if (settings.contains("settings/volumeLimit"))
+            m_volumeLimit = settings.value("settings/volumeLimit").toInt();
 
         if (settings.contains("database/enabled"))
             m_mysql = settings.value("database/enabled").toBool();
@@ -238,16 +236,18 @@ bool SettingsManager::writeSettings()
         settings.setValue("settings/appTheme", m_appTheme);
         settings.setValue("settings/appThemeAuto", m_appThemeAuto);
         settings.setValue("settings/appLanguage", m_appLanguage);
+
         settings.setValue("settings/bluetoothControl", m_bluetoothControl);
         settings.setValue("settings/bluetoothLimitScanningRange", m_bluetoothLimitScanningRange);
         settings.setValue("settings/bluetoothSimUpdates", m_bluetoothSimUpdates);
         settings.setValue("settings/startMinimized", m_startMinimized);
         settings.setValue("settings/trayEnabled", m_systrayEnabled);
         settings.setValue("settings/notifsEnabled", m_notificationsEnabled);
-        //settings.setValue("settings/updateIntervalBackground", m_updateIntervalBackground);
+        settings.setValue("settings/updateIntervalBackground", m_updateIntervalBackground);
         settings.setValue("settings/updateIntervalPlant", m_updateIntervalPlant);
         settings.setValue("settings/updateIntervalThermo", m_updateIntervalThermometer);
-        //settings.setValue("settings/updateIntervalEnv", m_updateIntervalEnvironmental);
+        settings.setValue("settings/updateIntervalEnv", m_updateIntervalEnvironmental);
+
         settings.setValue("settings/graphHistory", m_graphHistogram);
         settings.setValue("settings/graphThermometer", m_graphThermometer);
         settings.setValue("settings/graphShowDots", m_graphShowDots);
@@ -256,6 +256,8 @@ bool SettingsManager::writeSettings()
         settings.setValue("settings/tempUnit", m_tempUnit);
         settings.setValue("settings/dynaScale", m_dynaScale);
         settings.setValue("settings/orderBy", m_orderBy);
+
+        settings.setValue("settings/volumeLimit", m_volumeLimit);
 
         settings.setValue("database/enabled", m_mysql);
         settings.setValue("database/host", m_mysqlHost);
@@ -298,7 +300,7 @@ bool SettingsManager::writeSettings()
 
 void SettingsManager::resetSettings()
 {
-    m_appTheme = "THEME_PLANT";
+    m_appTheme = "THEME_DAY";
     Q_EMIT appThemeChanged();
     m_appThemeAuto = false;
     Q_EMIT appThemeAutoChanged();
@@ -359,6 +361,9 @@ void SettingsManager::resetSettings()
     Q_EMIT dynaScaleChanged();
     m_orderBy = "model";
     Q_EMIT orderByChanged();
+
+    m_volumeLimit = 66;
+    Q_EMIT volumeLimitChanged();
 
     m_mysql = false;
     m_mysqlHost = "";
@@ -643,6 +648,18 @@ void SettingsManager::setFakeIt(const bool value)
         m_fakeIt = value;
         //writeSettings();
         Q_EMIT fakeitChanged();
+    }
+}
+
+void SettingsManager::setVolumeLimit(const int value)
+{
+    const int value_clamped = qBound(0, value, 100);
+
+    if (m_volumeLimit != value_clamped)
+    {
+        m_volumeLimit = value_clamped;
+        writeSettings();
+        Q_EMIT volumeLimitChanged();
     }
 }
 

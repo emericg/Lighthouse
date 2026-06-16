@@ -109,10 +109,36 @@ Grid {
             VolumeButtonRow {
                 btnSize: parent.btnSize
 
+                muted: networkControls.volumeMuted
+
                 onVolumeMute: networkControls.volume_mute()
                 onVolumeDown: networkControls.volume_down()
                 onVolumeUp: networkControls.volume_up()
             }
+        }
+
+        ////
+
+        SliderValueSolid {
+            id: volumeSlider
+            anchors.left: parent.left
+            anchors.right: parent.right
+
+            from: 0
+            to: 100
+            stepSize: 1
+            unit: "%"
+            floatprecision: 0
+
+            enabled: networkControls.connected && networkControls.volume >= 0
+
+            // reflect the desktop state, but never overwrite what the user is setting
+            property real remoteVolume: networkControls.volume >= 0 ? networkControls.volume * 100 : 0
+            onRemoteVolumeChanged: if (!pressed) value = remoteVolume
+            Component.onCompleted: value = remoteVolume
+
+            // apply the chosen level once, on release
+            onPressedChanged: if (!pressed) networkControls.volume_set(Math.round(value))
         }
 
         ////

@@ -68,6 +68,7 @@ class SettingsManager: public QObject
     Q_PROPERTY(bool dynaScale READ getDynaScale WRITE setDynaScale NOTIFY dynaScaleChanged)
 
     Q_PROPERTY(bool fakeIt READ getFakeIt WRITE setFakeIt NOTIFY fakeitChanged)
+    Q_PROPERTY(int volumeLimit READ getVolumeLimit WRITE setVolumeLimit NOTIFY volumeLimitChanged)
 
     Q_PROPERTY(bool mysql READ getMySQL WRITE setMySQL NOTIFY mysqlChanged)
     Q_PROPERTY(QString mysqlHost READ getMysqlHost WRITE setMysqlHost NOTIFY mysqlChanged)
@@ -107,8 +108,6 @@ class SettingsManager: public QObject
     bool m_systrayEnabled = true;
     bool m_notificationsEnabled = true;
 
-    bool m_fakeIt = false; // not persistent
-
     bool m_bluetoothControl = false;
     bool m_bluetoothLimitScanningRange = false;
     unsigned m_bluetoothSimUpdates = 2;
@@ -127,6 +126,9 @@ class SettingsManager: public QObject
     bool m_dynaScale = true;
     QString m_orderBy = "model";
     unsigned m_dataRetentionDays = 90;
+
+    bool m_fakeIt = false; // not persistent
+    int m_volumeLimit = 66;                 //!< desktop volume hard cap, in % [0 ; 100]
 
     bool m_mysql = false;
     QString m_mysqlHost;
@@ -189,6 +191,7 @@ Q_SIGNALS:
     void netctrlChanged();
     void netctrlSecureChanged();
     void fakeitChanged();
+    void volumeLimitChanged();
 
 public:
     static const unsigned s_intervalBackgroundUpdate = 60;
@@ -200,6 +203,8 @@ public:
 
 public:
     static SettingsManager *getInstance();
+
+    ////
 
     bool isFirstLaunch() const { return m_firstlaunch; }
 
@@ -230,6 +235,8 @@ public:
 
     bool getNotifs() const { return m_notificationsEnabled; }
     void setNotifs(const bool value);
+
+    ////
 
     bool getBluetoothControl() const { return m_bluetoothControl; }
     void setBluetoothControl(const bool value);
@@ -276,10 +283,17 @@ public:
     QString getOrderBy() const { return m_orderBy; }
     void setOrderBy(const QString &value);
 
+    unsigned getDataRetentionDays() const { return m_dataRetentionDays; }
+
+    ////
+
     bool getFakeIt() const { return m_fakeIt; }
     void setFakeIt(const bool value);
 
-    unsigned getDataRetentionDays() const { return m_dataRetentionDays; }
+    int getVolumeLimit() const { return m_volumeLimit; }
+    void setVolumeLimit(const int value);
+
+    ////
 
     bool getMySQL() const { return m_mysql; }
     void setMySQL(const bool value);
@@ -298,6 +312,8 @@ public:
 
     QString getMysqlPassword() const { return m_mysqlPassword; }
     void setMysqlPassword(const QString &value);
+
+    ////
 
     bool getMQTT() const { return m_mqtt; }
     void setMQTT(const bool value);
@@ -320,6 +336,8 @@ public:
     QString getMqttTopics() const { return m_mqttTopics; }
     void setMqttTopics(const QString &value);
 
+    ////
+
     bool getNetCtrl() const { return m_netctrl; }
     void setNetCtrl(const bool value);
 
@@ -339,6 +357,7 @@ public:
     void setNetCtrlPassword(const QString &value);
 
     // Utils
+
     Q_INVOKABLE void reloadSettings();
     Q_INVOKABLE void resetSettings();
 

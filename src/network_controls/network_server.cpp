@@ -34,6 +34,12 @@ NetworkServer::NetworkServer(QObject *parent) : QObject(parent)
     startServer();
 
     connect(m_tcpServer, &QTcpServer::newConnection, this, &NetworkServer::newClientConnection);
+
+    // forward desktop volume/mute changes to the connected client
+    // (routed through LocalControls so we never reference the platform Volume backend)
+    LocalControls *ctrls = LocalControls::getInstance();
+    connect(ctrls, &LocalControls::volumeChanged, this, &NetworkServer::sendVolumeState);
+    connect(ctrls, &LocalControls::muteChanged, this, &NetworkServer::sendVolumeState);
 }
 
 /* ************************************************************************** */
@@ -142,6 +148,9 @@ void NetworkServer::newClientConnection()
         out << QString("WELCOME CLIENT");
 
         m_clientConnection->write(block);
+
+        // let the freshly connected client know the current volume state
+        sendVolumeState();
     }
 }
 
@@ -162,11 +171,23 @@ void NetworkServer::closeClientConnection()
 
 void NetworkServer::readClientData()
 {
-    QString cData;
-    m_clientDataStream.startTransaction();
-    m_clientDataStream >> cData;
+    //qDebug() << "NetworkServer::readClientData()";
+    // QAbstractSocket emits readyRead once even when several messages arrived at once,
+    // so we must drain every complete message here, or risk processing message with some latency.
+    while (true)
+    {
+        QString cData;
+        m_clientDataStream.startTransaction();
+        m_clientDataStream >> cData;
+        if (!m_clientDataStream.commitTransaction()) break;
 
-    //qDebug() << "NetworkServer::readClientData() >" << cData;
+        processClientMessage(cData);
+    }
+}
+
+void NetworkServer::processClientMessage(const QString &cData)
+{
+    qDebug() << "NetworkServer::processClientMessage() >" << cData;
 
     if (cData.startsWith("press:"))
     {
@@ -203,8 +224,7 @@ void NetworkServer::readClientData()
     }
     else if (cData.startsWith("pad:"))
     {
-        cData.remove(0, 4);
-        QStringList axis = cData.split(';');
+        QStringList axis = cData.mid(4).split(';');
 
         float x1 = 0.f;
         float y1 = 0.f;
@@ -234,8 +254,42 @@ void NetworkServer::readClientData()
         LocalControls *ctrls = LocalControls::getInstance();
         ctrls->gamepad_action(x1*32767.f, y1*32767.f, x2*32767.f, y2*32767.f, a, b, x, y);
     }
+    else if (cData.startsWith("volume:"))
+    {
+        LocalControls *ctrls = LocalControls::getInstance();
 
-    m_clientDataStream.commitTransaction();
+        if (cData == "volume:up") ctrls->volume_up();
+        else if (cData == "volume:down") ctrls->volume_down();
+        else if (cData == "volume:mute") ctrls->volume_mute();
+        else if (cData == "volume:unmute") ctrls->volume_unmute();
+        else if (cData == "volume:toggle") ctrls->volume_toggle_mute();
+        else if (cData == "volume:get") sendVolumeState();
+        else if (cData.startsWith("volume:set:"))
+        {
+            int pct = qBound(0, cData.mid(11).toInt(), 100);
+            ctrls->volume_set(pct / 100.f);
+            sendVolumeState();
+        }
+    }
+}
+
+/* ************************************************************************** */
+
+void NetworkServer::sendVolumeState()
+{
+    if (!m_clientConnection || !m_clientConnected) return;
+
+    LocalControls *ctrls = LocalControls::getInstance();
+    const float level = ctrls->getVolumeLevel();
+    const int pct = (level < 0.f) ? 0 : qRound(level * 100.f);
+    const int muted = ctrls->isMuted() ? 1 : 0;
+
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_6_0);
+    out << QString("volume:state:%1;%2").arg(pct).arg(muted);
+
+    m_clientConnection->write(block);
 }
 
 /* ************************************************************************** */
