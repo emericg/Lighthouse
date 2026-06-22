@@ -203,7 +203,7 @@ Window {
                         else
                             mobileExit.timerStart()
                     } else {
-                        mobileUI.backToHomeScreen()
+                        MobileUI.backToHomeScreen()
                     }
                 }
             } else if (appContent.state === "VirtualInputs") {

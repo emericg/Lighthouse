@@ -361,14 +361,14 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     )
 endif()
 
-################################################################################
-
 ## Windows
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     set_target_properties(${PROJECT_NAME} PROPERTIES
         WIN32_EXECUTABLE ON
     )
 endif()
+
+################################################################################
 
 ## Android
 if(CMAKE_SYSTEM_NAME STREQUAL "Android")
