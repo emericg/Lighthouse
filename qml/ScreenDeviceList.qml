@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Controls
 
 import ComponentLibrary
-import Lighthouse
 
 Item {
     id: screenDeviceList
@@ -191,7 +190,7 @@ Item {
             bottomPadding: isDesktop ? 16 : 0
             spacing: isDesktop ? 20 : 8
 
-            visible: (isDesktop) || (isMobile && networkClient.connected) || (settingsManager.fakeIt)
+            visible: (isDesktop) || (isMobile && networkClient.connected) || (SettingsManager.fakeIt)
 
             ListTitle { ////////////////////////////////////////////////////////
                 anchors.leftMargin: devicesView.listMargin
@@ -210,6 +209,8 @@ Item {
                 rows: singleColumn ? 3 : 1
                 columns: singleColumn ? 1 : 3
                 spacing: 12
+
+                ////////////////
 
                 Rectangle { // MPRIS
                     width: singleColumn ? parent.width : 520
@@ -306,6 +307,8 @@ Item {
                     }
                 }
 
+                ////////////////
+
                 Rectangle { // KEYBOARD
                     width: singleColumn ? parent.width : 420
                     height: 128
@@ -347,6 +350,8 @@ Item {
                         }
                     }
                 }
+
+                ////////////////
 
                 Rectangle { // VIRTUAL INPUTS
                     width: singleColumn ? parent.width : 420
@@ -410,7 +415,7 @@ Item {
                 height: visible ? (singleColumn ? 112 : 128) : 0
                 radius: 4
 
-                visible: (isMobile && networkClient.connected) || (settingsManager.fakeIt)
+                visible: (isMobile && networkClient.connected) || (SettingsManager.fakeIt)
 
                 color: Theme.colorDeviceWidget
                 border.width: 2
@@ -449,7 +454,7 @@ Item {
                 height: visible ? (singleColumn ? 96 : 96) : 0
                 radius: 4
 
-                visible: (isMobile && networkClient.connected) || (settingsManager.fakeIt)
+                visible: (isMobile && networkClient.connected) || (SettingsManager.fakeIt)
 
                 color: Theme.colorForeground // Theme.colorDeviceWidget
                 border.width: 2

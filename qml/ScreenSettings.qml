@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Controls
 
 import ComponentLibrary
-import Lighthouse
+import AppUtils
 
 Loader {
     id: screenSettings
@@ -147,7 +147,7 @@ Loader {
 
                             radius: 2
                             color: "white"
-                            border.color: (settingsManager.appTheme === "THEME_SNOW") ? Theme.colorSubText : "#ddd"
+                            border.color: (SettingsManager.appTheme === "THEME_SNOW") ? Theme.colorSubText : "#ddd"
                             border.width: 2
 
                             Text {
@@ -155,13 +155,13 @@ Loader {
                                 visible: wideWideMode
                                 text: qsTr("snow")
                                 textFormat: Text.PlainText
-                                color: (settingsManager.appTheme === "THEME_SNOW") ? Theme.colorSubText : "#ccc"
+                                color: (SettingsManager.appTheme === "THEME_SNOW") ? Theme.colorSubText : "#ccc"
                                 font.bold: true
                                 font.pixelSize: Theme.fontSizeContentSmall
                             }
                             MouseArea {
                                 anchors.fill: parent
-                                onClicked: settingsManager.appTheme = "THEME_SNOW"
+                                onClicked: SettingsManager.appTheme = "THEME_SNOW"
                             }
                         }
                         Rectangle {
@@ -173,7 +173,7 @@ Loader {
                             radius: 2
                             color: "#FFE400" // day theme colorSecondary
                             border.color: Theme.colorPrimary
-                            border.width: (settingsManager.appTheme === "THEME_DAY") ? 2 : 0
+                            border.width: (SettingsManager.appTheme === "THEME_DAY") ? 2 : 0
 
                             Text {
                                 anchors.centerIn: parent
@@ -186,7 +186,7 @@ Loader {
                             }
                             MouseArea {
                                 anchors.fill: parent
-                                onClicked: settingsManager.appTheme = "THEME_DAY"
+                                onClicked: SettingsManager.appTheme = "THEME_DAY"
                             }
                         }
                         Rectangle {
@@ -198,20 +198,20 @@ Loader {
                             radius: 2
                             color: "#555151"
                             border.color: Theme.colorPrimary
-                            border.width: (settingsManager.appTheme === "THEME_NIGHT") ? 2 : 0
+                            border.width: (SettingsManager.appTheme === "THEME_NIGHT") ? 2 : 0
 
                             Text {
                                 anchors.centerIn: parent
                                 visible: wideWideMode
                                 text: qsTr("night")
                                 textFormat: Text.PlainText
-                                color: (settingsManager.appTheme === "THEME_NIGHT") ? Theme.colorPrimary : "#ececec"
+                                color: (SettingsManager.appTheme === "THEME_NIGHT") ? Theme.colorPrimary : "#ececec"
                                 font.bold: true
                                 font.pixelSize: Theme.fontSizeContentSmall
                             }
                             MouseArea {
                                 anchors.fill: parent
-                                onClicked: settingsManager.appTheme = "THEME_NIGHT"
+                                onClicked: SettingsManager.appTheme = "THEME_NIGHT"
                             }
                         }
                     }
@@ -259,10 +259,10 @@ Loader {
                         anchors.verticalCenter: parent.verticalCenter
                         z: 1
 
-                        checked: settingsManager.appThemeAuto
+                        checked: SettingsManager.appThemeAuto
                         onClicked: {
-                            settingsManager.appThemeAuto = checked
-                            Theme.loadTheme(settingsManager.appTheme)
+                            SettingsManager.appThemeAuto = checked
+                            Theme.loadTheme(SettingsManager.appTheme)
                         }
                     }
                 }
@@ -275,7 +275,7 @@ Loader {
                     topPadding: -12
                     bottomPadding: 12
 
-                    text: settingsManager.appThemeAuto ?
+                    text: SettingsManager.appThemeAuto ?
                               qsTr("Dark mode schedule will respect device setting.") :
                               qsTr("Dark mode schedule is disabled.")
                     textFormat: Text.PlainText
@@ -338,8 +338,8 @@ Loader {
                         anchors.verticalCenter: parent.verticalCenter
                         z: 1
 
-                        checked: settingsManager.minimized
-                        onClicked: settingsManager.minimized = checked
+                        checked: SettingsManager.minimized
+                        onClicked: SettingsManager.minimized = checked
                     }
                 }
 
@@ -387,12 +387,12 @@ Loader {
                         anchors.verticalCenter: parent.verticalCenter
                         z: 1
 
-                        checked: settingsManager.systray
+                        checked: SettingsManager.systray
                         onClicked: {
                             if (isMobile) {
                                 //
                             } else {
-                                settingsManager.systray = checked
+                                SettingsManager.systray = checked
                             }
                         }
                     }
@@ -407,7 +407,7 @@ Loader {
                     bottomPadding: 0
                     visible: isDesktop
 
-                    text: settingsManager.systray ?
+                    text: SettingsManager.systray ?
                               qsTr("Lighthouse will remain active in the background after the window is closed, and show in the notification area.") :
                               qsTr("Lighthouse is only active while the window is open.")
                     textFormat: Text.PlainText
@@ -426,8 +426,8 @@ Loader {
                     height: Theme.componentHeightXL
 
                     visible: isDesktop
-                    enabled: false // settingsManager.systray
-                    opacity: settingsManager.systray ? 1 : 0.4
+                    enabled: false // SettingsManager.systray
+                    opacity: SettingsManager.systray ? 1 : 0.4
 
                     IconSvg {
                         anchors.left: parent.left
@@ -462,8 +462,8 @@ Loader {
                         anchors.verticalCenter: parent.verticalCenter
                         z: 1
 
-                        checked: settingsManager.notifications
-                        onClicked: settingsManager.notifications = checked
+                        checked: SettingsManager.notifications
+                        onClicked: SettingsManager.notifications = checked
                     }
                 }
                 Text { // legend_notifications
@@ -475,9 +475,9 @@ Loader {
                     topPadding: -12
                     bottomPadding: 12
                     visible: isDesktop
-                    opacity: settingsManager.systray ? 1 : 0.4
+                    opacity: SettingsManager.systray ? 1 : 0.4
 
-                    text: settingsManager.notifications ?
+                    text: SettingsManager.notifications ?
                               qsTr("Notifications are enabled.") :
                               qsTr("Notifications are disabled.")
                     textFormat: Text.PlainText
@@ -540,8 +540,8 @@ Loader {
                         anchors.verticalCenter: parent.verticalCenter
                         z: 1
 
-                        checked: settingsManager.bluetoothControl
-                        onClicked: settingsManager.bluetoothControl = checked
+                        checked: SettingsManager.bluetoothControl
+                        onClicked: SettingsManager.bluetoothControl = checked
                     }
                 }
                 Text { // legend_bluetoothControl
@@ -554,7 +554,7 @@ Loader {
                     bottomPadding: 12
                     visible: (Qt.platform.os === "android")
 
-                    text: settingsManager.bluetoothControl ?
+                    text: SettingsManager.bluetoothControl ?
                               qsTr("Lighthouse will enable your device's Bluetooth in order to operate.") :
                               qsTr("Lighthouse will only operate if your device's Bluetooth is already enabled.")
                     textFormat: Text.PlainText
@@ -619,8 +619,8 @@ Loader {
                         unit: "%"
                         floatprecision: 0
 
-                        value: settingsManager.volumeLimit
-                        onMoved: settingsManager.volumeLimit = Math.round(value)
+                        value: SettingsManager.volumeLimit
+                        onMoved: SettingsManager.volumeLimit = Math.round(value)
                     }
                 }
 
@@ -676,9 +676,9 @@ Loader {
                         anchors.verticalCenter: parent.verticalCenter
                         z: 1
 
-                        checked: settingsManager.netctrl
+                        checked: SettingsManager.netctrl
                         onClicked: {
-                            settingsManager.netctrl = checked
+                            SettingsManager.netctrl = checked
                         }
                     }
                 }
@@ -725,9 +725,9 @@ Loader {
                         anchors.verticalCenter: parent.verticalCenter
                         z: 1
 
-                        checked: settingsManager.netctrlSecure
+                        checked: SettingsManager.netctrlSecure
                         onClicked: {
-                            settingsManager.netctrlSecure = checked
+                            SettingsManager.netctrlSecure = checked
                         }
                     }
                 }
@@ -742,7 +742,7 @@ Loader {
                     bottomPadding: 0
                     visible: isDesktop
 
-                    text: settingsManager.netctrl ?
+                    text: SettingsManager.netctrl ?
                               qsTr("Lighthouse will accept network connections, acting as remotes.") :
                               qsTr("Lighthouse won't accept network connections.")
                     textFormat: Text.PlainText
@@ -877,8 +877,8 @@ Loader {
                         source: "qrc:/IconLibrary/material-icons/duotone/qr_code_scanner.svg"
 
                         onClicked: {
-                            if (!utilsApp.checkMobileCameraPermission()) {
-                                utilsApp.getMobileCameraPermission()
+                            if (!UtilsOS.checkMobileCameraPermission()) {
+                                UtilsOS.getMobileCameraPermission()
                             } else {
                                 highlighted = !highlighted
                             }
@@ -932,12 +932,12 @@ Loader {
                         height: 36
 
                         placeholderText: qsTr("Filter by Wi-Fi network name?")
-                        text: settingsManager.netctrlSSID
+                        text: SettingsManager.netctrlSSID
                         selectByMouse: true
 
                         onEditingFinished: {
-                            //utilsWiFi.requestLocationPermissions() // BLE should have done that
-                            settingsManager.netctrlSSID = text
+                            //UtilsWiFi.requestLocationPermissions() // BLE should have done that
+                            SettingsManager.netctrlSSID = text
                             networkClient.connectToServer()
                         }
 
@@ -987,11 +987,11 @@ Loader {
                         height: 36
 
                         placeholderText: qsTr("Host")
-                        text: settingsManager.netctrlHost
+                        text: SettingsManager.netctrlHost
                         selectByMouse: true
 
                         onEditingFinished: {
-                            settingsManager.netctrlHost = text
+                            SettingsManager.netctrlHost = text
                             networkClient.connectToServer()
                         }
 
@@ -1041,12 +1041,12 @@ Loader {
                         height: 36
 
                         placeholderText: qsTr("Port")
-                        text: settingsManager.netctrlPort
+                        text: SettingsManager.netctrlPort
                         validator: IntValidator { bottom: 1; top: 65535; }
                         selectByMouse: true
 
                         onEditingFinished: {
-                            settingsManager.netctrlPort = parseInt(text, 10)
+                            SettingsManager.netctrlPort = parseInt(text, 10)
                             networkClient.connectToServer()
                         }
 
@@ -1096,12 +1096,12 @@ Loader {
                         height: 36
 
                         placeholderText: qsTr("Password")
-                        text: settingsManager.netctrlPassword
+                        text: SettingsManager.netctrlPassword
                         validator: IntValidator { bottom: 1; top: 65535; }
                         selectByMouse: true
 
                         onEditingFinished: {
-                            settingsManager.netctrlPassword = text
+                            SettingsManager.netctrlPassword = text
                             networkClient.connectToServer()
                         }
 
@@ -1163,8 +1163,8 @@ Loader {
                         anchors.verticalCenter: parent.verticalCenter
                         z: 1
 
-                        checked: settingsManager.fakeIt
-                        onClicked: settingsManager.fakeIt = checked
+                        checked: SettingsManager.fakeIt
+                        onClicked: SettingsManager.fakeIt = checked
                     }
                 }
 

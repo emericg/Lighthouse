@@ -2,7 +2,6 @@ import QtQuick
 
 import ComponentLibrary
 import DeviceUtils
-import Lighthouse
 
 Rectangle {
     id: itemLoadData

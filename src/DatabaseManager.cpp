@@ -22,32 +22,36 @@
 #include "DatabaseManager.h"
 #include "SettingsManager.h"
 
-#include <QDir>
-#include <QFile>
-#include <QString>
-#include <QDateTime>
-#include <QStandardPaths>
-#include <QDebug>
+#include <QCoreApplication>
+#include <QQmlEngine>
+#include <QJSEngine>
 
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
 
-/* ************************************************************************** */
+#include <QStandardPaths>
+#include <QDateTime>
+#include <QFile>
+#include <QDir>
+#include <QDebug>
 
-DatabaseManager *DatabaseManager::instance = nullptr;
+/* ************************************************************************** */
 
 DatabaseManager *DatabaseManager::getInstance()
 {
-    if (instance == nullptr)
-    {
-        instance = new DatabaseManager();
-    }
-
+    static DatabaseManager *instance = new DatabaseManager(QCoreApplication::instance());
     return instance;
 }
 
-DatabaseManager::DatabaseManager()
+DatabaseManager *DatabaseManager::create(QQmlEngine *, QJSEngine *)
+{
+    DatabaseManager *instance = getInstance();
+    QJSEngine::setObjectOwnership(instance, QJSEngine::CppOwnership);
+    return instance;
+}
+
+DatabaseManager::DatabaseManager(QObject *parent) : QObject(parent)
 {
     bool status = false;
 
@@ -59,11 +63,11 @@ DatabaseManager::DatabaseManager()
     {
         status = openDatabase_sqlite();
     }
-}
 
-DatabaseManager::~DatabaseManager()
-{
-    //
+    if (!status)
+    {
+        qWarning() << "DatabaseManager > NO DATABASE AVAILABLE !!!";
+    }
 }
 
 /* ************************************************************************** */
@@ -158,11 +162,6 @@ bool DatabaseManager::openDatabase_sqlite()
             qWarning() << "Cannot find QStandardPaths::AppDataLocation directory...";
         }
     }
-    else
-    {
-        qWarning() << "> SQLite is NOT available";
-        m_dbInternalAvailable = false;
-    }
 
     return m_dbInternalOpen;
 }
@@ -227,11 +226,6 @@ bool DatabaseManager::openDatabase_mysql()
             }
         }
     }
-    else
-    {
-        qDebug() << "> MySQL is NOT available";
-        m_dbExternalAvailable = false;
-    }
 
     return m_dbExternalOpen;
 }
@@ -274,8 +268,7 @@ void DatabaseManager::resetDatabase()
         m_dbExternalOpen = false;
 
         // remove db file
-        QFile dbFile(dbName);
-        dbFile.remove();
+        QFile::remove(dbName);
     }
 }
 
@@ -406,7 +399,7 @@ void DatabaseManager::createDatabase()
 /* ************************************************************************** */
 /* ************************************************************************** */
 
-void DatabaseManager::migrateDatabase()
+bool DatabaseManager::migrateDatabase()
 {
     int dbVersion = 0;
 
@@ -422,8 +415,14 @@ void DatabaseManager::migrateDatabase()
 
     if (dbVersion > 0 && dbVersion != s_dbCurrentVersion)
     {
+        qDebug() << "dbVersion is #" << dbVersion;
+
         //
+
+        qDebug() << "dbVersion is now #" << dbVersion;
     }
+
+    return false;
 }
 
 /* ************************************************************************** */

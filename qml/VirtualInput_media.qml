@@ -3,7 +3,6 @@ import QtQuick.Effects
 import QtQuick.Controls
 
 import ComponentLibrary
-import Lighthouse
 
 Grid {
     id: virtualInput_media

@@ -143,13 +143,7 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
 
     QQmlContext *engine_context = engine.rootContext();
-    engine_context->setContextProperty("settingsManager", sm);
     engine_context->setContextProperty("deviceManager", dm);
-
-    engine_context->setContextProperty("utilsApp", utilsApp);
-    engine_context->setContextProperty("utilsWiFi", utilsWiFi);
-    engine_context->setContextProperty("utilsScreen", utilsScreen);
-    engine_context->setContextProperty("utilsLanguage", utilsLanguage);
 
     engine_context->setContextProperty("networkServer", networkServer);
     engine_context->setContextProperty("networkClient", networkClient);

@@ -263,7 +263,6 @@ add_subdirectory(thirdparty/AppUtils)
 target_link_libraries(${PROJECT_NAME} PRIVATE AppUtils AppUtils_plugin)
 
 # SingleApplication
-set(QAPPLICATION_CLASS QApplication)
 add_subdirectory(thirdparty/SingleApplication)
 target_link_libraries(${PROJECT_NAME} PRIVATE SingleApplication)
 

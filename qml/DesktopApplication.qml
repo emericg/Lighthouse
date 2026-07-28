@@ -3,8 +3,7 @@ import QtQuick.Controls
 import QtQuick.Window
 
 import ComponentLibrary
-import DeviceUtils
-import Lighthouse
+import AppUtils
 
 ApplicationWindow {
     id: appWindow
@@ -13,13 +12,23 @@ ApplicationWindow {
     color: Theme.colorBackground
 
     // Helpers
+    property bool isHdpi: (UtilsScreen.screenDpi >= 128 || UtilsScreen.screenPar >= 2.0)
     property bool isDesktop: true
     property bool isMobile: false
     property bool isPhone: false
     property bool isTablet: false
-    property bool isHdpi: (utilsScreen.screenDpi >= 128 || utilsScreen.screenPar >= 2.0)
 
-    property var selectedDevice: null
+    // Setup ThemeEngine
+    Binding { target: Theme; property: "appTheme";               value: SettingsManager.appTheme }
+    Binding { target: Theme; property: "appThemeAuto";           value: SettingsManager.appThemeAuto }
+    Binding { target: Theme; property: "appThemeAutoMethod";     value: SettingsManager.appThemeAutoMethod }
+    Binding { target: Theme; property: "appWidth";               value: appWindow.width }
+    Binding { target: Theme; property: "appHeight";              value: appWindow.height }
+    Binding { target: Theme; property: "screenOrientation";      value: Screen.primaryOrientation }
+    Binding { target: Theme; property: "screenDpiLogical";       value: UtilsScreen.screenDpiLogical }
+    Binding { target: Theme; property: "screenDpi";              value: UtilsScreen.screenDpi }
+    Binding { target: Theme; property: "screenPar";              value: UtilsScreen.screenPar }
+    Binding { target: Theme; property: "screenSize";             value: UtilsScreen.screenSize }
 
     // Desktop stuff ///////////////////////////////////////////////////////////
 
@@ -27,20 +36,20 @@ ApplicationWindow {
     minimumHeight: isHdpi ? 480 : 560
 
     width: {
-        if (settingsManager.initialSize.width > 0)
-            return settingsManager.initialSize.width
+        if (SettingsManager.initialSize.width > 0)
+            return SettingsManager.initialSize.width
         else
             return isHdpi ? 800 : 1280
     }
     height: {
-        if (settingsManager.initialSize.height > 0)
-            return settingsManager.initialSize.height
+        if (SettingsManager.initialSize.height > 0)
+            return SettingsManager.initialSize.height
         else
             return isHdpi ? 560 : 720
     }
-    x: settingsManager.initialPosition.width
-    y: settingsManager.initialPosition.height
-    visibility: settingsManager.initialVisibility
+    x: SettingsManager.initialPosition.width
+    y: SettingsManager.initialPosition.height
+    visibility: SettingsManager.initialVisibility
     visible: true
 
     WindowGeometrySaver {
@@ -49,7 +58,7 @@ ApplicationWindow {
             // Make sure we handle window visibility correctly
             if (startMinimized) {
                 visible = false
-                if (settingsManager.systray) {
+                if (SettingsManager.systray) {
                     visibility = Window.Hidden
                 } else {
                     visibility = Window.Minimized
@@ -175,7 +184,6 @@ ApplicationWindow {
         target: Qt.application
         function onStateChanged() {
             switch (Qt.application.state) {
-
                 case Qt.ApplicationInactive:
                     //console.log("Qt.ApplicationInactive")
                     break
@@ -184,7 +192,7 @@ ApplicationWindow {
                     //console.log("Qt.ApplicationActive")
 
                     // Check if we need an 'automatic' theme change
-                    Theme.loadTheme(settingsManager.appTheme)
+                    Theme.loadTheme(SettingsManager.appTheme)
 
                     // Check Bluetooth anyway (on macOS)
                     //if (Qt.platform.os === "osx") deviceManager.checkBluetooth()
@@ -200,14 +208,14 @@ ApplicationWindow {
         //console.log("onVisibilityChanged(" + visibility + ")")
 
         if (visibility === Window.Hidden) {
-            if (settingsManager.systray && Qt.platform.os === "osx") {
+            if (SettingsManager.systray && Qt.platform.os === "osx") {
                 utilsDock.toggleDockIconVisibility(false)
             }
         }
         if (visibility === Window.AutomaticVisibility ||
             visibility === Window.Minimized || visibility === Window.Maximized ||
             visibility === Window.Windowed || visibility === Window.FullScreen) {
-             if (settingsManager.systray && Qt.platform.os === "osx") {
+             if (SettingsManager.systray && Qt.platform.os === "osx") {
                  utilsDock.toggleDockIconVisibility(true)
              }
          }
@@ -215,17 +223,6 @@ ApplicationWindow {
          if (visibility === Window.Hidden) {
              deviceManager.disconnectDevices()
          }
-    }
-
-    onClosing: (close) => {
-        //console.log("onClosing(" + close + ")")
-
-        deviceManager.disconnectDevices()
-
-        if (settingsManager.systray || Qt.platform.os === "osx") {
-            close.accepted = false
-            appWindow.hide()
-        }
     }
 
     // User generated events handling //////////////////////////////////////////
@@ -273,7 +270,7 @@ ApplicationWindow {
     MouseArea {
         anchors.fill: parent
         z: 99
-        acceptedButtons: Qt.BackButton | Qt.ForwardButton
+        acceptedButtons: (Qt.BackButton | Qt.ForwardButton)
         onClicked: (mouse) => {
             if (mouse.button === Qt.BackButton) {
                 backAction()
@@ -309,7 +306,7 @@ ApplicationWindow {
     }
     Shortcut {
         sequences: [StandardKey.Quit]
-        onActivated: utilsApp.appExit()
+        onActivated: UtilsApp.appExit()
     }
 
     // UI sizes ////////////////////////////////////////////////////////////////
@@ -334,38 +331,15 @@ ApplicationWindow {
 
     // QML /////////////////////////////////////////////////////////////////////
 
+    property var selectedDevice: null
+
     DesktopHeader {
         id: appHeader
-
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
     }
-/*
-    property alias appContent: appContentLoader.item
 
-    Loader {
-        id: appContentLoader
-
-        anchors.top: appHeader.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-
-        function load() {
-            appContentLoader.active = true
-        }
-        function unload() {
-            appContentLoader.active = false
-        }
-
-        active: false
-
-        sourceComponent: Item {
-            anchors.fill: parent
-*/
     Item {
         id: appContent
+
         anchors.top: appHeader.bottom
         anchors.left: parent.left
         anchors.right: parent.right
@@ -415,7 +389,7 @@ ApplicationWindow {
             id: screenAbout
         }
 
-        // Start on the tutorial?
+        // Start on the device list or tutorial?
         Component.onCompleted: {
             //
         }
@@ -429,6 +403,7 @@ ApplicationWindow {
             screenDeviceList.exitSelectionMode()
             appHeader.setActiveMenu()
 
+            if (state === "ScreenTutorial") return
             if (previousStates[previousStates.length-1] !== state) previousStates.push(state)
             if (previousStates.length > 4) previousStates.splice(0, 1)
             //console.log("states > " + appContent.previousStates)
@@ -567,4 +542,38 @@ ApplicationWindow {
             }
         ]
     }
+
+    ////////////////////////////////////////////////////////////////////////////
+
+    Timer {
+        id: disconnectTimer
+        interval: 33
+        running: false
+        repeat: true
+        onTriggered: {
+            if (!deviceManager.areDevicesConnected()) {
+                appWindow.close()
+            }
+        }
+    }
+    onClosing: (close) => {
+        //console.log("onClosing(" + close + ")")
+
+        // macOS hide in dock
+        if (SettingsManager.systray || Qt.platform.os === "osx") {
+            close.accepted = false
+            appWindow.hide()
+            return
+        }
+
+        // If BLE devices are still connected, disconnect them first
+        if (deviceManager.areDevicesConnected()) {
+            deviceManager.disconnectDevices()
+            disconnectTimer.start()
+            close.accepted = false
+            return
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
 }

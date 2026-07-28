@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Controls
 
 import ComponentLibrary
-import Lighthouse
 
 Drawer {
     width: (appWindow.screenOrientation === Qt.PortraitOrientation || appWindow.width < 480)
@@ -151,18 +150,18 @@ Drawer {
                     source: "qrc:/IconLibrary/material-symbols/sort.svg"
                     text: {
                         var txt = qsTr("Order by:") + " "
-                        if (settingsManager.orderBy === "model") {
+                        if (SettingsManager.orderBy === "model") {
                             txt += qsTr("sensor model")
-                        } else if (settingsManager.orderBy === "location") {
+                        } else if (SettingsManager.orderBy === "location") {
                             txt += qsTr("location")
                         }
                         return txt
                     }
 
                     property var sortmode: {
-                        if (settingsManager.orderBy === "model") {
+                        if (SettingsManager.orderBy === "model") {
                             return 1
-                        } else { // if (settingsManager.orderBy === "location") {
+                        } else { // if (SettingsManager.orderBy === "location") {
                             return 0
                         }
                     }
@@ -172,10 +171,10 @@ Drawer {
                         if (sortmode > 3) sortmode = 0
 
                         if (sortmode === 0) {
-                            settingsManager.orderBy = "location"
+                            SettingsManager.orderBy = "location"
                             deviceManager.orderby_location()
                         } else if (sortmode === 1) {
-                            settingsManager.orderBy = "model"
+                            SettingsManager.orderBy = "model"
                             deviceManager.orderby_model()
                         }
                     }

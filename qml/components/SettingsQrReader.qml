@@ -6,6 +6,7 @@ import QtMultimedia
 import ZXingQt
 
 import ComponentLibrary
+import AppUtils
 
 Rectangle {
     id: settingsQrReader
@@ -94,9 +95,9 @@ Rectangle {
             if (result.isValid && result.text !== "") {
                 //result.text, result.formatName, result.contentType
 
-                utilsApp.vibrate(33)
+                UtilsOS.hapticFeedback()
 
-                if (settingsManager.setNetCtrlSettings(result.text)) {
+                if (SettingsManager.setNetCtrlSettings(result.text)) {
                     buttonReader.highlighted = false
                     networkClient.connectToServer()
                 }

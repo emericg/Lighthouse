@@ -1,7 +1,7 @@
 import QtQuick
 
 import ComponentLibrary
-import Lighthouse
+import AppUtils
 
 Item {
     id: mobileMenu
@@ -93,7 +93,7 @@ Item {
 
         Row { // main menu
             anchors.centerIn: parent
-            spacing: (!appWindow.wideMode || (isPhone && utilsScreen.screenSize < 5.0)) ? -10 : 20
+            spacing: (!appWindow.wideMode || (isPhone && UtilsScreen.screenSize < 5.0)) ? -10 : 20
 
             visible: (appContent.state === "ScreenDeviceList" ||
                       appContent.state === "ScreenSettings" ||

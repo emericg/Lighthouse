@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Controls
 
 import ComponentLibrary
-import Lighthouse
+import AppUtils
 
 Item {
     id: screenAboutPermissions
@@ -31,9 +31,9 @@ Item {
 
     function refreshPermissions() {
         button_network_test.validperm = true
-        button_location_test.validperm = utilsApp.checkMobileBleLocationPermission()
-        button_gps_test.validperm = utilsApp.isMobileGpsEnabled()
-        button_camera_test.validperm = utilsApp.checkMobileCameraPermission()
+        button_location_test.validperm = UtilsOS.checkMobileBleLocationPermission()
+        button_gps_test.validperm = UtilsOS.isMobileGpsEnabled()
+        button_camera_test.validperm = UtilsOS.checkMobileCameraPermission()
     }
 
     Timer {
@@ -143,8 +143,8 @@ Item {
                     backgroundVisible: true
 
                     onClicked: {
-                        utilsApp.vibrate(25)
-                        validperm = utilsApp.getMobileBleLocationPermission()
+                        UtilsOS.hapticFeedback()
+                        validperm = UtilsOS.getMobileBleLocationPermission()
                         retryPermissions.start()
                     }
                 }
@@ -222,8 +222,8 @@ Item {
                     backgroundVisible: true
 
                     onClicked: {
-                        utilsApp.vibrate(25)
-                        validperm = utilsApp.isMobileGpsEnabled()
+                        UtilsOS.hapticFeedback()
+                        validperm = UtilsOS.isMobileGpsEnabled()
                         retryPermissions.start()
                     }
                 }
@@ -348,7 +348,7 @@ Item {
                     backgroundVisible: true
 
                     onClicked: {
-                        utilsApp.getMobileCameraPermission()
+                        UtilsOS.getMobileCameraPermission()
                         retryPermissions.start()
                     }
                 }
@@ -451,7 +451,7 @@ Item {
                 source: "qrc:/IconLibrary/material-icons/duotone/tune.svg"
                 sourceSize: 20
 
-                onClicked: utilsApp.openAndroidAppInfo("io.emeric.lighthouse")
+                onClicked: UtilsApp.openAndroidAppInfo("io.emeric.lighthouse")
             }
 
             ////////

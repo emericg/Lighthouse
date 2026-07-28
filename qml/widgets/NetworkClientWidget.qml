@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Layouts
 
 import ComponentLibrary
-import Lighthouse
 
 Item {
     required property var modelData

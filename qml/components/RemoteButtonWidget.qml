@@ -3,7 +3,6 @@ import QtQuick.Controls
 
 import ComponentLibrary
 import LocalActions
-import Lighthouse
 
 Rectangle {
     id: remoteButton

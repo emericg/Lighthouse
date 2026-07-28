@@ -2,7 +2,6 @@ import QtQuick
 
 import ComponentLibrary
 import DeviceUtils
-import Lighthouse
 
 Rectangle {
     id: appHeader
@@ -190,9 +189,9 @@ Rectangle {
 
             function setText() {
                 var txt = qsTr("Order by:") + " "
-                if (settingsManager.orderBy === "model") {
+                if (SettingsManager.orderBy === "model") {
                     txt += qsTr("sensor model")
-                } else if (settingsManager.orderBy === "location") {
+                } else if (SettingsManager.orderBy === "location") {
                     txt += qsTr("location")
                 }
                 buttonSort.tooltipText = txt
@@ -200,15 +199,15 @@ Rectangle {
 
             Component.onCompleted: buttonSort.setText()
             Connections {
-                target: settingsManager
+                target: SettingsManager
                 function onOrderByChanged() { buttonSort.setText() }
                 function onAppLanguageChanged() { buttonSort.setText() }
             }
 
             property var sortmode: {
-                if (settingsManager.orderBy === "model") {
+                if (SettingsManager.orderBy === "model") {
                     return 1
-                } else { // if (settingsManager.orderBy === "location") {
+                } else { // if (SettingsManager.orderBy === "location") {
                     return 0
                 }
             }
@@ -218,10 +217,10 @@ Rectangle {
                 if (sortmode > 3) sortmode = 0
 
                 if (sortmode === 0) {
-                    settingsManager.orderBy = "location"
+                    SettingsManager.orderBy = "location"
                     deviceManager.orderby_location()
                 } else if (sortmode === 1) {
-                    settingsManager.orderBy = "model"
+                    SettingsManager.orderBy = "model"
                     deviceManager.orderby_model()
                 }
             }

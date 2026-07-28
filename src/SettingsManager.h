@@ -30,7 +30,6 @@
 #include <QSize>
 #include <QList>
 #include <QDateTime>
-#include <QVariantList>
 
 class QQmlEngine;
 class QJSEngine;

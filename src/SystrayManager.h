@@ -26,7 +26,7 @@
 #include <QtGlobal>
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
 
-/* ************************************************************************** */
+#include <QtQml/qqmlregistration.h>
 
 #include <QObject>
 #include <QSystemTrayIcon>
@@ -34,6 +34,8 @@
 
 class QMenu;
 class QAction;
+class QJSEngine;
+class QQmlEngine;
 class QApplication;
 class QQuickWindow;
 
@@ -45,6 +47,8 @@ class QQuickWindow;
 class SystrayManager: public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_SINGLETON
 
     QApplication *m_saved_app = nullptr;
     QQuickWindow *m_saved_window = nullptr;
@@ -76,6 +80,8 @@ signals:
 
 public:
     static SystrayManager *getInstance();
+    static SystrayManager *create(QQmlEngine *, QJSEngine *);
+
     void setupSystray(QQuickWindow *window);
 
 public slots:

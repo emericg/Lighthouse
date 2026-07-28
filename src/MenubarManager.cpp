@@ -41,6 +41,11 @@ MenubarManager *MenubarManager::getInstance()
     return instance;
 }
 
+MenubarManager *MenubarManager::create(QQmlEngine *, QJSEngine *)
+{
+    return getInstance();
+}
+
 MenubarManager::MenubarManager()
 {
     //
@@ -127,12 +132,12 @@ void MenubarManager::sensorList()
 
 void MenubarManager::sensorScan()
 {
-    //
+    m_saved_devicemanager->scanDevices_start();
 }
 
 void MenubarManager::sensorRefresh()
 {
-    //
+    m_saved_devicemanager->refreshDevices_start();
 }
 
 void MenubarManager::settings()

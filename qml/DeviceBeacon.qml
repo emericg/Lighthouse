@@ -3,7 +3,6 @@ import QtQuick.Controls
 
 import ComponentLibrary
 import DeviceUtils
-import Lighthouse
 
 Loader {
     id: deviceBeacon

@@ -73,7 +73,7 @@ Rectangle {
                 deviceManager.requestBluetoothPermissions()
             }
             if (!deviceManager.bluetoothEnabled) {
-                deviceManager.enableBluetooth(settingsManager.bluetoothControl)
+                deviceManager.enableBluetooth(SettingsManager.bluetoothControl)
             }
             deviceManager.checkBluetooth()
         }

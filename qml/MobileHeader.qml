@@ -1,7 +1,8 @@
 import QtQuick
+import QtQuick.Layouts
 
 import ComponentLibrary
-import Lighthouse
+import AppUtils
 
 Rectangle {
     id: appHeader
@@ -10,16 +11,22 @@ Rectangle {
     anchors.left: parent.left
     anchors.right: parent.right
 
-    height: headerHeight + Math.max(screenPaddingStatusbar, screenPaddingTop)
+    height: (headerHeight + Math.max(screenPaddingStatusbar, screenPaddingTop) - (headerCompact ? 12 : 0))
     color: Theme.colorHeader
     clip: true
     z: 10
 
-    property int headerHeight: 52
+    ////////////////////////////////////////////////////////////////////////////
 
-    property int headerPosition: 56
+    property int headerHeight: 56 // vertical
 
-    property string headerTitle: utilsApp.appName()
+    property int headerPosition: 56 // horizontal
+
+    property bool headerCompact: true // appWindow.headerUnicolor
+
+    property string headerTitle: UtilsApp.appName()
+
+    property string headerSubTitle: ""
 
     ////////////////////////////////////////////////////////////////////////////
 
@@ -29,10 +36,10 @@ Rectangle {
     property string rightMenuMode: "off" // on / off
     signal rightMenuClicked()
 
-    ////////////////////////////////////////////////////////////////////////////
-
     function rightMenuIsOpen() { return actionMenu.visible; }
     function rightMenuClose() { actionMenu.close(); }
+
+    ////////////////////////////////////////////////////////////////////////////
 
     signal deviceConnectButtonClicked()
     signal deviceDisconnectButtonClicked()
@@ -45,28 +52,23 @@ Rectangle {
     signal deviceRefreshRealtimeButtonClicked()
     signal deviceRefreshHistoryButtonClicked()
     signal deviceClearButtonClicked()
-    signal deviceDataButtonClicked() // compatibility
-    signal deviceHistoryButtonClicked() // compatibility
-    signal devicePlantButtonClicked() // compatibility
-    signal deviceSettingsButtonClicked() // compatibility
+    signal deviceDataButtonClicked() // desktop header compatibility
+    signal deviceHistoryButtonClicked() // desktop header compatibility
+    signal devicePlantButtonClicked() // desktop header compatibility
+    signal deviceSettingsButtonClicked() // desktop header compatibility
 
-    function setActiveDeviceData() { } // compatibility
-    function setActiveDeviceHistory() { } // compatibility
-    function setActiveDevicePlant() { } // compatibility
-    function setActiveDeviceSettings() { } // compatibility
+    function setActiveDeviceData() { } // desktop header compatibility
+    function setActiveDeviceHistory() { } // desktop header compatibility
+    function setActiveDevicePlant() { } // desktop header compatibility
+    function setActiveDeviceSettings() { } // desktop header compatibility
 
     ////////////////////////////////////////////////////////////////////////////
 
     // prevent clicks below this area
     MouseArea { anchors.fill: parent; acceptedButtons: Qt.AllButtons; }
 
-    ActionMenuFixed {
-        id: actionMenu
-
-        onMenuSelected: (index) => {
-            //console.log("ActionMenu clicked #" + index)
-        }
-    }
+    // Action menu
+    ActionMenuFixed { id: actionMenu }
 
     ////////////////////////////////////////////////////////////////////////////
 
@@ -77,74 +79,69 @@ Rectangle {
 
         height: Math.max(screenPaddingStatusbar, screenPaddingTop)
         color: Theme.colorStatusbar
+        visible: !appHeader.headerCompact
     }
 
     Item {
-        anchors.fill: parent
-        anchors.topMargin: Math.max(screenPaddingStatusbar, screenPaddingTop)
+        anchors.left: parent.left
         anchors.leftMargin: screenPaddingLeft
+        anchors.right: parent.right
         anchors.rightMargin: screenPaddingRight
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: appHeader.headerCompact ? -4 : 0
 
-        Row { // left area
-            id: leftArea
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.leftMargin: 4
-            anchors.bottom: parent.bottom
-
-            spacing: 4
-
-            ////
-
-            MouseArea { // left button
-                width: headerHeight
-                height: headerHeight
-
-                visible: true
-                onClicked: leftMenuClicked()
-
-                RippleThemed {
-                    anchors.fill: parent
-                    anchor: parent
-
-                    pressed: parent.pressed
-                    //active: enabled && parent.containsPress
-                    color: Qt.rgba(Theme.colorForeground.r, Theme.colorForeground.g, Theme.colorForeground.b, 0.33)
-                }
-
-                IconSvg {
-                    anchors.centerIn: parent
-                    width: (headerHeight / 2)
-                    height: (headerHeight / 2)
-
-                    source: {
-                        if (leftMenuMode === "drawer") return "qrc:/IconLibrary/material-symbols/menu.svg"
-                        else if (leftMenuMode === "close") return "qrc:/IconLibrary/material-symbols/close.svg"
-                        return "qrc:/IconLibrary/material-symbols/arrow_back.svg"
-                    }
-                    color: Theme.colorHeaderContent
-                }
-            }
-
-            ////
-        }
+        height: appHeader.headerHeight
 
         ////////////
 
-        Text { // header title
-            height: parent.height
+        MouseArea { // left button
+            width: appHeader.headerHeight
+            height: appHeader.headerHeight
+
+            visible: true
+            onClicked: leftMenuClicked()
+
+            RippleThemed {
+                anchors.fill: parent
+                anchor: parent
+
+                pressed: parent.pressed
+                //active: enabled && parent.containsPress
+                color: Qt.rgba(Theme.colorForeground.r, Theme.colorForeground.g, Theme.colorForeground.b, 0.33)
+            }
+
+            IconSvg {
+                anchors.centerIn: parent
+                width: (appHeader.headerHeight / 2)
+                height: (appHeader.headerHeight / 2)
+
+                source: {
+                    if (leftMenuMode === "drawer") return "qrc:/IconLibrary/material-symbols/menu.svg"
+                    if (leftMenuMode === "close") return "qrc:/IconLibrary/material-symbols/close.svg"
+                    return "qrc:/IconLibrary/material-symbols/arrow_back.svg"
+                }
+                color: Theme.colorHeaderContent
+            }
+        }
+
+        RowLayout {
             anchors.left: parent.left
-            anchors.leftMargin: headerPosition
+            anchors.leftMargin: appHeader.headerPosition
             anchors.right: rightArea.left
-            anchors.rightMargin: 4
+            anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
 
-            text: headerTitle
-            color: Theme.colorHeaderContent
-            font.bold: true
-            font.pixelSize: Theme.fontSizeHeader
-            font.capitalization: Font.Capitalize
-            verticalAlignment: Text.AlignVCenter
+            Text { // header title
+                Layout.alignment: Qt.AlignVCenter
+
+                text: appHeader.headerTitle
+                textFormat: Text.PlainText
+                font.bold: true
+                font.capitalization: Font.Capitalize
+                font.pixelSize: Theme.fontSizeHeader
+                color: Theme.colorHeaderContent
+                elide: Text.ElideRight
+            }
         }
 
         ////////////
@@ -153,10 +150,9 @@ Rectangle {
             id: rightArea
             anchors.top: parent.top
             anchors.right: parent.right
-            anchors.rightMargin: 4
             anchors.bottom: parent.bottom
 
-            spacing: -8
+            spacing: 4
 
             ////
 
@@ -186,8 +182,8 @@ Rectangle {
                     width: 26; height: 26;
                     anchors.centerIn: parent
                     source: {
-                        if (settingsManager.netctrlSSID) {
-                            if (settingsManager.netctrlSSID === utilsWiFi.currentSSID) {
+                        if (SettingsManager.netctrlSSID) {
+                            if (SettingsManager.netctrlSSID === UtilsWiFi.currentSSID) {
                                 return "qrc:/IconLibrary/material-symbols/signal_wifi_4_bar.svg"
                             }
                             return "qrc:/IconLibrary/material-symbols/signal_wifi_off.svg"
@@ -200,7 +196,7 @@ Rectangle {
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
                         width: 8; height: 8; radius: 8;
-                        visible: !(settingsManager.netctrlSSID && settingsManager.netctrlSSID !== utilsWiFi.currentSSID)
+                        visible: !(SettingsManager.netctrlSSID && SettingsManager.netctrlSSID !== UtilsWiFi.currentSSID)
                         color: networkClient.connected ? Theme.colorSuccess : Theme.colorWarning
                     }
                 }
@@ -220,7 +216,7 @@ Rectangle {
                         deviceManager.requestBluetoothPermissions()
                     }
                     if (!deviceManager.bluetoothEnabled) {
-                        deviceManager.enableBluetooth(settingsManager.bluetoothControl)
+                        deviceManager.enableBluetooth(SettingsManager.bluetoothControl)
                     }
                     deviceManager.checkBluetooth()
                 }
@@ -263,13 +259,13 @@ Rectangle {
             ////
 
             MouseArea { // right menu button
-                width: headerHeight
-                height: headerHeight
+                width: appHeader.headerHeight
+                height: appHeader.headerHeight
 
                 visible: (deviceManager.bluetooth && appContent.state === "DeviceLight")
 
                 onClicked: {
-                    rightMenuClicked()
+                    appHeader.rightMenuClicked()
                     actionMenu.open()
                 }
 
@@ -283,9 +279,9 @@ Rectangle {
                 }
 
                 IconSvg {
-                    width: (headerHeight / 2)
-                    height: (headerHeight / 2)
                     anchors.centerIn: parent
+                    width: (appHeader.headerHeight / 2)
+                    height: (appHeader.headerHeight / 2)
 
                     source: "qrc:/IconLibrary/material-symbols/more_vert.svg"
                     color: Theme.colorHeaderContent

@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Controls
 
 import ComponentLibrary
-import Lighthouse
 
 Item {
     id: virtualInput_gamepad

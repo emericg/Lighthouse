@@ -2,7 +2,7 @@ import QtQuick
 
 import ComponentLibrary
 import DeviceUtils
-import Lighthouse
+import AppUtils
 
 Item {
     id: deviceWidget
@@ -224,7 +224,7 @@ Item {
             onPressAndHold: {
                 // multi selection
                 if (!boxDevice.selected) {
-                    utilsApp.vibrate(25)
+                    UtilsOS.hapticFeedback()
                     screenDeviceList.selectDevice(index)
                 } else {
                     screenDeviceList.deselectDevice(index)

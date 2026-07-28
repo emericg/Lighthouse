@@ -4,7 +4,7 @@ import Qt.labs.platform
 
 import ComponentLibrary
 import DeviceUtils
-import Lighthouse
+import AppUtils
 
 Loader {
     id: deviceLight
@@ -771,7 +771,7 @@ Loader {
                                 anchors.centerIn: parent
                                 width: parent.width * 0.33
                                 height: width
-                                color: utilsApp.isQColorLight(parent.color) ? Theme.colorHighContrast : Theme.colorLowContrast
+                                color: UtilsApp.isQColorLight(parent.color) ? Theme.colorHighContrast : Theme.colorLowContrast
                                 opacity: 0.5
                                 source: "qrc:/IconLibrary/material-icons/duotone/style.svg"
                             }
