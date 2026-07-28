@@ -7,17 +7,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(APP_NAME ${PROJECT_NAME})
-set(APP_VERSION ${CMAKE_PROJECT_VERSION})
-
 ################################################################################
 
-option(ENABLE_MBEDTLS "mbedTLS for PoGo+" ON)
 option(ENABLE_MEDIA_MPRIS "MPRIS media controller" ON)
 option(ENABLE_VOLUME_PIPEWIRE "Pipewire volume controller" ON)
 option(ENABLE_VOLUME_PULSEAUDIO "Pulseaudio volume controller" OFF)
 option(ENABLE_KEYBOARD_XTEST "Virtual keyboard using XTEST" OFF)
 option(ENABLE_KEYBOARD_UINPUT "Virtual keyboard using UInput" ON)
+
+option(ENABLE_MBEDTLS "mbedTLS for PoGo+ support" ON)
+option(ENABLE_ZXING "QrCode generator and scanner support" ON)
 
 ################################################################################
 
@@ -206,6 +205,7 @@ qt_add_qml_module(${PROJECT_NAME}
 )
 
 qt_add_translations(${PROJECT_NAME}
+    SOURCE_TARGETS ${PROJECT_NAME}
     TS_FILE_BASE ${PROJECT_NAME}
     TS_FILE_DIR ${PROJECT_SOURCE_DIR}/i18n/
     RESOURCE_PREFIX "/i18n"
@@ -222,7 +222,7 @@ function(add_other_files target)
 endfunction()
 
 add_other_files(${PROJECT_NAME}
-    README.md TODO.md LICENSE.md
+    README.md LICENSE.md TODO.md
     .gitignore
 )
 
@@ -241,31 +241,29 @@ if(NOT IOS AND NOT ANDROID)
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    add_definitions(-DENABLE_MBEDTLS)
-    add_definitions(-DENABLE_KEYBOARD_UINPUT)
-    add_definitions(-DENABLE_MEDIA_MPRIS)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_KEYBOARD_UINPUT)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_MEDIA_MPRIS)
     if(ENABLE_VOLUME_PIPEWIRE)
-        add_definitions(-DENABLE_VOLUME_PIPEWIRE)
+        target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_VOLUME_PIPEWIRE)
     elseif(ENABLE_VOLUME_PULSEAUDIO)
-        add_definitions(-DENABLE_VOLUME_PULSEAUDIO)
+        target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_VOLUME_PULSEAUDIO)
     endif()
 
     # D-Bus is used by the MPRIS media controller and the PulseAudio volume controller
     find_package(Qt6 REQUIRED COMPONENTS DBus)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::DBus)
-
-    target_link_libraries(${PROJECT_NAME} PUBLIC "-lmbedtls -lmbedx509 -lmbedcrypto")
 endif()
 
 ################################################################################
 
 # AppUtils
-set(UTILS_DOCK_ENABLED true)
-set(UTILS_WIFI_ENABLED true)
+set(UTILS_DOCK_ENABLED ON CACHE BOOL "" FORCE)
+set(UTILS_WIFI_ENABLED ON CACHE BOOL "" FORCE)
 add_subdirectory(thirdparty/AppUtils)
-target_link_libraries(${PROJECT_NAME} PRIVATE AppUtils)
+target_link_libraries(${PROJECT_NAME} PRIVATE AppUtils AppUtils_plugin)
 
 # SingleApplication
+set(QAPPLICATION_CLASS QApplication)
 add_subdirectory(thirdparty/SingleApplication)
 target_link_libraries(${PROJECT_NAME} PRIVATE SingleApplication)
 
@@ -277,18 +275,40 @@ target_link_libraries(${PROJECT_NAME} PRIVATE MobileUI MobileUI_plugin)
 add_subdirectory(thirdparty/ComponentLibrary)
 target_link_libraries(${PROJECT_NAME} PRIVATE ComponentLibrary_plugin)
 
-# zxing-cpp
-add_subdirectory(thirdparty/zxing-cpp)
-target_link_libraries(${PROJECT_NAME} PRIVATE ZXing)
-
-# zxing-cpp Qt wrapper
-add_definitions(-DENABLE_ZXING)
-add_subdirectory(thirdparty/zxing-cpp/wrappers/qt/)
-target_link_libraries(${PROJECT_NAME} PRIVATE ZXingQt)
-
 # RC4
 add_subdirectory(thirdparty/RC4)
 target_link_libraries(${PROJECT_NAME} PRIVATE RC4)
+
+if(ENABLE_ZXING)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_ZXING)
+
+    # zxing-cpp
+    add_subdirectory(thirdparty/zxing-cpp)
+    target_link_libraries(${PROJECT_NAME} PRIVATE ZXing)
+
+    # zxing-cpp Qt wrapper
+    add_subdirectory(thirdparty/zxing-cpp/wrappers/qt/)
+    target_link_libraries(${PROJECT_NAME} PRIVATE ZXingQt)
+endif()
+
+if(ENABLE_MBEDTLS)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_MBEDTLS)
+
+    # Using CMake include directory
+    set(ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+    set(ENABLE_PROGRAMS OFF CACHE BOOL "" FORCE)
+    set(MBEDTLS_FATAL_WARNINGS OFF CACHE BOOL "" FORCE)
+    add_subdirectory(thirdparty/mbedtls)
+    target_link_libraries(${PROJECT_NAME} PRIVATE MbedTLS::mbedtls)
+
+    # Using precompiled library + manual linking
+    #target_link_libraries(${PROJECT_NAME} PUBLIC "-lmbedtls3 -lmbedx509 -lmbedcrypto")
+
+    # Using precompiled library + ".cmake" files
+    #set(MbedTLS_DIR ${CMAKE_SOURCE_DIR}/contribs/env/${CONTRIBS_ARCH}/usr/lib/cmake/MbedTLS)
+    #find_package(MbedTLS REQUIRED)
+    #target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE MbedTLS::mbedtls)
+endif()
 
 # Qt libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -311,6 +331,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE thirdparty/)
 # Qt official hacks...
 set(QML_IMPORT_PATH
     "${CMAKE_BINARY_DIR}/thirdparty/"
+    "${CMAKE_BINARY_DIR}/thirdparty/AppUtils/"
     "${CMAKE_BINARY_DIR}/thirdparty/MobileUI"
     "${CMAKE_BINARY_DIR}/thirdparty/ComponentLibrary"
     CACHE STRING "QML Modules import paths" FORCE)
@@ -329,15 +350,16 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 
 ################################################################################
 
+include(GNUInstallDirs)
+
 ## Linux
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     # System install rules
-    install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin/)
-    install(FILES ${PROJECT_SOURCE_DIR}/assets/linux/${PROJECT_NAME}.desktop DESTINATION share/applications/)
-    #install(FILES ${PROJECT_SOURCE_DIR}/assets/linux/${PROJECT_NAME}.appdata.xml DESTINATION share/appdata/)
-    #install(FILES ${PROJECT_SOURCE_DIR}/assets/linux/${PROJECT_NAME}.svg DESTINATION share/pixmaps/)
-    #install(FILES ${PROJECT_SOURCE_DIR}/assets/linux/${PROJECT_NAME}.svg DESTINATION share/icons/hicolor/scalable/apps/)
-    #install(FILES ${PROJECT_SOURCE_DIR}/LICENSE.md DESTINATION share/licenses/${PROJECT_NAME}/)
+    install(FILES ${PROJECT_SOURCE_DIR}/assets/linux/${PROJECT_NAME}.desktop DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications/)
+    #install(FILES ${PROJECT_SOURCE_DIR}/assets/linux/${PROJECT_NAME}.appdata.xml DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/appdata/)
+    #install(FILES ${PROJECT_SOURCE_DIR}/assets/linux/${PROJECT_NAME}.svg DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pixmaps/)
+    #install(FILES ${PROJECT_SOURCE_DIR}/assets/linux/${PROJECT_NAME}.svg DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/scalable/apps/)
+    #install(FILES ${PROJECT_SOURCE_DIR}/LICENSE.md DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/licenses/${PROJECT_NAME}/)
 endif()
 
 ## macOS
@@ -379,6 +401,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Android")
         QT_ANDROID_TARGET_SDK_VERSION 36
         QT_ANDROID_PACKAGE_SOURCE_DIR "${PROJECT_SOURCE_DIR}/assets/android/"
     )
+
+    # Support 16 KB page sizes / pre NDK28
+    target_link_options(${PROJECT_NAME} PRIVATE "-Wl,-z,max-page-size=16384")
 endif()
 
 ## iOS

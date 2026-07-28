@@ -24,6 +24,8 @@
 
 #include <cmath>
 
+#include <QCoreApplication>
+#include <QQmlEngine>
 #include <QGuiApplication>
 #include <QQuickWindow>
 #include <QScreen>
@@ -45,25 +47,30 @@
 
 /* ************************************************************************** */
 
-UtilsScreen *UtilsScreen::instance = nullptr;
-
 UtilsScreen *UtilsScreen::getInstance()
 {
-    if (instance == nullptr)
-    {
-        instance = new UtilsScreen();
-    }
-
+    static UtilsScreen *instance = new UtilsScreen(QCoreApplication::instance());
     return instance;
 }
 
-UtilsScreen::UtilsScreen()
+UtilsScreen *UtilsScreen::create(QQmlEngine *, QJSEngine *)
+{
+    UtilsScreen *instance = getInstance();
+    QJSEngine::setObjectOwnership(instance, QJSEngine::CppOwnership);
+    return instance;
+}
+
+UtilsScreen::UtilsScreen(QObject *parent) : QObject(parent)
 {
     if (qApp)
     {
-        connect(qApp, &QGuiApplication::primaryScreenChanged, this, &UtilsScreen::getScreenInfos);
+        // Follow the primary screen, until a window is set.
+        // Otherwise, just keep following the primary screen...
+        connect(qApp, &QGuiApplication::primaryScreenChanged, this, [this](QScreen *scr) {
+            if (!m_win) setScreen(scr);
+        });
 
-        getScreenInfos(qApp->primaryScreen());
+        setScreen(qApp->primaryScreen());
     }
     else
     {
@@ -71,14 +78,45 @@ UtilsScreen::UtilsScreen()
     }
 }
 
-UtilsScreen::~UtilsScreen()
+/* ************************************************************************** */
+
+void UtilsScreen::setWindow(QObject *window)
 {
-    //
+    QWindow *win = qobject_cast<QWindow *>(window);
+    if (m_win == win) return;
+
+    if (m_win) disconnect(m_win, nullptr, this, nullptr);
+    m_win = win;
+
+    if (m_win)
+    {
+        // Re-evaluate when the window is moved to another screen
+        connect(m_win, &QWindow::screenChanged, this, [this](QScreen *scr) { setScreen(scr); });
+
+        if (m_win->screen()) setScreen(m_win->screen());
+    }
+}
+
+void UtilsScreen::setScreen(QScreen *scr)
+{
+    if (!scr || scr == m_scr) return;
+
+    // Drop the previous screen's connections
+    if (m_scr) disconnect(m_scr, nullptr, this, nullptr);
+
+    m_scr = scr;
+
+    // Track this screen DPIs and geometry changes
+    connect(m_scr, &QScreen::logicalDotsPerInchChanged,  this, [this]() { getScreenInfos(m_scr); });
+    connect(m_scr, &QScreen::physicalDotsPerInchChanged, this, [this]() { getScreenInfos(m_scr); });
+    connect(m_scr, &QScreen::geometryChanged,            this, [this]() { getScreenInfos(m_scr); });
+
+    getScreenInfos(m_scr);
 }
 
 /* ************************************************************************** */
 
-void UtilsScreen::getScreenInfos(const QScreen *scr)
+void UtilsScreen::getScreenInfos(QScreen *scr)
 {
     if (scr)
     {
@@ -91,7 +129,8 @@ void UtilsScreen::getScreenInfos(const QScreen *scr)
         m_screenDepth = scr->depth();
         m_screenRefreshRate = scr->refreshRate();
 
-        m_screenDpi = scr->physicalDotsPerInch();
+        m_screenDpiPhysical = scr->physicalDotsPerInch();
+        m_screenDpiLogical = scr->logicalDotsPerInch();
         m_screenPar = scr->devicePixelRatio();
         m_screenSizeInch = std::sqrt(std::pow(scr->physicalSize().width(), 2.0) +
                                      std::pow(scr->physicalSize().height(), 2.0)) / (2.54 * 10.0);

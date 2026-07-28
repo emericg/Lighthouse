@@ -8,9 +8,11 @@ import Lighthouse
 
 ApplicationWindow {
     id: appWindow
+
     flags: Qt.Window
     color: Theme.colorBackground
 
+    // Helpers
     property bool isDesktop: true
     property bool isMobile: false
     property bool isPhone: false

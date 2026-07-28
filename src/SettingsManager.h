@@ -23,12 +23,17 @@
 #define SETTINGS_MANAGER_H
 /* ************************************************************************** */
 
+#include <QtQml/qqmlregistration.h>
+
 #include <QObject>
 #include <QString>
 #include <QSize>
 #include <QList>
 #include <QDateTime>
 #include <QVariantList>
+
+class QQmlEngine;
+class QJSEngine;
 
 /* ************************************************************************** */
 
@@ -52,22 +57,25 @@ struct NetworkClientSettings
 class SettingsManager: public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_SINGLETON
 
     Q_PROPERTY(bool firstLaunch READ isFirstLaunch NOTIFY firstLaunchChanged)
 
     Q_PROPERTY(QSize initialSize READ getInitialSize NOTIFY initialSizeChanged)
     Q_PROPERTY(QSize initialPosition READ getInitialPosition NOTIFY initialSizeChanged)
-    Q_PROPERTY(int initialVisibility READ getInitialVisibility NOTIFY initialSizeChanged)
+    Q_PROPERTY(uint initialVisibility READ getInitialVisibility NOTIFY initialSizeChanged)
 
     Q_PROPERTY(QString appTheme READ getAppTheme WRITE setAppTheme NOTIFY appThemeChanged)
     Q_PROPERTY(bool appThemeAuto READ getAppThemeAuto WRITE setAppThemeAuto NOTIFY appThemeAutoChanged)
-    Q_PROPERTY(bool appThemeCSD READ getAppThemeCSD WRITE setAppThemeCSD NOTIFY appThemeCSDChanged)
-    Q_PROPERTY(int appUnits READ getAppUnits WRITE setAppUnits NOTIFY appUnitsChanged)
+    Q_PROPERTY(uint appThemeAutoMethod READ getAppThemeAutoMethod WRITE setAppThemeAutoMethod NOTIFY appThemeAutoChanged)
+    Q_PROPERTY(uint appUnitSystem READ getAppUnitSystem WRITE setAppUnitSystem NOTIFY appUnitSystemChanged)
     Q_PROPERTY(QString appLanguage READ getAppLanguage WRITE setAppLanguage NOTIFY appLanguageChanged)
 
+    Q_PROPERTY(bool minimized READ getMinimized WRITE setMinimized NOTIFY minimizedChanged)
     Q_PROPERTY(bool systray READ getSysTray WRITE setSysTray NOTIFY systrayChanged)
     Q_PROPERTY(bool notifications READ getNotifs WRITE setNotifs NOTIFY notifsChanged)
-    Q_PROPERTY(bool minimized READ getMinimized WRITE setMinimized NOTIFY minimizedChanged)
+
     Q_PROPERTY(bool bluetoothControl READ getBluetoothControl WRITE setBluetoothControl NOTIFY bluetoothControlChanged)
     Q_PROPERTY(bool bluetoothLimitScanningRange READ getBluetoothLimitScanningRange WRITE setBluetoothLimitScanningRange NOTIFY bluetoothLimitScanningRangeChanged)
     Q_PROPERTY(uint bluetoothSimUpdates READ getBluetoothSimUpdates WRITE setBluetoothSimUpdates NOTIFY bluetoothSimUpdatesChanged)
@@ -112,24 +120,27 @@ class SettingsManager: public QObject
 
     bool m_firstlaunch = true;
 
-    // Application window
-    QSize m_appSize;
-    QSize m_appPosition;
-    int m_appVisibility = 1;                //!< QWindow::Visibility
+    /// Application window
 
-    // Application generic
+    QSize m_appSize = QSize(1280, 720);
+    QSize m_appPosition = QSize(64, 64);
+    unsigned m_appVisibility = 1;               //!< QWindow::Visibility
+
+    /// Application generic
+
     QString m_appTheme = "THEME_DAY";
     bool m_appThemeAuto = false;
-    bool m_appThemeCSD = false;
-    int m_appUnits = 0;                     //!< QLocale::MeasurementSystem
+    unsigned m_appThemeAutoMethod = 0;
+    unsigned m_appUnitSystem = 0;               //!< QLocale::MeasurementSystem
     QString m_appLanguage = "auto";
 
-    // Application specific
-    bool m_startMinimized = false;
-    bool m_systrayEnabled = true;
-    bool m_notificationsEnabled = true;
+    /// Application specific
 
-    bool m_bluetoothControl = false;
+    bool m_startMinimized = false;
+    bool m_systrayEnabled = false;
+    bool m_notificationsEnabled = false;
+
+    bool m_bluetoothControl = true;
     bool m_bluetoothLimitScanningRange = false;
     unsigned m_bluetoothSimUpdates = 2;
 
@@ -177,21 +188,22 @@ class SettingsManager: public QObject
     QString m_netclientName;
     QString m_netclientToken;
 
-    // Singleton
-    static SettingsManager *instance;
-    SettingsManager();
-    ~SettingsManager();
+    /// SettingsManager
 
+    // Read / Write settings
     bool readSettings();
     bool writeSettings();
+
+    // Singleton
+    explicit SettingsManager(QObject *parent = nullptr);
 
 Q_SIGNALS:
     void firstLaunchChanged();
     void initialSizeChanged();
     void appThemeChanged();
     void appThemeAutoChanged();
-    void appThemeCSDChanged();
-    void appUnitsChanged();
+    void appThemeAutoMethodChanged();
+    void appUnitSystemChanged();
     void appLanguageChanged();
     void minimizedChanged();
     void systrayChanged();
@@ -230,29 +242,32 @@ public:
 
 public:
     static SettingsManager *getInstance();
+    static SettingsManager *create(QQmlEngine *, QJSEngine *);
 
-    ////
+    /// Generic
 
     bool isFirstLaunch() const { return m_firstlaunch; }
 
     QSize getInitialSize() { return m_appSize; }
     QSize getInitialPosition() { return m_appPosition; }
-    int getInitialVisibility() { return m_appVisibility; }
+    unsigned getInitialVisibility() { return m_appVisibility; }
 
-    QString getAppTheme() const { return m_appTheme; }
+    const QString &getAppTheme() const { return m_appTheme; }
     void setAppTheme(const QString &value);
 
     bool getAppThemeAuto() const { return m_appThemeAuto; }
     void setAppThemeAuto(const bool value);
 
-    bool getAppThemeCSD() const { return m_appThemeCSD; }
-    void setAppThemeCSD(const bool value);
+    unsigned getAppThemeAutoMethod() const { return m_appThemeAutoMethod; }
+    void setAppThemeAutoMethod(const unsigned value);
 
-    int getAppUnits() const { return m_appUnits; }
-    void setAppUnits(const int value);
+    unsigned getAppUnitSystem() const { return m_appUnitSystem; }
+    void setAppUnitSystem(const unsigned value);
 
-    QString getAppLanguage() const { return m_appLanguage; }
+    const QString &getAppLanguage() const { return m_appLanguage; }
     void setAppLanguage(const QString &value);
+
+    /// App
 
     bool getMinimized() const { return m_startMinimized; }
     void setMinimized(const bool value);
@@ -263,7 +278,7 @@ public:
     bool getNotifs() const { return m_notificationsEnabled; }
     void setNotifs(const bool value);
 
-    ////
+    ///
 
     bool getBluetoothControl() const { return m_bluetoothControl; }
     void setBluetoothControl(const bool value);
@@ -289,10 +304,10 @@ public:
     QString getTempUnit() const { return m_tempUnit; }
     void setTempUnit(const QString &value);
 
-    QString getGraphHistogram() const { return m_graphHistogram; }
+    const QString &getGraphHistogram() const { return m_graphHistogram; }
     void setGraphHistogram(const QString &value);
 
-    QString getGraphThermometer() const { return m_graphThermometer; }
+    const QString &getGraphThermometer() const { return m_graphThermometer; }
     void setGraphThermometer(const QString &value);
 
     bool getGraphShowDots() const { return m_graphShowDots; }
@@ -307,12 +322,12 @@ public:
     bool getDynaScale() const { return m_dynaScale; }
     void setDynaScale(const bool value);
 
-    QString getOrderBy() const { return m_orderBy; }
+    const QString &getOrderBy() const { return m_orderBy; }
     void setOrderBy(const QString &value);
 
     unsigned getDataRetentionDays() const { return m_dataRetentionDays; }
 
-    ////
+    ///
 
     bool getFakeIt() const { return m_fakeIt; }
     void setFakeIt(const bool value);
@@ -320,50 +335,50 @@ public:
     int getVolumeLimit() const { return m_volumeLimit; }
     void setVolumeLimit(const int value);
 
-    ////
+    ///
 
     bool getMySQL() const { return m_mysql; }
     void setMySQL(const bool value);
 
-    QString getMysqlHost() const { return m_mysqlHost; }
+    const QString &getMysqlHost() const { return m_mysqlHost; }
     void setMysqlHost(const QString &value);
 
     int getMysqlPort() const { return m_mysqlPort; }
     void setMysqlPort(const int value);
 
-    QString getMysqlName() const { return m_mysqlName; }
+    const QString &getMysqlName() const { return m_mysqlName; }
     void setMysqlName(const QString &value);
 
-    QString getMysqlUser() const { return m_mysqlUser; }
+    const QString &getMysqlUser() const { return m_mysqlUser; }
     void setMysqlUser(const QString &value);
 
-    QString getMysqlPassword() const { return m_mysqlPassword; }
+    const QString &getMysqlPassword() const { return m_mysqlPassword; }
     void setMysqlPassword(const QString &value);
 
-    ////
+    ///
 
     bool getMQTT() const { return m_mqtt; }
     void setMQTT(const bool value);
 
-    QString getMqttHost() const { return m_mqttHost; }
+    const QString &getMqttHost() const { return m_mqttHost; }
     void setMqttHost(const QString &value);
 
     int getMqttPort() const { return m_mqttPort; }
     void setMqttPort(const int value);
 
-    QString getMqttName() const { return m_mqttName; }
+    const QString &getMqttName() const { return m_mqttName; }
     void setMqttName(const QString &value);
 
-    QString getMqttUser() const { return m_mqttUser; }
+    const QString &getMqttUser() const { return m_mqttUser; }
     void setMqttUser(const QString &value);
 
-    QString getMqttPassword() const { return m_mqttPassword; }
+    const QString &getMqttPassword() const { return m_mqttPassword; }
     void setMqttPassword(const QString &value);
 
-    QString getMqttTopics() const { return m_mqttTopics; }
+    const QString &getMqttTopics() const { return m_mqttTopics; }
     void setMqttTopics(const QString &value);
 
-    ////
+    ///
 
     bool getNetCtrl() const { return m_netctrl; }
     void setNetCtrl(const bool value);
@@ -383,11 +398,12 @@ public:
     QString getNetCtrlPassword() const { return m_netctrlPassword; }
     void setNetCtrlPassword(const QString &value);
 
+    //! Set the server settings, all at once
+    Q_INVOKABLE bool setNetCtrlSettings(const QString &value);
+
     const QList <NetworkClientSettings> &getNetCtrlClients() const { return m_netctrlClients; }
     QList <NetworkClientSettings> &getNetCtrlClients() { return m_netctrlClients; }
     void saveNetCtrlClients();
-
-    ////
 
     QString getNetClientName() const { return m_netclientName; }
     void setNetClientName(const QString &value);
@@ -395,13 +411,10 @@ public:
     QString getNetClientToken() const { return m_netclientToken; }
     void setNetClientToken(const QString &value);
 
-    // Utils
+    /// Utils
 
-    //! Set the server settings, all at once
-    Q_INVOKABLE bool setNetCtrlSettings(const QString &value);
-
-    Q_INVOKABLE void reloadSettings();
     Q_INVOKABLE void resetSettings();
+    void reloadSettings();
 };
 
 /* ************************************************************************** */
