@@ -150,6 +150,8 @@ qt_add_qml_module(${PROJECT_NAME}
 
         qml/ScreenTutorial.qml
         qml/ScreenDeviceList.qml
+        qml/DeviceListHeader_desktop.qml
+        qml/DeviceListHeader_mobile.qml
         qml/ScreenSettings.qml
         qml/ScreenAbout.qml
         qml/DeviceBeacon.qml
