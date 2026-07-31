@@ -19,6 +19,9 @@ Release/*
 *.xcodeproj/*
 asset_catalog_compiler.Info.plist
 
+# Optional thirdparties
+thirdparty/mbedtls
+
 # Others
 stash/*
 .DS_Store

@@ -15,7 +15,7 @@ option(ENABLE_VOLUME_PULSEAUDIO "Pulseaudio volume controller" OFF)
 option(ENABLE_KEYBOARD_XTEST "Virtual keyboard using XTEST" OFF)
 option(ENABLE_KEYBOARD_UINPUT "Virtual keyboard using UInput" ON)
 
-option(ENABLE_MBEDTLS "mbedTLS for PoGo+ support" ON)
+option(ENABLE_MBEDTLS "mbedTLS for proper crypto support" OFF)
 option(ENABLE_ZXING "QrCode generator and scanner support" ON)
 
 ################################################################################
@@ -87,6 +87,7 @@ set(SOURCES
     src/network_controls/network_client.cpp src/network_controls/network_client.h
     src/network_controls/network_art_provider.h
 
+    src/crypto/aes_wrapper.cpp src/crypto/aes_wrapper.h
     src/crypto/pgp/pgp_crypto.cpp src/crypto/pgp/pgp_crypto.h
     src/crypto/pgp/pgp_keystore.cpp src/crypto/pgp/pgp_keystore.h
 
@@ -300,6 +301,7 @@ if(ENABLE_ZXING)
 endif()
 
 if(ENABLE_MBEDTLS)
+    message(STATUS "[CRYPTO] AES backend                = mbedTLS")
     target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_MBEDTLS)
 
     # Using CMake include directory
@@ -316,6 +318,8 @@ if(ENABLE_MBEDTLS)
     #set(MbedTLS_DIR ${CMAKE_SOURCE_DIR}/contribs/env/${CONTRIBS_ARCH}/usr/lib/cmake/MbedTLS)
     #find_package(MbedTLS REQUIRED)
     #target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE MbedTLS::mbedtls)
+else()
+    message(STATUS "[CRYPTO] AES backend                = tinyAES")
 endif()
 
 # Qt libraries

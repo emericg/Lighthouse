@@ -21,10 +21,7 @@
 
 #include "device_ylkg07yl.h"
 
-#if defined(ENABLE_MBEDTLS) && !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
-#include "mbedtls/aes.h"
-#include "mbedtls/ccm.h"
-#endif
+#include "../crypto/aes_wrapper.h"
 
 #include <QBluetoothUuid>
 #include <QBluetoothAddress>
@@ -35,7 +32,6 @@
 #include <QDebug>
 
 #include <cstdint>
-#include <cmath>
 
 /* ************************************************************************** */
 
@@ -140,7 +136,6 @@ void DeviceYLKG07YL::parseAdvertisementData(const uint16_t type,
         uint8_t beaconkey[12] = {0xA1, 0xB1, 0xC1, 0xD1, 0xE1, 0xF1, 0xA2, 0xB2, 0xC2, 0xD2, 0xE2, 0xF2};
         uint8_t beaconkey_padding[4] = {0x8D, 0x3D, 0x3C, 0x97};
         uint8_t key[16] = {0xA1, 0xB1, 0xC1, 0xD1, 0xE1, 0xF1, 0x8D, 0x3D, 0x3C, 0x97, 0xA2, 0xB2, 0xC2, 0xD2, 0xE2, 0xF2};
-        uint8_t add[1] = {0x11};
 
         if (m_beaconkey.size() == 24)
         {
@@ -165,25 +160,15 @@ void DeviceYLKG07YL::parseAdvertisementData(const uint16_t type,
             return;
         }
 
-        uint8_t *data_uint8 = new uint8_t [ba.size()];
-        memcpy(data_uint8, data, ba.size());
-
-        uint8_t *mac_reversed;
-        uint8_t *frame_ctl_data;
-        uint8_t *device_type;
-        uint8_t *encrypted_payload;
-        uint8_t *encrypted_payload_counter;
-        uint8_t *packet_id;
+        const uint8_t *frame_ctl_data = data;
+        const uint8_t *device_type = data + 2;
+        const uint8_t *packet_id = data + 4;
+        const uint8_t *mac_reversed = data + 5;
+        const uint8_t *encrypted_payload = data + 11;
+        const uint8_t *encrypted_payload_counter = encrypted_payload + 6;
 
         uint8_t nonce[13];
         uint8_t decrypted_payload[6];
-
-        frame_ctl_data = data_uint8;
-        device_type = data_uint8 + 2;
-        packet_id = data_uint8 + 4;
-        mac_reversed = data_uint8 + 5;
-        encrypted_payload = data_uint8 + 11;
-        encrypted_payload_counter = encrypted_payload + 6;
 
         uint8_t offset = 0;
         memcpy(nonce + offset, frame_ctl_data, 2);
@@ -197,34 +182,16 @@ void DeviceYLKG07YL::parseAdvertisementData(const uint16_t type,
         memcpy(nonce + offset, mac_reversed, 5);
         offset += 5;
 
-#if defined(ENABLE_MBEDTLS) && !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
-        // USING MBED
-        mbedtls_ccm_context mtctx;
-        mbedtls_ccm_init(&mtctx);
-        if (mbedtls_ccm_setkey(&mtctx, MBEDTLS_CIPHER_ID_AES, key, 128) != 0)
+        // The advertisement carries no MAC, so this is CCM* with an empty tag: there is
+        // nothing to authenticate, and the 0x11 associated data would not change the
+        // plaintext either way. A wrong beacon key yields garbage, not an error.
+        if (aes128_ccm_star_decrypt(key, nonce, sizeof(nonce),
+                                    encrypted_payload, sizeof(decrypted_payload),
+                                    decrypted_payload) != 0)
         {
-            qWarning() << "CCM setup failed";
+            qWarning() << "DeviceYLKG07YL: CCM decryption failed";
             return;
         }
-
-        int res = mbedtls_ccm_star_auth_decrypt(&mtctx, 1,
-                             nonce, 13,
-                             NULL, 0,
-                             add, add,
-                             NULL, 0);
-        if (res != 0)
-            return;
-
-        res = mbedtls_ccm_star_auth_decrypt(&mtctx, 6,
-                             nonce, 13,
-                             NULL, 0,
-                             encrypted_payload, decrypted_payload,
-                             NULL, 0);
-        if (res != 0)
-            return;
-
-        mbedtls_ccm_free(&mtctx);
-#endif
 
         int8_t value1 = decrypted_payload[3];
         int8_t value2 = decrypted_payload[4];

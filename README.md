@@ -47,8 +47,10 @@ You will need a C++17 compiler and Qt 6.8+ with the following 'additional librai
 - Qt Multimedia
 - Qt Quick 3D (for desktop builds)
 
-You will also need the `mbedtls` librairie installed in order to handle YLKG07YL and YLKG08YL devices.  
-On linux you'll need an `uinput` enabled kernel.  
+On Linux you'll need an `uinput` enabled kernel.  
+
+AES support comes from the bundled `tinyAES`.  
+You can build against `mbedTLS` 3.6 for 'proper' crypto support instead. Place it under `thirdparty/mbedtls/`, enable it with `-DENABLE_MBEDTLS=ON`.  
 
 For macOS and iOS builds, you'll need Xcode (15+) installed.  
 For Windows builds, you'll need MSVC (2022) installed. Bluetooth won't work with MinGW.  
