@@ -241,6 +241,9 @@ void DeviceMiPow::setOff()
         v.push_back(char(0));
         v.push_back(char(0));
 
+        m_brightness = 0;
+        m_colors = 0;
+
         QBluetoothUuid ic(QStringLiteral("0000fffc-0000-1000-8000-00805f9b34fb"));
         QLowEnergyCharacteristic cic = serviceData->characteristic(ic);
         serviceData->writeCharacteristic(cic, v, QLowEnergyService::WriteWithoutResponse);
@@ -260,6 +263,7 @@ void DeviceMiPow::setLuminosity(unsigned brightness)
         v.push_back(char(0));
 
         m_brightness = brightness;
+        m_colors = 0;
 
         QBluetoothUuid ic(QStringLiteral("0000fffc-0000-1000-8000-00805f9b34fb"));
         QLowEnergyCharacteristic cic = serviceData->characteristic(ic);
@@ -280,6 +284,7 @@ void DeviceMiPow::setColors(unsigned brightness, unsigned r, unsigned g, unsigne
         v.push_back(char(b));
 
         m_brightness = brightness;
+        m_colors = ((r & 0xff) << 16) + ((g & 0xff) << 8) + (b & 0xff);
 
         QBluetoothUuid ic(QStringLiteral("0000fffc-0000-1000-8000-00805f9b34fb"));
         QLowEnergyCharacteristic cic = serviceData->characteristic(ic);

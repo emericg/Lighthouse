@@ -103,7 +103,7 @@ T.Popup {
                 text: qsTr("Connect")
                 source: "qrc:/IconLibrary/material-icons/outlined/bluetooth_disabled.svg"
                 layoutDirection: actionMenu.layoutDirection
-                visible: (deviceManager.bluetooth && selectedDevice && !selectedDevice.busy)
+                visible: (deviceManager.bluetooth && selectedDevice && !selectedDevice.connected)
 
                 onClicked: {
                     deviceConnectButtonClicked()
@@ -121,7 +121,7 @@ T.Popup {
                 text: qsTr("Disconnect")
                 source: "qrc:/IconLibrary/material-icons/outlined/bluetooth_disabled.svg"
                 layoutDirection: actionMenu.layoutDirection
-                visible: (deviceManager.bluetooth && selectedDevice && selectedDevice.busy)
+                visible: (deviceManager.bluetooth && selectedDevice && selectedDevice.connected)
 
                 onClicked: {
                     deviceDisconnectButtonClicked()

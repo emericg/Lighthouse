@@ -356,22 +356,27 @@ Loader {
                     return singleColumn ? (parent.height - headerBox.height) : parent.height
                 }
 
-                ////////
+                ////////////////
 
                 ItemLoadData {
                     id: itemLoadData
                     anchors.centerIn: parent
                 }
 
-                ////////
+                ////////////////
 
                 Column {
                     id: columnLightbulb
                     anchors.fill: parent
                     anchors.margins: isPhone ? 12 : 24
 
-                    spacing: 16
+                    topPadding: 8
+                    bottomPadding: 0
+                    spacing: 12
+
                     visible: (currentDevice && currentDevice.status >= DeviceUtils.DEVICE_CONNECTED)
+
+                    ////////
 
                     Item {
                         anchors.left: parent.left
@@ -431,6 +436,10 @@ Loader {
 
                     ////////
 
+                    Item { width: 4; height: 4; } // spacer
+
+                    ////////
+
                     Item {
                         anchors.left: parent.left
                         anchors.right: parent.right
@@ -454,14 +463,19 @@ Loader {
 
                             onMoved: {
                                 var l = slider_luminosity.value
-                                var c = Qt.hsva(slider_color.value, 1, 1, 1)
 
-                                currentDevice.setColors_float(l, c.r, c.g, c.b)
+                                if (btnLightMode.currentSelection === 4) {
+                                    var c = Qt.hsva(slider_color.value, 1, 1, 1)
+                                    currentDevice.setColors_float(l, c.r, c.g, c.b)
+                                } else {
+                                    // white only, or the color we just turned off would come back
+                                    currentDevice.setColors_float(l, 0, 0, 0)
+                                }
                             }
                         }
                     }
 
-                    ////////////////
+                    ////////
 
                     Item {
                         anchors.left: parent.left

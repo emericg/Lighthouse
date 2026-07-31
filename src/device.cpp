@@ -23,6 +23,10 @@
 #include "DeviceManager.h"
 #include "SettingsManager.h"
 
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+#include "utils_screen.h"
+#endif
+
 #include <cstdlib>
 #include <cmath>
 
