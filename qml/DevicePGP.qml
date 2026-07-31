@@ -241,6 +241,10 @@ Loader {
                     RemoteButtonWidget { // btn1
                         currentButton: currentDevice.btn1
                     }
+
+                    PgpButtonKey { // device key
+                        currentDevice: devicePGP.currentDevice
+                    }
                 }
             }
 

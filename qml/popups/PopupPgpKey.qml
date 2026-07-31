@@ -1,11 +1,12 @@
 import QtQuick
 import QtQuick.Effects
 import QtQuick.Controls
+import Qt.labs.platform
 
 import ComponentLibrary
 
 Popup {
-    id: popupBeaconKey
+    id: popupPgpKey
 
     x: singleColumn ? 0 : (appWindow.width / 2) - (width / 2)
     y: singleColumn ? (appWindow.height - appHeader.height - height)
@@ -24,12 +25,14 @@ Popup {
 
     signal confirmed()
 
+    property var currentDevice: null
+
+    property url selectedFile
+    property string errorString
+
     onAboutToShow: {
-        textInputBeaconKey.text = selectedDevice.beaconkey
-        textInputBeaconKey.focus = false
-    }
-    onAboutToHide: {
-        textInputBeaconKey.focus = false
+        selectedFile = ""
+        errorString = ""
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -67,6 +70,21 @@ Popup {
 
     ////////////////////////////////////////////////////////////////////////////
 
+    FileDialog {
+        id: fileDialogPgpKey
+        title: qsTr("Please choose a key dump")
+
+        fileMode: FileDialog.OpenFile
+        nameFilters: [qsTr("Key dump") + " (*.json)", qsTr("All files") + " (*)"]
+
+        onAccepted: {
+            popupPgpKey.selectedFile = file
+            popupPgpKey.errorString = ""
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+
     contentItem: Item {
         Column {
             id: columnContent
@@ -80,7 +98,7 @@ Popup {
                 anchors.left: parent.left
                 anchors.right: parent.right
 
-                text: qsTr("Set the beacon key of this remote")
+                text: qsTr("Set the device key of this Pokemon GO Plus")
                 textFormat: Text.PlainText
                 font.pixelSize: Theme.fontSizeContentVeryBig
                 color: Theme.colorText
@@ -98,8 +116,8 @@ Popup {
                     anchors.left: parent.left
                     anchors.right: parent.right
 
-                    text: qsTr("A beacon key MUST be set before you can use this remote.") + "<br>" +
-                          qsTr("The expected format is a 24 hexadecimal characters string.")
+                    text: qsTr("A device key MUST be set before you can use this device.") + "<br>" +
+                          qsTr("Every Pokemon GO Plus has its own key, burned into its memory at the factory: it cannot be guessed or computed, it has to be extracted from the device itself.")
                     textFormat: Text.StyledText
                     font.pixelSize: Theme.fontSizeContent
                     color: Theme.colorSubText
@@ -110,7 +128,7 @@ Popup {
                     anchors.left: parent.left
                     anchors.right: parent.right
 
-                    text: qsTr("You can extract the key using this <a href=\"https://github.com/custom-components/ble_monitor/blob/master/custom_components/ble_monitor/ble_parser/get_beacon_key.py\">python script</a>.")
+                    text: qsTr("You can extract it using the <a href=\"https://github.com/Jesus805/Suota-Go-Plus\">SUOTA Go+ tool</a>, which will produce a small '.json' file. Select that file below, it will be copied next to the application settings.")
                     textFormat: Text.StyledText
                     font.pixelSize: Theme.fontSizeContent
                     color: Theme.colorSubText
@@ -129,23 +147,46 @@ Popup {
                     color: Theme.colorSubText
                     wrapMode: Text.WordWrap
                 }
+            }
 
-                TextFieldThemed {
-                    id: textInputBeaconKey
+            ////////
+
+            Column {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                spacing: 8
+
+                ButtonSolid {
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    height: 40
+
+                    color: (popupPgpKey.selectedFile.toString() !== "" || (popupPgpKey.currentDevice && popupPgpKey.currentDevice.hasDeviceKey)) ?
+                               Theme.colorSuccess : Theme.colorSubText
+
+                    source: "qrc:/IconLibrary/material-symbols/folder_open.svg"
+                    text: {
+                        if (popupPgpKey.selectedFile.toString() !== "") {
+                            return decodeURIComponent(popupPgpKey.selectedFile.toString().split('/').pop())
+                        }
+                        if (popupPgpKey.currentDevice && popupPgpKey.currentDevice.hasDeviceKey) {
+                            return qsTr("Replace the current key dump")
+                        }
+                        return qsTr("Select a key dump")
+                    }
+                    onClicked: fileDialogPgpKey.open()
+                }
+
+                Text {
                     anchors.left: parent.left
                     anchors.right: parent.right
 
-                    font.pixelSize: Theme.fontSizeContentBig
-                    font.bold: false
-                    color: Theme.colorText
-
-                    overwriteMode: true
-                    maximumLength: 24
-                    inputMask: "HHHHHHHHHHHHHHHHHHHHHHHH"
-                    //validator: RegularExpressionValidator { regularExpression: /[0-9A-F]+/ }
-                    inputMethodHints: Qt.ImhNoPredictiveText
-
-                    placeholderText: "AABBCCDDEEFFGGHHIIJJKKLL"
+                    visible: (popupPgpKey.errorString !== "")
+                    text: popupPgpKey.errorString
+                    textFormat: Text.PlainText
+                    font.pixelSize: Theme.fontSizeContent
+                    color: Theme.colorWarning
+                    wrapMode: Text.WordWrap
                 }
             }
 
@@ -165,10 +206,7 @@ Popup {
                     color: Theme.colorGrey
 
                     text: qsTr("Cancel")
-                    onClicked: {
-                        textInputBeaconKey.focus = false
-                        popupBeaconKey.close()
-                    }
+                    onClicked: popupPgpKey.close()
                 }
                 ButtonFlat {
                     width: parent.btnSize
@@ -176,12 +214,19 @@ Popup {
 
                     text: qsTr("Set key")
                     onClicked: {
-                        if (selectedDevice /*&& textInputBeaconKey.text.length === 24*/) {
-                            selectedDevice.setBeaconKey(textInputBeaconKey.text)
+                        if (popupPgpKey.selectedFile.toString() === "") {
+                            popupPgpKey.errorString = qsTr("Please select a key dump first.")
+                            return
                         }
-                        textInputBeaconKey.focus = false
-                        popupBeaconKey.confirmed()
-                        popupBeaconKey.close()
+                        if (!popupPgpKey.currentDevice) return
+
+                        if (!popupPgpKey.currentDevice.setDeviceKeyFile(popupPgpKey.selectedFile)) {
+                            popupPgpKey.errorString = qsTr("This file is not a valid key dump for this device.")
+                            return
+                        }
+
+                        popupPgpKey.confirmed()
+                        popupPgpKey.close()
                     }
                 }
             }

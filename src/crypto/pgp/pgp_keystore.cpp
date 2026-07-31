@@ -36,6 +36,22 @@ QString pgp_keys_directory()
     return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/pgp";
 }
 
+/*!
+ * File name a dump gets when we install it: the device address, minus the characters
+ * that are not legal in a file name on every platform we build for ("::" on Windows,
+ * the braces around the UUID we use as an address on macOS and iOS).
+ */
+static QString pgp_keys_filename(const QString &deviceAddress)
+{
+    QString name = deviceAddress.trimmed().toUpper();
+
+    name.replace(':', '-');
+    name.remove('{');
+    name.remove('}');
+
+    return name + ".json";
+}
+
 PgpKeys pgp_load_keys(const QString &deviceAddress)
 {
     PgpKeys keys;
@@ -90,6 +106,79 @@ PgpKeys pgp_load_keys(const QString &deviceAddress)
 
     qWarning() << "PGP: no key dump for" << wanted << "in" << dir.absolutePath();
     return keys;
+}
+
+bool pgp_has_keys(const QString &deviceAddress)
+{
+    return pgp_load_keys(deviceAddress).isValid();
+}
+
+bool pgp_import_keys(const QString &deviceAddress, const QString &filePath)
+{
+    const QString wanted = deviceAddress.trimmed().toUpper();
+
+    QFile src(filePath);
+    if (!src.open(QIODevice::ReadOnly))
+    {
+        qWarning() << "PGP: cannot read key dump" << filePath << ":" << src.errorString();
+        return false;
+    }
+    const QByteArray content = src.readAll();
+    src.close();
+
+    QJsonParseError err;
+    const QJsonDocument doc = QJsonDocument::fromJson(content, &err);
+    if (err.error != QJsonParseError::NoError || !doc.isObject())
+    {
+        qWarning() << "PGP: cannot parse key dump" << filePath << ":" << err.errorString();
+        return false;
+    }
+
+    // We never log the values themselves, only whether they are the right shape
+    const QJsonObject obj = doc.object();
+    const QString address = obj.value("bluetooth").toString().trimmed().toUpper();
+    const QByteArray deviceKey = QByteArray::fromHex(obj.value("device").toString().toLatin1());
+    const QByteArray blob = QByteArray::fromHex(obj.value("blob").toString().toLatin1());
+
+    if (deviceKey.size() != 16 || blob.size() != 256)
+    {
+        qWarning() << "PGP: key dump" << filePath << "is malformed (device key" << deviceKey.size()
+                   << "bytes, blob" << blob.size() << "bytes)";
+        return false;
+    }
+    if (address != wanted)
+    {
+        // The dump carries the address it was taken from, and that is what we match on when loading
+        qWarning() << "PGP: key dump" << filePath << "belongs to" << address << "not to" << wanted;
+        return false;
+    }
+
+    QDir dir(pgp_keys_directory());
+    if (!dir.mkpath("."))
+    {
+        qWarning() << "PGP: cannot create key directory" << dir.absolutePath();
+        return false;
+    }
+
+    // Note: the source file may already be the destination, so the content has to be read before this
+    const QString destination = dir.filePath(pgp_keys_filename(wanted));
+    QFile dst(destination);
+    if (!dst.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
+        qWarning() << "PGP: cannot write" << destination << ":" << dst.errorString();
+        return false;
+    }
+    const bool written = (dst.write(content) == content.size());
+    dst.close();
+
+    if (!written)
+    {
+        qWarning() << "PGP: cannot write" << destination;
+        return false;
+    }
+
+    qDebug() << "PGP: installed keys for" << wanted << "at" << destination;
+    return true;
 }
 
 /* ************************************************************************** */

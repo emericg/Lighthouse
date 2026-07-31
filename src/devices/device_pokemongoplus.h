@@ -28,6 +28,7 @@
 
 #include <QObject>
 #include <QList>
+#include <QUrl>
 
 #include <QBluetoothDeviceInfo>
 #include <QBluetoothUuid>
@@ -50,8 +51,10 @@ class DevicePokemonGoPlus: public DeviceBeacon
     Q_OBJECT
 
     Q_PROPERTY(bool autoConnect READ getAutoConnect WRITE setAutoConnect NOTIFY autoconnectChanged)
+    Q_PROPERTY(bool hasDeviceKey READ hasDeviceKey NOTIFY deviceKeyChanged)
 
     bool m_autoConnect = true;
+    bool m_hasDeviceKey = false;
 
     ////////
 
@@ -136,6 +139,7 @@ class DevicePokemonGoPlus: public DeviceBeacon
 Q_SIGNALS:
     void autoconnectChanged();
     void btnChanged();
+    void deviceKeyChanged();
 
 protected:
     int getButtonCount() { return 1; }
@@ -150,6 +154,15 @@ public:
 
     bool getAutoConnect() { return m_autoConnect; }
     void setAutoConnect(const bool value);
+
+    //! Whether a key dump for this device has already been installed
+    bool hasDeviceKey() const { return m_hasDeviceKey; }
+
+    //! Installs the key dump the user picked, returns false if it isn't usable for this device
+    Q_INVOKABLE bool setDeviceKeyFile(const QUrl &fileUrl);
+
+    //! Where the key dumps live, so the UI can point the user at it
+    Q_INVOKABLE QString getDeviceKeyDirectory() const { return pgp_keys_directory(); }
 
     void setNotification(const QByteArray &value);
 };

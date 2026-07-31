@@ -47,6 +47,8 @@ DevicePokemonGoPlus::DevicePokemonGoPlus(QString &deviceAddr, QString &deviceNam
     {
         m_autoConnect = (getSetting("autoConnect").toString() == "true");
     }
+
+    m_hasDeviceKey = pgp_has_keys(m_deviceAddress);
 }
 
 DevicePokemonGoPlus::DevicePokemonGoPlus(const QBluetoothDeviceInfo &d, QObject *parent):
@@ -61,6 +63,8 @@ DevicePokemonGoPlus::DevicePokemonGoPlus(const QBluetoothDeviceInfo &d, QObject 
     {
         m_autoConnect = (getSetting("autoConnect").toString() == "true");
     }
+
+    m_hasDeviceKey = pgp_has_keys(m_deviceAddress);
 }
 
 DevicePokemonGoPlus::~DevicePokemonGoPlus()
@@ -82,6 +86,18 @@ void DevicePokemonGoPlus::setAutoConnect(const bool value)
 
         setSetting("autoConnect", m_autoConnect);
     }
+}
+
+bool DevicePokemonGoPlus::setDeviceKeyFile(const QUrl &fileUrl)
+{
+    const QString path = fileUrl.isLocalFile() ? fileUrl.toLocalFile() : fileUrl.toString();
+
+    if (!pgp_import_keys(m_deviceAddress, path)) return false;
+
+    m_hasDeviceKey = true;
+    Q_EMIT deviceKeyChanged();
+
+    return true;
 }
 
 void DevicePokemonGoPlus::setNotification(const QByteArray &value)
@@ -222,9 +238,9 @@ void DevicePokemonGoPlus::subscribeToSfidaCommands()
 {
     if (!m_serviceCertificate) return;
 
-        QLowEnergyCharacteristic csfida = m_serviceCertificate->characteristic(s_chrSfidaCommands);
-        m_sifdaNotifDesc = csfida.clientCharacteristicConfiguration();
-        m_serviceCertificate->writeDescriptor(m_sifdaNotifDesc, QByteArray::fromHex("0100"));
+    QLowEnergyCharacteristic csfida = m_serviceCertificate->characteristic(s_chrSfidaCommands);
+    m_sifdaNotifDesc = csfida.clientCharacteristicConfiguration();
+    m_serviceCertificate->writeDescriptor(m_sifdaNotifDesc, QByteArray::fromHex("0100"));
 
     certificationStart();
 }

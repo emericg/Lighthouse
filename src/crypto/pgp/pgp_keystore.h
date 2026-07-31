@@ -67,6 +67,22 @@ struct PgpKeys
 PgpKeys pgp_load_keys(const QString &deviceAddress);
 
 /*!
+ * Whether we already have a usable key dump for a given device address.
+ */
+bool pgp_has_keys(const QString &deviceAddress);
+
+/*!
+ * Installs a key dump the user picked for a given device address.
+ *
+ * The file is validated (shape of the keys, and the "bluetooth" field matching the device,
+ * otherwise pgp_load_keys() would never pick it up) then copied to the key directory,
+ * named after the device address.
+ *
+ * Returns false and leaves the key directory untouched if the dump is not usable.
+ */
+bool pgp_import_keys(const QString &deviceAddress, const QString &filePath);
+
+/*!
  * Directory the key dumps are read from, so we can tell the user where to put them.
  */
 QString pgp_keys_directory();
