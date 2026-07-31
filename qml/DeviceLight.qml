@@ -140,7 +140,7 @@ Loader {
                 return
             }
 
-            currentDevice.deviceDisconnect()
+            currentDevice.actionDisconnect()
 
             screenDeviceList.loadScreen()
         }
@@ -158,10 +158,10 @@ Loader {
             id: colorDialog
             title: "Please choose a color"
 
-            currentColor: selectedDevice.colorSaved
+            currentColor: (currentDevice && currentDevice.colorSaved) ? currentDevice.colorSaved : "#FFFFFF"
             onAccepted: {
                 //console.log("colorDialog::onAccepted(" + color + ")")
-                selectedDevice.setColorSaved(color)
+                currentDevice.setColorSaved(color)
 
                 colorSaved.selection = 12
                 currentDevice.setColors_rgb_hex(color)
@@ -760,7 +760,7 @@ Loader {
                             height: colorSaved.hh*2 + colorSaved.spacing
                             radius: colorSaved.rr
 
-                            color: selectedDevice && selectedDevice.colorSaved
+                            color: (currentDevice && currentDevice.colorSaved) ? currentDevice.colorSaved : "#FFFFFF"
                             border.width: (colorSaved.selection === cid) ? 3 : 2
                             border.color: (colorSaved.selection === cid) ? Theme.colorPrimary : Qt.darker(color, 1.05)
 

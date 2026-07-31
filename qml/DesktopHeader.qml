@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Layouts
 
 import ComponentLibrary
 import DeviceUtils
@@ -15,16 +16,26 @@ Rectangle {
     clip: false
     z: 10
 
-    property int headerHeight: isHdpi ? 60 : 64
+    ////////////////////////////////////////////////////////////////////////////
 
-    property int headerPosition: 64
+    property int headerHeight: isHdpi ? 58 : 64
+
+    property int headerPosition: 64 // horizontal
+
+    property bool headerCompact: Theme.singleColumn
 
     property string headerTitle: "Lighthouse"
+
+    property string headerSubTitle: (selectedDevice && selectedDevice.deviceModel)
 
     ////////////////////////////////////////////////////////////////////////////
 
     signal backButtonClicked()
-    signal rightMenuClicked() // compatibility
+    signal rightMenuClicked() // mobile header compatibility
+
+    signal refreshButtonClicked()
+    signal syncButtonClicked()
+    signal scanButtonClicked()
 
     signal deviceConnectButtonClicked()
     signal deviceDisconnectButtonClicked()
@@ -32,6 +43,7 @@ Rectangle {
     signal deviceRebootButtonClicked()
     signal deviceCalibrateButtonClicked()
     signal deviceWateringButtonClicked()
+    signal deviceWateringSettingsButtonClicked()
     signal deviceLedButtonClicked()
     signal deviceRefreshButtonClicked()
     signal deviceRefreshRealtimeButtonClicked()
@@ -43,9 +55,6 @@ Rectangle {
     signal devicePlantButtonClicked()
     signal deviceSettingsButtonClicked()
 
-    signal refreshButtonClicked()
-    signal syncButtonClicked()
-    signal scanButtonClicked()
     signal devicesButtonClicked()
     signal settingsButtonClicked()
     signal aboutButtonClicked()
@@ -101,9 +110,11 @@ Rectangle {
         target: null
     }
 
-    MouseArea {
-        width: 48
-        height: 48
+    ////////////////////////////////////////////////////////////////////////////
+
+    MouseArea { // left button
+        width: 44
+        height: 44
         anchors.left: parent.left
         anchors.leftMargin: 12
         anchors.verticalCenter: parent.verticalCenter
@@ -140,21 +151,56 @@ Rectangle {
         }
     }
 
-    Text {
-        id: title
+    RowLayout {
         anchors.left: parent.left
-        anchors.leftMargin: 64
+        anchors.leftMargin: headerPosition
         anchors.right: menus.left
         anchors.rightMargin: 8
         anchors.verticalCenter: parent.verticalCenter
 
-        visible: wideMode
+        visible: Theme.wideMode
 
-        text: "Lighthouse"
-        font.bold: true
-        font.pixelSize: Theme.fontSizeHeader
-        color: Theme.colorHeaderContent
-        elide: Text.ElideRight
+        Text { // header title
+            Layout.alignment: Qt.AlignVCenter
+
+            text: headerTitle
+            font.bold: true
+            font.pixelSize: Theme.fontSizeHeader
+            color: Theme.colorHeaderContent
+            elide: Text.ElideRight
+        }
+
+        Text { // separator
+            Layout.alignment: Qt.AlignVCenter
+
+            visible: headerSubTitle.length &&
+                     (appContent.state === "DevicePlantSensor" ||
+                      appContent.state === "DeviceThermometer" ||
+                      appContent.state === "DeviceEnvironmental")
+
+            text: "/"
+            textFormat: Text.PlainText
+            font.pixelSize: Theme.fontSizeHeader
+            color: Theme.colorHeaderContent
+            opacity: 0.66
+        }
+
+        Text { // header subtitle
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignVCenter
+
+            visible: headerSubTitle.length &&
+                     (appContent.state === "DevicePlantSensor" ||
+                      appContent.state === "DeviceThermometer" ||
+                      appContent.state === "DeviceEnvironmental")
+
+            text: headerSubTitle
+            textFormat: Text.PlainText
+            font.pixelSize: Theme.fontSizeHeader
+            color: Theme.colorHeaderContent
+            opacity: 0.8
+            elide: Text.ElideRight
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -162,14 +208,11 @@ Rectangle {
     Row {
         id: menus
         anchors.top: parent.top
-        anchors.topMargin: 0
         anchors.right: parent.right
-        anchors.rightMargin: 0
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 0
 
-        spacing: isHdpi ? 4 : 12
         visible: true
+        spacing: isHdpi ? 8 : 12
 
         // DEVICE ACTIONS //////////
 
@@ -178,6 +221,7 @@ Rectangle {
             height: compact ? 36 : 34
             anchors.verticalCenter: parent.verticalCenter
 
+            compact: headerCompact
             visible: (appContent.state === "ScreenDeviceList")
             enabled: visible
 
@@ -188,10 +232,10 @@ Rectangle {
 
             function setText() {
                 var txt = qsTr("Order by:") + " "
-                if (SettingsManager.orderBy === "model") {
-                    txt += qsTr("sensor model")
-                } else if (SettingsManager.orderBy === "location") {
+                if (SettingsManager.orderBy === "location") {
                     txt += qsTr("location")
+                } else {
+                    txt += qsTr("device model")
                 }
                 buttonSort.tooltipText = txt
             }
@@ -203,7 +247,7 @@ Rectangle {
                 function onAppLanguageChanged() { buttonSort.setText() }
             }
 
-            property var sortmode: {
+            property int sortmode: {
                 if (SettingsManager.orderBy === "model") {
                     return 1
                 } else { // if (SettingsManager.orderBy === "location") {
@@ -213,7 +257,7 @@ Rectangle {
 
             onClicked: {
                 sortmode++
-                if (sortmode > 3) sortmode = 0
+                if (sortmode > 1) sortmode = 0
 
                 if (sortmode === 0) {
                     SettingsManager.orderBy = "location"
@@ -224,15 +268,15 @@ Rectangle {
                 }
             }
         }
-/*
+
         Rectangle { // separator
             anchors.verticalCenter: parent.verticalCenter
             height: 40
             width: Theme.componentBorderWidth
             color: Theme.colorHeaderHighlight
-            visible: (deviceManager.bluetooth && appContent.state === "ScreenDeviceList")
+            visible: false // (deviceManager.bluetooth && appContent.state === "ScreenDeviceList")
         }
-*/
+
         // SERVER STATUS //////////
 
         Item { width: 12; height: 12; } // spacer
@@ -318,9 +362,9 @@ Rectangle {
 
             DesktopHeaderItem {
                 id: menuDevices
-                width: headerHeight
                 height: headerHeight
 
+                text: headerCompact ? "" : qsTr("Devices")
                 source: "qrc:/IconLibrary/material-icons/duotone/devices.svg"
                 colorContent: Theme.colorHeaderContent
                 colorHighlight: Theme.colorHeaderHighlight
@@ -330,9 +374,9 @@ Rectangle {
             }
             DesktopHeaderItem {
                 id: menuSettings
-                width: headerHeight
                 height: headerHeight
 
+                text: headerCompact ? "" : qsTr("Settings")
                 source: "qrc:/IconLibrary/material-icons/duotone/tune.svg"
                 colorContent: Theme.colorHeaderContent
                 colorHighlight: Theme.colorHeaderHighlight
@@ -342,22 +386,22 @@ Rectangle {
             }
             DesktopHeaderItem {
                 id: menuAbout
-                width: headerHeight
                 height: headerHeight
 
                 source: "qrc:/IconLibrary/material-icons/duotone/info.svg"
                 colorContent: Theme.colorHeaderContent
                 colorHighlight: Theme.colorHeaderHighlight
 
+                text: headerCompact ? "" : qsTr("About")
                 highlighted: (appContent.state === "ScreenAbout")
                 onClicked: aboutButtonClicked()
             }
         }
     }
 
-    ////////////
+    ////////////////////////////////////////////////////////////////////////////
 
-    Rectangle {
+    Rectangle { // bottom separator
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
@@ -372,5 +416,5 @@ Rectangle {
         color: Theme.colorHeaderHighlight
     }
 
-    ////////////
+    ////////////////////////////////////////////////////////////////////////////
 }

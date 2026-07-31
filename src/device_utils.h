@@ -70,7 +70,7 @@ public:
         DEVICE_THERMOMETER,
         DEVICE_ENVIRONMENTAL,
 
-        DEVICE_LIGHT                 = 8,
+        DEVICE_LIGHT                = 8,
         DEVICE_BEACON,
         DEVICE_REMOTE,
         DEVICE_PBP,
@@ -130,38 +130,51 @@ public:
 
     enum DeviceStatus {
         DEVICE_OFFLINE              =  0, //!< Not connected
+        DEVICE_AVAILABLE            =  1, //!< Available for connection
 
-        DEVICE_QUEUED               =  1, //!< In the update queue, not started
+        DEVICE_QUEUED               =  4, //!< In the update queue, not started // legacy
 
-        DEVICE_DISCONNECTING        =  2, //!< Disconnecting
-        DEVICE_CONNECTING           =  3, //!< Trying to connect to the device
-        DEVICE_CONNECTED            =  4, //!< Connected
+        DEVICE_DISCONNECTING        =  8, //!< Trying to disconnect the device
+        DEVICE_CONNECTING           =  9, //!< Trying to connect the device
+        DEVICE_CONNECTED            = 10, //!< Connected
 
-        DEVICE_WORKING              =  8, //!< Connected, doing something
-        DEVICE_UPDATING             =  9, //!< Connected, reading latest data
-        DEVICE_UPDATING_REALTIME    = 10, //!< Connected, reading realtime data
-        DEVICE_UPDATING_HISTORY     = 11, //!< Connected, reading data history
+        DEVICE_WORKING              = 12, //!< Connected, doing something
+        DEVICE_UPDATING             = 13, //!< Connected, reading latest data
+        DEVICE_UPDATING_REALTIME    = 14, //!< Connected, reading realtime data
+        DEVICE_UPDATING_HISTORY     = 15, //!< Connected, reading data history
     };
     Q_ENUM(DeviceStatus)
 
     enum DeviceActions {
         ACTION_IDLE                 = 0,  //!< No action, stay connected
 
-        ACTION_UPDATE,                    //!< Read sensor latest data
-        ACTION_UPDATE_REALTIME,           //!< Stay connected and read sensor data
-        ACTION_UPDATE_HISTORY,            //!< Sync sensor history
+        // BLE "standard" interactions
 
-        ACTION_LED_BLINK = 8,
+        ACTION_CONNECT,
+        ACTION_RECONNECT,
+        ACTION_DISCONNECT,
+        ACTION_DISCONNECT_FORNOW,           //!< Disconnect for now, won't prevent reconnection
+
+        ACTION_SCAN,                        //!< Scan for services and their characteristics
+        ACTION_SCAN_WITH_VALUES,            //!< Scan for services and their characteristics (and associated values)
+        ACTION_SCAN_WITHOUT_VALUES,         //!< Scan for services and their characteristics (without associated values)
+
+        ACTION_REBOOT,
+        ACTION_SHUTDOWN,
+        ACTION_FACTORYRESET,
+
+        // Sensor specific actions
+
+        ACTION_UPDATE = 16,                 //!< Read sensor latest data
+        ACTION_UPDATE_REALTIME,             //!< Stay connected and read sensor data
+        ACTION_UPDATE_HISTORY,              //!< Stay connected and read sensor history
+
+        // App specific actions
+
+        ACTION_LED_BLINK,
         ACTION_CLEAR_HISTORY,
         ACTION_WATERING,
         ACTION_CALIBRATE,
-
-        ACTION_SCAN = 64,                 //!< Scan for services and their characteristics
-        ACTION_SCAN_WITH_VALUES,          //!< Scan for services and their characteristics (and associated values)
-        ACTION_SCAN_WITHOUT_VALUES,       //!< Scan for services and their characteristics (without associated values)
-
-        ACTION_REBOOT = 256,
-        ACTION_SHUTDOWN,
     };
     Q_ENUM(DeviceActions)
 };
@@ -203,15 +216,23 @@ class ChartDataHistory: public QObject
     float temperatureMax = -99.f;
     float luminosityLuxMax = -99.f;
 
+    float getSoilMoisture() const { return soilMoisture; }
+    float getSoilCondu() const { return soilConductivity; }
+    float getSoilTemperature() const { return soilTemperature; }
+    float getSoilPH() const { return soilPH; }
+    float getTemperature() const { return temperature; }
+    float getHumidity() const { return humidity; }
+    float getLuminosityLux() const { return luminosityLux; }
+    float getLuminosityMmol() const { return luminosityMmol; }
+
+    float getTemperatureMax() const { return temperatureMax; }
+    float getLuminosityLuxMax() const { return luminosityLuxMax; }
+
 public:
-    ChartDataHistory(const QDateTime &dt,
-                     QObject *parent) : QObject(parent)
-    {
+    ChartDataHistory(const QDateTime &dt, QObject *parent) : QObject(parent) {
         datetime = dt;
     }
-    ChartDataHistory(const ChartDataHistory &dt,
-                     QObject *parent) : QObject(parent)
-    {
+    ChartDataHistory(const ChartDataHistory &dt, QObject *parent) : QObject(parent) {
         datetime = dt.datetime;
 
         soilMoisture = dt.soilMoisture;
@@ -226,12 +247,12 @@ public:
         temperatureMax = dt.temperatureMax;
         luminosityLuxMax = dt.luminosityLuxMax;
     }
+
     ChartDataHistory(const QDateTime &dt,
                      float sm, float sc, float st,
                      float t, float h, float l,
                      float tm, float lm,
-                     QObject *parent) : QObject(parent)
-    {
+                     QObject *parent) : QObject(parent) {
         datetime = dt;
 
         soilMoisture = sm;
@@ -245,23 +266,10 @@ public:
         luminosityLuxMax = lm;
     }
 
-public slots:
-    bool isToday() { return (datetime.date() == QDate::currentDate()); }
-    int getDay() { return datetime.date().day(); }
-    int getHour() { return datetime.time().hour(); }
-    QDateTime getDateTime() { return datetime; }
-
-    float getSoilMoisture() { return soilMoisture; }
-    float getSoilCondu() { return soilConductivity; }
-    float getSoilTemperature() { return soilTemperature; }
-    float getSoilPH() { return soilPH; }
-    float getTemperature() { return temperature; }
-    float getHumidity() { return humidity; }
-    float getLuminosityLux() { return luminosityLux; }
-    float getLuminosityMmol() { return luminosityMmol; }
-
-    float getTemperatureMax() { return temperatureMax; }
-    float getLuminosityLuxMax() { return luminosityLuxMax; }
+    bool isToday() const { return (datetime.date() == QDate::currentDate()); }
+    int getDay() const { return datetime.date().day(); }
+    int getHour() const { return datetime.time().hour(); }
+    QDateTime getDateTime() const { return datetime; }
 };
 
 /* ************************************************************************** */
@@ -289,6 +297,12 @@ class ChartDataMinMax: public QObject
     int hygroMin;
     int hygroMax;
 
+    float getTempMin() const { return tempMin; }
+    float getTempMean() const { return tempMean; }
+    float getTempMax() const { return tempMax; }
+    int getHygroMin() const { return hygroMin; }
+    int getHygroMax() const { return hygroMax; }
+
 public:
     ChartDataMinMax(const QDateTime &dt,
                     float tmin, float t, float tmax,
@@ -301,17 +315,10 @@ public:
         hygroMin = hmin; hygroMax = hmax;
     }
 
-public slots:
-    bool isToday() { return (datetime.date() == QDate::currentDate()); }
-    int getDay() { return datetime.date().day(); }
-    int getHour() { return datetime.time().hour(); }
-    QDateTime getDateTime() { return datetime; }
-
-    float getTempMin() { return tempMin; }
-    float getTempMean() { return tempMean; }
-    float getTempMax() { return tempMax; }
-    int getHygroMin() { return hygroMin; }
-    int getHygroMax() { return hygroMax; }
+    bool isToday() const { return (datetime.date() == QDate::currentDate()); }
+    int getDay() const { return datetime.date().day(); }
+    int getHour() const { return datetime.time().hour(); }
+    QDateTime getDateTime() const { return datetime; }
 };
 
 /* ************************************************************************** */
@@ -367,6 +374,26 @@ class ChartDataEnv: public QObject
     float pm10Mean = -99.f;
     float pm10Max;
 
+    float getVocMin() const { return vocMin; }
+    float getVocMean() const { return vocMean; }
+    float getVocMax() const { return vocMax; }
+
+    float getHchoMin() const { return hchoMin; }
+    float getHchoMean() const { return hchoMean; }
+    float getHchoMax() const { return hchoMax; }
+
+    float getCo2Min() const { return co2Min; }
+    float getCo2Mean() const { return co2Mean; }
+    float getCo2Max() const { return co2Max; }
+
+    float getPM25Min() const { return pm25Min; }
+    float getPM25Mean() const { return pm25Mean; }
+    float getPM25Max() const { return pm25Max; }
+
+    float getPM10Min() const { return pm10Min; }
+    float getPM10Mean() const { return pm10Mean; }
+    float getPM10Max() const { return pm10Max; }
+
 public:
     ChartDataEnv(const QDateTime &dt,
                  float vmin, float v, float vmax,
@@ -385,31 +412,10 @@ public:
         pm10Min = p10min; pm10Mean = p10; pm10Max = p10max;
     }
 
-public slots:
-    bool isToday() { return (datetime.date() == QDate::currentDate()); }
-    int getDay() { return datetime.date().day(); }
-    int getHour() { return datetime.time().hour(); }
-    QDateTime getDateTime() { return datetime; }
-
-    float getVocMin() { return vocMin; }
-    float getVocMean() { return vocMean; }
-    float getVocMax() { return vocMax; }
-
-    float getHchoMin() { return hchoMin; }
-    float getHchoMean() { return hchoMean; }
-    float getHchoMax() { return hchoMax; }
-
-    float getCo2Min() { return co2Min; }
-    float getCo2Mean() { return co2Mean; }
-    float getCo2Max() { return co2Max; }
-
-    float getPM25Min() { return pm25Min; }
-    float getPM25Mean() { return pm25Mean; }
-    float getPM25Max() { return pm25Max; }
-
-    float getPM10Min() { return pm10Min; }
-    float getPM10Mean() { return pm10Mean; }
-    float getPM10Max() { return pm10Max; }
+    bool isToday() const { return (datetime.date() == QDate::currentDate()); }
+    int getDay() const { return datetime.date().day(); }
+    int getHour() const { return datetime.time().hour(); }
+    QDateTime getDateTime() const { return datetime; }
 };
 
 /* ************************************************************************** */

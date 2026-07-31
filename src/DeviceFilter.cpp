@@ -100,9 +100,6 @@ QHash <int, QByteArray> DeviceModel::roleNames() const
     roles[ManualIndexRole] = "manual";
     roles[AssociatedLocationRole] = "location";
     roles[AssociatedNameRole] = "plant";
-
-    roles[PlantNameRole] = "plant";
-    roles[SoilMoistureRole] = "waterlevel";
     roles[InsideOutsideRole] = "insideoutside";
 
     roles[PointerRole] = "pointer";
@@ -170,9 +167,6 @@ QVariant DeviceModel::data(const QModelIndex &index, int role) const
             else
                 return device->getAssociatedName();
         }
-        // plant sensors
-        //if (role == PlantNameRole)
-        //if (role == SoilMoistureRole)
         if (role == InsideOutsideRole)
         {
             return device->isInside();

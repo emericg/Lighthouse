@@ -40,9 +40,7 @@
  *
  * Support the following actions: on, off, dim, plus/minus, M
  *
- * Get beacon key:
- * - https://custom-components.github.io/ble_monitor/faq#how-to-get-the-mibeacon-v2v3-encryption-key
- * - https://github.com/custom-components/ble_monitor/blob/master/custom_components/ble_monitor/ble_parser/get_beacon_key.py
+ * Unlike the YLKG07YL dimmer, this remote advertises its button events in clear text.
  *
  * Protocol infos:
  * - todo
@@ -51,7 +49,6 @@ class DeviceYLYK01YL: public DeviceBeacon
 {
     Q_OBJECT
 
-    QString m_beaconkey;
     QByteArray m_previousdata_remote;
 
 protected:

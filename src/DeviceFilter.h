@@ -79,9 +79,6 @@ public:
         ManualIndexRole,
         AssociatedLocationRole,
         AssociatedNameRole,
-        // plant sensors
-        PlantNameRole,
-        SoilMoistureRole,
         InsideOutsideRole,
 
         PointerRole,

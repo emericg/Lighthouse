@@ -150,10 +150,10 @@ Drawer {
                     source: "qrc:/IconLibrary/material-symbols/sort.svg"
                     text: {
                         var txt = qsTr("Order by:") + " "
-                        if (SettingsManager.orderBy === "model") {
-                            txt += qsTr("sensor model")
-                        } else if (SettingsManager.orderBy === "location") {
+                        if (SettingsManager.orderBy === "location") {
                             txt += qsTr("location")
+                        } else {
+                            txt += qsTr("device model")
                         }
                         return txt
                     }
@@ -168,7 +168,7 @@ Drawer {
 
                     onClicked: {
                         sortmode++
-                        if (sortmode > 3) sortmode = 0
+                        if (sortmode > 1) sortmode = 0
 
                         if (sortmode === 0) {
                             SettingsManager.orderBy = "location"

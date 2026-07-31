@@ -75,10 +75,15 @@ DeviceManager::DeviceManager(bool daemon)
     SettingsManager *sm = SettingsManager::getInstance();
     if (sm)
     {
+        // migrate settings from ordering modes we don't have anymore
+        if (sm->getOrderBy() != "manual" && sm->getOrderBy() != "location" &&
+            sm->getOrderBy() != "model" && sm->getOrderBy() != "insideoutside")
+        {
+            sm->setOrderBy("model");
+        }
+
         //if (sm->getOrderBy() == "manual") orderby_manual();
         if (sm->getOrderBy() == "location") orderby_location();
-        if (sm->getOrderBy() == "plant") orderby_plant();
-        if (sm->getOrderBy() == "waterlevel") orderby_waterlevel();
         if (sm->getOrderBy() == "model") orderby_model();
         if (sm->getOrderBy() == "insideoutside") orderby_insideoutside();
     }
@@ -176,14 +181,13 @@ bool DeviceManager::areDevicesConnected() const
 {
     for (auto d: std::as_const(m_devices_model->m_devices))
     {
-        if (d && d->isConnected())
+        if (d && (d->getStatus() >= DeviceUtils::DEVICE_DISCONNECTING))
         {
             return true;
         }
     }
 
-    qDebug() << "DeviceManager::areDevicesConnected() FALSE";
-
+    //qDebug() << "DeviceManager::areDevicesConnected() FALSE";
     return false;
 }
 
@@ -1026,6 +1030,11 @@ void DeviceManager::scanDevices_stop()
 
 /* ************************************************************************** */
 
+void DeviceManager::refreshDevices_check()
+{
+    //qDebug() << "DeviceManager::refreshDevices_check()";
+}
+
 void DeviceManager::refreshDevices_start()
 {
     //qDebug() << "DeviceManager::refreshDevices_start()";
@@ -1432,16 +1441,6 @@ void DeviceManager::orderby_name()
 void DeviceManager::orderby_location()
 {
     orderby(DeviceModel::AssociatedLocationRole, Qt::AscendingOrder);
-}
-
-void DeviceManager::orderby_waterlevel()
-{
-    orderby(DeviceModel::SoilMoistureRole, Qt::AscendingOrder);
-}
-
-void DeviceManager::orderby_plant()
-{
-    orderby(DeviceModel::PlantNameRole, Qt::AscendingOrder);
 }
 
 void DeviceManager::orderby_insideoutside()

@@ -101,6 +101,7 @@ class DeviceManager: public QObject
     QBluetoothLocalDevice::HostMode m_bluetoothHostMode = QBluetoothLocalDevice::HostPoweredOff;
 
     QList <QObject *> m_bluetoothAdapters;
+    QBluetoothAddress m_bluetoothAdapter_selected;
 
     ////
 
@@ -231,7 +232,8 @@ public:
     void requestLocationPermission_results(const QPermission &permission);
 
     // Scanning management
-    static int getLastRun();
+    //static int getLastRun_min();
+    //Q_INVOKABLE int getLastRun();
 
     Q_INVOKABLE void scanNearby_start();
     Q_INVOKABLE void scanNearby_stop();
@@ -239,11 +241,12 @@ public:
     Q_INVOKABLE void scanDevices_start();
     Q_INVOKABLE void scanDevices_stop();
 
-    Q_INVOKABLE void refreshDevices_start();
-    Q_INVOKABLE void refreshDevices_stop();
-
     Q_INVOKABLE void listenDevices_start();
     Q_INVOKABLE void listenDevices_stop();
+
+    Q_INVOKABLE void refreshDevices_check();        //!< Refresh devices with data >xh old (if necessary)
+    Q_INVOKABLE void refreshDevices_start();        //!< Refresh every device
+    Q_INVOKABLE void refreshDevices_stop();
 
     // Device management
     Q_INVOKABLE void removeDevice(const QString &address);
@@ -268,8 +271,6 @@ public:
     Q_INVOKABLE void orderby_model();
     Q_INVOKABLE void orderby_name();
     Q_INVOKABLE void orderby_location();
-    Q_INVOKABLE void orderby_waterlevel();
-    Q_INVOKABLE void orderby_plant();
     Q_INVOKABLE void orderby_insideoutside();
     void orderby(int role, Qt::SortOrder order);
 

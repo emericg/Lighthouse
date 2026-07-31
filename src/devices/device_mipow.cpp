@@ -22,7 +22,6 @@
 #include "device_mipow.h"
 
 #include <cstdint>
-#include <cmath>
 
 #include <QBluetoothUuid>
 #include <QBluetoothAddress>
@@ -158,7 +157,7 @@ void DeviceMiPow::serviceDetailsDiscovered_infos(QLowEnergyService::ServiceState
             if (chf.value().size() > 0)
             {
                m_deviceFirmware = chf.value();
-               Q_EMIT sensorUpdated();
+               Q_EMIT firmwareUpdated();
 
                //qDebug() << "firmware: " << m_deviceFirmware;
             }
