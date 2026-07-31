@@ -213,7 +213,7 @@ Popup {
                     DesktopHeaderItem {
                         height: menuArea.height
 
-                        source: "qrc:/assets/gfx/icons/keyboard-variant.svg"
+                        source: "qrc:/assets/icons/keyboard-variant.svg"
                         colorContent: Theme.colorHeaderContent
                         colorHighlight: Theme.colorHeaderHighlight
 

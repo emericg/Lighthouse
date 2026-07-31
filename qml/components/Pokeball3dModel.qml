@@ -56,7 +56,7 @@ Node {
             id: bottom_
             y: -0.584008
             rotation: Qt.quaternion(-7.54979e-08, 0, 1, 0)
-            source: "qrc:/assets/models/pokeball_meshes/bottom_.mesh"
+            source: "qrc:/assets/models/pokeball/bottom_.mesh"
 
             materials: [
                 mat_material_white
@@ -68,7 +68,7 @@ Node {
                 scale.x: 1
                 scale.y: 1
                 scale.z: 1
-                source: "qrc:/assets/models/pokeball_meshes/bottom_black.mesh"
+                source: "qrc:/assets/models/pokeball/bottom_black.mesh"
 
                 materials: [
                     mat_material_black
@@ -84,7 +84,7 @@ Node {
             rotation: Qt.quaternion(0.707107, -0.707107, 0, 0)
             scale.y: 1
             scale.z: 1
-            source: "qrc:/assets/models/pokeball_meshes/top_black.mesh"
+            source: "qrc:/assets/models/pokeball/top_black.mesh"
 
             materials: [
                 mat_material_black
@@ -93,7 +93,7 @@ Node {
             Model {
                 id: button
                 z: -200
-                source: "qrc:/assets/models/pokeball_meshes/button.mesh"
+                source: "qrc:/assets/models/pokeball/button.mesh"
 
                 x: pokeballView.joyx
                 y: pokeballView.joyy
@@ -105,7 +105,7 @@ Node {
             Model {
                 id: button_holder
                 z: -197.662
-                source: "qrc:/assets/models/pokeball_meshes/button_holder.mesh"
+                source: "qrc:/assets/models/pokeball/button_holder.mesh"
 
                 materials: [
                     mat_material_white2
@@ -118,7 +118,7 @@ Node {
                 rotation: Qt.quaternion(0.707107, 0.707107, 0, 0)
                 scale.y: 1
                 scale.z: 1
-                source: "qrc:/assets/models/pokeball_meshes/top_red.mesh"
+                source: "qrc:/assets/models/pokeball/top_red.mesh"
 
                 materials: [
                     mat_material_red

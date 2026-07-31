@@ -1,24 +1,23 @@
 <RCC>
     <qresource prefix="/assets">
-        <file>gfx/logos/logo.svg</file>
-        <file>gfx/logos/logo_drawer.svg</file>
-        <file>gfx/logos/logo_tray_symbolic.svg</file>
-        <file>gfx/logos/github.svg</file>
+        <file>logos/logo.svg</file>
+        <file>logos/logo_drawer.svg</file>
+        <file>logos/logo_tray_symbolic.svg</file>
+        <file>logos/github.svg</file>
 
-        <file>gfx/icons/pbp.svg</file>
-        <file>gfx/icons/pgp.svg</file>
-        <file>gfx/icons/keyboard-variant.svg</file>
-        <file>gfx/icons/menu_back.svg</file>
-        <file>gfx/icons/menu_close.svg</file>
-        <file>gfx/icons/desk-lamp.svg</file>
-        <file>gfx/icons/desk-lamp-logo.svg</file>
+        <file>icons/arrow_back.svg</file>
+        <file>icons/pbp.svg</file>
+        <file>icons/pgp.svg</file>
+        <file>icons/keyboard-variant.svg</file>
+        <file>icons/desk-lamp.svg</file>
+        <file>icons/desk-lamp-logo.svg</file>
 
-        <file>models/pokeball_meshes/bottom_.mesh</file>
-        <file>models/pokeball_meshes/bottom_black.mesh</file>
-        <file>models/pokeball_meshes/button.mesh</file>
-        <file>models/pokeball_meshes/button_holder.mesh</file>
-        <file>models/pokeball_meshes/top_black.mesh</file>
-        <file>models/pokeball_meshes/top_red.mesh</file>
+        <file>models/pokeball/bottom_.mesh</file>
+        <file>models/pokeball/bottom_black.mesh</file>
+        <file>models/pokeball/button.mesh</file>
+        <file>models/pokeball/button_holder.mesh</file>
+        <file>models/pokeball/top_black.mesh</file>
+        <file>models/pokeball/top_red.mesh</file>
 
         <file>sounds/car-lock-sound-effect.ogg</file>
     </qresource>

@@ -247,7 +247,7 @@ Grid {
             anchors.right: parent.right
 
             text: qsTr("keyboard")
-            source: "qrc:/assets/gfx/icons/keyboard-variant.svg"
+            source: "qrc:/assets/icons/keyboard-variant.svg"
 
             colorBackground: virtualtextfield.focus ? Theme.colorPrimary : "white"
             colorHighlight: virtualtextfield.focus ? "white" : Theme.colorPrimary

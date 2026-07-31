@@ -75,7 +75,7 @@ void DeviceMiPow::serviceScanDone()
             connect(serviceInfos, &QLowEnergyService::stateChanged, this, &DeviceMiPow::serviceDetailsDiscovered_infos);
 
             // Windows hack, see: QTBUG-80770 and QTBUG-78488
-            QTimer::singleShot(0, this, [=] () { serviceInfos->discoverDetails(QLowEnergyService::SkipValueDiscovery); });
+            QTimer::singleShot(0, this, [=, this] () { serviceInfos->discoverDetails(QLowEnergyService::SkipValueDiscovery); });
         }
     }
 
@@ -86,7 +86,7 @@ void DeviceMiPow::serviceScanDone()
             connect(serviceBattery, &QLowEnergyService::stateChanged, this, &DeviceMiPow::serviceDetailsDiscovered_battery);
 
             // Windows hack, see: QTBUG-80770 and QTBUG-78488
-            QTimer::singleShot(0, this, [=] () { serviceBattery->discoverDetails(QLowEnergyService::SkipValueDiscovery); });
+            QTimer::singleShot(0, this, [=, this] () { serviceBattery->discoverDetails(QLowEnergyService::SkipValueDiscovery); });
         }
     }
 
@@ -101,7 +101,7 @@ void DeviceMiPow::serviceScanDone()
             connect(serviceData, &QLowEnergyService::characteristicChanged, this, &DeviceMiPow::bleReadNotify);
 
             // Windows hack, see: QTBUG-80770 and QTBUG-78488
-            QTimer::singleShot(0, this, [=] () { serviceData->discoverDetails(QLowEnergyService::SkipValueDiscovery); });
+            QTimer::singleShot(0, this, [=, this] () { serviceData->discoverDetails(QLowEnergyService::SkipValueDiscovery); });
         }
     }
 }

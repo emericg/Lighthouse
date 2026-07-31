@@ -80,15 +80,15 @@ Rectangle {
             title.text = qsTr("Welcome")
             menus.visible = false
 
-            buttonBack.source = "qrc:/assets/gfx/icons/menu_close.svg"
+            buttonBack.source = "qrc:/IconLibrary/material-symbols/close.svg"
         } else {
             title.text = "Lighthouse"
             menus.visible = true
 
             if (appContent.state === "ScreenDeviceList") {
-                buttonBack.source = "qrc:/assets/gfx/logos/logo.svg"
+                buttonBack.source = "qrc:/assets/logos/logo.svg"
             } else {
-                buttonBack.source = "qrc:/assets/gfx/icons/menu_back.svg"
+                buttonBack.source = "qrc:/assets/icons/arrow_back.svg"
             }
         }
     }
@@ -96,8 +96,7 @@ Rectangle {
     ////////////////////////////////////////////////////////////////////////////
 
     DragHandler {
-        // make that surface draggable
-        // also, prevent clicks below this area
+        // make that surface draggable // also, prevent clicks below this area
         onActiveChanged: if (active) appWindow.startSystemMove()
         target: null
     }
@@ -109,7 +108,7 @@ Rectangle {
         anchors.leftMargin: 12
         anchors.verticalCenter: parent.verticalCenter
 
-        hoverEnabled: (buttonBack.source !== "qrc:/assets/gfx/logos/logo.svg")
+        hoverEnabled: (buttonBack.source !== "qrc:/assets/logos/logo.svg")
         onEntered: { buttonBackBg.opacity = 0.5; }
         onExited: { buttonBackBg.opacity = 0; buttonBack.width = 32; }
 
@@ -117,7 +116,7 @@ Rectangle {
         onReleased: buttonBack.width = 32
         onClicked: backButtonClicked()
 
-        enabled: (buttonBack.source !== "qrc:/assets/gfx/logos/logo.svg" || wideMode)
+        enabled: (buttonBack.source !== "qrc:/assets/logos/logo.svg" || wideMode)
         visible: enabled
 
         Rectangle {
@@ -136,7 +135,7 @@ Rectangle {
             height: width
             anchors.centerIn: parent
 
-            source: "qrc:/assets/gfx/icons/menu_back.svg"
+            source: "qrc:/assets/logos/logo.svg"
             color: Theme.colorHeaderContent
         }
     }

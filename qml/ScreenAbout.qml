@@ -95,7 +95,7 @@ Loader {
                             height: 128
                             anchors.verticalCenter: parent.verticalCenter
 
-                            source: "qrc:/assets/gfx/icons/desk-lamp-logo.svg"
+                            source: "qrc:/assets/icons/desk-lamp-logo.svg"
                             //sourceSize: Qt.size(width, height)
                             color: Theme.colorIcon
                         }
@@ -161,7 +161,7 @@ Loader {
                             //color: (Theme.currentTheme === Theme.THEME_NIGHT) ? Theme.colorHeader : "#5483EF"
 
                             text: qsTr("GitHub")
-                            source: "qrc:/assets/gfx/logos/github.svg"
+                            source: "qrc:/assets/logos/github.svg"
                             sourceSize: 22
 
                             onClicked: Qt.openUrlExternally("https://github.com/emericg/Lighthouse")

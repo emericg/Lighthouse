@@ -71,12 +71,12 @@ function getDeviceIcon(device, devicePlanted) {
     if (device.isPlantSensor) {
         if (devicePlanted) {
             if (deviceName === "ropot" || deviceName === "Parrot pot")
-                src = "qrc:/assets/gfx/icons/pot_flower.svg"
+                src = "qrc:/assets/icons/pot_flower.svg"
             else
                 src = "qrc:/IconLibrary/material-symbols/local_florist.svg"
         } else {
             if (deviceName === "ropot" || deviceName === "Parrot pot")
-                src = "qrc:/assets/gfx/icons/pot_empty.svg"
+                src = "qrc:/assets/icons/pot_empty.svg"
             else
                 src = "qrc:/IconLibrary/material-symbols/settings_remote.svg"
         }
@@ -101,7 +101,7 @@ function getDeviceIcon(device, devicePlanted) {
         }
     } else if (device.isEnvironmentalSensor) {
         if (deviceName === "GeigerCounter") {
-            src = "qrc:/assets/gfx/icons/nuclear_icon.svg"
+            src = "qrc:/assets/icons/nuclear_icon.svg"
         } else {
             src = "qrc:/IconLibrary/material-symbols/settings_remote.svg"
         }
@@ -112,9 +112,9 @@ function getDeviceIcon(device, devicePlanted) {
     } else if (device.isRemote) {
         src = "qrc:/IconLibrary/material-symbols/hardware/nest_remote.svg"
     } else if (device.isPBP) {
-        src = "qrc:/assets/gfx/icons/pbp.svg"
+        src = "qrc:/assets/icons/pbp.svg"
     } else if (device.isPGP) {
-        src = "qrc:/assets/gfx/icons/pgp.svg"
+        src = "qrc:/assets/icons/pgp.svg"
     } else {
         src = "qrc:/IconLibrary/material-symbols/hardware/settings_remote.svg"
     }
@@ -272,7 +272,7 @@ function getDeviceCapabilityIcon(capabilityId) {
     if (capabilityId === DeviceUtils.DeviceUtils.DEVICE_REALTIME) {
         src = "qrc:/IconLibrary/material-icons/duotone/update.svg"
     } else if (capabilityId === DeviceUtils.DeviceUtils.DEVICE_HISTORY) {
-        src = "qrc:/assets/gfx/icons/duotone-date_all.svg"
+        src = "qrc:/assets/icons/duotone-date_all.svg"
     } else if (capabilityId === DeviceUtils.DeviceUtils.DEVICE_BATTERY) {
         src = "qrc:/IconLibrary/material-icons/duotone/battery_full.svg"
     } else if (capabilityId === DeviceUtils.DeviceUtils.DEVICE_CLOCK) {
@@ -412,7 +412,7 @@ function getDeviceSensorIcon(sensorId) {
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_HCHO) {
         src = "qrc:/IconLibrary/material-symbols/air.svg"
     } else if (sensorId === DeviceUtils.DeviceUtils.SENSOR_GEIGER) {
-        src = "qrc:/assets/gfx/icons/nuclear_icon.svg"
+        src = "qrc:/assets/icons/nuclear_icon.svg"
     }
 
     return src

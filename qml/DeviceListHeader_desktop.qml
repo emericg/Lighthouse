@@ -154,7 +154,7 @@ Column {
 
                     color: Theme.colorSeparator
                     opacity: 0.5
-                    source: "qrc:/assets/gfx/icons/keyboard-variant.svg"
+                    source: "qrc:/assets/icons/keyboard-variant.svg"
                 }
 
                 VolumeButtonRow {

@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
     app.setOrganizationName("Lighthouse");
     app.setOrganizationDomain("Lighthouse");
 
-    app.setWindowIcon(QIcon(":/assets/gfx/logos/logo.svg"));
+    app.setWindowIcon(QIcon(":/assets/logos/logo.svg"));
 
     // Init app components
     SettingsManager *sm = SettingsManager::getInstance();

@@ -14,7 +14,7 @@ function getActionIcon(action) {
         return "qrc:/IconLibrary/material-icons/duotone/touch_app.svg"
 
     if (action === LocalActions.LocalActions.ACTION_keys)
-        return "qrc:/assets/gfx/icons/keyboard-variant.svg"
+        return "qrc:/assets/icons/keyboard-variant.svg"
 
     if (action === LocalActions.LocalActions.ACTION_commands)
         return "qrc:/IconLibrary/material-icons/duotone/launch.svg"
@@ -25,7 +25,7 @@ function getActionIcon(action) {
 
     if (action > LocalActions.LocalActions.ACTION_KEYBOARD_START &&
         action < LocalActions.LocalActions.ACTION_KEYBOARD_STOP)
-        return "qrc:/assets/gfx/icons/keyboard-variant.svg"
+        return "qrc:/assets/icons/keyboard-variant.svg"
 
     if (action > LocalActions.LocalActions.ACTION_MEDIA_START &&
         action < LocalActions.LocalActions.ACTION_MEDIA_STOP)

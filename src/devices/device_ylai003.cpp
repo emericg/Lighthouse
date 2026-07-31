@@ -71,7 +71,7 @@ void DeviceYLAI003::serviceScanDone()
             connect(m_serviceBattery, &QLowEnergyService::stateChanged, this, &DeviceYLAI003::serviceDetailsDiscovered_battery);
 
             // Windows hack, see: QTBUG-80770 and QTBUG-78488
-            QTimer::singleShot(0, this, [=] () { m_serviceBattery->discoverDetails(); });
+            QTimer::singleShot(0, this, [=, this] () { m_serviceBattery->discoverDetails(); });
         }
     }
 }

@@ -63,7 +63,7 @@ Drawer {
                     anchors.leftMargin: 8
                     anchors.verticalCenter: parent.verticalCenter
 
-                    source: "qrc:/assets/gfx/icons/desk-lamp-logo.svg"
+                    source: "qrc:/assets/icons/desk-lamp-logo.svg"
                     //sourceSize: Qt.size(width, height)
                     color: Theme.colorIcon
                 }
@@ -109,7 +109,7 @@ Drawer {
                 DrawerItem {
                     highlighted: (appContent.state === "ScreenDeviceList")
                     text: qsTr("Sensors")
-                    source: "qrc:/assets/gfx/logos/logo_drawer.svg"
+                    source: "qrc:/assets/logos/logo_drawer.svg"
 
                     onClicked: {
                         screenDeviceList.loadScreen()
