@@ -109,7 +109,187 @@ Until this completes, every other characteristic answers with `Insufficient Auth
 
 The device key cannot be derived. It lives in the DA14580 OTP memory and has to be dumped from the device, see the [SUOTA Go+](https://github.com/Jesus805/Suota-Go-Plus) tool.  
 
-> TODO
+#### Prerequisites
+
+Two things are needed before the handshake can even start.
+
+The link must be **encrypted**: the certificate service characteristics require authentication, so the central has to be bonded with the device.
+Writing the `SFIDA_COMMANDS` notification descriptor on an unencrypted link is refused with `Insufficient Authorization`, and the handshake never begins.
+
+The central must hold the **device key**, 16 bytes unique to that physical device.
+A key dump also contains a 256 bytes `blob` taken from the same OTP area,
+which the device sends inside its first challenge but which the central never has to verify:
+the blob is only needed when *emulating* a device, not when talking to one.
+
+#### Cryptographic primitives
+
+Everything is built on AES-128 in ECB mode, used as a block function by a CCM-like construction.
+It is neither plain CTR nor a standard MAC, and none of the pieces are interchangeable with their standard counterparts.
+
+Nonces are generated as 16 bytes buffers, but only the first 13 are ever consumed by the block formatting below.
+The official application leaves the last three bytes zeroed rather than randomizing them.
+
+##### Counter block
+
+| Position | 00        | 01-13         | 14-15                                  |
+| -------- | --------- | ------------- | -------------------------------------- |
+| Value    | `0x01`    | nonce[0:12]   | uint16_be counter, starting at 0       |
+
+The keystream block for counter `n` is `AES(key, counter_block(n))`.
+
+##### Hash block
+
+| Position | 00        | 01-13         | 14-15                                  |
+| -------- | --------- | ------------- | -------------------------------------- |
+| Value    | `0x39`    | nonce[0:12]   | uint16_be payload length, in bytes     |
+
+The `0x39` (57) flags byte is what the device firmware uses, it is not derived from anything.
+
+##### Operations
+
+| Operation         | Description                                               |
+| ----------------- | --------------------------------------------------------- |
+| `aes_ctr()`       | CTR mode over whole 16 bytes blocks. The counter is incremented **before** the first block, so the payload starts at counter 1 and counter 0 stays reserved. Being its own inverse, the same operation encrypts and decrypts. |
+| `aes_hash()`      | CBC-MAC over the payload, seeded with `AES(key, hash_block)`. Returns the last 16 bytes block. |
+| `encrypt_block()` | Masks a 16 bytes hash with the keystream of counter **0**, `hash ^ AES(key, counter_block(0))`. Also its own inverse. |
+
+Both `aes_ctr()` and `aes_hash()` silently ignore a trailing partial block, which is harmless here because every payload they are used on is a multiple of 16 bytes (16 or 80).
+
+So a payload is always protected the same way: the plaintext is CTR encrypted, hashed with `aes_hash()`, and the hash is masked with `encrypt_block()`.
+Verifying means CTR decrypting, recomputing the hash over the plaintext, and comparing it with the unmasked one.
+
+#### Payload structures
+
+All the certification payloads start with the same 4 bytes state field, and it is the *only* multi byte field in this protocol that is not opaque AES output.
+It carries the step number in its first byte, and the remaining three bytes are zero (`01 00 00 00` for state 1).
+
+##### challenge_data, 378 bytes
+
+The first challenge, read from `SFIDA_TO_CENTRAL`. Encrypted with the **device key**.
+
+| Bytes   | Field                     | Description                                                     |
+| ------- | ------------------------- | --------------------------------------------------------------- |
+| 000-003 | state                     | `00 00 00 00`                                                   |
+| 004-019 | nonce                     | nonce of the outer layer                                        |
+| 020-099 | encrypted_main_challenge  | a `main_challenge_data`, CTR encrypted with the device key      |
+| 100-115 | encrypted_hash            | masked hash of the plaintext `main_challenge_data`              |
+| 116-121 | bt_addr                   | the device address, byte reversed                               |
+| 122-377 | blob                      | 256 bytes read from the device OTP memory, sent in the clear    |
+
+##### main_challenge_data, 80 bytes
+
+The plaintext hidden by the outer layer above. Its own payload is encrypted with the **session key** it carries.
+
+| Bytes | Field               | Description                                                             |
+| ----- | ------------------- | ----------------------------------------------------------------------- |
+| 00-05 | bt_addr             | the device address, byte reversed                                       |
+| 06-21 | key                 | **the session key**, everything after this point is keyed with it       |
+| 22-37 | nonce               | nonce of the inner layer                                                |
+| 38-53 | encrypted_challenge | the 16 bytes challenge to echo back, CTR encrypted with the session key |
+| 54-69 | encrypted_hash      | masked hash of the plaintext challenge                                  |
+| 70-79 | flash_data          | device state, of no use to the central                                  |
+
+The device address is a useful sanity check: if the reversed `bt_addr` matches the address that was connected to,
+the decryption is right in substance and not merely self consistent.
+
+##### challenge_response, 20 bytes
+
+The answer to the first challenge, written to `CENTRAL_TO_SFIDA`. Sent **in the clear**, the point being to prove that the 16 bytes could be recovered at all.
+
+| Bytes | Field    | Description                              |
+| ----- | -------- | ---------------------------------------- |
+| 00-03 | state    | `01 00 00 00`                            |
+| 04-19 | response | the decrypted 16 bytes challenge         |
+
+##### next_challenge, 52 bytes
+
+Used by both sides for every step after the first one, always keyed with the **session key**.
+
+| Bytes | Field               | Description                                     |
+| ----- | ------------------- | ----------------------------------------------- |
+| 00-03 | state               | step number                                     |
+| 04-19 | nonce               | fresh for each challenge                        |
+| 20-35 | encrypted_challenge | 16 bytes payload, CTR encrypted                 |
+| 36-51 | encrypted_hash      | masked hash of the plaintext payload            |
+
+#### Message flow
+
+The device drives the whole exchange through `SFIDA_COMMANDS` notifications.
+Each notification carries 4 bytes, the first one being the state the device just moved to, and the payload that goes with it is read from `SFIDA_TO_CENTRAL`.
+
+The central answers by writing to `CENTRAL_TO_SFIDA`, and the state it stamps on its answer is the state it drives the device to.
+Every step is therefore one notification, one read and one write.
+
+| Step | Notification  | Read from `SFIDA_TO_CENTRAL` | Write to `CENTRAL_TO_SFIDA`     |
+| ---- | ------------- | ---------------------------- | ------------------------------- |
+| 0    | `00 00 00 00` | 378 bytes `challenge_data`   | 20 bytes `challenge_response`   |
+| 1    | `01 00 00 00` | 52 bytes `next_challenge`    | 52 bytes `next_challenge`       |
+| 2    | `02 00 00 00` | 20 bytes echo                | 52 bytes `next_challenge`       |
+| 3    | `04 00 23 00` | -                            | -                               |
+
+#### Step by step
+
+##### Step 0, the device challenges the central
+
+Subscribing to `SFIDA_COMMANDS`, by writing `0x0100` to its client characteristic configuration descriptor, is what makes the device offer its first challenge.
+It answers with a `00 00 00 00` notification and loads 378 bytes into `SFIDA_TO_CENTRAL`.
+This read is longer than the default MTU, so it goes over several ATT `Read Blob` transactions.
+
+The central peels the two layers:
+
+* CTR decrypt `encrypted_main_challenge` with the **device key**, then recompute and compare the outer hash.
+  A mismatch means the key does not belong to this device, and there is nothing to be done about it.
+* CTR decrypt `encrypted_challenge` from the recovered `main_challenge_data` with the **session key** it carries,
+  then recompute and compare the inner hash.
+
+The 16 bytes challenge is then written back as-is in a `challenge_response` stamped with state `01`.
+This authenticates the central: only a holder of the device key could have reached those bytes.
+
+##### Step 1, mutual challenge
+
+The device answers with a `01 00 00 00` notification and a 52 bytes `next_challenge`, which the central verifies with the session key.
+Its content is not meaningful, the emulated device sends a fixed `AA 00 ... 00` filler there, so verifying the hash is the whole point of the step.
+
+The central then sends its own 52 bytes `next_challenge`, stamped with state `02`, wrapping 16 **random** bytes and using a fresh nonce.
+These are the bytes the device will have to hand back.
+
+##### Step 2, the device answers
+
+The device notifies `02 00 00 00` and puts 20 bytes into `SFIDA_TO_CENTRAL`:
+the 4 bytes state followed by the 16 bytes the central just sent, decrypted and in the clear.
+
+Comparing them with what was sent is what authenticates the *device*, the earlier steps only authenticated the central.
+
+##### Step 3, the final challenge
+
+The last message wraps a fixed 16 bytes marker, the ASCII string `PokemonGoooooooo`, in a `next_challenge` keyed with the session key.
+Its state field goes back to `00` rather than continuing to count up.
+
+| Position | 00 | 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 |
+| -------- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- |
+| Value    | 50 | 6f | 6b | 65 | 6d | 6f | 6e | 47 | 6f | 6f | 6f | 6f | 6f | 6f | 6f | 6f |
+
+The device acknowledges with a `04 00 23 00` notification, and certification is complete.
+This is the one step that is not always announced beforehand, so a central that waits passively for a notification here
+can hang: reading `SFIDA_TO_CENTRAL` on its own after a short delay is more reliable.
+
+From that point on, the battery, LED, vibration and button characteristics answer normally.
+Services discovered *before* certification completed may have been cached as empty,
+so it is worth running the discovery of the battery and device control services only once the handshake is done.
+
+Nothing survives the connection: the session key is generated by the device for that connection only, and the whole handshake runs again on the next one.
+
+#### Reconnection
+
+A device that already knows the central takes a shorter path.
+Instead of the 378 bytes challenge, subscribing to `SFIDA_COMMANDS` produces a `03 00 00 00` notification
+and a 36 bytes payload, 4 bytes of state followed by a 32 bytes reconnect challenge.
+
+The central answers it with 16 bytes computed as `AES(session_key, challenge[0:15]) ^ challenge[16:31]`, and the exchange
+then runs through states `04 00 01 00`, `05` and `04 00 02 00` before the device considers the central certified.
+
+How the reconnect key itself is established and stored is not documented here, and Lighthouse does not implement this path:
+it runs the full handshake on every connection, which the device always accepts.
 
 ## Using the device
 

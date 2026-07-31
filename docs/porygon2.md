@@ -3,9 +3,9 @@
 
 * The Nintendo [Poke Ball Plus](https://www.pokemon.com/us/pokemon-video-games/poke-ball-plus) (PBP) is a controller and accessory for the Nintendo Switch and for the Pokemon GO mobile game
 * Doubles as a Pokemon GO accessory, where it replaces a [Pokemon GO Plus](porygon.md)
+* Uses Bluetooth Low Energy (BLE) for the Pokemon GO mode, and Nintendo's HID based protocol for the Switch
 * Has an analog stick with an integrated push button, a second top button, a RGB LED, a speaker and a vibration motor
 * Has an accelerometer and a gyroscope
-* Uses Bluetooth Low Energy (BLE) for the Pokemon GO mode, and Nintendo's HID based protocol for the Switch
 * An internal rechargeable Li-ion battery is used as power source
 
 ## Hardware
@@ -147,7 +147,7 @@ Two further services are advertised, but not much is known about them.
 See [porygon.md](porygon.md).  
 
 The certificate service is shared with the Pokemon GO Plus, and gates the Pokemon GO specific features only.
-The main problem is that keys are not extractables, because there are no tools like the [SUOTA Go+](https://github.com/Jesus805/Suota-Go-Plus) available for this device...
+The main problem is that **keys are not extractables**, because there are no tools like the [SUOTA Go+](https://github.com/Jesus805/Suota-Go-Plus) available for this device...
 
 The gamepad service is usable without it.
 
