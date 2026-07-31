@@ -27,6 +27,9 @@
 
 #include <QObject>
 #include <QList>
+#include <QVector3D>
+#include <QQuaternion>
+#include <QElapsedTimer>
 
 #include <QBluetoothDeviceInfo>
 #include <QLowEnergyController>
@@ -57,6 +60,8 @@ class DevicePokeballPlus: public DeviceBeacon
     Q_PROPERTY(float acclX READ getAcclXf NOTIFY acclChanged)
     Q_PROPERTY(float acclY READ getAcclYf NOTIFY acclChanged)
     Q_PROPERTY(float acclZ READ getAcclZf NOTIFY acclChanged)
+
+    Q_PROPERTY(QQuaternion orientation READ getOrientation NOTIFY orientationChanged)
 
     // QLowEnergyController related
     void serviceScanDone();
@@ -98,6 +103,16 @@ class DevicePokeballPlus: public DeviceBeacon
     float getAcclYf() { return m_accl_y; };
     float getAcclZf() { return m_accl_z; };
 
+    // orientation fusion
+    QQuaternion m_attitude;                 // in the sensor frame
+    QQuaternion m_orientation;              // in the 3d scene frame
+    QVector3D m_gyro_bias;
+    QElapsedTimer m_fusionTimer;
+    bool m_fusionReady = false;
+    void updateOrientation();
+
+    QQuaternion getOrientation() { return m_orientation; };
+
 Q_SIGNALS:
     void autoconnectChanged();
     void devicemodeChanged();
@@ -105,6 +120,7 @@ Q_SIGNALS:
     void axisChanged();
     void gyroChanged();
     void acclChanged();
+    void orientationChanged();
 
 protected:
     int getButtonCount() { return 2; }
@@ -122,6 +138,9 @@ public:
 
     QString getDeviceMode() { return m_deviceMode; }
     void setDeviceMode(const QString &value);
+
+    //! Re-align the orientation on the current gravity, and reset the heading
+    Q_INVOKABLE void resetOrientation();
 };
 
 /* ************************************************************************** */

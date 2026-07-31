@@ -187,6 +187,19 @@ Loader {
                     checked: currentDevice.autoConnect
                     onClicked: currentDevice.autoConnect = checked
                 }
+
+                IconSvg {
+                    id: imageBattery
+                    width: 40
+                    height: 38
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    visible: (currentDevice.hasBattery && currentDevice.deviceBattery >= 0)
+                    source: UtilsDeviceSensors.getDeviceBatteryIcon(currentDevice.deviceBattery)
+                    color: Theme.colorIcon
+                    rotation: 90
+                    fillMode: Image.PreserveAspectCrop
+                }
             }
 
             Row { // right

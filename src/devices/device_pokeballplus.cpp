@@ -23,21 +23,20 @@
 
 #include "../local_controls/local_controls.h"
 #include "../local_controls/local_actions.h"
-
-#include "../local_controls/gamepad.h"
 #include "../local_controls/gamepad_uinput.h"
 
-#include <cmath>
 #include <cstdint>
-#include <algorithm>
+#include <cmath>
 
 #include <QBluetoothUuid>
 #include <QBluetoothAddress>
 #include <QBluetoothServiceInfo>
 #include <QLowEnergyService>
 
+#include <QElapsedTimer>
 #include <QDebug>
 
+/* ************************************************************************** */
 /* ************************************************************************** */
 
 DevicePokeballPlus::DevicePokeballPlus(QString &deviceAddr, QString &deviceName, QObject *parent):
@@ -173,64 +172,6 @@ float getAnalogY(uint8_t value)
 }
 
 /* ************************************************************************** */
-
-float getGyroData(uint8_t firstByte, uint8_t secondByte)
-{
-    uint8_t bits[2];
-    bits[0] = firstByte;
-    bits[1] = secondByte;
-    uint8_t firstNibble = static_cast<uint8_t>(bits[0] >> 4 & 0x0F);
-
-    float PosNeg = firstNibble;
-    PosNeg = ((PosNeg < 8)) ? -1 : 1;
-
-    uint8_t difference;
-    float subDeg = bits[1] / 100.f;
-    float gyroValue;
-
-    if (PosNeg > 0)
-    {
-        difference = static_cast<uint8_t>(0xFF - firstByte);
-        gyroValue = (difference == 0x00) ? 0 : (static_cast<float>(difference) + subDeg);
-    }
-    else
-    {
-        gyroValue = (firstByte == 0xFF) ? 0 : (static_cast<float>(firstByte) + subDeg);
-    }
-
-    return gyroValue * PosNeg;
-}
-
-/* ************************************************************************** */
-
-float getAcclData(uint8_t firstByte, uint8_t secondByte)
-{
-    uint8_t bits[2];
-    bits[0] = firstByte;
-    bits[1] = secondByte;
-    uint8_t firstNibble = static_cast<uint8_t>(bits[0] >> 4 & 0x0F);
-
-    float PosNeg = firstNibble;
-    PosNeg = ((PosNeg < 8)) ? -1 : 1;
-
-    uint8_t difference;
-    float subG = bits[1] / 100.f;
-    float accelValue;
-
-    if (PosNeg > 0)
-    {
-        difference = static_cast<uint8_t>(0xFF - firstByte);
-        accelValue = (difference == 0x00) ? 0 : (static_cast<float>(difference) + subG) / 16.f;
-    }
-    else
-    {
-        accelValue = (firstByte == 0xFF) ? 0 : (static_cast<float>(firstByte) + subG) / 16.f;
-    }
-
-    return accelValue * PosNeg;
-}
-
-/* ************************************************************************** */
 /* ************************************************************************** */
 
 void DevicePokeballPlus::serviceScanDone()
@@ -244,7 +185,7 @@ void DevicePokeballPlus::serviceScanDone()
             connect(m_serviceBattery, &QLowEnergyService::stateChanged, this, &DevicePokeballPlus::serviceDetailsDiscovered_battery);
 
             // Windows hack, see: QTBUG-80770 and QTBUG-78488
-            QTimer::singleShot(0, this, [=] () { m_serviceBattery->discoverDetails(); });
+            QTimer::singleShot(0, this, [=, this] () { m_serviceBattery->discoverDetails(); });
         }
     }
 
@@ -258,7 +199,7 @@ void DevicePokeballPlus::serviceScanDone()
             connect(m_serviceGamepad, &QLowEnergyService::characteristicChanged, this, &DevicePokeballPlus::bleReadNotify);
 
             // Windows hack, see: QTBUG-80770 and QTBUG-78488
-            QTimer::singleShot(0, this, [=] () { m_serviceGamepad->discoverDetails(); });
+            QTimer::singleShot(0, this, [=, this] () { m_serviceGamepad->discoverDetails(); });
         }
     }
 }
@@ -350,8 +291,8 @@ void DevicePokeballPlus::bleReadNotify(const QLowEnergyCharacteristic &c, const 
         // gamepad buttons
 
         int btn = data[1];
-        int btn_a = (btn == 1 || btn == 3);
-        int btn_b = (btn == 2 || btn == 3);
+        int btn_top = (btn == 1 || btn == 3);
+        int btn_stick = (btn == 2 || btn == 3);
         Q_EMIT btnChanged();
 
         // gamepad axis
@@ -360,32 +301,36 @@ void DevicePokeballPlus::bleReadNotify(const QLowEnergyCharacteristic &c, const 
         m_axis_y = getAnalogY(data[4]);
         Q_EMIT axisChanged();
 
-        // gyro
+        // accelerometer, in g
 
-        m_gyro_x = getGyroData(data[6], data[5]) * 1.f;
-        m_gyro_y = getGyroData(data[8], data[7]) * 1.f;
-        m_gyro_z = getGyroData(data[10], data[9]) * 1.f;
+        m_accl_x = getAcclData(data[5], data[6]);
+        m_accl_y = getAcclData(data[7], data[8]);
+        m_accl_z = getAcclData(data[9], data[10]);
+        Q_EMIT acclChanged();
+
+        // gyroscope, in deg/s
+
+        m_gyro_x = getGyroData(data[11], data[12]);
+        m_gyro_y = getGyroData(data[13], data[14]);
+        m_gyro_z = getGyroData(data[15], data[16]);
         Q_EMIT gyroChanged();
 
-        // accl
+        // fused orientation
 
-        m_accl_x = getAcclData(data[12], data[11]) * 1.f;
-        m_accl_y = getAcclData(data[14], data[13]) * 1.f;
-        m_accl_z = getAcclData(data[16], data[15]) * 1.f;
-        Q_EMIT acclChanged();
+        updateOrientation();
 
         //qDebug() << "ACCL X  > " << m_accl_x << " Y  > " << m_accl_y << " Z  > " << m_accl_z;
         //qDebug() << "GYRO X  > " << m_gyro_x << " Y  > " << m_gyro_y << " Z  > " << m_gyro_z;
 
         ////////////////
 
-        if (btn_a) triggerEvent(1, 0);
-        if (btn_b) triggerEvent(2, 0);
+        if (btn_top) triggerEvent(1, 0);
+        if (btn_stick) triggerEvent(2, 0);
 
         if (m_deviceMode == "button")
         {
-            if (btn_a) triggerAction(1, 0);
-            if (btn_b) triggerAction(2, 0);
+            if (btn_top) triggerAction(1, 0);
+            if (btn_stick) triggerAction(2, 0);
         }
 
         ////////////////
@@ -395,15 +340,15 @@ void DevicePokeballPlus::bleReadNotify(const QLowEnergyCharacteristic &c, const 
             LocalControls *ctrls = LocalControls::getInstance();
             ctrls->mouse_action(static_cast<int>(m_axis_x*15.f),
                                 static_cast<int>(m_axis_y*15.f),
-                                btn_a, btn_b, false);
+                                btn_top, btn_stick, false);
         }
 
         ////////////////
 
         if (m_deviceMode == "keyboard")
         {
-            if (btn_a) triggerDirectAction(LocalActions::ACTION_MOUSE_click_left);
-            if (btn_b) triggerDirectAction(LocalActions::ACTION_MOUSE_click_right);
+            if (btn_top) triggerDirectAction(LocalActions::ACTION_MOUSE_click_left);
+            if (btn_stick) triggerDirectAction(LocalActions::ACTION_MOUSE_click_right);
 
             if (m_axis_x > 0.5) triggerDirectAction(LocalActions::ACTION_KEYBOARD_right);
             else if (m_axis_x < -0.5) triggerDirectAction(LocalActions::ACTION_KEYBOARD_left);
@@ -424,7 +369,7 @@ void DevicePokeballPlus::bleReadNotify(const QLowEnergyCharacteristic &c, const 
             }
             if (m_gamepad)
             {
-                dynamic_cast<Gamepad_uinput*>(m_gamepad)->action_pbp(m_axis_x*32767.f, m_axis_y*32767.f, btn_a, btn_b);
+                dynamic_cast<Gamepad_uinput*>(m_gamepad)->action_pbp(m_axis_x*32767.f, m_axis_y*32767.f, btn_top, btn_stick);
             }
 #endif // defined(ENABLE_KEYBOARD_UINPUT)
         }
@@ -436,6 +381,101 @@ void DevicePokeballPlus::bleReadNotify(const QLowEnergyCharacteristic &c, const 
 
         ////////////////
     }
+}
+
+/* ************************************************************************** */
+/* ************************************************************************** */
+
+// Orientation fusion
+
+// The accelerometer is an absolute reference, it always points away from gravity, but only
+// while the device is not otherwise accelerated, and it says nothing at all about the heading.
+// The gyroscope is smooth and complete, but integrating it drifts.
+// Integrating the gyroscope, then slowly pulling the result back towards gravity,
+// gives an orientation that is both responsive and stable in roll and pitch.
+// The heading cannot be corrected by anything here, there is no magnetometer, so it slowly drifts.
+
+#define PBP_FUSION_TAU          1.0f    // accelerometer correction time constant, in s
+#define PBP_BIAS_TAU            5.0f    // gyroscope bias tracking time constant, in s
+#define PBP_STILL_RATE          5.0f    // below that rotation rate the device is "still", in deg/s
+#define PBP_GRAVITY_TOLERANCE   0.25f   // accepted deviation from 1 g to trust the accelerometer
+#define PBP_STALE_REPORT        1.0f    // above that gap, do not integrate the gyroscope, in s
+
+// The sensor has Z up, towards the top button, while Qt Quick 3D has Y up: that is the first rotation.
+// The second one is the quarter turn between the horizontal axes of the sensor and the ones of the 3d model.
+static const QQuaternion s_sensorToScene = QQuaternion::fromAxisAndAngle(1.f, 0.f, 0.f, -90.f) *
+                                           QQuaternion::fromAxisAndAngle(0.f, 0.f, 1.f, 90.f);
+
+void DevicePokeballPlus::resetOrientation()
+{
+    m_fusionReady = false;
+    m_gyro_bias = QVector3D();
+    m_fusionTimer.invalidate();
+}
+
+void DevicePokeballPlus::updateOrientation()
+{
+    const QVector3D accl(m_accl_x, m_accl_y, m_accl_z);
+    const QVector3D gyro(m_gyro_x, m_gyro_y, m_gyro_z);
+    const float g = accl.length();
+    const bool gravityUsable = (std::fabs(g - 1.f) < PBP_GRAVITY_TOLERANCE);
+
+    // start from the current gravity, so the 3d view does not have to converge from scratch
+    if (!m_fusionReady)
+    {
+        if (!gravityUsable) return;
+
+        m_attitude = QQuaternion::rotationTo(accl / g, QVector3D(0.f, 0.f, 1.f));
+        m_fusionReady = true;
+        m_fusionTimer.start();
+
+        m_orientation = s_sensorToScene * m_attitude * s_sensorToScene.conjugated();
+        Q_EMIT orientationChanged();
+        return;
+    }
+
+    // the device does not stream at a fixed rate, so use the actual elapsed time
+    float dt = m_fusionTimer.nsecsElapsed() / 1000000000.f;
+    m_fusionTimer.restart();
+    if (dt <= 0.f) return;
+
+    // a long gap means the device was idle and throttled its reports:
+    // the rotation rates in between are unknown, so only the accelerometer correction can be applied
+    const bool stale = (dt > PBP_STALE_REPORT);
+    if (stale) dt = PBP_STALE_REPORT;
+
+    // gyroscope bias, re-estimated whenever the device sits still
+    const QVector3D rate = gyro - m_gyro_bias;
+    if (rate.length() < PBP_STILL_RATE)
+    {
+        m_gyro_bias += (gyro - m_gyro_bias) * (1.f - std::exp(-dt / PBP_BIAS_TAU));
+    }
+
+    // integrate the rotation rate, in the sensor frame
+    if (!stale)
+    {
+        const float angle = rate.length() * dt;
+        if (angle > 0.f)
+        {
+            m_attitude *= QQuaternion::fromAxisAndAngle(rate.normalized(), angle);
+        }
+    }
+
+    // pull the result back towards gravity, but only while the accelerometer is
+    // actually measuring gravity, and not the device being moved around
+    if (gravityUsable)
+    {
+        const QVector3D measured = accl / g;
+        const QVector3D expected = m_attitude.conjugated().rotatedVector(QVector3D(0.f, 0.f, 1.f));
+        const QQuaternion error = QQuaternion::rotationTo(expected, measured);
+
+        m_attitude *= QQuaternion::nlerp(QQuaternion(), error, 1.f - std::exp(-dt / PBP_FUSION_TAU)).conjugated();
+    }
+
+    m_attitude.normalize();
+
+    m_orientation = s_sensorToScene * m_attitude * s_sensorToScene.conjugated();
+    Q_EMIT orientationChanged();
 }
 
 /* ************************************************************************** */

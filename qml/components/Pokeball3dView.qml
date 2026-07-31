@@ -1,3 +1,4 @@
+import QtQuick
 import QtQuick3D
 
 View3D { // pokeball 3d
@@ -6,9 +7,7 @@ View3D { // pokeball 3d
     width: parent.width
     height: width
 
-    property real xx: 0.0
-    property real yy: 0.0
-    property real zz: 0.0
+    property quaternion orientation: Qt.quaternion(1, 0, 0, 0)
 
     property real joyx: 0.0
     property real joyy: 0.0
@@ -51,7 +50,7 @@ View3D { // pokeball 3d
         position: Qt.vector3d(0, 0, 0)
         scale: Qt.vector3d(1, 1, 1)
 
-        eulerRotation: Qt.vector3d(pokeballView.xx, pokeballView.yy, pokeballView.zz)
+        rotation: pokeballView.orientation
     }
 
 

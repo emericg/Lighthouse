@@ -87,6 +87,9 @@ set(SOURCES
     src/network_controls/network_client.cpp src/network_controls/network_client.h
     src/network_controls/network_art_provider.h
 
+    src/crypto/pgp/pgp_crypto.cpp src/crypto/pgp/pgp_crypto.h
+    src/crypto/pgp/pgp_keystore.cpp src/crypto/pgp/pgp_keystore.h
+
     ${app_icon_macos}
     ${app_icon_windows}
     assets/assets.qrc
@@ -275,6 +278,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE MobileUI MobileUI_plugin)
 # ComponentLibrary
 add_subdirectory(thirdparty/ComponentLibrary)
 target_link_libraries(${PROJECT_NAME} PRIVATE ComponentLibrary_plugin)
+
+# tinyAES
+add_subdirectory(thirdparty/tinyAES)
+target_link_libraries(${PROJECT_NAME} PRIVATE tinyAES)
 
 # RC4
 add_subdirectory(thirdparty/RC4)

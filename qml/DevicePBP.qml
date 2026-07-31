@@ -187,6 +187,19 @@ Loader {
                     checked: currentDevice.autoConnect
                     onClicked: currentDevice.autoConnect = checked
                 }
+
+                IconSvg {
+                    id: imageBattery
+                    width: 40
+                    height: 38
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    visible: (currentDevice.hasBattery && currentDevice.deviceBattery >= 0)
+                    source: UtilsDeviceSensors.getDeviceBatteryIcon(currentDevice.deviceBattery)
+                    color: Theme.colorIcon
+                    rotation: 90
+                    fillMode: Image.PreserveAspectCrop
+                }
             }
 
             Row { // right
@@ -248,49 +261,49 @@ Loader {
             anchors.left: parent.left
             anchors.leftMargin: 24
 
-            Row {
+            Row { // accelerometer, in g
+                DataBarSolid {
+                    legend: "x"
+                    value: currentDevice.acclX
+                    valueMin: -8
+                    valueMax: 8
+                    floatprecision: 2
+                }
+                DataBarSolid {
+                    legend: "y"
+                    value: currentDevice.acclY
+                    floatprecision: 2
+                    valueMin: -8
+                    valueMax: 8
+                }
+                DataBarSolid {
+                    legend: "z"
+                    value: currentDevice.acclZ
+                    valueMin: -8
+                    valueMax: 8
+                    floatprecision: 2
+                }
+            }
+            Row { // gyroscope, in deg/s
                 DataBarSolid {
                     legend: "x"
                     value: currentDevice.gyroX
-                    valueMin: -180
-                    valueMax: 180
+                    valueMin: -2000
+                    valueMax: 2000
                     floatprecision: 1
                 }
                 DataBarSolid {
                     legend: "y"
                     value: currentDevice.gyroY
                     floatprecision: 1
-                    valueMin: -180
-                    valueMax: 180
+                    valueMin: -2000
+                    valueMax: 2000
                 }
                 DataBarSolid {
                     legend: "z"
                     value: currentDevice.gyroZ
-                    valueMin: -180
-                    valueMax: 180
-                    floatprecision: 1
-                }
-            }
-            Row {
-                DataBarSolid {
-                    legend: "x"
-                    value: currentDevice.acclX
-                    valueMin: -180
-                    valueMax: 180
-                    floatprecision: 1
-                }
-                DataBarSolid {
-                    legend: "y"
-                    value: currentDevice.acclY
-                    floatprecision: 1
-                    valueMin: -180
-                    valueMax: 180
-                }
-                DataBarSolid {
-                    legend: "z"
-                    value: currentDevice.acclZ
-                    valueMin: -180
-                    valueMax: 180
+                    valueMin: -2000
+                    valueMax: 2000
                     floatprecision: 1
                 }
             }
@@ -345,14 +358,8 @@ Loader {
 
                     visible: (selectorPbpView.currentSelection === 2)
 
-                    // DEBUG PBP AXIS
-                    //xx : fakeX.value
-                    //yy : fakeY.value
-                    //zz : fakeZ.value
-
-                    xx : UtilsNumber.mapNumber(currentDevice.gyroX, -18, 18, 90 , -90)
-                    //yy : UtilsNumber.mapNumber(currentDevice.gyroZ, -20, 20, 180 , -180) // DISABLED
-                    zz : UtilsNumber.mapNumber(currentDevice.gyroY, -18, 18, 180, -180)
+                    // accelerometer and gyroscope, fused into a full 3d orientation
+                    orientation: currentDevice.orientation
 
                     joyx: currentDevice.axis_x * -6
                     joyy: currentDevice.axis_y * -6

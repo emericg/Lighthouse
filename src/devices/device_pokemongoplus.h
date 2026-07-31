@@ -24,11 +24,14 @@
 /* ************************************************************************** */
 
 #include "../device_beacon.h"
+#include "../crypto/pgp/pgp_keystore.h"
 
 #include <QObject>
 #include <QList>
 
 #include <QBluetoothDeviceInfo>
+#include <QBluetoothUuid>
+#include <QBluetoothLocalDevice>
 #include <QLowEnergyController>
 
 /* ************************************************************************** */
@@ -50,12 +53,29 @@ class DevicePokemonGoPlus: public DeviceBeacon
 
     bool m_autoConnect = true;
 
+    ////////
+
+    static inline const QBluetoothUuid s_srvBattery {QStringLiteral("0000180f-0000-1000-8000-00805f9b34fb")};
+    static inline const QBluetoothUuid s_chrBatteryLevel {QStringLiteral("00002a19-0000-1000-8000-00805f9b34fb")};
+
+    static inline const QBluetoothUuid s_srvCertificate {QStringLiteral("bbe87709-5b89-4433-ab7f-8b8eef0d8e37")};
+    static inline const QBluetoothUuid s_chrSfidaCommands {QStringLiteral("bbe87709-5b89-4433-ab7f-8b8eef0d8e39")};
+    static inline const QBluetoothUuid s_chrCentralToSfida {QStringLiteral("bbe87709-5b89-4433-ab7f-8b8eef0d8e38")};
+    static inline const QBluetoothUuid s_chrSfidaToCentral {QStringLiteral("bbe87709-5b89-4433-ab7f-8b8eef0d8e3a")};
+
+    static inline const QBluetoothUuid s_srvControl {QStringLiteral("21c50462-67cb-63a3-5c4c-82b5b9939aeb")};
+    static inline const QBluetoothUuid s_chrLedVibrate {QStringLiteral("21c50462-67cb-63a3-5c4c-82b5b9939aec")};
+    static inline const QBluetoothUuid s_chrButtonNotif {QStringLiteral("21c50462-67cb-63a3-5c4c-82b5b9939aed")};
+
+    ////////
+
     // QLowEnergyController related
     void serviceScanDone();
     void addLowEnergyService(const QBluetoothUuid &uuid);
     void serviceDetailsDiscovered_battery(QLowEnergyService::ServiceState newState);
     void serviceDetailsDiscovered_certificate(QLowEnergyService::ServiceState newState);
     void serviceDetailsDiscovered_control(QLowEnergyService::ServiceState newState);
+    void discoverControlService();
 
     QLowEnergyService *m_serviceBattery = nullptr;
     QLowEnergyService *m_serviceCertificate = nullptr;
@@ -66,9 +86,56 @@ class DevicePokemonGoPlus: public DeviceBeacon
     void bleWriteDone(const QLowEnergyCharacteristic &c, const QByteArray &value);
     void bleReadDone(const QLowEnergyCharacteristic &c, const QByteArray &value);
     void bleReadNotify(const QLowEnergyCharacteristic &c, const QByteArray &value);
+    void bleServiceErrored(QLowEnergyService::ServiceError error);
+
+    ////////
+
+    /*!
+     * Certification handshake.
+     *
+     * The device hangs up on connections that do not certify, so this runs first and
+     * everything else waits for it. The steps are driven by SFIDA_COMMANDS notifications
+     * carrying a 4 bytes state, with the payload of each step read from SFIDA_TO_CENTRAL
+     * and our answers written to CENTRAL_TO_SFIDA.
+     *
+     * States, from the device's point of view:
+     * - 0: device offers the 378 bytes challenge, we answer with the decrypted challenge
+     * - 1: device sends a 52 bytes challenge, we verify it and send our own
+     * - 2: device acknowledges, we send the final challenge
+     * - 3: device sends 4 00 23 00, certified
+     */
+    enum CertState {
+        CERT_IDLE = 0,          //!< nothing started yet
+        CERT_CHALLENGE_SENT,    //!< we answered the initial challenge
+        CERT_EXCHANGE,          //!< mutual verification
+        CERT_FINAL,             //!< final challenge sent
+        CERT_DONE,              //!< certified, the link is ready
+        CERT_FAILED,            //!< failed...
+    };
+
+    CertState m_certState = CERT_IDLE;
+    PgpKeys m_keys;
+    QByteArray m_sessionKey;    //!< 16 bytes, valid once the initial challenge is decrypted
+    QByteArray m_appChallenge;  //!< 16 bytes we sent at step 2, the device echoes them back decrypted
+
+    void certificationStart();
+    void certificationNotify(const QByteArray &state);
+    void certificationData(const QByteArray &data);
+    void certificationFailed(const QString &why);
+    void certificationDone();
+
+    void writeCentralToSfida(const QByteArray &payload);
+    void readSfidaToCentral();
+    void subscribeToSfidaCommands();
+
+    // The certificate service needs an encrypted link, and Qt's BLE controller never initiates bonding on its own
+    QBluetoothLocalDevice *m_localDevice = nullptr;
+    bool ensurePaired();
+    void pairingDone(const QBluetoothAddress &address, QBluetoothLocalDevice::Pairing pairing);
 
 Q_SIGNALS:
     void autoconnectChanged();
+    void btnChanged();
 
 protected:
     int getButtonCount() { return 1; }
@@ -83,6 +150,8 @@ public:
 
     bool getAutoConnect() { return m_autoConnect; }
     void setAutoConnect(const bool value);
+
+    void setNotification(const QByteArray &value);
 };
 
 /* ************************************************************************** */

@@ -22,8 +22,6 @@
 #include "device.h"
 #include "DeviceManager.h"
 #include "SettingsManager.h"
-#include "DatabaseManager.h"
-#include "utils_screen.h"
 
 #include <cstdlib>
 #include <cmath>
@@ -685,7 +683,7 @@ QDateTime Device::getDeviceUptime() const
 {
     if (m_device_time > 0)
     {
-        return QDateTime::fromSecsSinceEpoch(QDateTime::currentDateTime().toSecsSinceEpoch() - m_device_time);
+        return QDateTime::fromSecsSinceEpoch(QDateTime::currentSecsSinceEpoch() - m_device_time);
     }
 
     return QDateTime();
@@ -717,14 +715,14 @@ QDateTime Device::getLastHistorySync() const
 int Device::getLastHistorySync_int() const
 {
     if (m_lastHistorySync.isValid())
-        return QDateTime::currentDateTime().toSecsSinceEpoch() - m_lastHistorySync.toSecsSinceEpoch();
+        return QDateTime::currentSecsSinceEpoch() - m_lastHistorySync.toSecsSinceEpoch();
 
     return -1;
 }
 
 float Device::getLastHistorySync_days() const
 {
-    int64_t sec = QDateTime::currentDateTime().toSecsSinceEpoch() - m_lastHistorySync.toSecsSinceEpoch();
+    int64_t sec = QDateTime::currentSecsSinceEpoch() - m_lastHistorySync.toSecsSinceEpoch();
 
     float days = (sec / 3600.f / 24.f);
     if (days < 0.f) days = 0.f;
@@ -1421,7 +1419,7 @@ void Device::serviceDetailsDiscovered(QLowEnergyService::ServiceState)
 }
 
 void Device::serviceScanDone()
-{
+{    
     //qDebug() << "Device::serviceScanDone(" << getAddress() << ")";
 }
 
