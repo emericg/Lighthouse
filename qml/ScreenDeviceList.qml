@@ -182,6 +182,26 @@ Item {
 
         ////////////////
 
+        // Mobile positioninng hack // header resized after creation scroll the view...
+
+        property bool userScrolled: false
+        onDragStarted: userScrolled = true
+        onFlickStarted: userScrolled = true
+        onMovementEnded: userScrolled = (contentY > originY + 1)
+
+        Connections {
+            target: devicesView.headerItem
+            function onHeightChanged() {
+                if (Theme.isMobile) {
+                    if (!devicesView.userScrolled) {
+                        devicesView.positionViewAtBeginning()
+                    }
+                }
+            }
+        }
+
+        ////////////////
+
         header: Column {
             anchors.left: parent.left
             anchors.right: parent.right

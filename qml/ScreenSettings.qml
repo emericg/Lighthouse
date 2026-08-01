@@ -611,7 +611,7 @@ Loader {
                         anchors.right: parent.right
                         anchors.rightMargin: Theme.componentMargin
                         anchors.verticalCenter: parent.verticalCenter
-                        width: 200
+                        width: 256
 
                         from: 0
                         to: 100

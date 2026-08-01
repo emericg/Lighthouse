@@ -9,10 +9,11 @@ Column {
 
     spacing: 20
 
+    visible: isDesktop
+
     ListTitle { ////////////////////////////////////////////////////////////////
         anchors.leftMargin: devicesView.listMargin
         anchors.rightMargin: devicesView.listMargin
-        visible: isDesktop
         text: qsTr("Local control(s)")
     }
 
@@ -22,7 +23,6 @@ Column {
         anchors.right: parent.right
         anchors.rightMargin: 8
 
-        visible: isDesktop
         columns: singleColumn ? 1 : 4
         spacing: 12
 
@@ -174,7 +174,6 @@ Column {
             height: visible ? 128 : 0
             radius: 4
 
-            visible: isDesktop
             color: Theme.colorDeviceWidget
             border.width: 2
             border.color: singleColumn ? "transparent" : Theme.colorSeparator
@@ -226,10 +225,11 @@ Column {
             height: visible ? 128 : 0
             radius: 4
 
-            visible: isDesktop && ClaudeMonitor.enabled && ClaudeMonitor.available
             color: Theme.colorDeviceWidget
             border.width: 2
             border.color: singleColumn ? "transparent" : Theme.colorSeparator
+
+            visible: isDesktop && ClaudeMonitor.enabled && ClaudeMonitor.available
 
             function resetString(seconds) {
                 if (seconds < 0) return ""
@@ -334,31 +334,20 @@ Column {
                         }
                     }
 
-                    Text {
-                        id: claudeSessionValue
-                        width: 40
-                        anchors.right: parent.right
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        text: claudeWidget.usageString(ClaudeMonitor.fiveHourValid,
-                                                       ClaudeMonitor.fiveHourPercent)
-                        textFormat: Text.PlainText
-                        color: Theme.colorSubText
-                        font.pixelSize: 14
-                        horizontalAlignment: Text.AlignRight
-                    }
-
-                    ProgressBarThemed {
+                    SliderValueSolid { // 5 hour session window
                         anchors.left: claudeSessionLabel.right
                         anchors.leftMargin: 8
-                        anchors.right: claudeSessionValue.left
-                        anchors.rightMargin: 8
+                        anchors.right: parent.right
                         anchors.verticalCenter: parent.verticalCenter
-                        height: 10
+                        height: 20
+                        hhh: 16
 
                         from: 0
                         to: 100
+                        unit: "%"
                         value: Math.max(0, ClaudeMonitor.fiveHourPercent)
+
+                        //legend: "5 hour session window"
                         colorForeground: claudeWidget.usageColor(ClaudeMonitor.fiveHourPercent)
                     }
                 }
@@ -387,31 +376,20 @@ Column {
                         }
                     }
 
-                    Text {
-                        id: claudeWeeklyValue
-                        width: 40
-                        anchors.right: parent.right
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        text: claudeWidget.usageString(ClaudeMonitor.sevenDayValid,
-                                                       ClaudeMonitor.sevenDayPercent)
-                        textFormat: Text.PlainText
-                        color: Theme.colorSubText
-                        font.pixelSize: 14
-                        horizontalAlignment: Text.AlignRight
-                    }
-
-                    ProgressBarThemed {
+                    SliderValueSolid { // 7 day window
                         anchors.left: claudeWeeklyLabel.right
                         anchors.leftMargin: 8
-                        anchors.right: claudeWeeklyValue.left
-                        anchors.rightMargin: 8
+                        anchors.right: parent.right
                         anchors.verticalCenter: parent.verticalCenter
-                        height: 10
+                        height: 20
+                        hhh: 16
 
                         from: 0
                         to: 100
+                        unit: "%"
                         value: Math.max(0, ClaudeMonitor.sevenDayPercent)
+
+                        //legend: "7 day window"
                         colorForeground: claudeWidget.usageColor(ClaudeMonitor.sevenDayPercent)
                     }
                 }

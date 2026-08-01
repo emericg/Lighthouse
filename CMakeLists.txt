@@ -176,6 +176,7 @@ qt_add_qml_module(${PROJECT_NAME}
         qml/popups/PopupBeaconKey.qml
         qml/popups/PopupConfirmation.qml
         qml/popups/PopupDeleteDevice.qml
+        qml/popups/PopupPgpKey.qml
 
         qml/components/SettingsQrReader.qml
         qml/components/SettingsQrGenerator.qml
@@ -188,6 +189,7 @@ qt_add_qml_module(${PROJECT_NAME}
         qml/components/AnalogPad.qml
 
         qml/components/ItemKey.qml
+        qml/components/PgpButtonKey.qml
         qml/components/RemoteButtonKey.qml
         qml/components/RemoteButtonWidget.qml
         qml/components/SchematicButton.qml

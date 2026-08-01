@@ -106,19 +106,6 @@ bool SettingsManager::readSettings()
         if (settings.contains("settings/bluetoothLimitScanningRange"))
             m_bluetoothLimitScanningRange = settings.value("settings/bluetoothLimitScanningRange").toBool();
 
-        {
-#if defined(Q_OS_ANDROID)
-            // too many weak devices on Android...
-            m_bluetoothSimUpdates = 2;
-#elif defined(Q_OS_IOS)
-            // iOS is better
-            m_bluetoothSimUpdates = 3;
-#else
-            // desktops are usually good with simultaneous updates
-            m_bluetoothSimUpdates = 4;
-#endif
-        }
-
         if (settings.contains("settings/startMinimized"))
             m_startMinimized = settings.value("settings/startMinimized").toBool();
 

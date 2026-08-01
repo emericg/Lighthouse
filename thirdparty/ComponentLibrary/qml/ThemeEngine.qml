@@ -1,12 +1,13 @@
 pragma Singleton
 
 import QtQuick
-import QtQuick.Controls.Material
 
 Item {
     ////////////////////////////////////////////////////////////////////////////
 
     enum ThemeNames {
+        THEME_DEFAULT,
+
         // Generic mobile themes
         THEME_MOBILE_LIGHT,
         THEME_MOBILE_DARK,
@@ -35,12 +36,20 @@ Item {
     }
     property int currentTheme: -1
 
+    enum ThemeColors { // Same values than MobileUI.Theme or Material.theme
+        Light = 0,
+        Dark = 1
+    }
+
     ////////////////////////////////////////////////////////////////////////////
 
-    // Inputs // bind these from the application // sensible defaults let the library run standalone
+    // Inputs
+
+    // Sensible defaults let the library run standalone
+    // Bind these from the calling application OR set values directly here
 
     // Theme engine
-    property string appTheme: "THEME_DEFAULT"
+    property string appTheme // "THEME_DEFAULT"
     property bool appThemeAuto: false
     property int appThemeAutoMethod: 0
 
@@ -65,16 +74,16 @@ Item {
 
     ////////////////////////////////////////////////////////////////////////////
 
-    // device presets
+    // Device presets
 
     property bool isDesktop: (Qt.platform.os !== "ios" && Qt.platform.os !== "android")
     property bool isMobile: (Qt.platform.os === "ios" || Qt.platform.os === "android")
 
-    property bool isHdpi: (screenDpi >= 128 && screenPar < 2.0)
+    property bool isHdpi: (screenDpi >= 128 || screenPar >= 2.0)
     property bool isPhone: (isMobile && (screenSize < 7.0))
     property bool isTablet: (isMobile && (screenSize >= 7.0))
 
-    // app presets
+    // App presets
 
     property bool singleColumn: {
         if (isMobile) {
@@ -126,7 +135,7 @@ Item {
     property color colorHeaderContent
     property color colorHeaderHighlight
 
-    // Action bar (mobile)
+    // Action bar
     property color colorActionbar
     property color colorActionbarContent
     property color colorActionbarHighlight
@@ -222,7 +231,7 @@ Item {
     property string sidebarSelector // 'arrow' or 'bar'
 
     // App specific (WatchFlower)
-    property color colorDeviceWidget
+    property color colorDeviceWidget: "#fdfdfd"
     readonly property color colorLightGrey: "#a9bcb8"
     readonly property color colorLightGreen: "#09debc"
     readonly property color colorNeutralNight: "#ffb300"
@@ -263,6 +272,8 @@ Item {
     ////////////////////////////////////////////////////////////////////////////
 
     function getThemeIndex(name) {
+        if (name === "THEME_DEFAULT") return Theme.THEME_DEFAULT
+
         if (name === "THEME_MOBILE_LIGHT") return Theme.THEME_MOBILE_LIGHT
         if (name === "THEME_MOBILE_DARK") return Theme.THEME_MOBILE_DARK
 
@@ -330,17 +341,24 @@ Item {
             themeIndex = newTheme
         }
 
-        // Validate the result (or set the default)
-        if (themeIndex < 0 || themeIndex >= Theme.THEME_LAST) {
+        // Validate the result
+        if (themeIndex === Theme.THEME_DEFAULT) { // set the default
             if (isDesktop) themeIndex = Theme.THEME_DESKTOP_LIGHT
             else if (isMobile) themeIndex = Theme.THEME_MOBILE_LIGHT
+        }
+        if (themeIndex <= 0 || themeIndex >= Theme.THEME_LAST) { // or exit
+            return
         }
 
         // Handle day/night themes
         if (appThemeAuto) {
+            var needSwitch = false
             var rightnow = new Date()
+
             var hour = Qt.formatDateTime(rightnow, "hh")
-            if (hour >= 21 || hour <= 8) {
+            if (hour >= 21 || hour <= 8) needSwitch = true
+
+            if (needSwitch) {
 
                 // Simple light/dark toggle
 
@@ -400,7 +418,7 @@ Item {
             isLight = true
             isDark = false
 
-            themeStatusbar = Material.Light
+            themeStatusbar = Theme.Light
             colorStatusbar = "#eeeeee"
 
             colorHeader                 = "#eeeeee"
@@ -442,8 +460,8 @@ Item {
             colorComponentDown          = "#e9e9e9"
             colorComponentBackground    = "white"
 
-            componentRadius = 6
-            componentBorderWidth = 2
+            componentRadius             = 6
+            componentBorderWidth        = 2
 
         } else if (themeIndex === Theme.THEME_MOBILE_DARK) { ///////////////////
 
@@ -456,7 +474,7 @@ Item {
             isLight = false
             isDark = true
 
-            themeStatusbar = Material.Dark
+            themeStatusbar = Theme.Dark
             colorStatusbar = "#292929"
 
             colorHeader                 = "#292929"
@@ -498,8 +516,8 @@ Item {
             colorComponentDown          = "#444"
             colorComponentBackground    = "#505050"
 
-            componentRadius = 6
-            componentBorderWidth = 2
+            componentRadius             = 6
+            componentBorderWidth        = 2
 
         } else if (themeIndex === Theme.THEME_MATERIAL_LIGHT) { ////////////////
 
@@ -512,7 +530,7 @@ Item {
             isLight = true
             isDark = false
 
-            themeStatusbar = Material.Light
+            themeStatusbar = Theme.Light
             colorStatusbar = "white"
 
             colorHeader                 = "white"
@@ -554,8 +572,8 @@ Item {
             colorComponentDown          = "#eee"
             colorComponentBackground    = "white"
 
-            componentRadius = 6
-            componentBorderWidth = 2
+            componentRadius             = 6
+            componentBorderWidth        = 2
 
         } else if (themeIndex === Theme.THEME_MATERIAL_DARK) { /////////////////
 
@@ -568,7 +586,7 @@ Item {
             isLight = false
             isDark = true
 
-            themeStatusbar = Material.Dark
+            themeStatusbar = Theme.Dark
             colorStatusbar = "#313236"
 
             colorHeader                 = "#313236"
@@ -610,8 +628,8 @@ Item {
             colorComponentDown          = "#444"
             colorComponentBackground    = "#505050"
 
-            componentRadius = 8
-            componentBorderWidth = 2
+            componentRadius             = 8
+            componentBorderWidth        = 2
 
         } else if (themeIndex === Theme.THEME_DESKTOP_LIGHT) { /////////////////
 
@@ -625,7 +643,7 @@ Item {
             isLight = true
             isDark = false
 
-            themeStatusbar = Material.Light
+            themeStatusbar = Theme.Light
             colorStatusbar = "#f1f0ef"
 
             colorHeader                 = "#f1f0ef"
@@ -667,8 +685,8 @@ Item {
             colorComponentDown          = "#dadada"
             colorComponentBackground    = "#fcfcfc"
 
-            componentRadius = 6
-            componentBorderWidth = 2
+            componentRadius             = 6
+            componentBorderWidth        = 2
 
             // (app)
             colorBox                    = "white"
@@ -694,7 +712,7 @@ Item {
             isLight = false
             isDark = true
 
-            themeStatusbar              = Material.Dark
+            themeStatusbar              = Theme.Dark
             colorStatusbar              = "#b16bee"
 
             colorHeader                 = "#b16bee"
@@ -736,8 +754,8 @@ Item {
             colorComponentDown          = "#595959"
             colorComponentBackground    = "#393939"
 
-            componentRadius = 6
-            componentBorderWidth = 2
+            componentRadius             = 6
+            componentBorderWidth        = 2
 
             // (app)
             colorBox                    = "#252024"
@@ -762,7 +780,7 @@ Item {
             isLight = true
             isDark = false
 
-            themeStatusbar = Material.Light
+            themeStatusbar = Theme.Light
             colorStatusbar = "white"
 
             colorHeader                 = "white"
@@ -804,11 +822,11 @@ Item {
             colorComponentDown          = "#DADADA"
             colorComponentBackground    = "#FAFAFA"
 
-            componentRadius = (componentHeight / 2)
-            componentBorderWidth = 2
+            componentRadius             = (componentHeight / 2)
+            componentBorderWidth        = 2
 
             // (app)
-            colorDeviceWidget = "#fdfdfd"
+            colorDeviceWidget           = "#fdfdfd"
 
         } else if (themeIndex === Theme.THEME_PLANT) { /////////////////////////
 
@@ -821,7 +839,7 @@ Item {
             isLight = true
             isDark = false
 
-            themeStatusbar = Material.Dark
+            themeStatusbar = Theme.Dark
             colorStatusbar = colorGreen // "#009688"
 
             colorHeader                 = colorGreen
@@ -863,11 +881,11 @@ Item {
             colorComponentDown          = "#D0D0D0"
             colorComponentBackground    = "#F1F1F1"
 
-            componentRadius = 4
-            componentBorderWidth = 2
+            componentRadius             = 4
+            componentBorderWidth        = 2
 
             // (app)
-            colorDeviceWidget = "#fdfdfd"
+            colorDeviceWidget           = "#fdfdfd"
 
         } else if (themeIndex === Theme.THEME_RAIN) { //////////////////////////
 
@@ -880,7 +898,7 @@ Item {
             isLight = true
             isDark = false
 
-            themeStatusbar = Material.Dark
+            themeStatusbar = Theme.Dark
             colorStatusbar = "#325da9" // "#1e3c77"
 
             colorHeader                 = "#325da9"
@@ -922,11 +940,11 @@ Item {
             colorComponentDown          = "#DDDDDD"
             colorComponentBackground    = "#FAFAFA"
 
-            componentRadius = 6
-            componentBorderWidth = 2
+            componentRadius             = 6
+            componentBorderWidth        = 2
 
             // (app)
-            colorDeviceWidget = "#fdfdfd"
+            colorDeviceWidget           = "#fdfdfd"
 
         } else if (themeIndex === Theme.THEME_DAY) { ///////////////////////////
 
@@ -939,7 +957,7 @@ Item {
             isLight = true
             isDark = false
 
-            themeStatusbar = Material.Dark
+            themeStatusbar = Theme.Dark
             colorStatusbar = "#ffcf00" // colorNeutralNight
 
             colorHeader                 = "#ffcf00"
@@ -981,11 +999,11 @@ Item {
             colorComponentDown          = "#DDDDDD"
             colorComponentBackground    = "#FAFAFA"
 
-            componentRadius = 6
-            componentBorderWidth = 2
+            componentRadius             = 6
+            componentBorderWidth        = 2
 
             // (app)
-            colorDeviceWidget = "#fdfdfd"
+            colorDeviceWidget           = "#fdfdfd"
 
         } else if (themeIndex === Theme.THEME_NIGHT) { /////////////////////////
 
@@ -998,7 +1016,7 @@ Item {
             isLight = false
             isDark = true
 
-            themeStatusbar = Material.Dark
+            themeStatusbar = Theme.Dark
             colorStatusbar = "#9b5ed0" // "#725595"
 
             colorHeader                 = "#9b5ed0"
@@ -1040,18 +1058,18 @@ Item {
             colorComponentDown          = "#595959"
             colorComponentBackground    = "#292929"
 
-            componentRadius = 4
-            componentBorderWidth = 2
+            componentRadius             = 4
+            componentBorderWidth        = 2
 
             // (app)
-            colorDeviceWidget = "#333"
+            colorDeviceWidget           = "#333"
 
         } else if (themeIndex === Theme.THEME_LIGHT_AND_WARM) { ////////////////
 
             isLight = true
             isDark = false
 
-            themeStatusbar = Material.Dark
+            themeStatusbar = Theme.Dark
             colorStatusbar = "#BBB"
 
             colorHeader                 = "#e4e5e6"
@@ -1093,18 +1111,18 @@ Item {
             colorComponentDown          = "#E6E6E6"
             colorComponentBackground    = "#FAFAFA"
 
-            componentRadius = 6
-            componentBorderWidth = 2
+            componentRadius             = 6
+            componentBorderWidth        = 2
 
             // (app)
-            sidebarSelector = ""
+            sidebarSelector             = ""
 
         } else if (themeIndex === Theme.THEME_DARK_AND_SPOOKY) { ///////////////
 
             isLight = false
             isDark = true
 
-            themeStatusbar = Material.Dark
+            themeStatusbar = Theme.Dark
             colorStatusbar = "black"
 
             colorHeader                 = "#282828"
@@ -1146,18 +1164,18 @@ Item {
             colorComponentDown          = "#7C7C7C"
             colorComponentBackground    = "#333"
 
-            componentRadius = 3
-            componentBorderWidth = 2
+            componentRadius             = 3
+            componentBorderWidth        = 2
 
             // (app)
-            sidebarSelector = ""
+            sidebarSelector             = ""
 
         } else if (themeIndex === Theme.THEME_PLAIN_AND_BORING) { //////////////
 
             isLight = true
             isDark = false
 
-            themeStatusbar = Material.Dark
+            themeStatusbar = Theme.Dark
             colorStatusbar = "#BBB"
 
             colorHeader                 = "#eee"
@@ -1199,18 +1217,18 @@ Item {
             colorComponentDown          = "#eee"
             colorComponentBackground    = "#f8f8f8"
 
-            componentRadius = 4
-            componentBorderWidth = 2
+            componentRadius             = 4
+            componentBorderWidth        = 2
 
             // (app)
-            sidebarSelector = "arrow"
+            sidebarSelector             = "arrow"
 
         } else if (themeIndex === Theme.THEME_BLOOD_AND_TEARS) { ///////////////
 
             isLight = false
             isDark = true
 
-            themeStatusbar = Material.Dark
+            themeStatusbar = Theme.Dark
             colorStatusbar = "black"
 
             colorHeader                 = "#141414"
@@ -1252,18 +1270,18 @@ Item {
             colorComponentDown          = "#ddd"
             colorComponentBackground    = "white"
 
-            componentRadius = 2
-            componentBorderWidth = 2
+            componentRadius             = 2
+            componentBorderWidth        = 2
 
             // (app)
-            sidebarSelector = "bar"
+            sidebarSelector             = "bar"
 
         } else if (themeIndex === Theme.THEME_MIGHTY_KITTENS) { ////////////////
 
             isLight = true
             isDark = false
 
-            themeStatusbar = Material.Dark
+            themeStatusbar = Theme.Dark
             colorStatusbar = "#944197"
 
             colorHeader                 = "#FFB4DC"
@@ -1305,11 +1323,11 @@ Item {
             colorComponentDown          = "#FF9ED9"
             colorComponentBackground    = "#FFF4F9"
 
-            componentRadius = (componentHeight / 2)
-            componentBorderWidth = 2
+            componentRadius             = (componentHeight / 2)
+            componentBorderWidth        = 2
 
             // (app)
-            sidebarSelector = ""
+            sidebarSelector             = ""
 
         }
 

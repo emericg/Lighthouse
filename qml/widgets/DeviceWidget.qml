@@ -154,10 +154,10 @@ Item {
             if (mousearea.containsPress) return Theme.colorSecondary
             return Theme.colorSeparator
         }
-        Behavior on border.color { ColorAnimation { duration: 133 } }
+        Behavior on border.color { enabled: (Theme.currentTheme >= 0); ColorAnimation { duration: 133 } }
 
         color: boxDevice.selected ? Theme.colorSeparator : Theme.colorDeviceWidget
-        Behavior on color { ColorAnimation { duration: 133 } }
+        Behavior on color { enabled: (Theme.currentTheme >= 0); ColorAnimation { duration: 133 } }
 
         opacity: boxDevice.selected ? 0.5 : (singleColumn ? 0 : 1)
         Behavior on opacity { OpacityAnimator { duration: 133 } }
