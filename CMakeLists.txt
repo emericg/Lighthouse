@@ -102,15 +102,18 @@ set(SOURCES
     thirdparty/IconLibrary/IconLibrary_material.qrc
 )
 
-if(IOS OR ANDROID)
-    set(QAPPLICATION_CLASS QGuiApplication)
-endif()
+if(IOS OR ANDROID) # Mobile build
 
-if(NOT IOS AND NOT ANDROID)
+    set(QAPPLICATION_CLASS QGuiApplication)
+
+else() # Desktop build
+
     set(QAPPLICATION_CLASS QApplication)
+
     set(SOURCES_DESKTOP
         src/MenubarManager.cpp src/MenubarManager.h
         src/SystrayManager.cpp src/SystrayManager.h
+        src/local_controls/media.h
         src/local_controls/volume.h
         src/local_controls/volume_keyboard.cpp src/local_controls/volume_keyboard.h
         src/local_controls/mouse.h
@@ -118,6 +121,7 @@ if(NOT IOS AND NOT ANDROID)
         src/local_controls/gamepad.h
         src/local_controls/os_commander.h
     )
+
     if(LINUX)
         set(SOURCES_DESKTOP ${SOURCES_DESKTOP}
             src/local_controls/mouse_uinput.cpp src/local_controls/mouse_uinput.h
@@ -402,6 +406,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src/)
+target_include_directories(${PROJECT_NAME} PRIVATE src/local_monitors/)
 target_include_directories(${PROJECT_NAME} PRIVATE thirdparty/)
 
 # Qt official hacks...

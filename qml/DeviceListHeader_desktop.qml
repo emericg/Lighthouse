@@ -51,7 +51,7 @@ Column {
                     anchors.left: parent.left
                     anchors.right: parent.right
 
-                    text: mediaControls.playerName + " / " + mediaControls.playbackStatus
+                    text: mediaControls ? (mediaControls.playerName + " / " + mediaControls.playbackStatus) : ""
                     font.pixelSize: Theme.fontSizeContentSmall
                     color: Theme.colorSubText
                     elide: Text.ElideRight
@@ -63,7 +63,7 @@ Column {
 
                     visible: (text.length > 1)
 
-                    text: mediaControls.metaTitle + " " + mediaControls.metaAlbum
+                    text: mediaControls ? (mediaControls.metaTitle + " " + mediaControls.metaAlbum) : ""
                     font.pixelSize: Theme.fontSizeContentBig
                     color: Theme.colorText
                     elide: Text.ElideRight
@@ -72,19 +72,19 @@ Column {
                 MediaButtonRow {
                     btnSize: 36
                     //visible: mediaControls.canControl
-                    onMediaPrevious: mediaControls.media_prev()
-                    onMediaPlayPause: mediaControls.media_playpause()
-                    onMediaNext: mediaControls.media_next()
+                    onMediaPrevious: mediaControls?.media_prev()
+                    onMediaPlayPause: mediaControls?.media_playpause()
+                    onMediaNext: mediaControls?.media_next()
                 }
 
                 SliderThemed {
                     anchors.left: parent.left
                     anchors.right: parent.right
-                    visible: (mediaControls.position > 0 && mediaControls.metaDuration > 0)
+                    visible: mediaControls && (mediaControls.position_us > 0 && mediaControls.metaDuration > 0)
 
                     from: 0
-                    to: mediaControls.metaDuration
-                    value: mediaControls.position
+                    to: mediaControls ? mediaControls.metaDuration : 1
+                    value: mediaControls ? mediaControls.position_us : 0
                 }
             }
 
@@ -98,7 +98,7 @@ Column {
                 width: height
 
                 source: {
-                    if (mediaControls.playbackStatus === "paused")
+                    if (mediaControls && mediaControls.playbackStatus === "Paused")
                         return "qrc:/IconLibrary/material-symbols/media/slideshow.svg"
                     else
                         return "qrc:/IconLibrary/material-symbols/media/slideshow.svg"
@@ -117,7 +117,7 @@ Column {
                 anchors.bottomMargin: 8
                 width: height
 
-                source: mediaControls.metaThumbnail
+                source: mediaControls ? mediaControls.metaThumbnail : ""
                 sourceSize: Qt.size(width, height)
                 fillMode: Image.PreserveAspectCrop
             }

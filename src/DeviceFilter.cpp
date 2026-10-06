@@ -42,7 +42,12 @@ DeviceFilter::~DeviceFilter()
 
 void DeviceFilter::invalidatefilter()
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 10, 0)
+    beginFilterChange();
+    endFilterChange(QSortFilterProxyModel::Direction::Rows);
+#else
     invalidateFilter();
+#endif
 }
 
 /* ************************************************************************** */

@@ -196,7 +196,7 @@ ApplicationWindow {
                     // Check Bluetooth anyway (on macOS)
                     //if (Qt.platform.os === "osx") deviceManager.checkBluetooth()
 
-                    mediaControls.select_player()
+                    if (mediaControls) mediaControls.select_player()
 
                     break
             }
@@ -296,7 +296,7 @@ ApplicationWindow {
         onActivated: deviceManager.refreshDevices_start()
     }
     Shortcut {
-        sequence: StandardKey.Preferences
+        sequences: [StandardKey.Preferences]
         onActivated: screenSettings.loadScreen()
     }
     Shortcut {
