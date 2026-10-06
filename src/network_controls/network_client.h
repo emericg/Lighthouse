@@ -69,10 +69,11 @@ class NetworkClient: public QObject
 
     QString m_ssid;
     QString m_host;
-    unsigned m_port = 5555;
+    quint16 m_port = 5555;
 
     bool m_wifi = false;
     bool m_connected = false;
+    bool m_welcomed = false;        //!< the server announced a compatible protocol version
     bool m_authenticated = false;   //!< secure handshake completed (always true in non-secure mode)
 
     float m_volume = -1.f;          //!< desktop volume, normalized [0.0 ; 1.0], -1.0 if unknown
@@ -105,7 +106,6 @@ class NetworkClient: public QObject
 
     qint64 m_position_us = -1;
     qint64 m_duration_us = 0;
-    float m_rate = 1.f;
 
     // most MPRIS players never push Position updates, so we advance it locally while playing
     QTimer *m_positionTimer = nullptr;
@@ -114,26 +114,47 @@ class NetworkClient: public QObject
     void connected();
     void disconnected();
 
+    /*!
+     * \brief Introduce ourselves to the server, with our name, token and password.
+     */
+    void sendHello();
+
+    /*!
+     * \brief Serialize and write a message frame (UTF-8) to the server, if the socket is open.
+     */
+    void writeMessage(const QString &msg);
+
+    /*!
+     * \brief Write a command to the server, once authenticated.
+     */
     void sendCommand(const QString &cmd);
 
     void parseMediaState(const QString &payload);
     void parseMediaMetadata(const QString &payload);
-    void parseMediaArt(const QString &payload);
+    void parseMediaArt(const QByteArray &payload);
     void parseClaudeState(const QString &payload);
     void parseTypingState(const QString &payload);
 
-    //! Seconds left before a relayed deadline, or -1 when that window is unknown
-    int claudeRemaining(qint64 deadlineMs) const {
+    /*!
+     * \param deadlineMs A relayed deadline, on the m_claudeClock timeline.
+     * \return Seconds left before that deadline, or -1 when that window is unknown.
+     */
+    int claudeRemaining(qint64 deadlineMs) const
+    {
         if (deadlineMs < 0 || !m_claudeClock.isValid()) return -1;
         return static_cast<int>(qMax(qint64(0), (deadlineMs - m_claudeClock.elapsed() + 999) / 1000));
     }
 
 private slots:
+    void readServerData();
+    void displayError(QAbstractSocket::SocketError socketError);
+
     void tickPosition();            //!< local interpolation of the playback position while playing
     void tickClaudeCountdown();     //!< local countdown of the Claude reset windows
 
 signals:
     void authError();
+    void protocolError();           //!< the server speaks an incompatible protocol version
     void wifiEvent();
     void connectionEvent();
 
@@ -171,8 +192,11 @@ public:
     qint64 getPosition_us() const { return m_position_us; }
     qint64 getMetaDuration() const { return m_duration_us; }
 
-    float getPosition() const {
-        // playback progress in percent [0 ; 100], -1 if unknown
+    /*!
+     * \return Playback progress in percent [0 ; 100], -1 if unknown.
+     */
+    float getPosition() const
+    {
         if (m_duration_us <= 0 || m_position_us < 0) return -1.f;
         return qBound(0.f, float(double(m_position_us) / double(m_duration_us) * 100.0), 100.f);
     }
@@ -197,10 +221,6 @@ public slots:
     void connectToServer();
     void disconnectFromServer();
 
-    void displayError(QAbstractSocket::SocketError socketError);
-
-    void readMetadata();
-
     void sendAction(int action);
     void sendKey(QChar key);
     void sendGamepad(float x1, float y1, float x2, float y2,
@@ -224,6 +244,8 @@ public slots:
     void media_next();
 
     void volume_mute();
+    void volume_unmute();
+    void volume_toggle_mute();
     void volume_down();
     void volume_up();
     void volume_set(int pct);   //!< set an absolute level, pct in [0 ; 100]

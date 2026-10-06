@@ -44,6 +44,7 @@ struct NetworkClientSettings
     QString name;
     QString token;
     bool enabled = true;
+    bool verified = false;
     QDateTime firstSeen;
     QDateTime lastSeen;
 };

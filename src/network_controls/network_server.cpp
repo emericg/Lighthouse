@@ -20,14 +20,114 @@
  */
 
 #include "network_server.h"
+#include "network_protocol.h"
 #include "SettingsManager.h"
 #include "local_controls/local_controls.h"
 #include "local_controls/local_actions.h"
 #include "local_monitors/ClaudeMonitor.h"
 #include "local_monitors/InputMonitor.h"
 
-#include <QtCore>
-#include <QtNetwork>
+#include <QTcpServer>
+#include <QTcpSocket>
+#include <QDataStream>
+#include <QNetworkInterface>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QImage>
+#include <QBuffer>
+#include <QFile>
+#include <QUrl>
+#include <QUuid>
+
+#include <algorithm>
+
+static constexpr qint64 kMaxInboundBytes = 64 * 1024;      //!< client messages are tiny, more is abuse
+static constexpr qint64 kMaxArtBytes = 8 * 1024 * 1024;    //!< album art is never that big
+static constexpr int kArtMaxSize = 768;                     //!< clients only show a thumbnail
+
+/*!
+ * \return True if the image has at least one pixel that is not fully opaque.
+ */
+static bool hasTransparency(const QImage &img)
+{
+    if (!img.hasAlphaChannel()) return false;
+
+    const QImage argb = img.convertToFormat(QImage::Format_ARGB32);
+    for (int y = 0; y < argb.height(); y++)
+    {
+        const QRgb *line = reinterpret_cast<const QRgb *>(argb.constScanLine(y));
+        for (int x = 0; x < argb.width(); x++)
+        {
+            if (qAlpha(line[x]) < 255) return true;
+        }
+    }
+
+    return false;
+}
+
+/* ************************************************************************** */
+
+/*!
+ * \brief A single remote connection handled by the NetworkServer.
+ *
+ * Owns its socket and the QDataStream used to (de)serialize the message frames.
+ * The token is filled in once the client authenticates,
+ * in non-secure mode the connection is accepted without authentication.
+ */
+class ServerConnection
+{
+public:
+    QTcpSocket *m_socket = nullptr;
+    QDataStream m_dataStream;
+    bool m_authenticated = false;
+    QString m_token;
+    QString m_peer;
+
+    explicit ServerConnection(QTcpSocket *socket) : m_socket(socket)
+    {
+        m_dataStream.setDevice(m_socket);
+        m_dataStream.setVersion(QDataStream::Qt_6_0);
+        m_peer = m_socket->peerAddress().toString();
+    }
+
+    /*!
+     * \note The socket signals are disconnected first,
+     *       or closing it would re-enter NetworkServer::closeClientConnection().
+     */
+    ~ServerConnection()
+    {
+        m_socket->disconnect();
+        m_socket->close();
+        m_socket->deleteLater();
+    }
+
+    /*!
+     * \brief Serialize and queue a message frame, empty messages are ignored.
+     */
+    void write(const QByteArray &msg)
+    {
+        if (msg.isEmpty() || !m_socket->isOpen()) return;
+
+        QByteArray block;
+        QDataStream out(&block, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_6_0);
+        out << msg;
+        m_socket->write(block);
+    }
+
+    /*!
+     * \brief Tell the client it is denied, and close the connection.
+     * \note The reply is still pending when this returns, so the socket is only closed
+     *       (and this object deleted) later, from the event loop.
+     */
+    void deny()
+    {
+        write(QByteArrayLiteral("auth:denied"));
+        m_socket->disconnectFromHost();
+    }
+};
 
 /* ************************************************************************** */
 /* ************************************************************************** */
@@ -74,7 +174,7 @@ NetworkServer::NetworkServer(QObject *parent) : QObject(parent)
     // react to the server enabled being toggled
     connect(sm, &SettingsManager::netctrlChanged, this, &NetworkServer::onServerChanged);
     // react to the secure mode being toggled
-    connect(sm, &SettingsManager::netctrlSecureChanged, this, &NetworkServer::onSecureModeChanged);
+    connect(sm, &SettingsManager::netctrlSecureChanged, this, &NetworkServer::enforceRevocations);
     // refresh the known-clients list if the settings are reset/reloaded externally
     connect(sm, &SettingsManager::netctrlClientsChanged, this, &NetworkServer::loadClients);
 }
@@ -84,38 +184,41 @@ NetworkServer::NetworkServer(QObject *parent) : QObject(parent)
 
 QList<QObject *> NetworkServer::getClients() const
 {
-    QList<QObject *> out;
-    out.reserve(m_knownClients.size());
-    for (NetworkClientModel *m : m_knownClients)
-    {
-        out.push_back(m);
-    }
-    return out;
+    return QList<QObject *>(m_knownClients.cbegin(), m_knownClients.cend());
 }
 
 /* ************************************************************************** */
 
 void NetworkServer::loadClients()
 {
-    qDeleteAll(m_knownClients);
+    // QML may still hold the previous models, so they are not deleted right away
+    for (NetworkClientModel *m : std::as_const(m_knownClients))
+    {
+        m->deleteLater();
+    }
     m_knownClients.clear();
 
-    SettingsManager *sm = SettingsManager::getInstance();
-
-    const QList<NetworkClientSettings> &list = sm->getNetCtrlClients();
-    for (const NetworkClientSettings &s : list)
+    const SettingsManager *sm = SettingsManager::getInstance();
+    for (const NetworkClientSettings &s : sm->getNetCtrlClients())
     {
-        // connected/secure are runtime flags, false until a live connection authenticates
-        NetworkClientModel *m = new NetworkClientModel(s, this);
-        connect(m, &NetworkClientModel::enabledChanged, this, &NetworkServer::onKnownClientChanged);
-        connect(m, &NetworkClientModel::nameChanged, this, &NetworkServer::onKnownClientChanged);
-        m_knownClients.push_back(m);
+        addKnownClient(new NetworkClientModel(s, this));
+    }
+
+    // connected is a runtime flag, restore it from the live connections
+    for (const ServerConnection *c : std::as_const(m_clients))
+    {
+        updateKnownClientState(c->m_token);
     }
 
     Q_EMIT clientsChanged();
 }
 
-/* ************************************************************************** */
+void NetworkServer::addKnownClient(NetworkClientModel *client)
+{
+    connect(client, &NetworkClientModel::enabledChanged, this, &NetworkServer::onKnownClientChanged);
+    connect(client, &NetworkClientModel::nameChanged, this, &NetworkServer::onKnownClientChanged);
+    m_knownClients.push_back(client);
+}
 
 void NetworkServer::saveClients()
 {
@@ -123,8 +226,6 @@ void NetworkServer::saveClients()
 
     QList<NetworkClientSettings> &list = sm->getNetCtrlClients();
     list.clear();
-
-    // write the known-clients list back to SettingsManager and save
     for (const NetworkClientModel *m : std::as_const(m_knownClients))
     {
         list.push_back(m->toSettings());
@@ -134,34 +235,25 @@ void NetworkServer::saveClients()
 }
 
 /* ************************************************************************** */
-/* ************************************************************************** */
 
-void NetworkServer::enforceRevocations()
+ServerConnection *NetworkServer::connectionForSocket(QObject *socket) const
 {
-    // A disabled (or forgotten) client must not stay connected, regardless of the server's secure mode
-    const QList<Client *> snapshot = m_clients;
-    for (Client *c : snapshot)
+    for (ServerConnection *c : m_clients)
     {
-        if (c->m_token.isEmpty()) continue;
-
-        NetworkClientModel *m = knownClientForToken(c->m_token);
-        if (!m || !m->isEnabled())
-        {
-            qDebug() << "NetworkServer::enforceRevocations() revoking" << c->m_peer;
-            c->write(QStringLiteral("auth:denied"));
-            if (c->m_connection) c->m_connection->close();
-            // the disconnected signal -> closeClientConnection() removes & deletes it
-        }
-    }
-}
-
-Client *NetworkServer::clientForSocket(QObject *socket) const
-{
-    for (Client *c : m_clients)
-    {
-        if (c->m_connection == socket) return c;
+        if (c->m_socket == socket) return c;
     }
     return nullptr;
+}
+
+bool NetworkServer::isAddressable(const ServerConnection *conn) const
+{
+    return conn->m_authenticated || !SettingsManager::getInstance()->getNetCtrlSecure();
+}
+
+bool NetworkServer::areClientsConnected() const
+{
+    return std::any_of(m_clients.cbegin(), m_clients.cend(),
+                       [this](const ServerConnection *c) { return isAddressable(c); });
 }
 
 NetworkClientModel *NetworkServer::knownClientForToken(const QString &token) const
@@ -175,32 +267,68 @@ NetworkClientModel *NetworkServer::knownClientForToken(const QString &token) con
     return nullptr;
 }
 
+void NetworkServer::updateKnownClientState(const QString &token)
+{
+    NetworkClientModel *m = knownClientForToken(token);
+    if (!m) return;
+
+    // several live connections may share the same token
+    const bool connected = std::any_of(m_clients.cbegin(), m_clients.cend(),
+                                       [&token](const ServerConnection *c) { return c->m_token == token; });
+    m->setConnected(connected);
+}
+
+void NetworkServer::enforceRevocations()
+{
+    const bool secure = SettingsManager::getInstance()->getNetCtrlSecure();
+
+    // a disabled (or forgotten) client must not stay connected, regardless of the secure mode,
+    // and in secure mode neither can a client that never proved the password
+    for (ServerConnection *c : std::as_const(m_clients))
+    {
+        if (c->m_token.isEmpty()) continue;
+
+        NetworkClientModel *m = knownClientForToken(c->m_token);
+        if (!m || !m->isEnabled() || (secure && !m->isVerified()))
+        {
+            qDebug() << "NetworkServer::enforceRevocations() revoking" << c->m_peer;
+            c->deny();
+        }
+    }
+
+    // toggling the secure mode changes which connections are addressable
+    Q_EMIT connectionEvent();
+}
+
+void NetworkServer::updateLastSeen(const QList<ServerConnection *> &connections)
+{
+    const QDateTime now = QDateTime::currentDateTime();
+    bool changed = false;
+
+    for (const ServerConnection *c : connections)
+    {
+        NetworkClientModel *m = knownClientForToken(c->m_token);
+        if (!m) continue;
+
+        m->setLastSeen(now);
+        changed = true;
+    }
+
+    if (changed) saveClients();
+}
+
 /* ************************************************************************** */
 
 void NetworkServer::onKnownClientChanged()
 {
-    // a known client's enabled/name was edited (from QML) : persist + enforce
+    // a known client's enabled/name was edited (from QML): persist, and drop it if disabled
     saveClients();
-
-    // if a client was just disabled, drop its live connection
-    enforceRevocations();
-
-    Q_EMIT clientsChanged();
-}
-
-void NetworkServer::onSecureModeChanged()
-{
-    // server secure mode toggled (from QML) : refresh clients + enforce
     enforceRevocations();
 }
 
 void NetworkServer::onServerChanged()
 {
-    SettingsManager *sm = SettingsManager::getInstance();
-    bool server = sm->getNetCtrl();
-
-    // server enabled or disabled (from QML)
-    if (server) startServer();
+    if (SettingsManager::getInstance()->getNetCtrl()) startServer();
     else stopServer();
 }
 
@@ -211,35 +339,27 @@ void NetworkServer::startServer()
 {
     stopServer();
 
-    // check if we should
-    SettingsManager *sm = SettingsManager::getInstance();
-    if (!sm || (sm && !sm->getNetCtrl()))
-    {
-        return;
-    }
+    const SettingsManager *sm = SettingsManager::getInstance();
+    if (!sm->getNetCtrl()) return;
 
-    // start the tcp server
+    const int port = sm->getNetCtrlPort();
+    if (port > 0 && port <= 65535) m_tcpServerPort = static_cast<quint16>(port);
+
     m_tcpServer = new QTcpServer(this);
     connect(m_tcpServer, &QTcpServer::newConnection, this, &NetworkServer::newClientConnection);
+
     if (m_tcpServer->listen(QHostAddress::Any, m_tcpServerPort))
     {
-        m_serverAddress.clear();
-        QList <QHostAddress> ipAddressesList = QNetworkInterface::allAddresses();
-
-        // use the first non-localhost IPv4 address
-        for (int i = 0; i < ipAddressesList.size(); ++i)
+        // advertise the first non-loopback IPv4 address, or IPv4 localhost if there is none
+        m_serverAddress = QHostAddress(QHostAddress::LocalHost).toString();
+        const QList<QHostAddress> addresses = QNetworkInterface::allAddresses();
+        for (const QHostAddress &a : addresses)
         {
-            if (ipAddressesList.at(i) != QHostAddress::LocalHost &&
-                ipAddressesList.at(i).toIPv4Address())
+            if (!a.isLoopback() && a.protocol() == QAbstractSocket::IPv4Protocol)
             {
-                m_serverAddress = ipAddressesList.at(i).toString();
+                m_serverAddress = a.toString();
                 break;
             }
-        }
-        // if we did not find one, use IPv4 localhost
-        if (m_serverAddress.isEmpty())
-        {
-            m_serverAddress = QHostAddress(QHostAddress::LocalHost).toString();
         }
 
         m_serverRunning = true;
@@ -254,62 +374,45 @@ void NetworkServer::startServer()
     Q_EMIT serverEvent();
 }
 
-/* ************************************************************************** */
-
 void NetworkServer::stopServer()
 {
-    if (m_tcpServer)
+    if (!m_tcpServer) return;
+
+    qDebug() << "NetworkServer::stopServer()";
+
+    // the connections go first, their sockets are children of the QTcpServer
+    const QList<ServerConnection *> clients = std::exchange(m_clients, {});
+    updateLastSeen(clients);
+    qDeleteAll(clients);
+
+    m_tcpServer->close();
+    delete m_tcpServer;
+    m_tcpServer = nullptr;
+
+    // no live connections left: clear the runtime "connected" flags
+    for (NetworkClientModel *m : std::as_const(m_knownClients))
     {
-        qDebug() << "NetworkServer::stopServer()";
-
-        m_tcpServer->close();
-
-        delete m_tcpServer;
-        m_tcpServer = nullptr;
-
-        qDeleteAll(m_clients);
-        m_clients.clear();
-
-        // no live connections left: clear the runtime "connected"/"secure" flags
-        for (NetworkClientModel *m : std::as_const(m_knownClients))
-        {
-            m->setConnected(false);
-            m->setSecure(false);
-        }
-
-        m_serverRunning = false;
-        Q_EMIT serverEvent();
-        Q_EMIT connectionEvent();
+        m->setConnected(false);
     }
+
+    m_serverRunning = false;
+    Q_EMIT serverEvent();
+    Q_EMIT connectionEvent();
 }
 
 /* ************************************************************************** */
 
 void NetworkServer::forgetClient(QObject *client)
 {
-    // forget a known client and drop its connection
-
     NetworkClientModel *known = qobject_cast<NetworkClientModel *>(client);
-    if (!known) return;
+    if (!known || !m_knownClients.removeOne(known)) return;
 
-    const QString token = known->getToken();
-
-    // drop any live connection using this token
-    const QList<Client *> snapshot = m_clients;
-    for (Client *c : snapshot)
-    {
-        if (!token.isEmpty() && c->m_token == token)
-        {
-            c->write(QStringLiteral("auth:denied"));
-            if (c->m_connection) c->m_connection->close();
-        }
-    }
-
-    // delete client
-    m_knownClients.removeOne(known);
     known->deleteLater();
-
     saveClients();
+
+    // drops any live connection still using the forgotten token
+    enforceRevocations();
+
     Q_EMIT clientsChanged();
 }
 
@@ -318,69 +421,44 @@ void NetworkServer::forgetClient(QObject *client)
 
 void NetworkServer::newClientConnection()
 {
-    QTcpSocket *conn = m_tcpServer->nextPendingConnection();
-    if (conn && conn->peerAddress().toString() == "::ffff:127.0.0.1") return;
-    if (conn && conn->peerAddress().toString() == "127.0.0.1") return;
-    if (conn && conn->localPort() != m_tcpServerPort) return;
-    if (!conn) return;
-
-    qDebug() << "NetworkServer::newClientConnection()";
-    qDebug() << "- " << conn->peerAddress();
-    qDebug() << "- " << conn->peerName();
-    qDebug() << "- " << conn->peerPort();
-    qDebug() << "- " << conn->localPort();
-
-    Client *client = new Client(conn);
-    m_clients.push_back(client);
-
-    //qDebug() << "NetworkServer::newClientConnection(ACCEPTED)";
-    connect(conn, &QIODevice::readyRead, this, &NetworkServer::readClientData);
-    connect(conn, &QAbstractSocket::disconnected, this, &NetworkServer::closeClientConnection);
-
-    Q_EMIT connectionEvent();
-
-    client->write(QStringLiteral("WELCOME CLIENT"));
-}
-
-/* ************************************************************************** */
-
-void NetworkServer::closeClientConnection()
-{
-    Client *client = clientForSocket(sender());
-    if (!client) return;
-
-    //qDebug() << "NetworkServer::closeClientConnection()" << client->m_peer;
-
-    const QString token = client->m_token;
-
-    m_clients.removeOne(client);
-    delete client;
-
-    // update the known client's "connected" flag (unless another live connection still uses the same token)
-    if (!token.isEmpty())
+    while (QTcpSocket *socket = m_tcpServer->nextPendingConnection())
     {
-        bool stillConnected = false;
-        bool stillSecure = false;
-
-        for (const Client *c : std::as_const(m_clients))
+        // local connections are refused, this server is meant for remote devices
+        if (socket->peerAddress().isLoopback())
         {
-            if (c->m_token == token)
-            {
-                stillConnected = true;
-                if (c->m_secure) stillSecure = true;
-            }
+            socket->abort();
+            socket->deleteLater();
+            continue;
         }
 
-        NetworkClientModel *m = knownClientForToken(token);
-        if (m)
-        {
-            m->setConnected(stillConnected);
-            m->setSecure(stillSecure);
-        }
+        qDebug() << "NetworkServer::newClientConnection()" << socket->peerAddress() << socket->peerPort();
+
+        ServerConnection *conn = new ServerConnection(socket);
+        m_clients.push_back(conn);
+
+        connect(socket, &QIODevice::readyRead, this, &NetworkServer::readClientData);
+        connect(socket, &QAbstractSocket::disconnected, this, &NetworkServer::closeClientConnection);
+
+        conn->write("welcome:" + QByteArray::number(kNetworkProtocolVersion));
     }
 
     Q_EMIT connectionEvent();
-    Q_EMIT clientsChanged();
+}
+
+void NetworkServer::closeClientConnection()
+{
+    ServerConnection *conn = connectionForSocket(sender());
+    if (!conn) return;
+
+    const QString token = conn->m_token;
+
+    m_clients.removeOne(conn);
+    updateLastSeen({ conn });
+    delete conn;
+
+    updateKnownClientState(token);
+
+    Q_EMIT connectionEvent();
 }
 
 /* ************************************************************************** */
@@ -388,172 +466,133 @@ void NetworkServer::closeClientConnection()
 
 void NetworkServer::readClientData()
 {
-    Client *client = clientForSocket(sender());
-    if (!client) return;
+    ServerConnection *conn = connectionForSocket(sender());
+    if (!conn) return;
 
     const bool secure = SettingsManager::getInstance()->getNetCtrlSecure();
 
     // Drain every complete message currently buffered:
     // QAbstractSocket emits readyRead once even when several messages arrived at once,
     // so we must drain every complete message here, or risk processing message with some latency...
-    while (true)
+    while (conn->m_socket->state() == QAbstractSocket::ConnectedState)
     {
-        QString cData;
-        client->m_dataStream.startTransaction();
-        client->m_dataStream >> cData;
-        if (!client->m_dataStream.commitTransaction()) break;
+        QByteArray frame;
+        conn->m_dataStream.startTransaction();
+        conn->m_dataStream >> frame;
+        if (!conn->m_dataStream.commitTransaction()) break;
+
+        const QString cData = QString::fromUtf8(frame);
 
         if (cData.startsWith("hello:"))
         {
-            handleClientHello(client, cData);
+            handleClientHello(conn, cData);
         }
-        else if (!secure || client->m_authenticated)
+        else if (!secure || conn->m_authenticated)
         {
-            // In non-secure mode commands are accepted even from a client that never introduced itself
-            processClientMessage(client, cData);
+            // in non-secure mode commands are accepted even from a client that never introduced itself
+            processClientMessage(conn, cData);
         }
-        else
-        {
-            // Secure mode, not yet authenticated, ignore until "hello:"
-        }
+    }
+
+    // an incomplete message this large is not coming from a legitimate client
+    if (conn->m_socket->bytesAvailable() > kMaxInboundBytes)
+    {
+        qWarning() << "NetworkServer::readClientData() dropping" << conn->m_peer << "(oversized message)";
+        conn->m_socket->abort();
     }
 }
 
 /* ************************************************************************** */
 
-void NetworkServer::handleClientHello(Client *client, const QString &cData)
+void NetworkServer::handleClientHello(ServerConnection *conn, const QString &cData)
 {
-    // register/authenticate on the hello handshake
-
     // 'hello:<name>:<token>:<password>'
-    // name and token never contain ':'; the password (last field) may, so keep the rest
-
+    // name and token never contain ':', the password (last field) may, so keep the rest
     const QStringList p = cData.mid(6).split(':');
     const QString name = p.value(0);
     const QString token = p.value(1);
-    const QString password = (p.size() > 2) ? p.mid(2).join(':') : QString();
+    const QString password = p.mid(2).join(':');
 
     SettingsManager *sm = SettingsManager::getInstance();
     const bool secure = sm->getNetCtrlSecure();
 
-    // Returning client: a token we already know about
     NetworkClientModel *known = knownClientForToken(token);
-    if (known)
+    const bool enroll = !known;
+    const bool passwordOk = (password == sm->getNetCtrlPassword());
+    const QString previousToken = conn->m_token;
+
+    if (known && !known->isEnabled())
     {
-        if (!known->isEnabled())
-        {
-            // token exists but was revoked (disabled): refused regardless of secure mode
-            qDebug() << "NetworkServer::handleClientHello() denied revoked token from" << client->m_peer;
-            client->write(QStringLiteral("auth:denied"));
-            if (client->m_connection) client->m_connection->close();
-            return;
-        }
-
-        client->m_authenticated = true;
-        client->m_secure = secure;
-        client->m_name = name;
-        client->m_token = token;
-
-        if (!name.isEmpty()) known->setName(name);
-        known->setLastSeen(QDateTime::currentDateTime());
-        known->setConnected(true);
-        known->setSecure(secure);
-        saveClients();
-
-        client->write(QStringLiteral("auth:ok"));
-        sendVolumeStateTo(client);
-        sendMediaStateTo(client);
-        sendMediaMetadataTo(client);
-        sendMediaArtTo(client);
-        sendClaudeStateTo(client);
-    sendTypingStateTo(client);
-        Q_EMIT clientsChanged();
+        // token exists but was revoked (disabled): refused regardless of secure mode
+        qDebug() << "NetworkServer::handleClientHello() denied revoked token from" << conn->m_peer;
+        conn->deny();
         return;
     }
 
-    // New client (no token, or an unknown one): enroll it
-    // The shared password is only required when the server runs in secure mode
-    if (secure && password != sm->getNetCtrlPassword())
+    // In secure mode the password is required, unless the token has already been verified:
+    // a token issued while the server was not secure does not get a free pass
+    if (secure && !passwordOk && !(known && known->isVerified()))
     {
-        qDebug() << "NetworkServer::handleClientHello() enrollment refused (password) for" << client->m_peer;
-        client->write(QStringLiteral("auth:denied"));
-        if (client->m_connection) client->m_connection->close();
+        qDebug() << "NetworkServer::handleClientHello() refused (password) for" << conn->m_peer;
+        conn->deny();
         return;
     }
 
-    const QDateTime now = QDateTime::currentDateTime();
-    NetworkClientModel *m = new NetworkClientModel(this);
-    m->setName(name.isEmpty() ? QStringLiteral("client") : name);
-    m->setToken(QUuid::createUuid().toString(QUuid::Id128));
-    m->setEnabled(true);
-    m->setFirstSeen(now);
-    m->setLastSeen(now);
-    m->setSecure(secure);
-    m->setConnected(true);
-    connect(m, &NetworkClientModel::enabledChanged, this, &NetworkServer::onKnownClientChanged);
-    connect(m, &NetworkClientModel::nameChanged, this, &NetworkServer::onKnownClientChanged);
-    m_knownClients.push_back(m);
+    if (enroll)
+    {
+        // new client (no token, or an unknown one): enroll it
+        known = new NetworkClientModel(this);
+        known->setName(name.isEmpty() ? QStringLiteral("client") : name);
+        known->setToken(QUuid::createUuid().toString(QUuid::Id128));
+        known->setFirstSeen(QDateTime::currentDateTime());
+        addKnownClient(known);
 
-    client->m_authenticated = true;
-    client->m_secure = secure;
-    client->m_name = name;
-    client->m_token = m->getToken();
+        qDebug() << "NetworkServer::handleClientHello() enrolled new client" << known->getName();
+    }
+    else if (!name.isEmpty())
+    {
+        known->setName(name);
+    }
+
+    conn->m_authenticated = true;
+    conn->m_token = known->getToken();
+
+    // the password is checked whatever the mode, so a client can be verified before secure mode is on
+    if (passwordOk) known->setVerified(true);
+    known->setLastSeen(QDateTime::currentDateTime());
+    updateKnownClientState(conn->m_token);
+    if (previousToken != conn->m_token) updateKnownClientState(previousToken);
     saveClients();
 
-    qDebug() << "NetworkServer::handleClientHello() enrolled new client" << m->getName();
+    // a newly enrolled client gets its token, to present on its next connections
+    conn->write(enroll ? "auth:ok:" + conn->m_token.toUtf8() : QByteArrayLiteral("auth:ok"));
+    sendFullStateTo(conn);
 
-    client->write(QStringLiteral("auth:ok:") + m->getToken());
-    sendVolumeStateTo(client);
-    sendMediaStateTo(client);
-    sendMediaMetadataTo(client);
-    sendMediaArtTo(client);
-    sendClaudeStateTo(client);
-    sendTypingStateTo(client);
-    Q_EMIT clientsChanged();
+    if (enroll) Q_EMIT clientsChanged();
+    Q_EMIT connectionEvent();
 }
 
 /* ************************************************************************** */
 
-void NetworkServer::processClientMessage(Client *client, const QString &cData)
+void NetworkServer::processClientMessage(ServerConnection *conn, const QString &cData)
 {
-    Q_UNUSED(client)
+    //qDebug() << "NetworkServer::processClientMessage() >" << cData;
 
-    qDebug() << "NetworkServer::processClientMessage() >" << cData;
+    LocalControls *ctrls = LocalControls::getInstance();
 
     if (cData.startsWith("press:"))
     {
-        LocalControls *ctrls = LocalControls::getInstance();
-        if (cData == "press:lock") ctrls->action(LocalActions::ACTION_KEYBOARD_computer_lock);
-        else if (cData == "press:sleep") ctrls->action(LocalActions::ACTION_KEYBOARD_computer_sleep);
-        else if (cData == "press:poweroff") ctrls->action(LocalActions::ACTION_KEYBOARD_computer_poweroff);
-
-        else if (cData == "press:playpause") ctrls->action(LocalActions::ACTION_KEYBOARD_media_playpause);
-        else if (cData == "press:stop") ctrls->action(LocalActions::ACTION_KEYBOARD_media_stop);
-        else if (cData == "press:next") ctrls->action(LocalActions::ACTION_KEYBOARD_media_next);
-        else if (cData == "press:prev") ctrls->action(LocalActions::ACTION_KEYBOARD_media_prev);
-
-        else if (cData == "press:mute") ctrls->action(LocalActions::ACTION_KEYBOARD_volume_mute);
-        else if (cData == "press:volumeup") ctrls->action(LocalActions::ACTION_KEYBOARD_volume_up);
-        else if (cData == "press:volumedown") ctrls->action(LocalActions::ACTION_KEYBOARD_volume_down);
-
-        else if (cData == "press:up") ctrls->action(LocalActions::ACTION_KEYBOARD_up);
-        else if (cData == "press:down") ctrls->action(LocalActions::ACTION_KEYBOARD_down);
-        else if (cData == "press:left") ctrls->action(LocalActions::ACTION_KEYBOARD_left);
-        else if (cData == "press:right") ctrls->action(LocalActions::ACTION_KEYBOARD_right);
-        else if (cData == "press:enter") ctrls->action(LocalActions::ACTION_KEYBOARD_enter);
-        else if (cData == "press:escape") ctrls->action(LocalActions::ACTION_KEYBOARD_escape);
+        const int action = networkPressActionFromName(QStringView(cData).mid(6));
+        if (action >= 0) ctrls->action(action);
     }
     else if (cData.startsWith("key:"))
     {
-        LocalControls *ctrls = LocalControls::getInstance();
-        ctrls->keyboard_key(cData.back());
+        if (cData.size() > 4) ctrls->keyboard_key(cData.at(4));
     }
     else if (cData.startsWith("mouse:"))
     {
-        QStringList p = cData.mid(6).split(';');
-        const QString sub = p.isEmpty() ? QString() : p.at(0);
-
-        LocalControls *ctrls = LocalControls::getInstance();
+        const QStringList p = cData.mid(6).split(';');
+        const QString sub = p.value(0);
 
         if (sub == "m" && p.size() >= 3) // relative move
         {
@@ -565,7 +604,7 @@ void NetworkServer::processClientMessage(Client *client, const QString &cData)
         }
         else if (sub == "c" && p.size() >= 2) // click (press + release)
         {
-            int btn = p.at(1).toInt();
+            const int btn = p.at(1).toInt();
             if (btn == 1) ctrls->action(LocalActions::ACTION_MOUSE_click_right);
             else if (btn == 2) ctrls->action(LocalActions::ACTION_MOUSE_click_middle);
             else ctrls->action(LocalActions::ACTION_MOUSE_click_left);
@@ -577,49 +616,27 @@ void NetworkServer::processClientMessage(Client *client, const QString &cData)
     }
     else if (cData.startsWith("pad:"))
     {
-        QStringList axis = cData.mid(4).split(';');
+        // pad:<x1>;<y1>;<x2>;<y2>[;<a>;<b>;<x>;<y>], axes normalized to [-1 ; 1]
+        const QStringList p = cData.mid(4).split(';');
+        if (p.size() < 4) return;
 
-        float x1 = 0.f;
-        float y1 = 0.f;
-        float x2 = 0.f;
-        float y2 = 0.f;
+        auto axis = [&p](int i) { return qBound(-1.f, p.at(i).toFloat(), 1.f) * 32767.f; };
+        auto button = [&p](int i) { return p.value(i).toInt(); };
 
-        int a = 0;
-        int b = 0;
-        int x = 0;
-        int y = 0;
-
-        if (axis.size() >= 4)
-        {
-            x1 = axis.at(0).toFloat();
-            y1 = axis.at(1).toFloat();
-            x2 = axis.at(2).toFloat();
-            y2 = axis.at(3).toFloat();
-        }
-        if (axis.size() >= 8)
-        {
-            a = axis.at(4).toInt();
-            b = axis.at(5).toInt();
-            x = axis.at(6).toInt();
-            y = axis.at(7).toInt();
-        }
-
-        LocalControls *ctrls = LocalControls::getInstance();
-        ctrls->gamepad_action(x1*32767.f, y1*32767.f, x2*32767.f, y2*32767.f, a, b, x, y);
+        ctrls->gamepad_action(axis(0), axis(1), axis(2), axis(3),
+                              button(4), button(5), button(6), button(7));
     }
     else if (cData.startsWith("volume:"))
     {
-        LocalControls *ctrls = LocalControls::getInstance();
-
         if (cData == "volume:up") ctrls->volume_up();
         else if (cData == "volume:down") ctrls->volume_down();
         else if (cData == "volume:mute") ctrls->volume_mute();
         else if (cData == "volume:unmute") ctrls->volume_unmute();
         else if (cData == "volume:toggle") ctrls->volume_toggle_mute();
-        else if (cData == "volume:get") sendVolumeState();
+        else if (cData == "volume:get") conn->write(volumeStateMessage());
         else if (cData.startsWith("volume:set:"))
         {
-            int pct = qBound(0, cData.mid(11).toInt(), 100);
+            const int pct = qBound(0, cData.mid(11).toInt(), 100);
             ctrls->volume_set(pct / 100.f);
             sendVolumeState();
         }
@@ -634,64 +651,74 @@ void NetworkServer::processClientMessage(Client *client, const QString &cData)
 }
 
 /* ************************************************************************** */
+/* ************************************************************************** */
 
-void NetworkServer::broadcast(const QString &msg)
+void NetworkServer::broadcast(const QByteArray &msg)
 {
-    const bool secure = SettingsManager::getInstance()->getNetCtrlSecure();
+    if (msg.isEmpty()) return;
 
-    for (Client *c : std::as_const(m_clients))
+    for (ServerConnection *c : std::as_const(m_clients))
     {
-        // in secure mode only authenticated clients are addressed
-        if (!secure || c->m_authenticated) c->write(msg);
+        if (isAddressable(c)) c->write(msg);
     }
 }
 
-/* ************************************************************************** */
-/* ************************************************************************** */
-
-void NetworkServer::sendVolumeStateTo(Client *client)
+void NetworkServer::sendFullStateTo(ServerConnection *conn)
 {
-    if (!client) return;
+    conn->write(volumeStateMessage());
+    conn->write(mediaStateMessage());
+    conn->write(mediaMetadataMessage());
+    conn->write(mediaArtMessage());
+    conn->write(claudeStateMessage());
+    conn->write(typingStateMessage());
+}
 
+void NetworkServer::sendVolumeState() { broadcast(volumeStateMessage()); }
+void NetworkServer::sendMediaState() { broadcast(mediaStateMessage()); }
+void NetworkServer::sendClaudeState() { broadcast(claudeStateMessage()); }
+void NetworkServer::sendTypingState() { broadcast(typingStateMessage()); }
+
+void NetworkServer::sendMediaMetadata()
+{
+    broadcast(mediaMetadataMessage());
+
+    // the artwork is heavy, so it is (re)loaded and broadcast only when the URL actually changes
+    refreshArt(LocalControls::getInstance()->getMediaArtUrl());
+}
+
+void NetworkServer::updateInputMonitor()
+{
+    const bool wanted = SettingsManager::getInstance()->getMonitorInput() && areClientsConnected();
+    InputMonitor::getInstance()->setActive(wanted);
+}
+
+/* ************************************************************************** */
+
+QByteArray NetworkServer::volumeStateMessage() const
+{
     LocalControls *ctrls = LocalControls::getInstance();
     const float level = ctrls->getVolumeLevel();
-    const int pct = (level < 0.f) ? 0 : qRound(level * 100.f);
-    const int muted = ctrls->isMuted() ? 1 : 0;
 
-    client->write(QStringLiteral("volume:state:%1;%2").arg(pct).arg(muted));
+    // volume:state:<percent>;<muted>
+    return QStringLiteral("volume:state:%1;%2")
+        .arg((level < 0.f) ? 0 : qRound(level * 100.f))
+        .arg(ctrls->isMuted() ? 1 : 0).toUtf8();
 }
 
-void NetworkServer::sendVolumeState()
+QByteArray NetworkServer::mediaStateMessage() const
 {
-    const bool secure = SettingsManager::getInstance()->getNetCtrlSecure();
-
-    for (Client *c : std::as_const(m_clients))
-    {
-        // in secure mode only authenticated clients are addressed
-        if (!secure || c->m_authenticated) sendVolumeStateTo(c);
-    }
-}
-
-/* ************************************************************************** */
-
-void NetworkServer::sendMediaStateTo(Client *client)
-{
-    if (!client) return;
-
     LocalControls *ctrls = LocalControls::getInstance();
 
     // media:state:<playerId>;<status>;<position_us>;<duration_us>
-    client->write(QStringLiteral("media:state:%1;%2;%3;%4")
-                  .arg(ctrls->getMediaPlayerId())
-                  .arg(ctrls->getMediaStatus())
-                  .arg(ctrls->getMediaPosition_us())
-                  .arg(ctrls->getMediaDuration_us()));
+    return QStringLiteral("media:state:%1;%2;%3;%4")
+        .arg(ctrls->getMediaPlayerId())
+        .arg(ctrls->getMediaStatus())
+        .arg(ctrls->getMediaPosition_us())
+        .arg(ctrls->getMediaDuration_us()).toUtf8();
 }
 
-void NetworkServer::sendMediaMetadataTo(Client *client)
+QByteArray NetworkServer::mediaMetadataMessage() const
 {
-    if (!client) return;
-
     LocalControls *ctrls = LocalControls::getInstance();
 
     // free-text fields can contain any character, so carry them as a compact JSON blob
@@ -702,31 +729,22 @@ void NetworkServer::sendMediaMetadataTo(Client *client)
     o["artist"] = ctrls->getMediaArtist();
     o["album"] = ctrls->getMediaAlbum();
 
-    const QByteArray json = QJsonDocument(o).toJson(QJsonDocument::Compact);
-    client->write(QStringLiteral("media:meta:") + QString::fromUtf8(json));
+    return "media:meta:" + QJsonDocument(o).toJson(QJsonDocument::Compact);
 }
 
-QString NetworkServer::mediaArtMessage() const
+QByteArray NetworkServer::mediaArtMessage() const
 {
-    // an empty payload tells the client to clear its thumbnail
-    if (m_artBytes.isEmpty()) return QStringLiteral("media:art:");
+    // media:art:<mime>;<raw image bytes>
+    if (m_artBytes.isEmpty()) return QByteArrayLiteral("media:art:");
 
-    return QStringLiteral("media:art:%1;%2").arg(m_artMime, QString::fromLatin1(m_artBytes.toBase64()));
+    return "media:art:" + m_artMime.toUtf8() + ';' + m_artBytes;
 }
 
-void NetworkServer::sendMediaArtTo(Client *client)
+QByteArray NetworkServer::claudeStateMessage() const
 {
-    if (!client) return;
-    client->write(mediaArtMessage());
-}
-
-void NetworkServer::sendClaudeStateTo(Client *client)
-{
-    if (!client) return;
-
     // Compiled out: nothing to report, stay off the wire entirely.
     // Turned off in the settings: the cleared state still goes out, so clients hide it.
-    if (!ClaudeMonitor::isSupported()) return;
+    if (!ClaudeMonitor::isSupported()) return QByteArray();
     ClaudeMonitor *cm = ClaudeMonitor::getInstance();
 
     // Countdowns travel as seconds remaining rather than as absolute reset dates:
@@ -741,83 +759,28 @@ void NetworkServer::sendClaudeStateTo(Client *client)
     sevenDay["percent"] = cm->getSevenDayPercent();
     sevenDay["remaining"] = cm->getSevenDayRemaining();
 
+    // lets a client offer a probe, and follow its progress
+    QJsonObject probe;
+    probe["available"] = cm->isProbeAvailable();
+    probe["state"] = cm->getProbeState();
+
     QJsonObject o;
     o["state"] = cm->getCaptureState();
     o["fiveHour"] = fiveHour;
     o["sevenDay"] = sevenDay;
-
-    // Lets a client offer a probe, and follow its progress
-    QJsonObject probe;
-    probe["available"] = cm->isProbeAvailable();
-    probe["state"] = cm->getProbeState();
     o["probe"] = probe;
 
-    const QByteArray json = QJsonDocument(o).toJson(QJsonDocument::Compact);
-    client->write(QStringLiteral("claude:state:") + QString::fromUtf8(json));
+    return "claude:state:" + QJsonDocument(o).toJson(QJsonDocument::Compact);
 }
 
-void NetworkServer::sendClaudeState()
+QByteArray NetworkServer::typingStateMessage() const
 {
-    const bool secure = SettingsManager::getInstance()->getNetCtrlSecure();
-
-    for (Client *c : std::as_const(m_clients))
-    {
-        if (!secure || c->m_authenticated) sendClaudeStateTo(c);
-    }
-}
-
-void NetworkServer::sendTypingStateTo(Client *client)
-{
-    if (!client) return;
-
     InputMonitor *im = InputMonitor::getInstance();
 
     // typing:state:<available>;<typing>
-    client->write(QStringLiteral("typing:state:%1;%2")
-                  .arg(im->isAvailable() ? 1 : 0)
-                  .arg(im->isTyping() ? 1 : 0));
-}
-
-void NetworkServer::updateInputMonitor()
-{
-    const bool wanted = SettingsManager::getInstance()->getMonitorInput() && areClientsConnected();
-    InputMonitor::getInstance()->setActive(wanted);
-}
-
-void NetworkServer::sendTypingState()
-{
-    const bool secure = SettingsManager::getInstance()->getNetCtrlSecure();
-
-    for (Client *c : std::as_const(m_clients))
-    {
-        if (!secure || c->m_authenticated) sendTypingStateTo(c);
-    }
-}
-
-/* ************************************************************************** */
-
-void NetworkServer::sendMediaState()
-{
-    LocalControls *ctrls = LocalControls::getInstance();
-
-    broadcast(QStringLiteral("media:state:%1;%2;%3;%4")
-              .arg(ctrls->getMediaPlayerId())
-              .arg(ctrls->getMediaStatus())
-              .arg(ctrls->getMediaPosition_us())
-              .arg(ctrls->getMediaDuration_us()));
-}
-
-void NetworkServer::sendMediaMetadata()
-{
-    const bool secure = SettingsManager::getInstance()->getNetCtrlSecure();
-
-    for (Client *c : std::as_const(m_clients))
-    {
-        if (!secure || c->m_authenticated) sendMediaMetadataTo(c);
-    }
-
-    // the artwork is heavy, so it is (re)loaded and broadcast only when the URL actually changes
-    refreshArt(LocalControls::getInstance()->getMediaArtUrl());
+    return QStringLiteral("typing:state:%1;%2")
+        .arg(im->isAvailable() ? 1 : 0)
+        .arg(im->isTyping() ? 1 : 0).toUtf8();
 }
 
 /* ************************************************************************** */
@@ -831,11 +794,27 @@ void NetworkServer::refreshArt(const QString &url)
     m_artMime.clear();
     m_artBytes.clear();
 
-    if (url.isEmpty())
+    if (url.startsWith("http://") || url.startsWith("https://"))
     {
-        broadcast(mediaArtMessage()); // empty -> clears the client thumbnail
+        // online remote art: fetch asynchronously, then embed the bytes like any other source
+        if (!m_nam) m_nam = new QNetworkAccessManager(this);
+
+        QNetworkReply *reply = m_nam->get(QNetworkRequest(QUrl(url)));
+        connect(reply, &QNetworkReply::downloadProgress, reply, [reply](qint64 received, qint64) {
+            if (received > kMaxArtBytes) reply->abort();
+        });
+        connect(reply, &QNetworkReply::finished, this, [this, reply, url]() {
+            reply->deleteLater();
+
+            // the track may have moved on while we were fetching: only apply if still current
+            if (url != m_artUrl) return;
+
+            setArt((reply->error() == QNetworkReply::NoError) ? reply->read(kMaxArtBytes) : QByteArray());
+        });
         return;
     }
+
+    QByteArray bytes;
 
     if (url.startsWith("data:"))
     {
@@ -843,53 +822,50 @@ void NetworkServer::refreshArt(const QString &url)
         const int comma = url.indexOf(',');
         if (comma > 5)
         {
-            const QString header = url.mid(5, comma - 5);
-            const QString payload = url.mid(comma + 1);
-            const QString mime = header.section(';', 0, 0);
-            if (mime.contains('/')) m_artMime = mime;
-            m_artBytes = header.contains("base64") ? QByteArray::fromBase64(payload.toLatin1())
-                                                   : QByteArray::fromPercentEncoding(payload.toLatin1());
+            const QByteArray payload = url.mid(comma + 1).toLatin1();
+            bytes = url.left(comma).contains(";base64") ? QByteArray::fromBase64(payload)
+                                                        : QByteArray::fromPercentEncoding(payload);
         }
-        broadcast(mediaArtMessage());
-        return;
     }
-
-    if (url.startsWith("http://") || url.startsWith("https://"))
-    {
-        // online remote art: fetch asynchronously, then embed the bytes like any other source
-        if (!m_nam) m_nam = new QNetworkAccessManager(this);
-
-        QNetworkReply *reply = m_nam->get(QNetworkRequest(QUrl(url)));
-        const QString requested = url;
-        connect(reply, &QNetworkReply::finished, this, [this, reply, requested]() {
-            reply->deleteLater();
-
-            // the track may have moved on while we were fetching: only apply if still current
-            if (requested != m_artUrl) return;
-
-            if (reply->error() == QNetworkReply::NoError)
-            {
-                m_artBytes = reply->readAll();
-                m_artMime = reply->header(QNetworkRequest::ContentTypeHeader).toString();
-                if (m_artMime.isEmpty()) m_artMime = QMimeDatabase().mimeTypeForData(m_artBytes).name();
-            }
-            broadcast(mediaArtMessage());
-        });
-    }
-    else
+    else if (!url.isEmpty())
     {
         // otherwise assume a local file (file:// URL or a bare file path)
         const QUrl u(url);
-        const QString path = u.isLocalFile() ? u.toLocalFile() : url;
-
-        QFile f(path);
-        if (f.open(QIODevice::ReadOnly))
-        {
-            m_artBytes = f.read(8 * 1024 * 1024); // cap at 8 MB, album art is never that big
-            m_artMime = QMimeDatabase().mimeTypeForFileNameAndData(path, m_artBytes).name();
-        }
-        broadcast(mediaArtMessage());
+        QFile f(u.isLocalFile() ? u.toLocalFile() : url);
+        if (f.open(QIODevice::ReadOnly)) bytes = f.read(kMaxArtBytes);
     }
+
+    setArt(bytes);
+}
+
+void NetworkServer::setArt(const QByteArray &bytes)
+{
+    m_artBytes.clear();
+    m_artMime.clear();
+
+    QImage img;
+    if (!bytes.isEmpty() && img.loadFromData(bytes))
+    {
+        if (img.width() > kArtMaxSize || img.height() > kArtMaxSize)
+        {
+            img = img.scaled(kArtMaxSize, kArtMaxSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        }
+
+        // JPEG unless the image actually uses transparency
+        const bool png = hasTransparency(img);
+        QBuffer buffer(&m_artBytes);
+        buffer.open(QIODevice::WriteOnly);
+        if (img.save(&buffer, png ? "PNG" : "JPG", png ? -1 : 85))
+        {
+            m_artMime = png ? QStringLiteral("image/png") : QStringLiteral("image/jpeg");
+        }
+        else
+        {
+            m_artBytes.clear();
+        }
+    }
+
+    broadcast(mediaArtMessage());
 }
 
 /* ************************************************************************** */

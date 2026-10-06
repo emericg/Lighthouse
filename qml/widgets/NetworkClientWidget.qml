@@ -75,15 +75,15 @@ Item {
             spacing: Theme.componentMargin
             z: 1
 
-            IconSvg { // secure (authenticated) indicator
+            IconSvg { // verified (has proven the password) indicator
                 anchors.verticalCenter: parent.verticalCenter
                 width: 20
                 height: 20
 
                 visible: modelData.connected
-                color: modelData.secure ? Theme.colorGreen : Theme.colorGrey
-                source: modelData.secure ? "qrc:/IconLibrary/material-symbols/lock.svg"
-                                         : "qrc:/IconLibrary/material-symbols/lock_open.svg"
+                color: modelData.verified ? Theme.colorGreen : Theme.colorGrey
+                source: modelData.verified ? "qrc:/IconLibrary/material-symbols/lock.svg"
+                                           : "qrc:/IconLibrary/material-symbols/lock_open.svg"
             }
 
             SwitchThemed { // enable client

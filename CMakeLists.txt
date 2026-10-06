@@ -90,6 +90,7 @@ set(SOURCES
     src/network_controls/network_server.cpp src/network_controls/network_server.h
     src/network_controls/network_client.cpp src/network_controls/network_client.h
     src/network_controls/network_art_provider.h
+    src/network_controls/network_protocol.h
 
     src/crypto/aes_wrapper.cpp src/crypto/aes_wrapper.h
     src/crypto/pgp/pgp_crypto.cpp src/crypto/pgp/pgp_crypto.h

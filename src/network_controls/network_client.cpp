@@ -21,11 +21,11 @@
 
 #include "network_client.h"
 #include "SettingsManager.h"
+#include "network_protocol.h"
 #include "local_controls/local_actions.h"
 #include "local_monitors/ClaudeMonitor.h"
 #include "utils_wifi.h"
 
-#include <QtNetwork>
 #include <QSysInfo>
 #include <QTimer>
 #include <QJsonDocument>
@@ -40,7 +40,7 @@ NetworkClient::NetworkClient(QObject *parent) : QObject(parent)
     m_dataInput.setDevice(m_tcpSocket);
     m_dataInput.setVersion(QDataStream::Qt_6_0);
 
-    connect(m_tcpSocket, &QIODevice::readyRead, this, &NetworkClient::readMetadata);
+    connect(m_tcpSocket, &QIODevice::readyRead, this, &NetworkClient::readServerData);
     connect(m_tcpSocket, &QAbstractSocket::connected, this, &NetworkClient::connected);
     connect(m_tcpSocket, &QAbstractSocket::disconnected, this, &NetworkClient::disconnected);
     connect(m_tcpSocket, &QAbstractSocket::errorOccurred, this, &NetworkClient::displayError);
@@ -61,9 +61,10 @@ NetworkClient::NetworkClient(QObject *parent) : QObject(parent)
 
 void NetworkClient::connectToServer()
 {
-    m_ssid = SettingsManager::getInstance()->getNetCtrlSSID();
-    m_host = SettingsManager::getInstance()->getNetCtrlHost();
-    m_port = SettingsManager::getInstance()->getNetCtrlPort();
+    const SettingsManager *sm = SettingsManager::getInstance();
+    m_ssid = sm->getNetCtrlSSID();
+    m_host = sm->getNetCtrlHost();
+    m_port = sm->getNetCtrlPort();
 
     m_tcpSocket->abort();
 
@@ -73,20 +74,12 @@ void NetworkClient::connectToServer()
     {
         UtilsWiFi *wf = UtilsWiFi::getInstance();
         wf->refreshWiFi();
-        QString ssid_current = wf->getCurrentSSID();
 
-        if (m_ssid == ssid_current)
-        {
-            m_wifi = true;
-            Q_EMIT wifiEvent();
-        }
-        else
-        {
-            // this is not our WiFi, no need to attempt a connection
-            m_wifi = false;
-            Q_EMIT wifiEvent();
-            return;
-        }
+        m_wifi = (m_ssid == wf->getCurrentSSID());
+        Q_EMIT wifiEvent();
+
+        // this is not our WiFi, no need to attempt a connection
+        if (!m_wifi) return;
     }
 
     m_tcpSocket->connectToHost(m_host, m_port);
@@ -102,44 +95,32 @@ void NetworkClient::connected()
 {
     m_connected = true;
     m_authenticated = false;
+    m_welcomed = false;
 
+    // the hello is only sent once the server's welcome confirmed it speaks our protocol
+    Q_EMIT connectionEvent();
+}
+
+void NetworkClient::sendHello()
+{
     SettingsManager *sm = SettingsManager::getInstance();
 
-    // Send greetings + name + token + password every time and wait for the "auth:ok" reply
-    const QString hello = QStringLiteral("hello:")
-                           + sm->getNetClientName() + " (" + QSysInfo::productType() + ")"
-                           + ":" + sm->getNetClientToken()
-                           + ":" + sm->getNetCtrlPassword();
-
-    QByteArray block;
-    QDataStream out(&block, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_6_0);
-    out << hello;
-    m_tcpSocket->write(block);
-
-    Q_EMIT connectionEvent();
+    // Send greetings + name + token + password every time and wait for the "auth:ok" reply,
+    // ':' separates the fields so it cannot appear in the (user editable) name
+    const QString name = QString(sm->getNetClientName() + " (" + QSysInfo::productType() + ")").remove(':');
+    writeMessage(QStringLiteral("hello:") + name
+                 + ":" + sm->getNetClientToken()
+                 + ":" + sm->getNetCtrlPassword());
 }
 
 void NetworkClient::disconnected()
 {
     //qDebug() << "NetworkClient::disconnected()";
     m_connected = false;
+    m_welcomed = false;
     m_authenticated = false;
 
-    if (m_positionTimer) m_positionTimer->stop();
-
-    // the relayed limits belong to the desktop we just lost: showing them frozen
-    // would be worse than showing nothing
-    if (m_claudeTimer) m_claudeTimer->stop();
-    m_claudeState = ClaudeMonitor::CaptureNone;
-    m_claudeFiveHourPercent = -1.0;
-    m_claudeFiveHourResetMs = -1;
-    m_claudeSevenDayPercent = -1.0;
-    m_claudeSevenDayResetMs = -1;
-    m_claudeProbeAvailable = false;
-    m_claudeProbeState = ClaudeMonitor::ProbeNone;
-    Q_EMIT claudeStateChanged();
-    Q_EMIT claudeCountdownChanged();
+    m_positionTimer->stop();
 
     m_typingAvailable = false;
     m_typing = false;
@@ -153,23 +134,23 @@ void NetworkClient::displayError(QAbstractSocket::SocketError socketError)
     switch (socketError)
     {
     case QAbstractSocket::RemoteHostClosedError:
-        qWarning() << "RemoteHostClosedError";
+        qWarning() << "NetworkClient: the server closed the connection";
         break;
     case QAbstractSocket::HostNotFoundError:
-        qWarning() << "The host was not found. Please check the host name and port settings";
+        qWarning() << "NetworkClient: host not found, check the host name and port settings";
         break;
     case QAbstractSocket::ConnectionRefusedError:
-        qWarning() << "The connection was refused by the peer. Make sure settings are correct.";
+        qWarning() << "NetworkClient: connection refused, check the host name and port settings";
         break;
     default:
-        qWarning() << "The following error occurred:" << m_tcpSocket->errorString();
+        qWarning() << "NetworkClient: socket error:" << m_tcpSocket->errorString();
         break;
     }
 }
 
 /* ************************************************************************** */
 
-void NetworkClient::readMetadata()
+void NetworkClient::readServerData()
 {
     // Drain every complete message currently buffered:
     // A single readyRead can cover several messages, and reading just one would leave
@@ -178,12 +159,40 @@ void NetworkClient::readMetadata()
     {
         m_dataInput.startTransaction();
 
-        QString metadata;
-        m_dataInput >> metadata;
+        QByteArray frame;
+        m_dataInput >> frame;
 
         if (!m_dataInput.commitTransaction()) break;
 
-        qDebug() << "NetworkClient::readMetadata() >" << metadata;
+        // truncated, artwork messages carry raw image bytes
+        qDebug() << "NetworkClient::readServerData() >" << frame.left(64);
+
+        if (!m_welcomed)
+        {
+            // the first frame must be "welcome:<version>", an older server sends something else
+            const int version = frame.startsWith("welcome:") ? frame.mid(8).toInt() : -1;
+            if (version != kNetworkProtocolVersion)
+            {
+                qWarning() << "NetworkClient: incompatible server protocol version" << version
+                           << "(expected" << kNetworkProtocolVersion << ")";
+                Q_EMIT protocolError();
+                m_tcpSocket->abort();
+                return;
+            }
+
+            m_welcomed = true;
+            sendHello();
+            continue;
+        }
+
+        // binary payload, must not go through the UTF-8 decoding
+        if (frame.startsWith("media:art:"))
+        {
+            parseMediaArt(frame.mid(10));
+            continue;
+        }
+
+        const QString metadata = QString::fromUtf8(frame);
 
         if (metadata.startsWith("auth:ok:"))
         {
@@ -223,10 +232,6 @@ void NetworkClient::readMetadata()
         else if (metadata.startsWith("media:meta:"))
         {
             parseMediaMetadata(metadata.mid(11));
-        }
-        else if (metadata.startsWith("media:art:"))
-        {
-            parseMediaArt(metadata.mid(10));
         }
         else if (metadata.startsWith("claude:state:"))
         {
@@ -272,16 +277,15 @@ void NetworkClient::parseMediaMetadata(const QString &payload)
     Q_EMIT mediaMetadataChanged();
 }
 
-void NetworkClient::parseMediaArt(const QString &payload)
+void NetworkClient::parseMediaArt(const QByteArray &payload)
 {
-    // <mime>;<base64> , or empty to clear
+    // <mime>;<raw image bytes> , or empty to clear
     const int sep = payload.indexOf(';');
 
     QImage img;
     if (sep > 0)
     {
-        const QByteArray bytes = QByteArray::fromBase64(payload.mid(sep + 1).toLatin1());
-        img.loadFromData(bytes); // format auto-detected from the bytes
+        img.loadFromData(QByteArrayView(payload).sliced(sep + 1)); // format auto-detected from the bytes
     }
 
     m_artImage = img;
@@ -362,9 +366,8 @@ void NetworkClient::tickPosition()
         return;
     }
 
-    // advance the position by the wall-clock time elapsed since the last server sync, scaled by rate
-    const qint64 elapsed_us = qint64(m_positionClock.nsecsElapsed() / 1000.0 * (m_rate > 0.f ? m_rate : 1.f));
-    qint64 pos = m_position_us + elapsed_us;
+    // advance the position by the wall-clock time elapsed since the last server sync
+    qint64 pos = m_position_us + m_positionClock.nsecsElapsed() / 1000;
     if (m_duration_us > 0 && pos > m_duration_us) pos = m_duration_us;
 
     m_position_us = pos;
@@ -373,151 +376,65 @@ void NetworkClient::tickPosition()
     Q_EMIT mediaStateChanged();
 }
 
+void NetworkClient::writeMessage(const QString &msg)
+{
+    if (!m_tcpSocket->isOpen()) return;
+
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_6_0);
+    out << msg.toUtf8();
+    m_tcpSocket->write(block);
+}
+
 void NetworkClient::sendCommand(const QString &cmd)
 {
-    if (m_tcpSocket->isOpen() && m_authenticated)
-    {
-        QByteArray block;
-        QDataStream dataOutput(&block, QIODevice::WriteOnly);
-        dataOutput.setVersion(QDataStream::Qt_6_0);
-
-        dataOutput << cmd;
-
-        m_tcpSocket->write(block);
-    }
+    if (m_authenticated) writeMessage(cmd);
 }
 
 void NetworkClient::sendAction(int action)
 {
-    //qDebug() << "NetworkClient::sendAction()";
-
-    if (m_tcpSocket->isOpen() && m_authenticated)
+    const char *name = networkPressActionName(action);
+    if (!name)
     {
-        QByteArray block;
-        QDataStream dataOutput(&block, QIODevice::WriteOnly);
-        dataOutput.setVersion(QDataStream::Qt_6_0);
-
-        if (action == LocalActions::ACTION_KEYBOARD_computer_lock) dataOutput << QString("press:lock");
-        else if (action == LocalActions::ACTION_KEYBOARD_computer_sleep) dataOutput << QString("press:sleep");
-        else if (action == LocalActions::ACTION_KEYBOARD_computer_poweroff) dataOutput << QString("press:poweroff");
-
-        else if (action == LocalActions::ACTION_KEYBOARD_media_playpause) dataOutput << QString("press:playpause");
-        else if (action == LocalActions::ACTION_KEYBOARD_media_stop) dataOutput << QString("press:stop");
-        else if (action == LocalActions::ACTION_KEYBOARD_media_next) dataOutput << QString("press:next");
-        else if (action == LocalActions::ACTION_KEYBOARD_media_prev) dataOutput << QString("press:prev");
-
-        else if (action == LocalActions::ACTION_KEYBOARD_volume_mute) dataOutput << QString("press:mute");
-        else if (action == LocalActions::ACTION_KEYBOARD_volume_up) dataOutput << QString("press:volumeup");
-        else if (action == LocalActions::ACTION_KEYBOARD_volume_down) dataOutput << QString("press:volumedown");
-
-        else if (action == LocalActions::ACTION_KEYBOARD_up) dataOutput << QString("press:up");
-        else if (action == LocalActions::ACTION_KEYBOARD_down) dataOutput << QString("press:down");
-        else if (action == LocalActions::ACTION_KEYBOARD_left) dataOutput << QString("press:left");
-        else if (action == LocalActions::ACTION_KEYBOARD_right) dataOutput << QString("press:right");
-        else if (action == LocalActions::ACTION_KEYBOARD_enter) dataOutput << QString("press:enter");
-        else if (action == LocalActions::ACTION_KEYBOARD_escape) dataOutput << QString("press:escape");
-
-        else
-        {
-            qWarning() << "Unknown action code:" << action;
-            return;
-        }
-
-        m_tcpSocket->write(block);
+        qWarning() << "Unknown action code:" << action;
+        return;
     }
+
+    sendCommand(QStringLiteral("press:") + QLatin1StringView(name));
 }
 
 void NetworkClient::sendKey(QChar key)
 {
-    //qDebug() << "NetworkClient::sendKey(" << key << ")";
-
-    if (m_tcpSocket->isOpen() && m_authenticated)
-    {
-        QByteArray block;
-        QDataStream dataOutput(&block, QIODevice::WriteOnly);
-        dataOutput.setVersion(QDataStream::Qt_6_0);
-
-        dataOutput << QString("key:") + key;
-
-        m_tcpSocket->write(block);
-    }
+    sendCommand(QStringLiteral("key:") + key);
 }
 
 void NetworkClient::sendGamepad(float x1, float y1, float x2, float y2,
                                 int a, int b, int x, int y)
 {
-    //qDebug() << "NetworkClient::sendGamepad(" << key << ")";
-
-    if (m_tcpSocket->isOpen() && m_authenticated)
-    {
-        QByteArray block;
-        QDataStream dataOutput(&block, QIODevice::WriteOnly);
-        dataOutput.setVersion(QDataStream::Qt_6_0);
-
-        dataOutput << QString("pad:") +
-                      QString::number(x1, 'g') + ";" +
-                      QString::number(y1, 'g') + ";" +
-                      QString::number(x2, 'g') + ";" +
-                      QString::number(y2, 'g') + ";";
-
-        m_tcpSocket->write(block);
-    }
+    sendCommand(QStringLiteral("pad:%1;%2;%3;%4;%5;%6;%7;%8")
+                .arg(x1).arg(y1).arg(x2).arg(y2)
+                .arg(a).arg(b).arg(x).arg(y));
 }
 
 void NetworkClient::sendMouseMove(int dx, int dy)
 {
-    if (m_tcpSocket->isOpen() && m_authenticated)
-    {
-        QByteArray block;
-        QDataStream dataOutput(&block, QIODevice::WriteOnly);
-        dataOutput.setVersion(QDataStream::Qt_6_0);
-
-        dataOutput << QString("mouse:m;") + QString::number(dx) + ";" + QString::number(dy);
-
-        m_tcpSocket->write(block);
-    }
+    sendCommand(QStringLiteral("mouse:m;%1;%2").arg(dx).arg(dy));
 }
 
 void NetworkClient::sendMouseScroll(int dx, int dy)
 {
-    if (m_tcpSocket->isOpen() && m_authenticated)
-    {
-        QByteArray block;
-        QDataStream dataOutput(&block, QIODevice::WriteOnly);
-        dataOutput.setVersion(QDataStream::Qt_6_0);
-
-        dataOutput << QString("mouse:s;") + QString::number(dx) + ";" + QString::number(dy);
-
-        m_tcpSocket->write(block);
-    }
+    sendCommand(QStringLiteral("mouse:s;%1;%2").arg(dx).arg(dy));
 }
 
 void NetworkClient::sendMouseClick(int btn)
 {
-    if (m_tcpSocket->isOpen() && m_authenticated)
-    {
-        QByteArray block;
-        QDataStream dataOutput(&block, QIODevice::WriteOnly);
-        dataOutput.setVersion(QDataStream::Qt_6_0);
-
-        dataOutput << QString("mouse:c;") + QString::number(btn);
-
-        m_tcpSocket->write(block);
-    }
+    sendCommand(QStringLiteral("mouse:c;%1").arg(btn));
 }
 
 void NetworkClient::sendMouseButton(int btn, bool down)
 {
-    if (m_tcpSocket->isOpen() && m_authenticated)
-    {
-        QByteArray block;
-        QDataStream dataOutput(&block, QIODevice::WriteOnly);
-        dataOutput.setVersion(QDataStream::Qt_6_0);
-
-        dataOutput << QString("mouse:b;") + QString::number(btn) + ";" + QString::number(down ? 1 : 0);
-
-        m_tcpSocket->write(block);
-    }
+    sendCommand(QStringLiteral("mouse:b;%1;%2").arg(btn).arg(down ? 1 : 0));
 }
 
 /* ************************************************************************** */
@@ -572,6 +489,14 @@ void NetworkClient::media_next()
 // so the desktop pushes its actual level/mute state back to us via "volume:state:".
 
 void NetworkClient::volume_mute()
+{
+    sendCommand(QStringLiteral("volume:mute"));
+}
+void NetworkClient::volume_unmute()
+{
+    sendCommand(QStringLiteral("volume:unmute"));
+}
+void NetworkClient::volume_toggle_mute()
 {
     sendCommand(QStringLiteral("volume:toggle"));
 }

@@ -24,72 +24,23 @@
 /* ************************************************************************** */
 
 #include <QObject>
-#include <QTcpServer>
-#include <QTcpSocket>
-#include <QDataStream>
 #include <QList>
 #include <QDateTime>
 #include <QByteArray>
 
 #include "SettingsManager.h"
 
+class QTcpServer;
 class QNetworkAccessManager;
-
-/* ************************************************************************** */
-
-/*!
- * \brief A single remote connection handled by the NetworkServer.
- *
- * Owns its socket and the QDataStream used to (de)serialize messages. Identity
- * (name/token) is filled in once the client authenticates; in non-secure mode
- * the connection is treated as authenticated right away.
- */
-class Client
-{
-public:
-    QTcpSocket *m_connection = nullptr;
-    QDataStream m_dataStream;
-    bool m_authenticated = false;
-    bool m_secure = false; //!< authenticated while the server was in secure mode
-    QString m_name;
-    QString m_token;
-    QString m_peer;
-
-    explicit Client(QTcpSocket *connection) : m_connection(connection)
-    {
-        m_dataStream.setDevice(m_connection);
-        m_dataStream.setVersion(QDataStream::Qt_6_0);
-        if (m_connection) m_peer = m_connection->peerAddress().toString();
-    }
-
-    ~Client()
-    {
-        if (m_connection)
-        {
-            m_connection->close();
-            m_connection->deleteLater();
-        }
-    }
-
-    void write(const QString &msg)
-    {
-        if (!m_connection || !m_connection->isOpen()) return;
-
-        QByteArray block;
-        QDataStream out(&block, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_6_0);
-        out << msg;
-        m_connection->write(block);
-    }
-};
+class ServerConnection;
 
 /* ************************************************************************** */
 
 /*!
  * \brief A network control client as exposed to the QML layer.
  *
- * Wraps the persisted identity (name/token/enabled/firstSeen/lastSeen) with the
- * runtime state (connected/secure). NetworkServer owns these objects and keeps
+ * Wraps the persisted identity (name/token/enabled/verified/firstSeen/lastSeen) with the
+ * runtime state (connected). NetworkServer owns these objects and keeps
  * them in sync with the SettingsManager-persisted list.
  */
 class NetworkClientModel : public QObject
@@ -99,25 +50,25 @@ class NetworkClientModel : public QObject
     Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QString token READ getToken CONSTANT)
     Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
+    Q_PROPERTY(bool verified READ isVerified NOTIFY verifiedChanged)
     Q_PROPERTY(QDateTime firstSeen READ getFirstSeen NOTIFY firstSeenChanged)
     Q_PROPERTY(QDateTime lastSeen READ getLastSeen NOTIFY lastSeenChanged)
     Q_PROPERTY(bool connected READ isConnected NOTIFY connectedChanged)
-    Q_PROPERTY(bool secure READ isSecure NOTIFY secureChanged)
 
     QString m_name;
     QString m_token;
     bool m_enabled = true;
+    bool m_verified = false;    //!< has proven the server password at least once
     QDateTime m_firstSeen;
-    QDateTime m_lastSeen;
+    QDateTime m_lastSeen;       //!< last authentication, or last disconnection
     bool m_connected = false;
-    bool m_secure = false;
 
 public:
     explicit NetworkClientModel(QObject *parent = nullptr) : QObject(parent) {}
 
     NetworkClientModel(const NetworkClientSettings &s, QObject *parent = nullptr)
         : QObject(parent), m_name(s.name), m_token(s.token), m_enabled(s.enabled),
-          m_firstSeen(s.firstSeen), m_lastSeen(s.lastSeen) {}
+          m_verified(s.verified), m_firstSeen(s.firstSeen), m_lastSeen(s.lastSeen) {}
 
     NetworkClientSettings toSettings() const
     {
@@ -125,6 +76,7 @@ public:
         s.name = m_name;
         s.token = m_token;
         s.enabled = m_enabled;
+        s.verified = m_verified;
         s.firstSeen = m_firstSeen;
         s.lastSeen = m_lastSeen;
         return s;
@@ -139,6 +91,9 @@ public:
     bool isEnabled() const { return m_enabled; }
     void setEnabled(bool v) { if (m_enabled != v) { m_enabled = v; Q_EMIT enabledChanged(); } }
 
+    bool isVerified() const { return m_verified; }
+    void setVerified(bool v) { if (m_verified != v) { m_verified = v; Q_EMIT verifiedChanged(); } }
+
     QDateTime getFirstSeen() const { return m_firstSeen; }
     void setFirstSeen(const QDateTime &v) { if (m_firstSeen != v) { m_firstSeen = v; Q_EMIT firstSeenChanged(); } }
 
@@ -148,16 +103,13 @@ public:
     bool isConnected() const { return m_connected; }
     void setConnected(bool v) { if (m_connected != v) { m_connected = v; Q_EMIT connectedChanged(); } }
 
-    bool isSecure() const { return m_secure; }
-    void setSecure(bool v) { if (m_secure != v) { m_secure = v; Q_EMIT secureChanged(); } }
-
 signals:
     void nameChanged();
     void enabledChanged();
+    void verifiedChanged();
     void firstSeenChanged();
     void lastSeenChanged();
     void connectedChanged();
-    void secureChanged();
 };
 
 /* ************************************************************************** */
@@ -177,49 +129,90 @@ class NetworkServer : public QObject
     QTcpServer *m_tcpServer = nullptr;
     bool m_serverRunning = false;
     QString m_serverAddress;
-    unsigned m_tcpServerPort = 5555;
+    quint16 m_tcpServerPort = 5555;                 //!< overridden by a valid SettingsManager port
 
-    QList <Client *> m_clients;                     //!< live clients
+    QList <ServerConnection *> m_clients;           //!< live connections
     QList <NetworkClientModel *> m_knownClients;    //!< known clients, exposed to QML
+
+    QNetworkAccessManager *m_nam = nullptr;
+    QString m_artUrl;                               //!< source URL the cached bytes were loaded from
+    QString m_artMime;                              //!< mime type of the cached bytes (ex: "image/png")
+    QByteArray m_artBytes;                          //!< raw image bytes for the current track (may be empty)
 
     bool isRunning() const { return m_serverRunning; }
 
-    bool areClientsConnected() const { return !m_clients.isEmpty(); }
+    /*!
+     * \return True if at least one live connection is allowed to receive messages.
+     * \note In secure mode, the connections that did not authenticate yet are not counted.
+     */
+    bool areClientsConnected() const;
 
     QList <QObject *> getClients() const;
 
     QString getServerAddress() const { return m_serverAddress; }
     int getServerPort() const { return m_tcpServerPort; }
 
-    Client *clientForSocket(QObject *socket) const;
+    ServerConnection *connectionForSocket(QObject *socket) const;
+
+    /*!
+     * \return True if this connection is allowed to receive messages.
+     * \note In secure mode, only authenticated connections are.
+     */
+    bool isAddressable(const ServerConnection *conn) const;
+
+    /*!
+     * \brief Stamp the known clients behind these connections as last seen now, and persist them.
+     */
+    void updateLastSeen(const QList<ServerConnection *> &connections);
     NetworkClientModel *knownClientForToken(const QString &token) const;
 
-    void loadClients();
+    void addKnownClient(NetworkClientModel *client);
     void saveClients();
+
+    /*!
+     * \brief Close the live connections whose token is no longer known, or has been disabled.
+     * \note In secure mode, the clients that never proved the password are closed too.
+     */
     void enforceRevocations();
 
-    void handleClientHello(Client *client, const QString &cData);
-    void processClientMessage(Client *client, const QString &cData);
+    /*!
+     * \brief Sync a known client's runtime connected flag with the live connections.
+     * \param token Token of the known client to update.
+     */
+    void updateKnownClientState(const QString &token);
 
-    void broadcast(const QString &msg);
+    void handleClientHello(ServerConnection *conn, const QString &cData);
+    void processClientMessage(ServerConnection *conn, const QString &cData);
 
-    void sendVolumeStateTo(Client *client);
+    /*!
+     * \brief Send a message to every addressable live connection.
+     */
+    void broadcast(const QByteArray &msg);
 
-    void sendClaudeStateTo(Client *client);
+    /*!
+     * \brief Send the whole desktop state to a connection that just authenticated.
+     */
+    void sendFullStateTo(ServerConnection *conn);
 
-    void sendTypingStateTo(Client *client);
+    QByteArray volumeStateMessage() const;
+    QByteArray mediaStateMessage() const;
+    QByteArray mediaMetadataMessage() const;
+    QByteArray mediaArtMessage() const;             //!< empty payload when no art (clears the client thumbnail)
+    QByteArray claudeStateMessage() const;          //!< empty when the ClaudeMonitor is compiled out
+    QByteArray typingStateMessage() const;
 
-    void sendMediaStateTo(Client *client);
-    void sendMediaMetadataTo(Client *client);
-    void sendMediaArtTo(Client *client);
+    /*!
+     * \brief (Re)load the artwork bytes if the URL changed, then broadcast them.
+     * \param url A data:, http(s)://, file:// URL, or a bare local file path.
+     */
+    void refreshArt(const QString &url);
 
-    QString mediaArtMessage() const;                //!< "media:art:<mime>;<base64>" for the cached bytes (empty payload clears)
-    void refreshArt(const QString &url);            //!< (re)load the art bytes if the URL changed, then broadcast
-
-    QNetworkAccessManager *m_nam = nullptr;
-    QString m_artUrl;                               //!< source URL the cached bytes were loaded from
-    QString m_artMime;                              //!< mime type of the cached bytes (ex: "image/png")
-    QByteArray m_artBytes;                          //!< raw image bytes for the current track (may be empty)
+    /*!
+     * \brief Downscale and re-encode the artwork (JPEG, or PNG if transparent), then broadcast it.
+     * \note Only decodable images are kept: the URL comes from any local media player,
+     *       and must not be usable to push arbitrary local files to the network clients.
+     */
+    void setArt(const QByteArray &bytes);
 
 signals:
     void serverEvent();
@@ -232,8 +225,9 @@ private slots:
 
     void readClientData();
 
+    void loadClients();
+
     void onServerChanged();
-    void onSecureModeChanged();
     void onKnownClientChanged();
 
     void sendVolumeState();

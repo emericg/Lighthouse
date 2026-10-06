@@ -221,6 +221,7 @@ bool SettingsManager::readSettings()
             c.name = settings.value("name").toString();
             c.token = settings.value("token").toString();
             c.enabled = settings.value("enabled", true).toBool();
+            c.verified = settings.value("verified", false).toBool();
             c.firstSeen = settings.value("firstSeen").toDateTime();
             c.lastSeen = settings.value("lastSeen").toDateTime();
             if (!c.token.isEmpty()) m_netctrlClients.push_back(c);
@@ -320,6 +321,7 @@ bool SettingsManager::writeSettings()
             settings.setValue("name", m_netctrlClients.at(i).name);
             settings.setValue("token", m_netctrlClients.at(i).token);
             settings.setValue("enabled", m_netctrlClients.at(i).enabled);
+            settings.setValue("verified", m_netctrlClients.at(i).verified);
             settings.setValue("firstSeen", m_netctrlClients.at(i).firstSeen);
             settings.setValue("lastSeen", m_netctrlClients.at(i).lastSeen);
         }
@@ -978,6 +980,7 @@ void SettingsManager::saveNetCtrlClients()
         settings.setValue("name", m_netctrlClients.at(i).name);
         settings.setValue("token", m_netctrlClients.at(i).token);
         settings.setValue("enabled", m_netctrlClients.at(i).enabled);
+        settings.setValue("verified", m_netctrlClients.at(i).verified);
         settings.setValue("firstSeen", m_netctrlClients.at(i).firstSeen);
         settings.setValue("lastSeen", m_netctrlClients.at(i).lastSeen);
     }
