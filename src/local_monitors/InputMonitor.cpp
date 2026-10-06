@@ -25,6 +25,8 @@
 #include "InputMonitor_evdev.h"
 #elif defined(ENABLE_INPUT_IDLENOTIFY)
 #include "InputMonitor_idlenotify.h"
+#elif defined(ENABLE_INPUT_EVENTTAP)
+#include "InputMonitor_eventtap.h"
 #endif
 
 #include <QCoreApplication>
@@ -53,6 +55,8 @@ InputMonitor::Backend InputMonitor::getBackend()
     return BackendEvdev;
 #elif defined(ENABLE_INPUT_IDLENOTIFY)
     return BackendIdleNotify;
+#elif defined(ENABLE_INPUT_EVENTTAP)
+    return BackendEventTap;
 #else
     return BackendNone;
 #endif
@@ -64,6 +68,8 @@ InputMonitor::InputMonitor(QObject *parent) : QObject(parent)
     m_backend = new InputMonitorEvdev(this);
 #elif defined(ENABLE_INPUT_IDLENOTIFY)
     m_backend = new InputMonitorIdleNotify(this);
+#elif defined(ENABLE_INPUT_EVENTTAP)
+    m_backend = new InputMonitorEventTap(this);
 #endif
 
     if (!m_backend) return;

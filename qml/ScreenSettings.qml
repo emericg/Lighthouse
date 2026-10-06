@@ -753,6 +753,8 @@ Loader {
                         if (!SettingsManager.monitorInput) return qsTr("Typing activity is not relayed.")
                         if (InputMonitor.backend === InputMonitor.BackendIdleNotify)
                             return qsTr("Connected remotes are told when you are active (keyboard or mouse), never what you do.")
+                        if (InputMonitor.backend === InputMonitor.BackendEventTap)
+                            return qsTr("Connected remotes are told when you are typing, never what you type. Requires the 'Input Monitoring' permission.")
                         return qsTr("Connected remotes are told when you are typing, never what you type. Requires read access to the input devices (the 'input' group).")
                     }
                     textFormat: Text.PlainText

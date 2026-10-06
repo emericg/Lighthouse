@@ -153,6 +153,13 @@ else() # Desktop build
             )
         endif()
     endif()
+    if(APPLE)
+        if(ENABLE_INPUT_MONITORING)
+            set(SOURCES_DESKTOP ${SOURCES_DESKTOP}
+                src/local_monitors/InputMonitor_eventtap.cpp src/local_monitors/InputMonitor_eventtap.h
+            )
+        endif()
+    endif()
 endif()
 
 qt_add_executable(${PROJECT_NAME} ${SOURCES} ${SOURCES_DESKTOP} ${SOURCES_MOBILE})
@@ -306,6 +313,10 @@ if(NOT IOS AND NOT ANDROID)
             message(STATUS "[INPUT] activity backend         = evdev")
             target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_INPUT_EVDEV)
         endif()
+    elseif(ENABLE_INPUT_MONITORING AND APPLE)
+        message(STATUS "[INPUT] activity backend         = Quartz event tap")
+        target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_INPUT_EVENTTAP)
+        target_link_libraries(${PROJECT_NAME} PRIVATE "-framework ApplicationServices")
     endif()
 endif()
 

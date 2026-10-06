@@ -71,8 +71,8 @@ public:
  * Only that boolean ever leaves this class: no key codes, and no per key
  * timing either, as inter keystroke delays are enough to infer what is typed.
  *
- * Depending on the backend, "typing" means keyboard activity only (evdev),
- * or any user input, pointer included (ext-idle-notify-v1).
+ * Depending on the backend, "typing" means keyboard activity only (evdev,
+ * Quartz event tap), or any user input, pointer included (ext-idle-notify-v1).
  *
  * The monitor is idle until setActive(true) is called, so that keyboards are
  * only opened while someone is actually there to watch the result.
@@ -93,6 +93,7 @@ public:
         BackendNone = 0,    //!< no backend compiled in for this platform
         BackendEvdev,       //!< keyboard activity only, needs read access to the input devices
         BackendIdleNotify,  //!< any input activity, as reported by the Wayland compositor
+        BackendEventTap,    //!< keyboard activity only, needs the macOS Input Monitoring permission
     };
     Q_ENUM(Backend)
 
