@@ -122,6 +122,7 @@ if(NOT IOS AND NOT ANDROID)
         set(SOURCES_DESKTOP ${SOURCES_DESKTOP}
             src/local_controls/mouse_uinput.cpp src/local_controls/mouse_uinput.h
             src/local_controls/keyboard_uinput.cpp src/local_controls/keyboard_uinput.h
+            src/local_controls/keymap_xkb.cpp src/local_controls/keymap_xkb.h
             src/local_controls/gamepad_uinput.cpp src/local_controls/gamepad_uinput.h
             src/local_controls/os_commander_logind.cpp src/local_controls/os_commander_logind.h
             src/local_controls/mpris_dbus.cpp src/local_controls/mpris_dbus.h
@@ -313,9 +314,14 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_VOLUME_PULSEAUDIO)
     endif()
 
-    # D-Bus is used by the MPRIS media controller and the PulseAudio volume controller
+    # D-Bus is used by the MPRIS media controller, the PulseAudio volume controller, and the keyboard layout detection
     find_package(Qt6 REQUIRED COMPONENTS DBus)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::DBus)
+
+    # xkbcommon maps the typed characters to the desktop keyboard layout (QtGui already needs it)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(XKBCOMMON REQUIRED IMPORTED_TARGET xkbcommon)
+    target_link_libraries(${PROJECT_NAME} PRIVATE PkgConfig::XKBCOMMON)
 endif()
 
 ################################################################################

@@ -25,6 +25,7 @@
 /* ************************************************************************** */
 
 #include "keyboard.h"
+#include "keymap_xkb.h"
 
 #include <linux/input.h>
 #include <linux/uinput.h>
@@ -41,7 +42,14 @@ class Keyboard_uinput: public Keyboard
     int m_fd = -1;
     struct uinput_user_dev m_uidev;
 
+    KeymapXkb m_keymap;
+
     void emitevent(int type, int code, int val);
+
+    /*!
+     * \brief Press and release a key, with its modifiers held down around it.
+     */
+    void emitStroke(const KeyStroke &stroke);
 
 public:
     Keyboard_uinput(QObject *parent = nullptr);
@@ -49,7 +57,13 @@ public:
 
     virtual void setup();
     virtual void action(int key_code);
-    virtual void key(QChar key_value);
+    /*!
+     * \brief Type a single character, using the desktop keyboard layout (see KeymapXkb).
+     * \note Characters the layout cannot produce are ignored.
+     *       Without a usable keymap, only letters, digits, space, tab and newline are typed,
+     *       at fixed QWERTY positions (digits use the shifted AZERTY level).
+     */
+    virtual void key(char32_t key_value);
 };
 
 /* ************************************************************************** */

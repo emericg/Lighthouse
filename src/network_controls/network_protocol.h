@@ -37,7 +37,7 @@
  * except the "media:art:<mime>;" message whose payload is the raw image bytes.
  * Bump it on any incompatible change, the client refuses a server with a different version.
  */
-inline constexpr int kNetworkProtocolVersion = 2;
+inline constexpr int kNetworkProtocolVersion = 3;
 
 /* ************************************************************************** */
 
@@ -72,6 +72,7 @@ inline constexpr NetworkPressAction kNetworkPressActions[] = {
     { LocalActions::ACTION_KEYBOARD_right,              "right" },
     { LocalActions::ACTION_KEYBOARD_enter,              "enter" },
     { LocalActions::ACTION_KEYBOARD_escape,             "escape" },
+    { LocalActions::ACTION_KEYBOARD_backspace,          "backspace" },
 };
 
 /*!

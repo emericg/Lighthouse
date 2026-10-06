@@ -232,11 +232,13 @@ void LocalControls::action(int action_code, const QString &action_params)
 
 /* ************************************************************************** */
 
-void LocalControls::keyboard_key(QChar key)
+void LocalControls::keyboard_text(QStringView text)
 {
-    if (keyboard)
+    if (!keyboard) return;
+
+    for (const char32_t c : text.toUcs4())
     {
-        keyboard->key(key);
+        keyboard->key(c);
     }
 }
 

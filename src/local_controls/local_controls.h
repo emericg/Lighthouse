@@ -100,7 +100,10 @@ public:
     qint64 getMediaDuration_us() const;
     float getMediaRate() const;
 
-    Q_INVOKABLE void keyboard_key(QChar key);
+    /*!
+     * \brief Type text through the virtual keyboard, one Unicode code point at a time.
+     */
+    void keyboard_text(QStringView text);
 
     Q_INVOKABLE void mouse_action(int dx, int dy, int btn_left, int btn_right, int btn_middle);
     void mouse_move(int dx, int dy);

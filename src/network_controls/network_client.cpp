@@ -404,9 +404,9 @@ void NetworkClient::sendAction(int action)
     sendCommand(QStringLiteral("press:") + QLatin1StringView(name));
 }
 
-void NetworkClient::sendKey(QChar key)
+void NetworkClient::sendText(const QString &text)
 {
-    sendCommand(QStringLiteral("key:") + key);
+    if (!text.isEmpty()) sendCommand(QStringLiteral("text:") + text);
 }
 
 void NetworkClient::sendGamepad(float x1, float y1, float x2, float y2,
@@ -462,6 +462,10 @@ void NetworkClient::key_enter()
 void NetworkClient::key_escape()
 {
     sendAction(LocalActions::ACTION_KEYBOARD_escape);
+}
+void NetworkClient::key_backspace()
+{
+    sendAction(LocalActions::ACTION_KEYBOARD_backspace);
 }
 
 /* ************************************************************************** */

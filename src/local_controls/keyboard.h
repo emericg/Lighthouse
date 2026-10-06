@@ -43,7 +43,7 @@ public:
 
     virtual void setup() = 0;
     virtual void action(int key_code) = 0;
-    virtual void key(QChar key_value) = 0;
+    virtual void key(char32_t key_value) = 0;   //!< a Unicode code point
 };
 
 /* ************************************************************************** */

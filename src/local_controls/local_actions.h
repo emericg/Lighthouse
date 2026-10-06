@@ -65,6 +65,7 @@ public:
             ACTION_KEYBOARD_right,
             ACTION_KEYBOARD_enter,
             ACTION_KEYBOARD_escape,
+            ACTION_KEYBOARD_backspace,
 
             ACTION_KEYBOARD_SHORTCUTS_START = 64,
                 ACTION_KEYBOARD_computer_lock,

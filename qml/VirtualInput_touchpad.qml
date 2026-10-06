@@ -116,6 +116,7 @@ Grid {
                 }
 
                 onReleased: (points) => {
+                    if (isDesktop) return
                     if (fingerCount() > 0) return // still a finger down
 
                     if (_dragging) {
@@ -142,6 +143,8 @@ Grid {
                     repeat: true
 
                     function flush() {
+                        if (isDesktop) return
+
                         var ix = Math.trunc(padArea._accDx)
                         var iy = Math.trunc(padArea._accDy)
                         if (ix !== 0 || iy !== 0) {
@@ -274,20 +277,43 @@ Grid {
             visible: false // < set to invisible
             focus: false
             cursorVisible: false
-            echoMode: TextInput.NoEcho
+
+            // Normal echo: NoEcho/Password fields hide the committed text from 'displayText',
+            // and make the Android IMEs restrict the input to Latin/ASCII characters
+            inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
 
             background: Item {
                 // older hack to fake invisibility
             }
 
-            onDisplayTextChanged: {
-                if (displayText) {
-                    //console.log("virtualtextfield::onDisplayTextChanged(" + displayText + ")")
+            // The field always holds this placeholder, so the IME has something to erase:
+            // a backspace on an empty field produces no edit at all
+            readonly property string sentinel: "  "
 
-                    // send virtual event
-                    networkControls.sendKey(displayText)
-                    clear()
+            onActiveFocusChanged: {
+                if (activeFocus) text = sentinel
+            }
+
+            Connections {
+                target: Qt.inputMethod
+                function onVisibleChanged() {
+                    if (!Qt.inputMethod.visible && virtualtextfield.activeFocus) {
+                        virtualtextfield.focus = false
+                        virtualtextfield.clear()
+                    }
                 }
+            }
+
+            onTextEdited: {
+                if (text.startsWith(sentinel)) {
+                    networkControls.sendText(text.substring(sentinel.length))
+                } else {
+                    // one backspace per placeholder character erased
+                    for (let i = text.length; i < sentinel.length; i++) {
+                        networkControls.key_backspace()
+                    }
+                }
+                text = sentinel
             }
             onEditingFinished: {
                 virtualtextfield.focus = false

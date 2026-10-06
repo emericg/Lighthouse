@@ -135,6 +135,7 @@ void Keyboard_uinput::action(int action_code)
     else if (action_code == LocalActions::ACTION_KEYBOARD_right) keymacro = KEY_RIGHT;
     else if (action_code == LocalActions::ACTION_KEYBOARD_enter) keymacro = KEY_ENTER;
     else if (action_code == LocalActions::ACTION_KEYBOARD_escape) keymacro = KEY_ESC;
+    else if (action_code == LocalActions::ACTION_KEYBOARD_backspace) keymacro = KEY_BACKSPACE;
 
     else if (action_code == LocalActions::ACTION_KEYBOARD_computer_lock) keymacro = KEY_SCREENLOCK;
     else if (action_code == LocalActions::ACTION_KEYBOARD_computer_sleep) keymacro = KEY_SLEEP;
@@ -180,74 +181,68 @@ void Keyboard_uinput::action(int action_code)
 
 /* ************************************************************************** */
 
-void Keyboard_uinput::key(QChar key_value)
+/*!
+ * \return The key stroke typing this character at a fixed QWERTY position, if any.
+ */
+static QList<KeyStroke> fixedStrokesFor(char32_t c)
 {
-    // get key macro
-    unsigned keymacro = 0;
-    unsigned keymodifier = 0;
+    // KEY_A to KEY_Z are not contiguous, they follow the physical rows
+    static constexpr unsigned kLetterKeys[26] = {
+        KEY_A, KEY_B, KEY_C, KEY_D, KEY_E, KEY_F, KEY_G, KEY_H, KEY_I, KEY_J, KEY_K, KEY_L, KEY_M,
+        KEY_N, KEY_O, KEY_P, KEY_Q, KEY_R, KEY_S, KEY_T, KEY_U, KEY_V, KEY_W, KEY_X, KEY_Y, KEY_Z,
+    };
 
-    if (key_value >= '0' && key_value <= '9')
+    KeyStroke s;
+
+    if (c >= U'0' && c <= U'9')
     {
-        keymodifier = KEY_LEFTSHIFT;
-        if (key_value == '0') keymacro = KEY_0;
-        else keymacro = 1 + key_value.digitValue();
+        s.code = (c == U'0') ? KEY_0 : KEY_1 + (c - U'1');
+        s.modifiers.push_back(KEY_LEFTSHIFT);
     }
-    else if ((key_value >= 'a' && key_value <= 'z') ||
-             (key_value >= 'A' && key_value <= 'A'))
+    else if (c >= U'a' && c <= U'z')
     {
-        if (key_value >= 'A' && key_value <= 'Z')
-            keymodifier = KEY_CAPSLOCK;
-
-        if (key_value.toLower() == 'a') keymacro = KEY_A;
-        if (key_value.toLower() == 'b') keymacro = KEY_B;
-        if (key_value.toLower() == 'c') keymacro = KEY_C;
-        if (key_value.toLower() == 'd') keymacro = KEY_D;
-        if (key_value.toLower() == 'e') keymacro = KEY_E;
-        if (key_value.toLower() == 'f') keymacro = KEY_F;
-        if (key_value.toLower() == 'g') keymacro = KEY_G;
-        if (key_value.toLower() == 'h') keymacro = KEY_H;
-        if (key_value.toLower() == 'i') keymacro = KEY_I;
-        if (key_value.toLower() == 'j') keymacro = KEY_J;
-        if (key_value.toLower() == 'k') keymacro = KEY_K;
-        if (key_value.toLower() == 'l') keymacro = KEY_L;
-        if (key_value.toLower() == 'm') keymacro = KEY_M;
-        if (key_value.toLower() == 'n') keymacro = KEY_N;
-        if (key_value.toLower() == 'o') keymacro = KEY_O;
-        if (key_value.toLower() == 'p') keymacro = KEY_P;
-        if (key_value.toLower() == 'q') keymacro = KEY_Q;
-        if (key_value.toLower() == 'r') keymacro = KEY_R;
-        if (key_value.toLower() == 's') keymacro = KEY_S;
-        if (key_value.toLower() == 't') keymacro = KEY_T;
-        if (key_value.toLower() == 'u') keymacro = KEY_U;
-        if (key_value.toLower() == 'v') keymacro = KEY_V;
-        if (key_value.toLower() == 'w') keymacro = KEY_W;
-        if (key_value.toLower() == 'x') keymacro = KEY_X;
-        if (key_value.toLower() == 'y') keymacro = KEY_Y;
-        if (key_value.toLower() == 'z') keymacro = KEY_Z;
+        s.code = kLetterKeys[c - U'a'];
     }
-    else
+    else if (c >= U'A' && c <= U'Z')
     {
-        // TODO
+        s.code = kLetterKeys[c - U'A'];
+        s.modifiers.push_back(KEY_LEFTSHIFT);
     }
+    else if (c == U' ') s.code = KEY_SPACE;
+    else if (c == U'\t') s.code = KEY_TAB;
+    else if (c == U'\n') s.code = KEY_ENTER;
 
-    // simulate keystroke
-    if (keymacro > 0)
+    if (s.code == 0) return {};
+    return { s };
+}
+
+void Keyboard_uinput::key(char32_t key_value)
+{
+    QList<KeyStroke> strokes = m_keymap.strokesFor(key_value);
+    if (strokes.isEmpty() && !m_keymap.isValid()) strokes = fixedStrokesFor(key_value);
+    if (strokes.isEmpty()) return;
+
+    if (m_fd < 0) setup();
+    if (m_fd < 0) return;
+
+    for (const KeyStroke &s : std::as_const(strokes))
     {
-        if (m_fd < 0) setup(); // setup?
-
-        if (m_fd >= 0)
-        {
-            if (keymodifier > 0) emitevent(EV_KEY, keymodifier, 1);
-            emitevent(EV_KEY, keymacro, 1);
-            emitevent(EV_SYN, SYN_REPORT, 0);
-            //usleep(33000); // 33 ms
-
-            if (keymodifier > 0) emitevent(EV_KEY, keymodifier, 0);
-            emitevent(EV_KEY, keymacro, 0);
-            emitevent(EV_SYN, SYN_REPORT, 0);
-            //usleep(33000); // 33 ms
-        }
+        emitStroke(s);
     }
+}
+
+void Keyboard_uinput::emitStroke(const KeyStroke &stroke)
+{
+    for (const unsigned m : stroke.modifiers) emitevent(EV_KEY, m, 1);
+    emitevent(EV_KEY, stroke.code, 1);
+    emitevent(EV_SYN, SYN_REPORT, 0);
+
+    emitevent(EV_KEY, stroke.code, 0);
+    for (auto it = stroke.modifiers.crbegin(); it != stroke.modifiers.crend(); ++it)
+    {
+        emitevent(EV_KEY, *it, 0);
+    }
+    emitevent(EV_SYN, SYN_REPORT, 0);
 }
 
 /* ************************************************************************** */

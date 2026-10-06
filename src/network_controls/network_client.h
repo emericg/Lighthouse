@@ -222,7 +222,11 @@ public slots:
     void disconnectFromServer();
 
     void sendAction(int action);
-    void sendKey(QChar key);
+    /*!
+     * \brief Type text on the server, as sent by the OS virtual keyboard.
+     * \param text Committed text, from a single character up to a whole word.
+     */
+    void sendText(const QString &text);
     void sendGamepad(float x1, float y1, float x2, float y2,
                      int a, int b, int x, int y);
 
@@ -237,6 +241,7 @@ public slots:
     void key_right();
     void key_enter();
     void key_escape();
+    void key_backspace();
 
     void media_prev();
     void media_playpause();

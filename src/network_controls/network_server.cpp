@@ -585,9 +585,9 @@ void NetworkServer::processClientMessage(ServerConnection *conn, const QString &
         const int action = networkPressActionFromName(QStringView(cData).mid(6));
         if (action >= 0) ctrls->action(action);
     }
-    else if (cData.startsWith("key:"))
+    else if (cData.startsWith("text:"))
     {
-        if (cData.size() > 4) ctrls->keyboard_key(cData.at(4));
+        ctrls->keyboard_text(QStringView(cData).mid(5));
     }
     else if (cData.startsWith("mouse:"))
     {

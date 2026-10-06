@@ -52,7 +52,7 @@ Column {
                 VolumeButtonRow {
                     btnSize: 52
 
-                    onVolumeMute: networkControls.volume_mute()
+                    onVolumeMute: networkControls.volume_toggle_mute()
                     onVolumeDown: networkControls.volume_down()
                     onVolumeUp: networkControls.volume_up()
                 }
