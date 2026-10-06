@@ -22,6 +22,7 @@
 #include "network_client.h"
 #include "SettingsManager.h"
 #include "local_controls/local_actions.h"
+#include "local_monitors/ClaudeMonitor.h"
 #include "utils_wifi.h"
 
 #include <QtNetwork>
@@ -48,6 +49,12 @@ NetworkClient::NetworkClient(QObject *parent) : QObject(parent)
     m_positionTimer = new QTimer(this);
     m_positionTimer->setInterval(1000);
     connect(m_positionTimer, &QTimer::timeout, this, &NetworkClient::tickPosition);
+
+    // the desktop relays the Claude limits only when they change, so the reset
+    // countdowns run locally in between
+    m_claudeTimer = new QTimer(this);
+    m_claudeTimer->setInterval(1000);
+    connect(m_claudeTimer, &QTimer::timeout, this, &NetworkClient::tickClaudeCountdown);
 }
 
 /* ************************************************************************** */
@@ -120,6 +127,23 @@ void NetworkClient::disconnected()
     m_authenticated = false;
 
     if (m_positionTimer) m_positionTimer->stop();
+
+    // the relayed limits belong to the desktop we just lost: showing them frozen
+    // would be worse than showing nothing
+    if (m_claudeTimer) m_claudeTimer->stop();
+    m_claudeState = ClaudeMonitor::CaptureNone;
+    m_claudeFiveHourPercent = -1.0;
+    m_claudeFiveHourResetMs = -1;
+    m_claudeSevenDayPercent = -1.0;
+    m_claudeSevenDayResetMs = -1;
+    m_claudeProbeAvailable = false;
+    m_claudeProbeState = ClaudeMonitor::ProbeNone;
+    Q_EMIT claudeStateChanged();
+    Q_EMIT claudeCountdownChanged();
+
+    m_typingAvailable = false;
+    m_typing = false;
+    Q_EMIT typingStateChanged();
 
     Q_EMIT connectionEvent();
 }
@@ -208,6 +232,10 @@ void NetworkClient::readMetadata()
         {
             parseClaudeState(metadata.mid(13));
         }
+        else if (metadata.startsWith("typing:state:"))
+        {
+            parseTypingState(metadata.mid(13));
+        }
     }
 }
 
@@ -262,6 +290,20 @@ void NetworkClient::parseMediaArt(const QString &payload)
     m_metaThumbnail = img.isNull() ? QString() : QStringLiteral("image://networkArt/%1").arg(++m_artSeq);
 
     Q_EMIT mediaArtChanged();
+}
+
+/* ************************************************************************** */
+
+void NetworkClient::parseTypingState(const QString &payload)
+{
+    // <available>;<typing>
+    const QStringList p = payload.split(';');
+    if (p.size() < 2) return;
+
+    m_typingAvailable = (p.at(0).toInt() != 0);
+    m_typing = m_typingAvailable && (p.at(1).toInt() != 0);
+
+    Q_EMIT typingStateChanged();
 }
 
 /* ************************************************************************** */
@@ -548,6 +590,13 @@ void NetworkClient::volume_set(int pct)
 void NetworkClient::volume_get()
 {
     sendCommand(QStringLiteral("volume:get"));
+}
+
+/* ************************************************************************** */
+
+void NetworkClient::claude_probe()
+{
+    sendCommand(QStringLiteral("claude:probe"));
 }
 
 /* ************************************************************************** */

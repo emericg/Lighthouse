@@ -168,6 +168,11 @@ bool SettingsManager::readSettings()
         if (settings.contains("settings/volumeLimit"))
             m_volumeLimit = settings.value("settings/volumeLimit").toInt();
 
+        if (settings.contains("monitors/claude"))
+            m_monitorClaude = settings.value("monitors/claude").toBool();
+        if (settings.contains("monitors/input"))
+            m_monitorInput = settings.value("monitors/input").toBool();
+
         if (settings.contains("database/enabled"))
             m_mysql = settings.value("database/enabled").toBool();
         if (settings.contains("database/host"))
@@ -282,6 +287,9 @@ bool SettingsManager::writeSettings()
         settings.setValue("settings/orderBy", m_orderBy);
 
         settings.setValue("settings/volumeLimit", m_volumeLimit);
+
+        settings.setValue("monitors/claude", m_monitorClaude);
+        settings.setValue("monitors/input", m_monitorInput);
 
         settings.setValue("database/enabled", m_mysql);
         settings.setValue("database/host", m_mysqlHost);
@@ -405,6 +413,11 @@ void SettingsManager::resetSettings()
 
     m_volumeLimit = 66;
     Q_EMIT volumeLimitChanged();
+
+    m_monitorClaude = true;
+    Q_EMIT monitorClaudeChanged();
+    m_monitorInput = false;
+    Q_EMIT monitorInputChanged();
 
     m_mysql = false;
     m_mysqlHost = "";
@@ -716,6 +729,26 @@ void SettingsManager::setVolumeLimit(const int value)
         m_volumeLimit = value_clamped;
         writeSettings();
         Q_EMIT volumeLimitChanged();
+    }
+}
+
+void SettingsManager::setMonitorClaude(const bool value)
+{
+    if (m_monitorClaude != value)
+    {
+        m_monitorClaude = value;
+        writeSettings();
+        Q_EMIT monitorClaudeChanged();
+    }
+}
+
+void SettingsManager::setMonitorInput(const bool value)
+{
+    if (m_monitorInput != value)
+    {
+        m_monitorInput = value;
+        writeSettings();
+        Q_EMIT monitorInputChanged();
     }
 }
 

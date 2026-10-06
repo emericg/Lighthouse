@@ -94,6 +94,9 @@ class SettingsManager: public QObject
     Q_PROPERTY(bool fakeIt READ getFakeIt WRITE setFakeIt NOTIFY fakeitChanged)
     Q_PROPERTY(int volumeLimit READ getVolumeLimit WRITE setVolumeLimit NOTIFY volumeLimitChanged)
 
+    Q_PROPERTY(bool monitorClaude READ getMonitorClaude WRITE setMonitorClaude NOTIFY monitorClaudeChanged)
+    Q_PROPERTY(bool monitorInput READ getMonitorInput WRITE setMonitorInput NOTIFY monitorInputChanged)
+
     Q_PROPERTY(bool mysql READ getMySQL WRITE setMySQL NOTIFY mysqlChanged)
     Q_PROPERTY(QString mysqlHost READ getMysqlHost WRITE setMysqlHost NOTIFY mysqlChanged)
     Q_PROPERTY(uint mysqlPort READ getMysqlPort WRITE setMysqlPort NOTIFY mysqlChanged)
@@ -160,6 +163,9 @@ class SettingsManager: public QObject
 
     bool m_fakeIt = false; // not persistent
     int m_volumeLimit = 66;                 //!< desktop volume hard cap, in % [0 ; 100]
+
+    bool m_monitorClaude = true;            //!< Claude Code plan limits monitoring
+    bool m_monitorInput = false;            //!< typing activity relay, opt-in as it reads the input devices
 
     bool m_mysql = false;
     QString m_mysqlHost;
@@ -229,6 +235,8 @@ Q_SIGNALS:
     void netctrlClientsChanged();
     void fakeitChanged();
     void volumeLimitChanged();
+    void monitorClaudeChanged();
+    void monitorInputChanged();
     void netclientChanged();
 
 public:
@@ -333,6 +341,12 @@ public:
 
     int getVolumeLimit() const { return m_volumeLimit; }
     void setVolumeLimit(const int value);
+
+    bool getMonitorClaude() const { return m_monitorClaude; }
+    void setMonitorClaude(const bool value);
+
+    bool getMonitorInput() const { return m_monitorInput; }
+    void setMonitorInput(const bool value);
 
     ///
 

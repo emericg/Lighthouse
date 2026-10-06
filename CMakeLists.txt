@@ -17,6 +17,8 @@ option(ENABLE_KEYBOARD_UINPUT "Virtual keyboard using UInput" ON)
 
 option(ENABLE_MBEDTLS "mbedTLS for proper crypto support" OFF)
 option(ENABLE_ZXING "QrCode generator and scanner support" ON)
+option(ENABLE_CLAUDE_MONITORING "Claude Code Plan stats" OFF)
+option(ENABLE_INPUT_MONITORING "Keyboard activity relay (bongo cat)" OFF)
 
 ################################################################################
 
@@ -67,6 +69,8 @@ set(SOURCES
     src/SettingsManager.cpp src/SettingsManager.h
     src/DatabaseManager.cpp src/DatabaseManager.h
     src/NotificationManager.cpp src/NotificationManager.h
+    src/local_monitors/ClaudeMonitor.cpp src/local_monitors/ClaudeMonitor.h
+    src/local_monitors/InputMonitor.cpp src/local_monitors/InputMonitor.h
 
     src/DeviceManager.cpp src/DeviceManager.h
     src/DeviceManager_advertisement.cpp src/DeviceManager_nearby.cpp
@@ -121,6 +125,17 @@ if(NOT IOS AND NOT ANDROID)
             src/local_controls/os_commander_logind.cpp src/local_controls/os_commander_logind.h
             src/local_controls/mpris_dbus.cpp src/local_controls/mpris_dbus.h
         )
+        if(ENABLE_INPUT_MONITORING)
+            if(INPUT_MONITOR_BACKEND STREQUAL "idlenotify")
+                set(SOURCES_DESKTOP ${SOURCES_DESKTOP}
+                    src/local_monitors/InputMonitor_idlenotify.cpp src/local_monitors/InputMonitor_idlenotify.h
+                )
+            else()
+                set(SOURCES_DESKTOP ${SOURCES_DESKTOP}
+                    src/local_monitors/InputMonitor_evdev.cpp src/local_monitors/InputMonitor_evdev.h
+                )
+            endif()
+        endif()
         if(ENABLE_VOLUME_PIPEWIRE)
             set(SOURCES_DESKTOP ${SOURCES_DESKTOP}
                 src/local_controls/volume_pipewire.cpp src/local_controls/volume_pipewire.h
@@ -246,6 +261,46 @@ if(NOT IOS AND NOT ANDROID)
     # for proper systray and menubar support
     find_package(Qt6 REQUIRED COMPONENTS Widgets)
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets)
+
+    if(ENABLE_CLAUDE_MONITORING)
+        target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_CLAUDE_MONITORING)
+    endif()
+
+    if(ENABLE_INPUT_MONITORING AND LINUX)
+        set(INPUT_MONITOR_BACKEND "evdev" CACHE STRING "Linux activity backend: evdev (keyboard only, needs the input group) or idlenotify (Wayland ext-idle-notify-v1, any input, no permission)")
+        set_property(CACHE INPUT_MONITOR_BACKEND PROPERTY STRINGS evdev idlenotify)
+
+        if(INPUT_MONITOR_BACKEND STREQUAL "idlenotify")
+            message(STATUS "[INPUT] activity backend         = ext-idle-notify-v1")
+            target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_INPUT_IDLENOTIFY)
+
+            find_package(PkgConfig REQUIRED)
+            pkg_check_modules(WAYLAND_CLIENT REQUIRED IMPORTED_TARGET wayland-client)
+            pkg_check_modules(WAYLAND_PROTOCOLS REQUIRED wayland-protocols>=1.27)
+            pkg_get_variable(WAYLAND_PROTOCOLS_DIR wayland-protocols pkgdatadir)
+            pkg_get_variable(WAYLAND_SCANNER wayland-scanner wayland_scanner)
+
+            set(idle_xml "${WAYLAND_PROTOCOLS_DIR}/staging/ext-idle-notify/ext-idle-notify-v1.xml")
+            set(idle_dir "${CMAKE_CURRENT_BINARY_DIR}/wayland")
+            add_custom_command(
+                OUTPUT ${idle_dir}/ext-idle-notify-v1-client-protocol.h ${idle_dir}/ext-idle-notify-v1-protocol.c
+                COMMAND ${CMAKE_COMMAND} -E make_directory ${idle_dir}
+                COMMAND ${WAYLAND_SCANNER} client-header ${idle_xml} ${idle_dir}/ext-idle-notify-v1-client-protocol.h
+                COMMAND ${WAYLAND_SCANNER} private-code ${idle_xml} ${idle_dir}/ext-idle-notify-v1-protocol.c
+                DEPENDS ${idle_xml}
+                VERBATIM
+            )
+            target_sources(${PROJECT_NAME} PRIVATE
+                ${idle_dir}/ext-idle-notify-v1-client-protocol.h
+                ${idle_dir}/ext-idle-notify-v1-protocol.c
+            )
+            target_include_directories(${PROJECT_NAME} PRIVATE ${idle_dir})
+            target_link_libraries(${PROJECT_NAME} PRIVATE PkgConfig::WAYLAND_CLIENT)
+        else()
+            message(STATUS "[INPUT] activity backend         = evdev")
+            target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_INPUT_EVDEV)
+        endif()
+    endif()
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")

@@ -205,6 +205,10 @@ class NetworkServer : public QObject
 
     void sendVolumeStateTo(Client *client);
 
+    void sendClaudeStateTo(Client *client);
+
+    void sendTypingStateTo(Client *client);
+
     void sendMediaStateTo(Client *client);
     void sendMediaMetadataTo(Client *client);
     void sendMediaArtTo(Client *client);
@@ -235,6 +239,9 @@ private slots:
     void sendVolumeState();
     void sendMediaState();
     void sendMediaMetadata();
+    void sendClaudeState();
+    void sendTypingState();
+    void updateInputMonitor();      //!< open the input devices only when enabled and someone is connected
 
 public:
     explicit NetworkServer(QObject *parent = nullptr);

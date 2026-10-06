@@ -53,6 +53,17 @@ class NetworkClient: public QObject
     Q_PROPERTY(qint64 metaDuration READ getMetaDuration NOTIFY mediaStateChanged)
     Q_PROPERTY(float position READ getPosition NOTIFY mediaStateChanged)
 
+    Q_PROPERTY(int claudeState READ getClaudeState NOTIFY claudeStateChanged)
+    Q_PROPERTY(double claudeFiveHourPercent READ getClaudeFiveHourPercent NOTIFY claudeStateChanged)
+    Q_PROPERTY(int claudeFiveHourRemaining READ getClaudeFiveHourRemaining NOTIFY claudeCountdownChanged)
+    Q_PROPERTY(double claudeSevenDayPercent READ getClaudeSevenDayPercent NOTIFY claudeStateChanged)
+    Q_PROPERTY(int claudeSevenDayRemaining READ getClaudeSevenDayRemaining NOTIFY claudeCountdownChanged)
+    Q_PROPERTY(bool claudeProbeAvailable READ isClaudeProbeAvailable NOTIFY claudeStateChanged)
+    Q_PROPERTY(int claudeProbeState READ getClaudeProbeState NOTIFY claudeStateChanged)
+
+    Q_PROPERTY(bool typingAvailable READ isTypingAvailable NOTIFY typingStateChanged)
+    Q_PROPERTY(bool typing READ isTyping NOTIFY typingStateChanged)
+
     QTcpSocket *m_tcpSocket = nullptr;
     QDataStream m_dataInput;
 
@@ -76,6 +87,22 @@ class NetworkClient: public QObject
     QImage m_artImage;
     int m_artSeq = 0;               //!< bumped on each new artwork so QML doesn't serve a cached image
 
+    int m_claudeState = 0;              //!< ClaudeMonitor::CaptureNone
+    double m_claudeFiveHourPercent = -1.0;
+    double m_claudeSevenDayPercent = -1.0;
+    bool m_claudeProbeAvailable = false;    //!< the server can probe its plan limits
+    int m_claudeProbeState = 0;             //!< ClaudeMonitor::ProbeNone
+
+    // the desktop only relays the limits when they actually change, so the reset
+    // countdowns are ticked down locally, on our own clock
+    qint64 m_claudeFiveHourResetMs = -1;    //!< monotonic deadline, -1 if unknown
+    qint64 m_claudeSevenDayResetMs = -1;
+    QElapsedTimer m_claudeClock;
+    QTimer *m_claudeTimer = nullptr;
+
+    bool m_typingAvailable = false;     //!< the server can see its keyboards
+    bool m_typing = false;
+
     qint64 m_position_us = -1;
     qint64 m_duration_us = 0;
     float m_rate = 1.f;
@@ -92,6 +119,14 @@ class NetworkClient: public QObject
     void parseMediaState(const QString &payload);
     void parseMediaMetadata(const QString &payload);
     void parseMediaArt(const QString &payload);
+    void parseClaudeState(const QString &payload);
+    void parseTypingState(const QString &payload);
+
+    //! Seconds left before a relayed deadline, or -1 when that window is unknown
+    int claudeRemaining(qint64 deadlineMs) const {
+        if (deadlineMs < 0 || !m_claudeClock.isValid()) return -1;
+        return static_cast<int>(qMax(qint64(0), (deadlineMs - m_claudeClock.elapsed() + 999) / 1000));
+    }
 
 private slots:
     void tickPosition();            //!< local interpolation of the playback position while playing
@@ -106,6 +141,9 @@ signals:
     void mediaStateChanged();
     void mediaMetadataChanged();
     void mediaArtChanged();
+    void claudeStateChanged();
+    void claudeCountdownChanged();
+    void typingStateChanged();
 
 public:
     explicit NetworkClient(QObject *parent = nullptr);
@@ -138,6 +176,22 @@ public:
         if (m_duration_us <= 0 || m_position_us < 0) return -1.f;
         return qBound(0.f, float(double(m_position_us) / double(m_duration_us) * 100.0), 100.f);
     }
+
+    ////
+
+    int getClaudeState() const { return m_claudeState; }
+
+    double getClaudeFiveHourPercent() const { return m_claudeFiveHourPercent; }
+    int getClaudeFiveHourRemaining() const { return claudeRemaining(m_claudeFiveHourResetMs); }
+
+    double getClaudeSevenDayPercent() const { return m_claudeSevenDayPercent; }
+    int getClaudeSevenDayRemaining() const { return claudeRemaining(m_claudeSevenDayResetMs); }
+
+    bool isClaudeProbeAvailable() const { return m_claudeProbeAvailable; }
+    int getClaudeProbeState() const { return m_claudeProbeState; }
+
+    bool isTypingAvailable() const { return m_typingAvailable; }
+    bool isTyping() const { return m_typing; }
 
 public slots:
     void connectToServer();
@@ -174,6 +228,12 @@ public slots:
     void volume_up();
     void volume_set(int pct);   //!< set an absolute level, pct in [0 ; 100]
     void volume_get();          //!< request the current desktop volume state
+
+    /*!
+     * \brief Ask the server to refresh its Claude Code plan limits through a probe.
+     * \note The server ignores it while its limits are fresh, a probe consumes plan quota.
+     */
+    void claude_probe();
 };
 
 /* ************************************************************************** */

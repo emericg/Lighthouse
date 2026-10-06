@@ -624,6 +624,143 @@ Loader {
                     }
                 }
 
+                ////////
+
+                Item { // element_monitorClaude
+                    anchors.left: parent.left
+                    anchors.leftMargin: contentColumn.paddingLeft
+                    anchors.right: parent.right
+                    anchors.rightMargin: contentColumn.paddingRight
+                    height: Theme.componentHeight
+
+                    visible: isDesktop && ClaudeMonitor.supported
+
+                    IconSvg {
+                        anchors.left: parent.left
+                        anchors.leftMargin: contentColumn.padIcon
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        width: 24
+                        height: 24
+                        color: Theme.colorIcon
+                        source: "qrc:/IconLibrary/material-symbols/speed.svg"
+                    }
+
+                    Text {
+                        anchors.left: parent.left
+                        anchors.leftMargin: contentColumn.padText
+                        anchors.right: switch_monitorClaude.left
+                        anchors.rightMargin: Theme.componentMargin
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        text: qsTr("Claude Code plan limits")
+                        textFormat: Text.PlainText
+                        wrapMode: Text.WordWrap
+                        font.pixelSize: Theme.fontSizeContent
+                        color: Theme.colorText
+                        verticalAlignment: Text.AlignVCenter
+                    }
+
+                    SwitchThemed {
+                        id: switch_monitorClaude
+                        anchors.right: parent.right
+                        anchors.rightMargin: 8
+                        anchors.verticalCenter: parent.verticalCenter
+                        z: 1
+
+                        checked: SettingsManager.monitorClaude
+                        onClicked: SettingsManager.monitorClaude = checked
+                    }
+                }
+                Text { // legend_monitorClaude
+                    anchors.left: parent.left
+                    anchors.leftMargin: contentColumn.paddingLeft + contentColumn.padText
+                    anchors.right: parent.right
+                    anchors.rightMargin: contentColumn.paddingRight + Theme.componentMargin
+
+                    topPadding: -12
+                    bottomPadding: 12
+                    visible: isDesktop && ClaudeMonitor.supported
+
+                    text: SettingsManager.monitorClaude ?
+                              qsTr("Session and weekly usage are shown here, and relayed to connected remotes.") :
+                              qsTr("Claude Code usage is not monitored.")
+                    textFormat: Text.PlainText
+                    wrapMode: Text.WordWrap
+                    color: Theme.colorSubText
+                    font.pixelSize: Theme.fontSizeContentSmall
+                }
+
+                ////////
+
+                Item { // element_monitorInput
+                    anchors.left: parent.left
+                    anchors.leftMargin: contentColumn.paddingLeft
+                    anchors.right: parent.right
+                    anchors.rightMargin: contentColumn.paddingRight
+                    height: Theme.componentHeight
+
+                    visible: isDesktop && InputMonitor.backend !== InputMonitor.BackendNone
+
+                    IconSvg {
+                        anchors.left: parent.left
+                        anchors.leftMargin: contentColumn.padIcon
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        width: 24
+                        height: 24
+                        color: Theme.colorIcon
+                        source: "qrc:/IconLibrary/material-symbols/hardware/keyboard.svg"
+                    }
+
+                    Text {
+                        anchors.left: parent.left
+                        anchors.leftMargin: contentColumn.padText
+                        anchors.right: switch_monitorInput.left
+                        anchors.rightMargin: Theme.componentMargin
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        text: qsTr("Bongo cat")
+                        textFormat: Text.PlainText
+                        wrapMode: Text.WordWrap
+                        font.pixelSize: Theme.fontSizeContent
+                        color: Theme.colorText
+                        verticalAlignment: Text.AlignVCenter
+                    }
+
+                    SwitchThemed {
+                        id: switch_monitorInput
+                        anchors.right: parent.right
+                        anchors.rightMargin: 8
+                        anchors.verticalCenter: parent.verticalCenter
+                        z: 1
+
+                        checked: SettingsManager.monitorInput
+                        onClicked: SettingsManager.monitorInput = checked
+                    }
+                }
+                Text { // legend_monitorInput
+                    anchors.left: parent.left
+                    anchors.leftMargin: contentColumn.paddingLeft + contentColumn.padText
+                    anchors.right: parent.right
+                    anchors.rightMargin: contentColumn.paddingRight + Theme.componentMargin
+
+                    topPadding: -12
+                    bottomPadding: 12
+                    visible: isDesktop && InputMonitor.backend !== InputMonitor.BackendNone
+
+                    text: {
+                        if (!SettingsManager.monitorInput) return qsTr("Typing activity is not relayed.")
+                        if (InputMonitor.backend === InputMonitor.BackendIdleNotify)
+                            return qsTr("Connected remotes are told when you are active (keyboard or mouse), never what you do.")
+                        return qsTr("Connected remotes are told when you are typing, never what you type. Requires read access to the input devices (the 'input' group).")
+                    }
+                    textFormat: Text.PlainText
+                    wrapMode: Text.WordWrap
+                    color: Theme.colorSubText
+                    font.pixelSize: Theme.fontSizeContentSmall
+                }
+
                 ////////////////
 
                 ListTitle {

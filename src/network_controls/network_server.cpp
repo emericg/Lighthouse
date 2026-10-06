@@ -23,6 +23,8 @@
 #include "SettingsManager.h"
 #include "local_controls/local_controls.h"
 #include "local_controls/local_actions.h"
+#include "local_monitors/ClaudeMonitor.h"
+#include "local_monitors/InputMonitor.h"
 
 #include <QtCore>
 #include <QtNetwork>
@@ -47,6 +49,22 @@ NetworkServer::NetworkServer(QObject *parent) : QObject(parent)
     // forward desktop media playback/metadata changes to the connected clients
     connect(ctrls, &LocalControls::mediaChanged, this, &NetworkServer::sendMediaState);
     connect(ctrls, &LocalControls::mediaMetadataChanged, this, &NetworkServer::sendMediaMetadata);
+
+    // forward the Claude Code plan limits; only limitsChanged is relayed, the per second
+    // countdown is interpolated client side rather than pushed over the network
+    connect(ClaudeMonitor::getInstance(), &ClaudeMonitor::limitsChanged,
+            this, &NetworkServer::sendClaudeState);
+    connect(ClaudeMonitor::getInstance(), &ClaudeMonitor::probeChanged,
+            this, &NetworkServer::sendClaudeState);
+
+    // forward the typing activity, with the input devices only opened while
+    // the feature is turned on and a client is connected
+    InputMonitor *im = InputMonitor::getInstance();
+    connect(im, &InputMonitor::typingChanged, this, &NetworkServer::sendTypingState);
+    connect(im, &InputMonitor::availableChanged, this, &NetworkServer::sendTypingState);
+    connect(this, &NetworkServer::connectionEvent, this, &NetworkServer::updateInputMonitor);
+    connect(SettingsManager::getInstance(), &SettingsManager::monitorInputChanged,
+            this, &NetworkServer::updateInputMonitor);
 
     // the media backend's initial metadata fires before we connect above, so prime the art
     // cache here for whatever is already playing (no clients yet: this just fills the cache)
@@ -447,6 +465,8 @@ void NetworkServer::handleClientHello(Client *client, const QString &cData)
         sendMediaStateTo(client);
         sendMediaMetadataTo(client);
         sendMediaArtTo(client);
+        sendClaudeStateTo(client);
+    sendTypingStateTo(client);
         Q_EMIT clientsChanged();
         return;
     }
@@ -487,6 +507,8 @@ void NetworkServer::handleClientHello(Client *client, const QString &cData)
     sendMediaStateTo(client);
     sendMediaMetadataTo(client);
     sendMediaArtTo(client);
+    sendClaudeStateTo(client);
+    sendTypingStateTo(client);
     Q_EMIT clientsChanged();
 }
 
@@ -602,6 +624,13 @@ void NetworkServer::processClientMessage(Client *client, const QString &cData)
             sendVolumeState();
         }
     }
+    else if (cData == "claude:probe")
+    {
+        // A probe consumes plan quota, so it is only honored when there is nothing fresh to show:
+        // a client repeating the command cannot burn through the quota
+        ClaudeMonitor *cm = ClaudeMonitor::getInstance();
+        if (cm->getCaptureState() != ClaudeMonitor::CaptureLive) cm->probe();
+    }
 }
 
 /* ************************************************************************** */
@@ -689,6 +718,80 @@ void NetworkServer::sendMediaArtTo(Client *client)
 {
     if (!client) return;
     client->write(mediaArtMessage());
+}
+
+void NetworkServer::sendClaudeStateTo(Client *client)
+{
+    if (!client) return;
+
+    // Compiled out: nothing to report, stay off the wire entirely.
+    // Turned off in the settings: the cleared state still goes out, so clients hide it.
+    if (!ClaudeMonitor::isSupported()) return;
+    ClaudeMonitor *cm = ClaudeMonitor::getInstance();
+
+    // Countdowns travel as seconds remaining rather than as absolute reset dates:
+    // the client ticks them down on its own clock, which cannot drift against ours.
+    // A negative percentage already means "this window is unknown", so no separate
+    // per window validity flag is carried.
+    QJsonObject fiveHour;
+    fiveHour["percent"] = cm->getFiveHourPercent();
+    fiveHour["remaining"] = cm->getFiveHourRemaining();
+
+    QJsonObject sevenDay;
+    sevenDay["percent"] = cm->getSevenDayPercent();
+    sevenDay["remaining"] = cm->getSevenDayRemaining();
+
+    QJsonObject o;
+    o["state"] = cm->getCaptureState();
+    o["fiveHour"] = fiveHour;
+    o["sevenDay"] = sevenDay;
+
+    // Lets a client offer a probe, and follow its progress
+    QJsonObject probe;
+    probe["available"] = cm->isProbeAvailable();
+    probe["state"] = cm->getProbeState();
+    o["probe"] = probe;
+
+    const QByteArray json = QJsonDocument(o).toJson(QJsonDocument::Compact);
+    client->write(QStringLiteral("claude:state:") + QString::fromUtf8(json));
+}
+
+void NetworkServer::sendClaudeState()
+{
+    const bool secure = SettingsManager::getInstance()->getNetCtrlSecure();
+
+    for (Client *c : std::as_const(m_clients))
+    {
+        if (!secure || c->m_authenticated) sendClaudeStateTo(c);
+    }
+}
+
+void NetworkServer::sendTypingStateTo(Client *client)
+{
+    if (!client) return;
+
+    InputMonitor *im = InputMonitor::getInstance();
+
+    // typing:state:<available>;<typing>
+    client->write(QStringLiteral("typing:state:%1;%2")
+                  .arg(im->isAvailable() ? 1 : 0)
+                  .arg(im->isTyping() ? 1 : 0));
+}
+
+void NetworkServer::updateInputMonitor()
+{
+    const bool wanted = SettingsManager::getInstance()->getMonitorInput() && areClientsConnected();
+    InputMonitor::getInstance()->setActive(wanted);
+}
+
+void NetworkServer::sendTypingState()
+{
+    const bool secure = SettingsManager::getInstance()->getNetCtrlSecure();
+
+    for (Client *c : std::as_const(m_clients))
+    {
+        if (!secure || c->m_authenticated) sendTypingStateTo(c);
+    }
 }
 
 /* ************************************************************************** */
