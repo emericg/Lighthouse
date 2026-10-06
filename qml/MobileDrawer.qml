@@ -2,31 +2,12 @@ import QtQuick
 import QtQuick.Controls
 
 import ComponentLibrary
+import AppUtils
 
-Drawer {
-    width: (appWindow.screenOrientation === Qt.PortraitOrientation || appWindow.width < 480)
-            ? 0.8 * appWindow.width : 0.5 * appWindow.width
-    height: appWindow.height
-
-    topPadding: 0
-    bottomPadding: 0
-
-    ////////////////////////////////////////////////////////////////////////////
-
-    background: Rectangle {
-        color: Theme.colorBackground
-
-        Rectangle { // left border
-            x: parent.width
-            width: 1
-            height: parent.height
-            color: Theme.colorSeparator
-        }
-    }
-
-    ////////////////////////////////////////////////////////////////////////////
-
+DrawerThemed {
     contentItem: Item {
+
+        ////////////////////////////////////////////////////////////////////////
 
         Column {
             id: headerColumn
@@ -57,11 +38,12 @@ Drawer {
 
                 IconSvg {
                     id: imageHeader
+                    anchors.left: parent.left
+                    anchors.leftMargin: 12
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenterOffset: 4
                     width: 48
                     height: 48
-                    anchors.left: parent.left
-                    anchors.leftMargin: 8
-                    anchors.verticalCenter: parent.verticalCenter
 
                     source: "qrc:/assets/icons/desk-lamp-logo.svg"
                     //sourceSize: Qt.size(width, height)
@@ -70,21 +52,22 @@ Drawer {
                 Text {
                     id: textHeader
                     anchors.left: imageHeader.right
-                    anchors.leftMargin: 8
+                    anchors.leftMargin: 12
                     anchors.verticalCenter: parent.verticalCenter
-                    anchors.verticalCenterOffset: 2
+                    anchors.verticalCenterOffset: 6
 
                     text: "Lighthouse"
+                    textFormat: Text.PlainText
                     color: Theme.colorText
                     font.bold: true
-                    font.pixelSize: Theme.fontSizeHeader
+                    font.pixelSize: Theme.fontSizeTitle
                 }
             }
 
             ////////
         }
 
-        ////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
 
         Flickable {
             anchors.top: headerColumn.bottom
@@ -99,6 +82,9 @@ Drawer {
                 id: contentColumn
                 anchors.left: parent.left
                 anchors.right: parent.right
+
+                topPadding: 0
+                bottomPadding: 0
 
                 ////////
 
@@ -118,7 +104,7 @@ Drawer {
                 }
 
                 DrawerItem {
-                    highlighted: (appContent.state === "ScreenSettings")
+                    highlighted: (appContent.state === "ScreenSettings" || appContent.state === "ScreenSettingsAdvanced")
                     text: qsTr("Settings")
                     source: "qrc:/IconLibrary/material-icons/duotone/tune.svg"
 
@@ -129,8 +115,7 @@ Drawer {
                 }
 
                 DrawerItem {
-                    highlighted: (appContent.state === "ScreenAbout" ||
-                                  appContent.state === "ScreenAboutPermissions")
+                    highlighted: (appContent.state === "ScreenAbout" || appContent.state === "ScreenAboutPermissions")
                     text: qsTr("About")
                     source: "qrc:/IconLibrary/material-icons/duotone/info.svg"
 
@@ -158,7 +143,7 @@ Drawer {
                         return txt
                     }
 
-                    property var sortmode: {
+                    property int sortmode: {
                         if (SettingsManager.orderBy === "model") {
                             return 1
                         } else { // if (SettingsManager.orderBy === "location") {

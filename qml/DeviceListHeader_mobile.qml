@@ -91,8 +91,8 @@ Column {
                 width: 72
                 height: 72
                 radius: 4
-                clip: true
 
+                clip: false
                 color: Theme.colorSeparator
 
                 Image {
@@ -101,7 +101,6 @@ Column {
                     visible: (networkClient.metaThumbnail !== "")
                     source: networkClient.metaThumbnail
                     fillMode: Image.PreserveAspectCrop
-                    asynchronous: true
                 }
 
                 IconSvg { // no artwork with this track
@@ -112,6 +111,30 @@ Column {
                     visible: (networkClient.metaThumbnail === "")
                     color: Theme.colorSubText
                     source: "qrc:/IconLibrary/material-symbols/media/album.svg"
+                }
+
+                Rectangle { // playback status
+                    anchors.left: parent.left
+                    anchors.leftMargin: -4
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: -4
+                    width: 24
+                    height: 24
+                    radius: width / 2
+
+                    visible: (networkClient.playbackStatus !== "")
+                    color: (networkClient.playbackStatus === "Playing") ? Theme.colorPrimary : Theme.colorComponentBorder
+
+                    IconSvg {
+                        anchors.centerIn: parent
+                        width: 16
+                        height: 16
+
+                        color: "white"
+                        source: (networkClient.playbackStatus === "Playing") ?
+                                    "qrc:/IconLibrary/material-symbols/media/play_arrow-fill.svg" :
+                                    "qrc:/IconLibrary/material-symbols/media/pause-fill.svg"
+                    }
                 }
             }
 
@@ -180,6 +203,12 @@ Column {
         readonly property int fiveHourRemaining: relayed ? networkClient.claudeFiveHourRemaining : -1
         readonly property real sevenDayPercent: relayed ? networkClient.claudeSevenDayPercent : -1
 
+        readonly property int probeState: relayed ? networkClient.claudeProbeState : ClaudeMonitor.ProbeNone
+
+        readonly property bool canProbe: relayed && networkClient.claudeProbeAvailable &&
+                                         probeState !== ClaudeMonitor.ProbeRunning &&
+                                         claudeState !== ClaudeMonitor.CaptureLive
+
         function resetString(seconds) {
             if (seconds < 0) return ""
 
@@ -201,6 +230,16 @@ Column {
         }
 
         ////////
+
+        MouseArea {
+            anchors.fill: parent
+            enabled: claudeWidget.canProbe
+
+            onPressAndHold: {
+                UtilsOS.hapticFeedback()
+                networkClient.claude_probe()
+            }
+        }
 
         Column {
             anchors.left: parent.left
@@ -232,12 +271,21 @@ Column {
                     anchors.verticalCenter: parent.verticalCenter
 
                     text: {
+                        if (claudeWidget.probeState === ClaudeMonitor.ProbeRunning) return qsTr("probing…")
+                        if (claudeWidget.canProbe) {
+                            if (claudeWidget.probeState === ClaudeMonitor.ProbeAuthExpired) return qsTr("log in to Claude Code again")
+                            if (claudeWidget.probeState === ClaudeMonitor.ProbeFailed) return qsTr("probe failed, hold to retry")
+                            return qsTr("stale, hold to probe")
+                        }
                         if (claudeWidget.claudeState === ClaudeMonitor.CaptureStale) return qsTr("stale")
                         return claudeWidget.resetString(claudeWidget.fiveHourRemaining)
                     }
                     textFormat: Text.PlainText
-                    color: (claudeWidget.claudeState === ClaudeMonitor.CaptureStale)
-                           ? Theme.colorOrange : Theme.colorSubText
+                    color: {
+                        if (claudeWidget.probeState === ClaudeMonitor.ProbeRunning) return Theme.colorSubText
+                        if (claudeWidget.claudeState === ClaudeMonitor.CaptureStale) return Theme.colorOrange
+                        return Theme.colorSubText
+                    }
                     font.pixelSize: Theme.fontSizeContent
                     horizontalAlignment: Text.AlignRight
                     elide: Text.ElideRight
@@ -254,9 +302,11 @@ Column {
                 to: 100
                 unit: "%"
                 value: Math.max(0, claudeWidget.fiveHourPercent)
+                enabled: false
 
                 //legend: "5 hour session window"
                 colorForeground: claudeWidget.usageColor(claudeWidget.fiveHourPercent)
+                colorForegroundDisabled: colorForeground
             }
 
             SliderValueSolid { // 7 day window
@@ -269,9 +319,11 @@ Column {
                 to: 100
                 unit: "%"
                 value: Math.max(0, claudeWidget.sevenDayPercent)
+                enabled: false
 
                 //legend: "7 day window"
                 colorForeground: claudeWidget.usageColor(claudeWidget.sevenDayPercent)
+                colorForegroundDisabled: colorForeground
             }
         }
 

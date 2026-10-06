@@ -785,7 +785,9 @@ Loader {
                     anchors.leftMargin: contentColumn.paddingLeft
                     anchors.right: parent.right
                     anchors.rightMargin: contentColumn.paddingRight
+
                     height: Theme.componentHeight
+                    visible: isDesktop
 
                     IconSvg {
                         anchors.left: parent.left

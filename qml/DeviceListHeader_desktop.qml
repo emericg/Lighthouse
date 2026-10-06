@@ -222,14 +222,21 @@ Column {
         Rectangle { // CLAUDE CODE
             id: claudeWidget
             width: singleColumn ? parent.width : 420
-            height: visible ? 128 : 0
+            height: visible ? (ClaudeMonitor.cacheValid ? 164 : 128) : 0
             radius: 4
 
             color: Theme.colorDeviceWidget
             border.width: 2
             border.color: singleColumn ? "transparent" : Theme.colorSeparator
 
-            visible: isDesktop && ClaudeMonitor.enabled && ClaudeMonitor.available
+            visible: isDesktop && ClaudeMonitor.enabled && (ClaudeMonitor.available || ClaudeMonitor.probeAvailable)
+
+            // Probing costs a little quota, so it is only offered when there is nothing fresh to show
+            readonly property bool canProbe: ClaudeMonitor.probeAvailable &&
+                                             ClaudeMonitor.probeState !== ClaudeMonitor.ProbeRunning &&
+                                             (!ClaudeMonitor.available || ClaudeMonitor.stale)
+            readonly property bool canInstallHook: ClaudeMonitor.enabled &&
+                                                   !ClaudeMonitor.hookInstalled && !ClaudeMonitor.hookForeign
 
             function resetString(seconds) {
                 if (seconds < 0) return ""
@@ -253,6 +260,24 @@ Column {
 
             function usageString(valid, percent) {
                 return valid ? Math.round(percent) + "%" : "–"
+            }
+
+            function cacheString(seconds) {
+                if (seconds < 0) return ""
+                if (seconds === 0) return qsTr("cold", "prompt cache expired")
+
+                // Time left before the prompt cache goes cold, as "1:02:05" / "4:32"
+                var h = Math.floor(seconds / 3600)
+                var m = Math.floor((seconds % 3600) / 60)
+                var s = seconds % 60
+                var mmss = (h > 0 && m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s
+                return (h > 0) ? h + ":" + mmss : mmss
+            }
+
+            function cacheColor(seconds, ttl) {
+                if (seconds <= 0) return Theme.colorSeparator
+                if (ttl > 0 && seconds < ttl * 0.2) return Theme.colorOrange
+                return Theme.colorGreen
             }
 
             Column {
@@ -285,16 +310,24 @@ Column {
                         anchors.verticalCenter: parent.verticalCenter
 
                         text: {
-                            if (ClaudeMonitor.hookForeign) return qsTr("another statusline is configured")
-                            if (!ClaudeMonitor.hookInstalled) return qsTr("set up the statusline hook")
+                            if (ClaudeMonitor.probeState === ClaudeMonitor.ProbeRunning) return qsTr("probing…")
+                            if (ClaudeMonitor.probeState === ClaudeMonitor.ProbeAuthExpired && claudeWidget.canProbe)
+                                return qsTr("log in to Claude Code again, then retry")
+                            if (ClaudeMonitor.probeState === ClaudeMonitor.ProbeFailed && claudeWidget.canProbe)
+                                return qsTr("probe failed, retry")
+                            if (claudeWidget.canInstallHook) return qsTr("set up the statusline hook")
+                            if (claudeWidget.canProbe) return ClaudeMonitor.available ? qsTr("stale, probe now") : qsTr("probe now")
+                            if (ClaudeMonitor.hookForeign && !ClaudeMonitor.available) return qsTr("another statusline is configured")
                             if (!ClaudeMonitor.available) return qsTr("no statusline capture")
                             if (ClaudeMonitor.stale) return qsTr("stale")
+                            if (ClaudeMonitor.source === ClaudeMonitor.SourceProbe) return qsTr("probed")
                             return ClaudeMonitor.modelName
                         }
                         textFormat: Text.PlainText
                         color: {
-                            if (ClaudeMonitor.hookForeign) return Theme.colorSubText
-                            if (!ClaudeMonitor.hookInstalled) return Theme.colorPrimary
+                            if (ClaudeMonitor.probeState === ClaudeMonitor.ProbeRunning) return Theme.colorSubText
+                            if (ClaudeMonitor.probeState === ClaudeMonitor.ProbeAuthExpired && claudeWidget.canProbe) return Theme.colorOrange
+                            if (claudeWidget.canInstallHook || claudeWidget.canProbe) return Theme.colorPrimary
                             return ClaudeMonitor.stale ? Theme.colorOrange : Theme.colorSubText
                         }
                         font.pixelSize: 13
@@ -302,11 +335,21 @@ Column {
                         elide: Text.ElideRight
                     }
 
-                    MouseArea { // click to install hook
+                    MouseArea { // click to install the hook, or to probe
                         anchors.fill: parent
-                        enabled: ClaudeMonitor.enabled && !ClaudeMonitor.hookInstalled && !ClaudeMonitor.hookForeign
+                        enabled: claudeWidget.canInstallHook || claudeWidget.canProbe
+                        hoverEnabled: enabled
                         cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                        onClicked: ClaudeMonitor.installStatuslineHook()
+
+                        ToolTip.visible: containsMouse && !claudeWidget.canInstallHook
+                        ToolTip.delay: 500
+                        ToolTip.text: qsTr("Sends one small request through Claude Code to read the plan limits.\n" +
+                                           "It uses a little of the quota, and starts a 5 hour window if none is active.")
+
+                        onClicked: {
+                            if (claudeWidget.canInstallHook) ClaudeMonitor.installStatuslineHook()
+                            else ClaudeMonitor.probe()
+                        }
                     }
                 }
 
@@ -346,9 +389,11 @@ Column {
                         to: 100
                         unit: "%"
                         value: Math.max(0, ClaudeMonitor.fiveHourPercent)
+                        enabled: false
 
                         //legend: "5 hour session window"
                         colorForeground: claudeWidget.usageColor(ClaudeMonitor.fiveHourPercent)
+                        colorForegroundDisabled: colorForeground
                     }
                 }
 
@@ -388,9 +433,55 @@ Column {
                         to: 100
                         unit: "%"
                         value: Math.max(0, ClaudeMonitor.sevenDayPercent)
+                        enabled: false
 
                         //legend: "7 day window"
                         colorForeground: claudeWidget.usageColor(ClaudeMonitor.sevenDayPercent)
+                        colorForegroundDisabled: colorForeground
+                    }
+                }
+
+                Item { // prompt cache of the captured session
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    height: 28
+                    visible: ClaudeMonitor.cacheValid
+
+                    Column {
+                        id: claudeCacheLabel
+                        width: 62
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        Text {
+                            text: qsTr("Cache")
+                            textFormat: Text.PlainText
+                            color: Theme.colorText
+                            font.pixelSize: 14
+                        }
+                        Text {
+                            text: claudeWidget.cacheString(ClaudeMonitor.cacheRemaining)
+                            textFormat: Text.PlainText
+                            color: Theme.colorSubText
+                            font.pixelSize: 11
+                        }
+                    }
+
+                    SliderValueSolid { // time left before the cache goes cold
+                        anchors.left: claudeCacheLabel.right
+                        anchors.leftMargin: 8
+                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        height: 20
+                        hhh: 16
+
+                        from: 0
+                        to: Math.max(1, ClaudeMonitor.cacheTtl, ClaudeMonitor.cacheRemaining)
+                        value: Math.max(0, ClaudeMonitor.cacheRemaining)
+                        showvalue: false
+                        enabled: false
+
+                        colorForeground: claudeWidget.cacheColor(ClaudeMonitor.cacheRemaining, ClaudeMonitor.cacheTtl)
+                        colorForegroundDisabled: colorForeground
                     }
                 }
             }

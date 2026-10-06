@@ -404,6 +404,12 @@ Loader {
 
                         SelectorMenuColorful {
                             id: btnLightMode
+
+                            //anchors.left: parent.left
+                            //anchors.right: parent.right
+                            //anchors.verticalCenter: parent.verticalCenter
+                            //fullWidth: true
+
                             anchors.centerIn: parent
                             height: 36
 
@@ -509,7 +515,39 @@ Loader {
 
                     ////////
 
-                    Item { width: 16; height: 16; } // spacer
+                    Item {
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        height: Theme.componentHeight
+
+                        // only the MiPow bulbs mix a white LED with their colors
+                        visible: (btnLightMode.currentSelection === 4 &&
+                                  currentDevice && currentDevice.brightMode !== undefined)
+
+                        Text {
+                            anchors.left: parent.left
+                            anchors.leftMargin: 8
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            text: qsTr("bright mode")
+                            textFormat: Text.PlainText
+                            font.pixelSize: Theme.componentFontSize
+                            color: Theme.colorText
+                        }
+
+                        SwitchThemed {
+                            id: switch_brightMode
+                            anchors.right: parent.right
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            checked: (currentDevice && currentDevice.brightMode === true)
+                            onClicked: currentDevice.brightMode = checked
+                        }
+                    }
+
+                    ////////
+
+                    Item { width: 12; height: 12; } // spacer
 
                     ////////
 
