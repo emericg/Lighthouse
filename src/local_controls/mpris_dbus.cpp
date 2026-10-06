@@ -22,11 +22,15 @@
 #include "mpris_dbus.h"
 #include "local_actions.h"
 
+#include <QTimer>
+
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
 #include <QDBusConnection>
 #include <QDBusConnectionInterface>
 #include <QDBusInterface>
 #include <QDBusReply>
+#include <QDBusMessage>
+#include <QDBusServiceWatcher>
 #endif
 
 /* ************************************************************************** */
@@ -59,6 +63,32 @@ Media_MPRIS::Media_MPRIS()
         qWarning() << "DBus is not connected?";
     }
 
+    // poll Position while a player is playing (MPRIS never pushes it)
+    m_positionTimer = new QTimer(this);
+    m_positionTimer->setInterval(1000);
+    connect(m_positionTimer, &QTimer::timeout, this, &Media_MPRIS::refreshPosition);
+
+    // re-select when a player appears, disappears, or is restarted
+    m_serviceWatcher = new QDBusServiceWatcher(mprisInterface_root + QLatin1Char('*'),
+                                               QDBusConnection::sessionBus(),
+                                               QDBusServiceWatcher::WatchForOwnerChange,
+                                               this);
+    connect(m_serviceWatcher, &QDBusServiceWatcher::serviceOwnerChanged, this, [this]() {
+        select_player();
+    });
+
+    // listen to the Player properties of every MPRIS player, not only the selected one
+    QDBusConnection::sessionBus().connect(
+        QString(),
+        mprisObjectPath,
+        freedesktopInterface_properties,
+        QStringLiteral("PropertiesChanged"),
+        QStringList{mprisInterface_player},
+        QStringLiteral("sa{sv}as"),
+        this,
+        SLOT(onPropertiesChanged(QString, QVariantMap, QStringList, QDBusMessage))
+    );
+
     select_player();
 }
 
@@ -71,30 +101,52 @@ Media_MPRIS::~Media_MPRIS()
 
 bool Media_MPRIS::select_player()
 {
-    QString player_was = m_player_selected;
+    return selectPlayer(QString());
+}
+
+bool Media_MPRIS::selectPlayer(const QString &preferredOwner)
+{
+    QDBusConnectionInterface *bus = QDBusConnection::sessionBus().interface();
+    const QString player_was = m_player_selected;
+    const QString owner_was = m_player_owner;
     QString player_selected;
     QStringList player_registered;
 
-    QDBusReply<QStringList> reply = QDBusConnection::sessionBus().interface()->registeredServiceNames();
+    QDBusReply<QStringList> reply = bus->registeredServiceNames();
     if (reply.isValid())
     {
         const QStringList values = reply.value();
         for (const QString &player_name : values)
         {
-            if (player_name.contains("mpris"))
+            if (player_name.startsWith(mprisInterface_root + QLatin1Char('.')))
             {
                 //qDebug() << "> MPRIS player detected:" << player_name;
                 player_registered.push_back(player_name);
+            }
+        }
 
-                if (player_selected.isEmpty())
+        if (!preferredOwner.isEmpty())
+        {
+            for (const QString &player_name : std::as_const(player_registered))
+            {
+                if (bus->serviceOwner(player_name).value() == preferredOwner)
                 {
-                    QDBusInterface remoteAppPlayer(player_name, mprisObjectPath, mprisInterface_player);
-                    QString playbackStatus = remoteAppPlayer.property("PlaybackStatus").toString();
-                    if (playbackStatus == "Playing")
-                    {
-                        //qDebug() << "> MPRIS player SELECTED:" << player_name << "is playing";
-                        player_selected = player_name;
-                    }
+                    player_selected = player_name;
+                    break;
+                }
+            }
+        }
+
+        if (player_selected.isEmpty())
+        {
+            for (const QString &player_name : std::as_const(player_registered))
+            {
+                QDBusInterface remoteAppPlayer(player_name, mprisObjectPath, mprisInterface_player);
+                if (remoteAppPlayer.property("PlaybackStatus").toString() == "Playing")
+                {
+                    //qDebug() << "> MPRIS player SELECTED:" << player_name << "is playing";
+                    player_selected = player_name;
+                    break;
                 }
             }
         }
@@ -119,13 +171,30 @@ bool Media_MPRIS::select_player()
         qWarning() << "Error:" << reply.error().message();
     }
 
-    if (m_player_selected != player_selected)
+    m_player_selected = player_selected;
+    m_player_owner = player_selected.isEmpty() ? QString() : bus->serviceOwner(player_selected).value();
+
+    if (m_player_selected == player_was && m_player_owner == owner_was)
     {
-        m_player_selected = player_selected;
-        Q_EMIT playerUpdated();
+        return !m_player_selected.isEmpty();
     }
 
-    if (m_player_selected != player_was)
+    if (m_player_selected.isEmpty())
+    {
+        m_playerName.clear();
+        m_canControl = m_canPlayPause = m_canGoPrevious = m_canGoNext = m_canSeek = false;
+
+        m_metaTitle.clear();
+        m_metaArtist.clear();
+        m_metaAlbum.clear();
+        m_metaThumbnail.clear();
+        m_metaPosition = 0;
+        m_metaDuration = 0;
+        Q_EMIT metadataUpdated();
+
+        setPlaybackStatus(QString());
+    }
+    else
     {
         QDBusInterface remoteApp(m_player_selected, mprisObjectPath, mprisInterface_root);
         //bool CanQuit = remoteApp.property("CanQuit").toBool();
@@ -167,17 +236,10 @@ bool Media_MPRIS::select_player()
         // We don't use that (yet)
         //QDBusInterface remoteAppPlaylists(name, mprisObjectPath, mprisInterface_playlists);
         //QDBusInterface remoteAppTracklists(name, mprisObjectPath, mprisInterface_trackList);
-
-        // Subscribe to notifications
-        QDBusConnection::sessionBus().connect(
-            m_player_selected,
-            mprisObjectPath,
-            freedesktopInterface_properties,
-            "PropertiesChanged",
-            this,
-            SLOT(onPropertiesChanged(QString, QVariantMap, QStringList))
-        );
     }
+
+    // emitted last, so listeners read the new player's name and capabilities
+    Q_EMIT playerUpdated();
 
     return !m_player_selected.isEmpty();
 }
@@ -186,14 +248,30 @@ bool Media_MPRIS::select_player()
 
 void Media_MPRIS::onPropertiesChanged(const QString &interfaceName,
                                       const QVariantMap &changedProps,
-                                      const QStringList &invalidatedProps)
+                                      const QStringList &invalidatedProps,
+                                      const QDBusMessage &msg)
 {
-    //qDebug() << "Media_MPRIS::onPropertiesChanged()" << changedProps;
+    //qDebug() << "Media_MPRIS::onPropertiesChanged()" << msg.service() << changedProps;
     Q_UNUSED(invalidatedProps);
+
+    //changedProps >>  QMap(("PlaybackStatus", QVariant(QString, "Playing")))
+    //changedProps >>  QMap(("Metadata", QVariant(QDBusArgument, )))
+    //changedProps >>  QMap(("Rate", QVariant(double, 0)))
+    //changedProps >>  QMap(("Volume", QVariant(double, 0.426673)))
 
     if (interfaceName != "org.mpris.MediaPlayer2.Player")
     {
         qWarning() << "Wrong MPRIS interface ?" << interfaceName;
+        return;
+    }
+
+    if (msg.service() != m_player_owner)
+    {
+        // another player started playing, follow it
+        if (changedProps.value("PlaybackStatus").toString() == "Playing")
+        {
+            selectPlayer(msg.service());
+        }
         return;
     }
 
@@ -221,6 +299,12 @@ void Media_MPRIS::onPropertiesChanged(const QString &interfaceName,
     {
         setPosition(changedProps.value("Position").toLongLong() / 60);
     }
+
+    // the selected player stopped, another one may still be playing
+    if (changedProps.contains("PlaybackStatus") && m_playbackStatus != "Playing")
+    {
+        select_player();
+    }
 }
 
 /* ************************************************************************** */
@@ -232,6 +316,31 @@ void Media_MPRIS::setPlaybackStatus(const QString &status)
         m_playbackStatus = status;
         Q_EMIT statusUpdated();
     }
+
+    // only poll Position while actually playing
+    if (m_positionTimer)
+    {
+        if (status == "Playing")
+        {
+            refreshPosition();
+            m_positionTimer->start();
+        }
+        else
+        {
+            m_positionTimer->stop();
+        }
+    }
+}
+
+void Media_MPRIS::refreshPosition()
+{
+    if (m_player_selected.isEmpty()) return;
+
+    QDBusInterface player(m_player_selected, mprisObjectPath, mprisInterface_player);
+    if (!player.isValid()) return;
+
+    const QVariant pos = player.property("Position");
+    if (pos.isValid()) setPosition_us(pos.toLongLong());
 }
 
 void Media_MPRIS::setPosition_us(int64_t pos)

@@ -28,6 +28,7 @@
 #include <QtNetwork>
 
 /* ************************************************************************** */
+/* ************************************************************************** */
 
 NetworkServer::NetworkServer(QObject *parent) : QObject(parent)
 {
@@ -43,6 +44,14 @@ NetworkServer::NetworkServer(QObject *parent) : QObject(parent)
     connect(ctrls, &LocalControls::volumeChanged, this, &NetworkServer::sendVolumeState);
     connect(ctrls, &LocalControls::muteChanged, this, &NetworkServer::sendVolumeState);
 
+    // forward desktop media playback/metadata changes to the connected clients
+    connect(ctrls, &LocalControls::mediaChanged, this, &NetworkServer::sendMediaState);
+    connect(ctrls, &LocalControls::mediaMetadataChanged, this, &NetworkServer::sendMediaMetadata);
+
+    // the media backend's initial metadata fires before we connect above, so prime the art
+    // cache here for whatever is already playing (no clients yet: this just fills the cache)
+    refreshArt(ctrls->getMediaArtUrl());
+
     SettingsManager *sm = SettingsManager::getInstance();
     // react to the server enabled being toggled
     connect(sm, &SettingsManager::netctrlChanged, this, &NetworkServer::onServerChanged);
@@ -52,6 +61,7 @@ NetworkServer::NetworkServer(QObject *parent) : QObject(parent)
     connect(sm, &SettingsManager::netctrlClientsChanged, this, &NetworkServer::loadClients);
 }
 
+/* ************************************************************************** */
 /* ************************************************************************** */
 
 QList<QObject *> NetworkServer::getClients() const
@@ -65,16 +75,7 @@ QList<QObject *> NetworkServer::getClients() const
     return out;
 }
 
-NetworkClientModel *NetworkServer::knownClientForToken(const QString &token) const
-{
-    if (token.isEmpty()) return nullptr;
-
-    for (NetworkClientModel *m : m_knownClients)
-    {
-        if (m->getToken() == token) return m;
-    }
-    return nullptr;
-}
+/* ************************************************************************** */
 
 void NetworkServer::loadClients()
 {
@@ -96,7 +97,9 @@ void NetworkServer::loadClients()
     Q_EMIT clientsChanged();
 }
 
-void NetworkServer::persistClients()
+/* ************************************************************************** */
+
+void NetworkServer::saveClients()
 {
     SettingsManager *sm = SettingsManager::getInstance();
 
@@ -111,6 +114,9 @@ void NetworkServer::persistClients()
 
     sm->saveNetCtrlClients();
 }
+
+/* ************************************************************************** */
+/* ************************************************************************** */
 
 void NetworkServer::enforceRevocations()
 {
@@ -131,10 +137,32 @@ void NetworkServer::enforceRevocations()
     }
 }
 
+Client *NetworkServer::clientForSocket(QObject *socket) const
+{
+    for (Client *c : m_clients)
+    {
+        if (c->m_connection == socket) return c;
+    }
+    return nullptr;
+}
+
+NetworkClientModel *NetworkServer::knownClientForToken(const QString &token) const
+{
+    if (token.isEmpty()) return nullptr;
+
+    for (NetworkClientModel *m : m_knownClients)
+    {
+        if (m->getToken() == token) return m;
+    }
+    return nullptr;
+}
+
+/* ************************************************************************** */
+
 void NetworkServer::onKnownClientChanged()
 {
     // a known client's enabled/name was edited (from QML) : persist + enforce
-    persistClients();
+    saveClients();
 
     // if a client was just disabled, drop its live connection
     enforceRevocations();
@@ -158,34 +186,7 @@ void NetworkServer::onServerChanged()
     else stopServer();
 }
 
-void NetworkServer::forgetClient(QObject *client)
-{
-    // forget a known client and drop its connection
-
-    NetworkClientModel *known = qobject_cast<NetworkClientModel *>(client);
-    if (!known) return;
-
-    const QString token = known->getToken();
-
-    // drop any live connection using this token
-    const QList<Client *> snapshot = m_clients;
-    for (Client *c : snapshot)
-    {
-        if (!token.isEmpty() && c->m_token == token)
-        {
-            c->write(QStringLiteral("auth:denied"));
-            if (c->m_connection) c->m_connection->close();
-        }
-    }
-
-    // delete client
-    m_knownClients.removeOne(known);
-    known->deleteLater();
-
-    persistClients();
-    Q_EMIT clientsChanged();
-}
-
+/* ************************************************************************** */
 /* ************************************************************************** */
 
 void NetworkServer::startServer()
@@ -235,6 +236,8 @@ void NetworkServer::startServer()
     Q_EMIT serverEvent();
 }
 
+/* ************************************************************************** */
+
 void NetworkServer::stopServer()
 {
     if (m_tcpServer)
@@ -264,6 +267,37 @@ void NetworkServer::stopServer()
 
 /* ************************************************************************** */
 
+void NetworkServer::forgetClient(QObject *client)
+{
+    // forget a known client and drop its connection
+
+    NetworkClientModel *known = qobject_cast<NetworkClientModel *>(client);
+    if (!known) return;
+
+    const QString token = known->getToken();
+
+    // drop any live connection using this token
+    const QList<Client *> snapshot = m_clients;
+    for (Client *c : snapshot)
+    {
+        if (!token.isEmpty() && c->m_token == token)
+        {
+            c->write(QStringLiteral("auth:denied"));
+            if (c->m_connection) c->m_connection->close();
+        }
+    }
+
+    // delete client
+    m_knownClients.removeOne(known);
+    known->deleteLater();
+
+    saveClients();
+    Q_EMIT clientsChanged();
+}
+
+/* ************************************************************************** */
+/* ************************************************************************** */
+
 void NetworkServer::newClientConnection()
 {
     QTcpSocket *conn = m_tcpServer->nextPendingConnection();
@@ -290,21 +324,14 @@ void NetworkServer::newClientConnection()
     client->write(QStringLiteral("WELCOME CLIENT"));
 }
 
-Client *NetworkServer::clientForSocket(QObject *socket) const
-{
-    for (Client *c : m_clients)
-    {
-        if (c->m_connection == socket) return c;
-    }
-    return nullptr;
-}
+/* ************************************************************************** */
 
 void NetworkServer::closeClientConnection()
 {
     Client *client = clientForSocket(sender());
     if (!client) return;
 
-    qDebug() << "NetworkServer::closeClientConnection()" << client->m_peer;
+    //qDebug() << "NetworkServer::closeClientConnection()" << client->m_peer;
 
     const QString token = client->m_token;
 
@@ -338,6 +365,9 @@ void NetworkServer::closeClientConnection()
     Q_EMIT clientsChanged();
 }
 
+/* ************************************************************************** */
+/* ************************************************************************** */
+
 void NetworkServer::readClientData()
 {
     Client *client = clientForSocket(sender());
@@ -370,6 +400,8 @@ void NetworkServer::readClientData()
         }
     }
 }
+
+/* ************************************************************************** */
 
 void NetworkServer::handleClientHello(Client *client, const QString &cData)
 {
@@ -408,10 +440,13 @@ void NetworkServer::handleClientHello(Client *client, const QString &cData)
         known->setLastSeen(QDateTime::currentDateTime());
         known->setConnected(true);
         known->setSecure(secure);
-        persistClients();
+        saveClients();
 
         client->write(QStringLiteral("auth:ok"));
         sendVolumeStateTo(client);
+        sendMediaStateTo(client);
+        sendMediaMetadataTo(client);
+        sendMediaArtTo(client);
         Q_EMIT clientsChanged();
         return;
     }
@@ -443,14 +478,19 @@ void NetworkServer::handleClientHello(Client *client, const QString &cData)
     client->m_secure = secure;
     client->m_name = name;
     client->m_token = m->getToken();
-    persistClients();
+    saveClients();
 
     qDebug() << "NetworkServer::handleClientHello() enrolled new client" << m->getName();
 
     client->write(QStringLiteral("auth:ok:") + m->getToken());
     sendVolumeStateTo(client);
+    sendMediaStateTo(client);
+    sendMediaMetadataTo(client);
+    sendMediaArtTo(client);
     Q_EMIT clientsChanged();
 }
+
+/* ************************************************************************** */
 
 void NetworkServer::processClientMessage(Client *client, const QString &cData)
 {
@@ -566,6 +606,20 @@ void NetworkServer::processClientMessage(Client *client, const QString &cData)
 
 /* ************************************************************************** */
 
+void NetworkServer::broadcast(const QString &msg)
+{
+    const bool secure = SettingsManager::getInstance()->getNetCtrlSecure();
+
+    for (Client *c : std::as_const(m_clients))
+    {
+        // in secure mode only authenticated clients are addressed
+        if (!secure || c->m_authenticated) c->write(msg);
+    }
+}
+
+/* ************************************************************************** */
+/* ************************************************************************** */
+
 void NetworkServer::sendVolumeStateTo(Client *client)
 {
     if (!client) return;
@@ -586,6 +640,152 @@ void NetworkServer::sendVolumeState()
     {
         // in secure mode only authenticated clients are addressed
         if (!secure || c->m_authenticated) sendVolumeStateTo(c);
+    }
+}
+
+/* ************************************************************************** */
+
+void NetworkServer::sendMediaStateTo(Client *client)
+{
+    if (!client) return;
+
+    LocalControls *ctrls = LocalControls::getInstance();
+
+    // media:state:<playerId>;<status>;<position_us>;<duration_us>
+    client->write(QStringLiteral("media:state:%1;%2;%3;%4")
+                  .arg(ctrls->getMediaPlayerId())
+                  .arg(ctrls->getMediaStatus())
+                  .arg(ctrls->getMediaPosition_us())
+                  .arg(ctrls->getMediaDuration_us()));
+}
+
+void NetworkServer::sendMediaMetadataTo(Client *client)
+{
+    if (!client) return;
+
+    LocalControls *ctrls = LocalControls::getInstance();
+
+    // free-text fields can contain any character, so carry them as a compact JSON blob
+    QJsonObject o;
+    o["playerId"] = ctrls->getMediaPlayerId();
+    o["player"] = ctrls->getMediaPlayerName();
+    o["title"] = ctrls->getMediaTitle();
+    o["artist"] = ctrls->getMediaArtist();
+    o["album"] = ctrls->getMediaAlbum();
+
+    const QByteArray json = QJsonDocument(o).toJson(QJsonDocument::Compact);
+    client->write(QStringLiteral("media:meta:") + QString::fromUtf8(json));
+}
+
+QString NetworkServer::mediaArtMessage() const
+{
+    // an empty payload tells the client to clear its thumbnail
+    if (m_artBytes.isEmpty()) return QStringLiteral("media:art:");
+
+    return QStringLiteral("media:art:%1;%2").arg(m_artMime, QString::fromLatin1(m_artBytes.toBase64()));
+}
+
+void NetworkServer::sendMediaArtTo(Client *client)
+{
+    if (!client) return;
+    client->write(mediaArtMessage());
+}
+
+/* ************************************************************************** */
+
+void NetworkServer::sendMediaState()
+{
+    LocalControls *ctrls = LocalControls::getInstance();
+
+    broadcast(QStringLiteral("media:state:%1;%2;%3;%4")
+              .arg(ctrls->getMediaPlayerId())
+              .arg(ctrls->getMediaStatus())
+              .arg(ctrls->getMediaPosition_us())
+              .arg(ctrls->getMediaDuration_us()));
+}
+
+void NetworkServer::sendMediaMetadata()
+{
+    const bool secure = SettingsManager::getInstance()->getNetCtrlSecure();
+
+    for (Client *c : std::as_const(m_clients))
+    {
+        if (!secure || c->m_authenticated) sendMediaMetadataTo(c);
+    }
+
+    // the artwork is heavy, so it is (re)loaded and broadcast only when the URL actually changes
+    refreshArt(LocalControls::getInstance()->getMediaArtUrl());
+}
+
+/* ************************************************************************** */
+
+void NetworkServer::refreshArt(const QString &url)
+{
+    // already loaded (or currently loading) this exact URL: nothing to do
+    if (url == m_artUrl) return;
+
+    m_artUrl = url;
+    m_artMime.clear();
+    m_artBytes.clear();
+
+    if (url.isEmpty())
+    {
+        broadcast(mediaArtMessage()); // empty -> clears the client thumbnail
+        return;
+    }
+
+    if (url.startsWith("data:"))
+    {
+        // data:[<mime>][;base64],<payload>
+        const int comma = url.indexOf(',');
+        if (comma > 5)
+        {
+            const QString header = url.mid(5, comma - 5);
+            const QString payload = url.mid(comma + 1);
+            const QString mime = header.section(';', 0, 0);
+            if (mime.contains('/')) m_artMime = mime;
+            m_artBytes = header.contains("base64") ? QByteArray::fromBase64(payload.toLatin1())
+                                                   : QByteArray::fromPercentEncoding(payload.toLatin1());
+        }
+        broadcast(mediaArtMessage());
+        return;
+    }
+
+    if (url.startsWith("http://") || url.startsWith("https://"))
+    {
+        // online remote art: fetch asynchronously, then embed the bytes like any other source
+        if (!m_nam) m_nam = new QNetworkAccessManager(this);
+
+        QNetworkReply *reply = m_nam->get(QNetworkRequest(QUrl(url)));
+        const QString requested = url;
+        connect(reply, &QNetworkReply::finished, this, [this, reply, requested]() {
+            reply->deleteLater();
+
+            // the track may have moved on while we were fetching: only apply if still current
+            if (requested != m_artUrl) return;
+
+            if (reply->error() == QNetworkReply::NoError)
+            {
+                m_artBytes = reply->readAll();
+                m_artMime = reply->header(QNetworkRequest::ContentTypeHeader).toString();
+                if (m_artMime.isEmpty()) m_artMime = QMimeDatabase().mimeTypeForData(m_artBytes).name();
+            }
+            broadcast(mediaArtMessage());
+        });
+    }
+    else
+    {
+        // otherwise assume a local file (file:// URL or a bare file path)
+        const QUrl u(url);
+        const QString path = u.isLocalFile() ? u.toLocalFile() : url;
+
+        QFile f(path);
+        if (f.open(QIODevice::ReadOnly))
+        {
+            m_artBytes = f.read(8 * 1024 * 1024); // cap at 8 MB, album art is never that big
+            m_artMime = QMimeDatabase().mimeTypeForFileNameAndData(path, m_artBytes).name();
+        }
+        broadcast(mediaArtMessage());
     }
 }
 

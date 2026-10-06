@@ -82,6 +82,16 @@ LocalControls::LocalControls()
 #if defined(ENABLE_MEDIA_MPRIS)
     mpris = Media_MPRIS::getInstance();
     mpris->select_player();
+    if (mpris)
+    {
+        // forward media backend updates so consumers (ex: NetworkServer) stay backend-agnostic
+        connect(mpris, &Media_MPRIS::playerUpdated, this, &LocalControls::mediaChanged);
+        connect(mpris, &Media_MPRIS::statusUpdated, this, &LocalControls::mediaChanged);
+        connect(mpris, &Media_MPRIS::positionUpdated, this, &LocalControls::mediaChanged);
+        connect(mpris, &Media_MPRIS::rateUpdated, this, &LocalControls::mediaChanged);
+        connect(mpris, &Media_MPRIS::playerUpdated, this, &LocalControls::mediaMetadataChanged);
+        connect(mpris, &Media_MPRIS::metadataUpdated, this, &LocalControls::mediaMetadataChanged);
+    }
 #endif
 
 #if defined(ENABLE_VOLUME_PIPEWIRE)
@@ -345,6 +355,73 @@ float LocalControls::getVolumeLevel() const
 bool LocalControls::isMuted() const
 {
     return volume ? volume->getMute() : false;
+}
+
+/* ************************************************************************** */
+
+QString LocalControls::getMediaPlayerName() const
+{
+#if defined(ENABLE_MEDIA_MPRIS)
+    return mpris ? mpris->getPlayerName() : QString();
+#else
+    return QString();
+#endif
+}
+QString LocalControls::getMediaStatus() const
+{
+#if defined(ENABLE_MEDIA_MPRIS)
+    return mpris ? mpris->getPlaybackStatus() : QString();
+#else
+    return QString();
+#endif
+}
+QString LocalControls::getMediaTitle() const
+{
+#if defined(ENABLE_MEDIA_MPRIS)
+    return mpris ? mpris->getTitle() : QString();
+#else
+    return QString();
+#endif
+}
+QString LocalControls::getMediaArtist() const
+{
+#if defined(ENABLE_MEDIA_MPRIS)
+    return mpris ? mpris->getArtist() : QString();
+#else
+    return QString();
+#endif
+}
+QString LocalControls::getMediaAlbum() const
+{
+#if defined(ENABLE_MEDIA_MPRIS)
+    return mpris ? mpris->getAlbum() : QString();
+#else
+    return QString();
+#endif
+}
+QString LocalControls::getMediaArtUrl() const
+{
+#if defined(ENABLE_MEDIA_MPRIS)
+    return mpris ? mpris->getThumbnail() : QString();
+#else
+    return QString();
+#endif
+}
+qint64 LocalControls::getMediaPosition_us() const
+{
+#if defined(ENABLE_MEDIA_MPRIS)
+    return mpris ? mpris->getPosition_us() : -1;
+#else
+    return -1;
+#endif
+}
+qint64 LocalControls::getMediaDuration_us() const
+{
+#if defined(ENABLE_MEDIA_MPRIS)
+    return mpris ? mpris->getMetaDuration() : 0;
+#else
+    return 0;
+#endif
 }
 
 /* ************************************************************************** */

@@ -27,6 +27,10 @@
 #include <QObject>
 #include <QString>
 
+class QTimer;
+class QDBusMessage;
+class QDBusServiceWatcher;
+
 /* ************************************************************************** */
 
 /*!
@@ -59,7 +63,8 @@ class Media_MPRIS: public QObject
     Q_PROPERTY(qint64 metaDuration READ getMetaDuration NOTIFY metadataUpdated)
 
     //QStringList m_player_registered;
-    QString m_player_selected;
+    QString m_player_selected;  //!< well-known bus name of the selected player
+    QString m_player_owner;     //!< unique bus name currently owning m_player_selected
 
     bool isMprisAvailable() const { return !m_player_selected.isEmpty(); }
 
@@ -89,6 +94,22 @@ class Media_MPRIS: public QObject
 
     void getMetadata();
 
+    // MPRIS players don't push Position updates, so we poll it while playing
+    QTimer *m_positionTimer = nullptr;
+
+    // notifies us when MPRIS players appear, disappear, or change owner
+    QDBusServiceWatcher *m_serviceWatcher = nullptr;
+
+    /*!
+     * \brief Select the player to follow, and refresh our state if it changed.
+     * \param preferredOwner: unique bus name of a player to select in priority (if registered).
+     * \return true if a player is selected.
+     *
+     * Without a preferred owner, the first playing player is selected,
+     * otherwise the current one is kept, otherwise the first registered one is used.
+     */
+    bool selectPlayer(const QString &preferredOwner);
+
     // Singleton
     static Media_MPRIS *instance;
     Media_MPRIS();
@@ -103,9 +124,19 @@ signals:
     void metadataUpdated();
 
 private slots:
+    /*!
+     * \brief Handle PropertiesChanged signals coming from any MPRIS player.
+     * \param msg: the D-Bus signal message, used to identify the emitting player.
+     *
+     * Changes from the selected player update our state.
+     * Another player starting playback, or the selected one stopping, triggers a new selection.
+     */
     void onPropertiesChanged(const QString &interfaceName,
                              const QVariantMap &changedProps,
-                             const QStringList &invalidatedProps);
+                             const QStringList &invalidatedProps,
+                             const QDBusMessage &msg);
+
+    void refreshPosition();     //!< poll the player's Position over D-Bus (it is never pushed)
 
 public:
     static Media_MPRIS *getInstance();

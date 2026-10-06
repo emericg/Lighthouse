@@ -88,6 +88,18 @@ public:
     Q_INVOKABLE float getVolumeLevel() const;
     Q_INVOKABLE bool isMuted() const;
 
+    // media (routed from the active media backend, when available)
+    int getMediaPlayerId() const { return 0; }  //!< reserved for future multi-player support
+    QString getMediaPlayerName() const;
+    QString getMediaStatus() const;             //!< MPRIS PlaybackStatus ("Playing"/"Paused"/...)
+    QString getMediaTitle() const;
+    QString getMediaArtist() const;
+    QString getMediaAlbum() const;
+    QString getMediaArtUrl() const;             //!< may be a file://, http(s):// or data: URL
+    qint64 getMediaPosition_us() const;
+    qint64 getMediaDuration_us() const;
+    float getMediaRate() const;
+
     Q_INVOKABLE void keyboard_key(QChar key);
 
     Q_INVOKABLE void mouse_action(int dx, int dy, int btn_left, int btn_right, int btn_middle);
@@ -111,8 +123,14 @@ public:
     Q_INVOKABLE void keyboard_volume_mute();
 
 signals:
+    // re-emitted from the active Volume backend, so consumers (ex: NetworkServer)
+    // never need to reference the platform-specific Volume backend directly
     void volumeChanged();
     void muteChanged();
+
+    // re-emitted from the active media backend, same rationale as the volume signals
+    void mediaChanged();            //!< playback status / position / rate changed (cheap, frequent)
+    void mediaMetadataChanged();    //!< title / artist / album / art URL changed
 };
 
 /* ************************************************************************** */

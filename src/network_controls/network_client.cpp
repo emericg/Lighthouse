@@ -26,6 +26,9 @@
 
 #include <QtNetwork>
 #include <QSysInfo>
+#include <QTimer>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 /* ************************************************************************** */
 
@@ -40,6 +43,11 @@ NetworkClient::NetworkClient(QObject *parent) : QObject(parent)
     connect(m_tcpSocket, &QAbstractSocket::connected, this, &NetworkClient::connected);
     connect(m_tcpSocket, &QAbstractSocket::disconnected, this, &NetworkClient::disconnected);
     connect(m_tcpSocket, &QAbstractSocket::errorOccurred, this, &NetworkClient::displayError);
+
+    // local interpolation of the playback position (MPRIS rarely pushes Position)
+    m_positionTimer = new QTimer(this);
+    m_positionTimer->setInterval(1000);
+    connect(m_positionTimer, &QTimer::timeout, this, &NetworkClient::tickPosition);
 }
 
 /* ************************************************************************** */
@@ -110,6 +118,9 @@ void NetworkClient::disconnected()
     //qDebug() << "NetworkClient::disconnected()";
     m_connected = false;
     m_authenticated = false;
+
+    if (m_positionTimer) m_positionTimer->stop();
+
     Q_EMIT connectionEvent();
 }
 
@@ -181,7 +192,143 @@ void NetworkClient::readMetadata()
                 Q_EMIT volumeStateChanged();
             }
         }
+        else if (metadata.startsWith("media:state:"))
+        {
+            parseMediaState(metadata.mid(12));
+        }
+        else if (metadata.startsWith("media:meta:"))
+        {
+            parseMediaMetadata(metadata.mid(11));
+        }
+        else if (metadata.startsWith("media:art:"))
+        {
+            parseMediaArt(metadata.mid(10));
+        }
+        else if (metadata.startsWith("claude:state:"))
+        {
+            parseClaudeState(metadata.mid(13));
+        }
     }
+}
+
+/* ************************************************************************** */
+
+void NetworkClient::parseMediaState(const QString &payload)
+{
+    // <playerId>;<status>;<position_us>;<duration_us>
+    const QStringList p = payload.split(';');
+    if (p.size() < 4) return;
+
+    // p.at(0) is the player id, reserved for future multi-player support (unused for now)
+    m_playbackStatus = p.at(1);
+    m_position_us = p.at(2).toLongLong();
+    m_duration_us = p.at(3).toLongLong();
+
+    // resync the interpolation clock and only run the timer while actually playing
+    m_positionClock.restart();
+    if (m_playbackStatus == "Playing" && m_position_us >= 0) m_positionTimer->start();
+    else m_positionTimer->stop();
+
+    Q_EMIT mediaStateChanged();
+}
+
+void NetworkClient::parseMediaMetadata(const QString &payload)
+{
+    const QJsonObject o = QJsonDocument::fromJson(payload.toUtf8()).object();
+
+    m_playerName = o.value("player").toString();
+    m_metaTitle = o.value("title").toString();
+    m_metaArtist = o.value("artist").toString();
+    m_metaAlbum = o.value("album").toString();
+
+    Q_EMIT mediaMetadataChanged();
+}
+
+void NetworkClient::parseMediaArt(const QString &payload)
+{
+    // <mime>;<base64> , or empty to clear
+    const int sep = payload.indexOf(';');
+
+    QImage img;
+    if (sep > 0)
+    {
+        const QByteArray bytes = QByteArray::fromBase64(payload.mid(sep + 1).toLatin1());
+        img.loadFromData(bytes); // format auto-detected from the bytes
+    }
+
+    m_artImage = img;
+
+    // a fresh URL each time so QML's image cache never serves the previous track's art
+    m_metaThumbnail = img.isNull() ? QString() : QStringLiteral("image://networkArt/%1").arg(++m_artSeq);
+
+    Q_EMIT mediaArtChanged();
+}
+
+/* ************************************************************************** */
+
+void NetworkClient::parseClaudeState(const QString &payload)
+{
+    const QJsonDocument doc = QJsonDocument::fromJson(payload.toUtf8());
+    if (!doc.isObject()) return;
+
+    const QJsonObject o = doc.object();
+    m_claudeState = o.value("state").toInt(ClaudeMonitor::CaptureNone);
+
+    const QJsonObject fiveHour = o.value("fiveHour").toObject();
+    m_claudeFiveHourPercent = fiveHour.value("percent").toDouble(-1.0);
+
+    const QJsonObject sevenDay = o.value("sevenDay").toObject();
+    m_claudeSevenDayPercent = sevenDay.value("percent").toDouble(-1.0);
+
+    // absent from older servers, which cannot probe
+    const QJsonObject probe = o.value("probe").toObject();
+    m_claudeProbeAvailable = probe.value("available").toBool(false);
+    m_claudeProbeState = probe.value("state").toInt(ClaudeMonitor::ProbeNone);
+
+    // Turn the relayed "seconds left" into deadlines on our own monotonic clock,
+    // so the countdown keeps running between two updates and never depends on the
+    // two devices agreeing on the time of day
+    const int fiveHourLeft = fiveHour.value("remaining").toInt(-1);
+    const int sevenDayLeft = sevenDay.value("remaining").toInt(-1);
+    m_claudeClock.restart();
+    m_claudeFiveHourResetMs = (fiveHourLeft < 0) ? -1 : qint64(fiveHourLeft) * 1000;
+    m_claudeSevenDayResetMs = (sevenDayLeft < 0) ? -1 : qint64(sevenDayLeft) * 1000;
+
+    if (m_claudeFiveHourResetMs >= 0 || m_claudeSevenDayResetMs >= 0) m_claudeTimer->start();
+    else m_claudeTimer->stop();
+
+    Q_EMIT claudeStateChanged();
+    Q_EMIT claudeCountdownChanged();
+}
+
+void NetworkClient::tickClaudeCountdown()
+{
+    if (m_claudeFiveHourResetMs < 0 && m_claudeSevenDayResetMs < 0)
+    {
+        m_claudeTimer->stop();
+        return;
+    }
+
+    Q_EMIT claudeCountdownChanged();
+}
+
+void NetworkClient::tickPosition()
+{
+    if (m_playbackStatus != "Playing" || m_position_us < 0)
+    {
+        m_positionTimer->stop();
+        return;
+    }
+
+    // advance the position by the wall-clock time elapsed since the last server sync, scaled by rate
+    const qint64 elapsed_us = qint64(m_positionClock.nsecsElapsed() / 1000.0 * (m_rate > 0.f ? m_rate : 1.f));
+    qint64 pos = m_position_us + elapsed_us;
+    if (m_duration_us > 0 && pos > m_duration_us) pos = m_duration_us;
+
+    m_position_us = pos;
+    m_positionClock.restart();
+
+    Q_EMIT mediaStateChanged();
 }
 
 void NetworkClient::sendCommand(const QString &cmd)

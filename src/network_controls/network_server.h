@@ -29,8 +29,11 @@
 #include <QDataStream>
 #include <QList>
 #include <QDateTime>
+#include <QByteArray>
 
 #include "SettingsManager.h"
+
+class QNetworkAccessManager;
 
 /* ************************************************************************** */
 
@@ -192,13 +195,27 @@ class NetworkServer : public QObject
     NetworkClientModel *knownClientForToken(const QString &token) const;
 
     void loadClients();
-    void persistClients();
+    void saveClients();
     void enforceRevocations();
 
     void handleClientHello(Client *client, const QString &cData);
     void processClientMessage(Client *client, const QString &cData);
 
+    void broadcast(const QString &msg);
+
     void sendVolumeStateTo(Client *client);
+
+    void sendMediaStateTo(Client *client);
+    void sendMediaMetadataTo(Client *client);
+    void sendMediaArtTo(Client *client);
+
+    QString mediaArtMessage() const;                //!< "media:art:<mime>;<base64>" for the cached bytes (empty payload clears)
+    void refreshArt(const QString &url);            //!< (re)load the art bytes if the URL changed, then broadcast
+
+    QNetworkAccessManager *m_nam = nullptr;
+    QString m_artUrl;                               //!< source URL the cached bytes were loaded from
+    QString m_artMime;                              //!< mime type of the cached bytes (ex: "image/png")
+    QByteArray m_artBytes;                          //!< raw image bytes for the current track (may be empty)
 
 signals:
     void serverEvent();
@@ -216,6 +233,8 @@ private slots:
     void onKnownClientChanged();
 
     void sendVolumeState();
+    void sendMediaState();
+    void sendMediaMetadata();
 
 public:
     explicit NetworkServer(QObject *parent = nullptr);
