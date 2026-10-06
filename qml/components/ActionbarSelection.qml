@@ -28,16 +28,16 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         spacing: 8
 
-        RoundButtonIcon {
+        RoundButtonClear {
             id: buttonClear
             width: 36
             height: 36
             anchors.verticalCenter: parent.verticalCenter
 
+            color: "white"
             source: "qrc:/IconLibrary/material-symbols/backspace-fill.svg"
             sourceRotation: 180
-            iconColor: Theme.colorActionbarContent
-            backgroundColor: Theme.colorActionbarHighlight
+
             onClicked: screenDeviceList.exitSelectionMode()
         }
 

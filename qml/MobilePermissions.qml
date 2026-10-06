@@ -40,7 +40,7 @@ Item {
         id: retryPermissions
         interval: 333
         repeat: false
-        onTriggered: refreshPermissions()
+        onTriggered: screenPermissions.refreshPermissions()
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -53,12 +53,13 @@ Item {
 
         Column {
             id: contentColumn
+
             anchors.left: parent.left
             anchors.right: parent.right
 
-            topPadding: 20
-            bottomPadding: 20
-            spacing: 8
+            topPadding: Theme.componentMarginXL
+            bottomPadding: Theme.componentMarginXL
+            spacing: Theme.componentMarginXL
 
             ////////
 
@@ -68,20 +69,19 @@ Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
 
-                RoundButtonIcon {
+                RoundButtonFlat {
                     id: button_bluetooth_test
-                    width: 32
-                    height: 32
                     anchors.left: parent.left
                     anchors.leftMargin: 16
                     anchors.verticalCenter: parent.verticalCenter
+                    width: 32
+                    height: 32
 
                     property bool validperm: true
 
                     source: (validperm) ? "qrc:/IconLibrary/material-symbols/check.svg" : "qrc:/IconLibrary/material-symbols/close.svg"
-                    iconColor: (validperm) ? "white" : "white"
-                    backgroundColor: (validperm) ? Theme.colorSuccess : Theme.colorSubText
-                    backgroundVisible: true
+                    color: (validperm) ? Theme.colorPrimary : Theme.colorSubText
+                    colorIcon: (validperm) ? "white" : "white"
                 }
 
                 Text {
@@ -127,20 +127,19 @@ Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
 
-                RoundButtonIcon {
+                RoundButtonFlat {
                     id: button_location_test
-                    width: 32
-                    height: 32
                     anchors.left: parent.left
                     anchors.leftMargin: 16
                     anchors.verticalCenter: parent.verticalCenter
+                    width: 32
+                    height: 32
 
                     property bool validperm: false
 
                     source: (validperm) ? "qrc:/IconLibrary/material-symbols/check.svg" : "qrc:/IconLibrary/material-symbols/close.svg"
-                    iconColor: (validperm) ? "white" : "white"
-                    backgroundColor: (validperm) ? Theme.colorSuccess : Theme.colorSubText
-                    backgroundVisible: true
+                    color: (validperm) ? Theme.colorPrimary : Theme.colorSubText
+                    colorIcon: (validperm) ? "white" : "white"
 
                     onClicked: {
                         UtilsOS.hapticFeedback()
@@ -206,20 +205,19 @@ Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
 
-                RoundButtonIcon {
+                RoundButtonFlat {
                     id: button_gps_test
-                    width: 32
-                    height: 32
                     anchors.left: parent.left
                     anchors.leftMargin: 16
                     anchors.verticalCenter: parent.verticalCenter
+                    width: 32
+                    height: 32
 
                     property bool validperm: false
 
                     source: (validperm) ? "qrc:/IconLibrary/material-symbols/check.svg" : "qrc:/IconLibrary/material-symbols/close.svg"
-                    iconColor: (validperm) ? "white" : "white"
-                    backgroundColor: (validperm) ? Theme.colorSuccess : Theme.colorSubText
-                    backgroundVisible: true
+                    color: (validperm) ? Theme.colorPrimary : Theme.colorSubText
+                    colorIcon: (validperm) ? "white" : "white"
 
                     onClicked: {
                         UtilsOS.hapticFeedback()
@@ -271,21 +269,20 @@ Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
 
-                RoundButtonIcon {
+                RoundButtonFlat {
                     id: button_network_test
-                    width: 32
-                    height: 32
                     anchors.left: parent.left
                     anchors.leftMargin: 16
                     anchors.verticalCenter: parent.verticalCenter
+                    width: 32
+                    height: 32
                     z: 1
 
                     property bool validperm: true
 
                     source: (validperm) ? "qrc:/IconLibrary/material-symbols/check.svg" : "qrc:/IconLibrary/material-symbols/close.svg"
-                    iconColor: (validperm) ? "white" : "white"
-                    backgroundColor: (validperm) ? Theme.colorSuccess : Theme.colorSubText
-                    backgroundVisible: true
+                    color: (validperm) ? Theme.colorPrimary : Theme.colorSubText
+                    colorIcon: (validperm) ? "white" : "white"
                 }
 
                 Text {
@@ -331,21 +328,20 @@ Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
 
-                RoundButtonIcon {
+                RoundButtonFlat {
                     id: button_camera_test
-                    width: 32
-                    height: 32
                     anchors.left: parent.left
                     anchors.leftMargin: 16
                     anchors.verticalCenter: parent.verticalCenter
+                    width: 32
+                    height: 32
                     z: 1
 
                     property bool validperm: true
 
                     source: (validperm) ? "qrc:/IconLibrary/material-symbols/check.svg" : "qrc:/IconLibrary/material-symbols/close.svg"
-                    iconColor: (validperm) ? "white" : "white"
-                    backgroundColor: (validperm) ? Theme.colorSuccess : Theme.colorSubText
-                    backgroundVisible: true
+                    color: (validperm) ? Theme.colorPrimary : Theme.colorSubText
+                    colorIcon: (validperm) ? "white" : "white"
 
                     onClicked: {
                         UtilsOS.getMobileCameraPermission()

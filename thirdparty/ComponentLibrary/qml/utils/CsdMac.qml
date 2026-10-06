@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Window
-import QtQuick.Controls
 
 import ComponentLibrary
 
@@ -13,7 +12,7 @@ Loader {
     height: active ? 24 : 0
 
     property bool appThemeCSD: false
-    property ApplicationWindow windowInstance: null
+    property Window windowInstance: null
 
     active: (windowInstance && appThemeCSD && Qt.platform.os === "osx")
     asynchronous: true
@@ -46,9 +45,9 @@ Loader {
                 IconSvg {
                     width: 10; height: 10;
                     anchors.centerIn: parent
-                    source: "qrc:/IconLibrary/material-symbols/close.svg"
+                    source: "qrc:/ComponentLibraryAssets/icons/close.svg"
                     opacity: mouseArea.containsMouse ? 0.6 : 0
-                    //Behavior on opacity { OpacityAnimator { duration: Theme.animationFastSpeed } }
+                    //Behavior on opacity { OpacityAnimator { duration: Theme.animationSpeedFast } }
                 }
                 MouseArea {
                     anchors.fill: parent
@@ -64,7 +63,7 @@ Loader {
                     anchors.centerIn: parent
                     color: "grey"
                     opacity: mouseArea.containsMouse ? 0.8 : 0
-                    //Behavior on opacity { OpacityAnimator { duration: Theme.animationFastSpeed } }
+                    //Behavior on opacity { OpacityAnimator { duration: Theme.animationSpeedFast } }
                 }
                 MouseArea {
                     anchors.fill: parent
@@ -78,7 +77,7 @@ Loader {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        if (csdMacLoader.windowInstance.visibility === ApplicationWindow.Maximized)
+                        if (csdMacLoader.windowInstance.visibility === Window.Maximized)
                             csdMacLoader.windowInstance.showNormal()
                         else
                             csdMacLoader.windowInstance.showMaximized()
