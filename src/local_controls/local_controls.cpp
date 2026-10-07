@@ -29,6 +29,7 @@
 #include "keyboard_xtest.h"
 #include "os_commander_logind.h"
 #include "mpris_dbus.h"
+#include "media_mediaremote.h"
 #include "volume_keyboard.h"
 #if defined(ENABLE_VOLUME_PIPEWIRE)
 #include "volume_pipewire.h"
@@ -80,18 +81,7 @@ LocalControls::LocalControls()
     oscommander = new OsCommander_logind();
 
 #if defined(ENABLE_MEDIA_MPRIS)
-    mpris = Media_MPRIS::getInstance();
-    mpris->select_player();
-    if (mpris)
-    {
-        // forward media backend updates so consumers (ex: NetworkServer) stay backend-agnostic
-        connect(mpris, &Media_MPRIS::playerUpdated, this, &LocalControls::mediaChanged);
-        connect(mpris, &Media_MPRIS::statusUpdated, this, &LocalControls::mediaChanged);
-        connect(mpris, &Media_MPRIS::positionUpdated, this, &LocalControls::mediaChanged);
-        connect(mpris, &Media_MPRIS::rateUpdated, this, &LocalControls::mediaChanged);
-        connect(mpris, &Media_MPRIS::playerUpdated, this, &LocalControls::mediaMetadataChanged);
-        connect(mpris, &Media_MPRIS::metadataUpdated, this, &LocalControls::mediaMetadataChanged);
-    }
+    media = Media_MPRIS::getInstance();
 #endif
 
 #if defined(ENABLE_VOLUME_PIPEWIRE)
@@ -108,7 +98,29 @@ LocalControls::LocalControls()
     }
 #endif
 
-#if defined(ENABLE_VOLUME_PIPEWIRE) || defined(ENABLE_VOLUME_PULSEAUDIO)
+#endif // Q_OS_LINUX
+
+#if defined(Q_OS_MACOS)
+
+#if defined(ENABLE_MEDIA_MEDIAREMOTE)
+    media = Media_mediaremote::getInstance();
+#endif
+
+#endif // Q_OS_MACOS
+
+    if (media)
+    {
+        media->select_player();
+
+        // forward media backend updates so consumers (ex: NetworkServer) stay backend-agnostic
+        connect(media, &Media::playerUpdated, this, &LocalControls::mediaChanged);
+        connect(media, &Media::statusUpdated, this, &LocalControls::mediaChanged);
+        connect(media, &Media::positionUpdated, this, &LocalControls::mediaChanged);
+        connect(media, &Media::rateUpdated, this, &LocalControls::mediaChanged);
+        connect(media, &Media::playerUpdated, this, &LocalControls::mediaMetadataChanged);
+        connect(media, &Media::metadataUpdated, this, &LocalControls::mediaMetadataChanged);
+    }
+
     if (volume)
     {
         connect(volume, &Volume::volumeChanged, this, &LocalControls::volumeChanged);
@@ -125,10 +137,6 @@ LocalControls::LocalControls()
             });
         }
     }
-#endif
-
-#endif // Q_OS_LINUX
-
 
 }
 
@@ -214,12 +222,10 @@ void LocalControls::action(int action_code, const QString &action_params)
     else if (action_code > LocalActions::ACTION_MEDIA_START &&
              action_code < LocalActions::ACTION_MEDIA_STOP)
     {
-#if defined(ENABLE_MEDIA_MPRIS)
-        if (mpris)
+        if (media)
         {
-            mpris->action(action_code);
+            media->action(action_code);
         }
-#endif
     }
     else
     {
@@ -363,67 +369,39 @@ bool LocalControls::isMuted() const
 
 QString LocalControls::getMediaPlayerName() const
 {
-#if defined(ENABLE_MEDIA_MPRIS)
-    return mpris ? mpris->getPlayerName() : QString();
-#else
-    return QString();
-#endif
+    return media ? media->getPlayerName() : QString();
 }
 QString LocalControls::getMediaStatus() const
 {
-#if defined(ENABLE_MEDIA_MPRIS)
-    return mpris ? mpris->getPlaybackStatus() : QString();
-#else
-    return QString();
-#endif
+    return media ? media->getPlaybackStatus() : QString();
 }
 QString LocalControls::getMediaTitle() const
 {
-#if defined(ENABLE_MEDIA_MPRIS)
-    return mpris ? mpris->getTitle() : QString();
-#else
-    return QString();
-#endif
+    return media ? media->getTitle() : QString();
 }
 QString LocalControls::getMediaArtist() const
 {
-#if defined(ENABLE_MEDIA_MPRIS)
-    return mpris ? mpris->getArtist() : QString();
-#else
-    return QString();
-#endif
+    return media ? media->getArtist() : QString();
 }
 QString LocalControls::getMediaAlbum() const
 {
-#if defined(ENABLE_MEDIA_MPRIS)
-    return mpris ? mpris->getAlbum() : QString();
-#else
-    return QString();
-#endif
+    return media ? media->getAlbum() : QString();
 }
 QString LocalControls::getMediaArtUrl() const
 {
-#if defined(ENABLE_MEDIA_MPRIS)
-    return mpris ? mpris->getThumbnail() : QString();
-#else
-    return QString();
-#endif
+    return media ? media->getThumbnail() : QString();
 }
 qint64 LocalControls::getMediaPosition_us() const
 {
-#if defined(ENABLE_MEDIA_MPRIS)
-    return mpris ? mpris->getPosition_us() : -1;
-#else
-    return -1;
-#endif
+    return media ? media->getPosition_us() : -1;
 }
 qint64 LocalControls::getMediaDuration_us() const
 {
-#if defined(ENABLE_MEDIA_MPRIS)
-    return mpris ? mpris->getMetaDuration() : 0;
-#else
-    return 0;
-#endif
+    return media ? media->getMetaDuration() : 0;
+}
+float LocalControls::getMediaRate() const
+{
+    return media ? media->getRate() : -1.f;
 }
 
 /* ************************************************************************** */

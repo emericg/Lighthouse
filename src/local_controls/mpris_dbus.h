@@ -24,6 +24,8 @@
 #define MPRIS_DBUS_H
 /* ************************************************************************** */
 
+#include "media.h"
+
 #include <QObject>
 #include <QString>
 
@@ -34,63 +36,29 @@ class QDBusServiceWatcher;
 /* ************************************************************************** */
 
 /*!
- * MPRIS interface
+ * Media controller (Linux / MPRIS, over D-Bus)
  */
-class Media_MPRIS: public QObject
+class Media_MPRIS: public Media
 {
     Q_OBJECT
 
-    Q_PROPERTY(bool available READ isMprisAvailable NOTIFY playerUpdated)
-
-    Q_PROPERTY(bool canControl READ canControl NOTIFY playerUpdated)
-    Q_PROPERTY(bool canPlayPause READ canPlayPause NOTIFY playerUpdated)
-    Q_PROPERTY(bool canSeek READ canSeek NOTIFY playerUpdated)
-    Q_PROPERTY(bool canGoPrevious READ canGoPrevious NOTIFY playerUpdated)
-    Q_PROPERTY(bool canGoNext READ canGoNext NOTIFY playerUpdated)
-
-    Q_PROPERTY(QString playerName READ getPlayerName NOTIFY playerUpdated)
-    Q_PROPERTY(QString playbackStatus READ getPlaybackStatus NOTIFY statusUpdated)
-    Q_PROPERTY(qint64 position_us READ getPosition_us WRITE setPosition_us NOTIFY statusUpdated)
-    Q_PROPERTY(float position READ getPosition WRITE setPosition NOTIFY statusUpdated)
+    Q_PROPERTY(float position READ getPosition WRITE setPosition NOTIFY positionUpdated)
     Q_PROPERTY(float volume READ getVolume WRITE setVolume NOTIFY volumeUpdated)
-    Q_PROPERTY(float rate READ getRate WRITE setRate NOTIFY rateUpdated)
-
-    Q_PROPERTY(QString metaTitle READ getTitle NOTIFY metadataUpdated)
-    Q_PROPERTY(QString metaArtist READ getArtist NOTIFY metadataUpdated)
-    Q_PROPERTY(QString metaAlbum READ getAlbum NOTIFY metadataUpdated)
-    Q_PROPERTY(QString metaThumbnail READ getThumbnail NOTIFY metadataUpdated)
     Q_PROPERTY(qint64 metaPosition READ getMetaPosition NOTIFY metadataUpdated)
-    Q_PROPERTY(qint64 metaDuration READ getMetaDuration NOTIFY metadataUpdated)
 
     //QStringList m_player_registered;
     QString m_player_selected;  //!< well-known bus name of the selected player
     QString m_player_owner;     //!< unique bus name currently owning m_player_selected
 
-    bool isMprisAvailable() const { return !m_player_selected.isEmpty(); }
-
-    bool m_canControl = false;
-    bool m_canPlayPause = false;
-    bool m_canGoPrevious = false;
-    bool m_canGoNext = false;
-    bool m_canSeek = false;
     bool m_canControlRate = false;
     bool m_canControlVolume = false;
 
-    QString m_playerName;
-    QString m_playbackStatus; // Playing // Paused
-    int64_t m_position_us = -1; // µs
     double m_position = -1.f; // in %
     double m_volume = -1.f; // in %
-    double m_rate = -1.f; // in %
 
     QString m_metadata; // raw
 
-    QString m_metaTitle;
-    QString m_metaArtist;
-    QString m_metaAlbum;
-    QString m_metaThumbnail;
-    int64_t m_metaPosition;
-    int64_t m_metaDuration; // µs
+    int64_t m_metaPosition = 0;
 
     void getMetadata();
 
@@ -116,12 +84,7 @@ class Media_MPRIS: public QObject
     ~Media_MPRIS();
 
 signals:
-    void playerUpdated();
-    void statusUpdated();
     void volumeUpdated();
-    void rateUpdated();
-    void positionUpdated();
-    void metadataUpdated();
 
 private slots:
     /*!
@@ -141,18 +104,10 @@ private slots:
 public:
     static Media_MPRIS *getInstance();
 
-    bool canControl() const { return m_canControl; }
-    bool canPlayPause() const { return m_canPlayPause; }
-    bool canSeek() const { return m_canSeek; }
-    bool canGoPrevious() const { return m_canGoPrevious; }
-    bool canGoNext() const { return m_canGoNext; }
+    bool isAvailable() const override { return !m_player_selected.isEmpty(); }
 
-    QString getPlayerName() const { return m_playerName; }
-
-    QString getPlaybackStatus() const { return m_playbackStatus; }
     void setPlaybackStatus(const QString &status);
 
-    qint64 getPosition_us() const { return m_position_us; }
     void setPosition_us(int64_t pos);
 
     float getPosition() const { return m_position; }
@@ -161,26 +116,20 @@ public:
     float getVolume() const { return m_volume; }
     void setVolume(float vol);
 
-    float getRate() const { return m_rate; }
     void setRate(float vol);
 
-    QString getTitle() const { return m_metaTitle; }
-    QString getArtist() const { return m_metaArtist; }
-    QString getAlbum() const { return m_metaAlbum; }
-    QString getThumbnail() const { return m_metaThumbnail; }
     qint64 getMetaPosition() const { return m_metaPosition; }
-    qint64 getMetaDuration() const { return m_metaDuration; }
 
-    Q_INVOKABLE void action(unsigned action_code);
+    void action(unsigned action_code) override;
 
-    Q_INVOKABLE bool select_player();
+    bool select_player() override;
 
     // shortcut
-    Q_INVOKABLE void media_playpause();
-    Q_INVOKABLE void media_stop();
-    Q_INVOKABLE void media_next();
-    Q_INVOKABLE void media_prev();
-    Q_INVOKABLE void media_seek(qint64 offset_us);
+    void media_playpause() override;
+    void media_stop() override;
+    void media_next() override;
+    void media_prev() override;
+    void media_seek(qint64 offset_us) override;
 };
 
 /* ************************************************************************** */

@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.20)
 
 project(Lighthouse VERSION 0.7 LANGUAGES C CXX)
 
+if(APPLE)
+    # some macOS backends need AppKit
+    enable_language(OBJCXX)
+endif()
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
@@ -154,6 +159,9 @@ else() # Desktop build
         endif()
     endif()
     if(APPLE)
+        set(SOURCES_DESKTOP ${SOURCES_DESKTOP}
+            src/local_controls/media_mediaremote.mm src/local_controls/media_mediaremote.h
+        )
         if(ENABLE_INPUT_MONITORING)
             set(SOURCES_DESKTOP ${SOURCES_DESKTOP}
                 src/local_monitors/InputMonitor_eventtap.cpp src/local_monitors/InputMonitor_eventtap.h
@@ -318,6 +326,11 @@ if(NOT IOS AND NOT ANDROID)
         target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_INPUT_EVENTTAP)
         target_link_libraries(${PROJECT_NAME} PRIVATE "-framework ApplicationServices")
     endif()
+endif()
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_MEDIA_MEDIAREMOTE)
+    target_link_libraries(${PROJECT_NAME} PRIVATE "-framework ApplicationServices" "-framework AppKit")
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")

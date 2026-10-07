@@ -30,7 +30,6 @@
 
 #include "media.h"
 #include "volume.h"
-#include "mpris_dbus.h"
 
 #include <QObject>
 #include <QString>
@@ -43,7 +42,7 @@ class QAudioOutput;
 /*!
  * LocalControls is the action dispatcher.
  * It holds virtual mouse, keyboard and gamepad to perform actions.
- * It also connects to an mpris server, if available on the platform and dynamically found.
+ * It also follows the media player currently in use, through the platform media backend.
  */
 class LocalControls: public QObject
 {
@@ -54,13 +53,9 @@ class LocalControls: public QObject
     Gamepad *gamepad = nullptr;
     OsCommander *oscommander = nullptr;
 
-    Media *media = nullptr;
+    Media *media = nullptr;         //!< media player backend: state, metadata and playback commands
     Volume *volume = nullptr;       //!< audio-server backend: absolute level + state + cap
     Volume *volume_keys = nullptr;  //!< media-key backend: relative up/down/mute with desktop OSD
-
-#if defined(ENABLE_MEDIA_MPRIS)
-    Media_MPRIS *mpris = nullptr;
-#endif
 
     QMediaPlayer *player = nullptr;
     QAudioOutput *audioOutput = nullptr;
@@ -91,7 +86,7 @@ public:
     // media (routed from the active media backend, when available)
     int getMediaPlayerId() const { return 0; }  //!< reserved for future multi-player support
     QString getMediaPlayerName() const;
-    QString getMediaStatus() const;             //!< MPRIS PlaybackStatus ("Playing"/"Paused"/...)
+    QString getMediaStatus() const;             //!< "Playing", "Paused", "Stopped", or empty
     QString getMediaTitle() const;
     QString getMediaArtist() const;
     QString getMediaAlbum() const;

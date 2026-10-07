@@ -39,7 +39,6 @@
 #include "network_controls/network_art_provider.h"
 #include "local_controls/local_controls.h"
 #include "local_controls/local_actions.h"
-#include "local_controls/mpris_dbus.h"
 
 #include <SingleApplication>
 #if defined(ENABLE_ZXING)
@@ -170,10 +169,7 @@ int main(int argc, char *argv[])
     engine_context->setContextProperty("menubarManager", mb);
     engine_context->setContextProperty("localControls", localControls);
     engine_context->setContextProperty("volumeControls", localControls->getVolumeController());
-#if defined(ENABLE_MEDIA_MPRIS)
-    Media_MPRIS *mprisControls = Media_MPRIS::getInstance();
-    engine_context->setContextProperty("mediaControls", mprisControls);
-#endif
+    engine_context->setContextProperty("mediaControls", localControls->getMediaController());
 
     // Load the main view
     engine.loadFromModule("Lighthouse", "DesktopApplication");
