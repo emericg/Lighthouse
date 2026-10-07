@@ -43,10 +43,27 @@ class DeviceMiPow: public DeviceLight
 {
     Q_OBJECT
 
+    Q_PROPERTY(bool brightMode READ getBrightMode WRITE setBrightMode NOTIFY brightModeChanged)
+
+    /*!
+     * The bulb has a white LED and RGB LEDs, driven by the same 4 bytes value.
+     *
+     * Colors alone are dim, so we can light the white LED along with them to get a brighter
+     * (but washed out) light. That is what this enables: when it is off, the white LED stays
+     * dark and the brightness is applied to the color channels instead.
+     */
+    bool m_brightMode = true;
+
+Q_SIGNALS:
+    void brightModeChanged();
+
 public:
     DeviceMiPow(QString &deviceAddr, QString &deviceName, QObject *parent = nullptr);
     DeviceMiPow(const QBluetoothDeviceInfo &d, QObject *parent = nullptr);
     ~DeviceMiPow();
+
+    bool getBrightMode() const { return m_brightMode; }
+    void setBrightMode(const bool value);
 
 public slots:
     void setMode(unsigned value);

@@ -22,6 +22,7 @@
 #include "device_mipow.h"
 
 #include <cstdint>
+#include <algorithm>
 
 #include <QBluetoothUuid>
 #include <QBluetoothAddress>
@@ -44,6 +45,11 @@ DeviceMiPow::DeviceMiPow(QString &deviceAddr, QString &deviceName, QObject *pare
 {
     m_deviceType = DeviceUtils::DEVICE_LIGHT;
     m_deviceCapabilities += DeviceUtils::DEVICE_LED_RGB;
+
+    if (hasSetting("brightMode"))
+    {
+        m_brightMode = (getSetting("brightMode").toString() == "true");
+    }
 }
 
 DeviceMiPow::DeviceMiPow(const QBluetoothDeviceInfo &d, QObject *parent):
@@ -51,6 +57,11 @@ DeviceMiPow::DeviceMiPow(const QBluetoothDeviceInfo &d, QObject *parent):
 {
     m_deviceType = DeviceUtils::DEVICE_LIGHT;
     m_deviceCapabilities += DeviceUtils::DEVICE_LED_RGB;
+
+    if (hasSetting("brightMode"))
+    {
+        m_brightMode = (getSetting("brightMode").toString() == "true");
+    }
 }
 
 DeviceMiPow::~DeviceMiPow()
@@ -217,6 +228,25 @@ void DeviceMiPow::serviceError(QLowEnergyService::ServiceError error)
 /* ************************************************************************** */
 /* ************************************************************************** */
 
+void DeviceMiPow::setBrightMode(const bool value)
+{
+    if (m_brightMode != value)
+    {
+        m_brightMode = value;
+        Q_EMIT brightModeChanged();
+
+        setSetting("brightMode", m_brightMode);
+
+        // Re-apply what is currently displayed, so the change is immediate
+        if (m_colors)
+        {
+            setColors(m_brightness, getColor_r(), getColor_g(), getColor_b());
+        }
+    }
+}
+
+/* ************************************************************************** */
+
 void DeviceMiPow::setMode(unsigned value)
 {
     //qDebug() << "DeviceMiPow::setMode(" << value << ")";
@@ -229,6 +259,15 @@ void DeviceMiPow::setEffect(unsigned value)
 
 /* ************************************************************************** */
 
+/*!
+ * The bulb only reports its state when we read the characteristic, at connection time.
+ * So every write keeps our copy of it in sync, otherwise getColor_*() would keep handing
+ * out the color the bulb had when we connected, and the UI would restore it on the next
+ * dataUpdated() (which the advertisement and refresh paths emit on their own).
+ *
+ * We do not emit dataUpdated() from here: these writes are what the user is doing right
+ * now, and refreshing the UI under a slider being dragged does more harm than good.
+ */
 void DeviceMiPow::setOff()
 {
     //qDebug() << "DeviceMiPow::setOff()";
@@ -277,12 +316,27 @@ void DeviceMiPow::setColors(unsigned brightness, unsigned r, unsigned g, unsigne
 
     if (serviceData && m_ble_status >= DeviceUtils::DEVICE_CONNECTED)
     {
-        QByteArray v;
-        v.push_back(char(brightness));
-        v.push_back(char(r));
-        v.push_back(char(g));
-        v.push_back(char(b));
+        unsigned w = brightness;
+        unsigned rr = r, gg = g, bb = b;
 
+        // With the white LED left dark, the bulb has no brightness of its own: the color
+        // channels have to carry it, so the color we send is the one the user picked, dimmed
+        if (!m_brightMode && (r || g || b))
+        {
+            w = 0;
+            rr = (r * brightness) / 255;
+            gg = (g * brightness) / 255;
+            bb = (b * brightness) / 255;
+        }
+
+        QByteArray v;
+        v.push_back(char(w));
+        v.push_back(char(rr));
+        v.push_back(char(gg));
+        v.push_back(char(bb));
+
+        // We keep what was asked for, not what went on the wire, so the UI stays on the
+        // color the user picked instead of following it down as the brightness drops
         m_brightness = brightness;
         m_colors = ((r & 0xff) << 16) + ((g & 0xff) << 8) + (b & 0xff);
 
@@ -356,6 +410,21 @@ void DeviceMiPow::bleReadDone(const QLowEnergyCharacteristic &c, const QByteArra
 
         m_brightness = (argb & 0xff000000) >> 24;
         m_colors = (argb & 0x00ffffff);
+
+        // A bulb lit by its color LEDs alone reports no brightness, it is baked into the
+        // color instead (see setColors()), so we take it back out to get our state back
+        if (m_brightness == 0 && m_colors != 0)
+        {
+            unsigned r = getColor_r(), g = getColor_g(), b = getColor_b();
+            const unsigned peak = std::max({r, g, b});
+
+            m_brightness = peak;
+            r = (r * 255) / peak;
+            g = (g * 255) / peak;
+            b = (b * 255) / peak;
+            m_colors = (r << 16) + (g << 8) + b;
+        }
+
         Q_EMIT dataUpdated();
 
         //qDebug() << "initial read / argb:   " << argb;
