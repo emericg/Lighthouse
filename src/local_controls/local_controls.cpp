@@ -27,6 +27,8 @@
 #include "keyboard_uinput.h"
 #include "gamepad_uinput.h"
 #include "keyboard_xtest.h"
+#include "keyboard_cgevent.h"
+#include "mouse_cgevent.h"
 #include "os_commander_logind.h"
 #include "mpris_dbus.h"
 #include "media_mediaremote.h"
@@ -35,6 +37,8 @@
 #include "volume_pipewire.h"
 #elif defined(ENABLE_VOLUME_PULSEAUDIO)
 #include "volume_pulseaudio.h"
+#elif defined(ENABLE_VOLUME_COREAUDIO)
+#include "volume_coreaudio.h"
 #endif
 
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
@@ -101,6 +105,21 @@ LocalControls::LocalControls()
 #endif // Q_OS_LINUX
 
 #if defined(Q_OS_MACOS)
+
+#if defined(ENABLE_MOUSE_CGEVENT)
+    mouse = new Mouse_cgevent();
+#endif
+
+#if defined(ENABLE_KEYBOARD_CGEVENT)
+    keyboard = new Keyboard_cgevent();
+
+    // relative volume / mute through the media keys, so macOS shows its OSD
+    volume_keys = new Volume_keyboard(keyboard);
+#endif
+
+#if defined(ENABLE_VOLUME_COREAUDIO)
+    volume = new Volume_coreaudio();
+#endif
 
 #if defined(ENABLE_MEDIA_MEDIAREMOTE)
     media = Media_mediaremote::getInstance();

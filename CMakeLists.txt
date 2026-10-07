@@ -160,6 +160,9 @@ else() # Desktop build
     endif()
     if(APPLE)
         set(SOURCES_DESKTOP ${SOURCES_DESKTOP}
+            src/local_controls/keyboard_cgevent.mm src/local_controls/keyboard_cgevent.h
+            src/local_controls/mouse_cgevent.mm src/local_controls/mouse_cgevent.h
+            src/local_controls/volume_coreaudio.cpp src/local_controls/volume_coreaudio.h
             src/local_controls/media_mediaremote.mm src/local_controls/media_mediaremote.h
         )
         if(ENABLE_INPUT_MONITORING)
@@ -329,8 +332,12 @@ if(NOT IOS AND NOT ANDROID)
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_KEYBOARD_CGEVENT)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_MOUSE_CGEVENT)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_VOLUME_COREAUDIO)
     target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_MEDIA_MEDIAREMOTE)
     target_link_libraries(${PROJECT_NAME} PRIVATE "-framework ApplicationServices" "-framework AppKit")
+    target_link_libraries(${PROJECT_NAME} PRIVATE "-framework CoreAudio" "-framework AudioToolbox")
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
