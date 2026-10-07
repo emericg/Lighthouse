@@ -37,6 +37,31 @@
 #include <QDebug>
 
 /* ************************************************************************** */
+
+// Both sensors report 3 axis of signed 16b little endian data. The sensitivities are
+// the standard values of a ST 6 axis IMU set to its widest ranges, and were checked
+// against this device: gravity reads 4121 LSB, and a tilt referenced on the
+// accelerometer gives 14.53 LSB per deg/s. See docs/porygon2.md
+
+#define PBP_ACCL_SENSITIVITY   4098.f   // LSB per g, +/- 8 g range
+#define PBP_GYRO_SENSITIVITY   14.29f   // LSB per deg/s, +/- 2000 deg/s range
+
+int16_t getMotionData(uint8_t lsb, uint8_t msb)
+{
+    return static_cast<int16_t>(lsb | (msb << 8));
+}
+
+float getAcclData(uint8_t lsb, uint8_t msb)
+{
+    return getMotionData(lsb, msb) / PBP_ACCL_SENSITIVITY;
+}
+
+float getGyroData(uint8_t lsb, uint8_t msb)
+{
+    return getMotionData(lsb, msb) / PBP_GYRO_SENSITIVITY;
+}
+
+/* ************************************************************************** */
 /* ************************************************************************** */
 
 DevicePokeballPlus::DevicePokeballPlus(QString &deviceAddr, QString &deviceName, QObject *parent):
