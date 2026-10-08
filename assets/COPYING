@@ -11,6 +11,9 @@
 # Icons:
 - assets/icons/*                                // Google Material Design symbols // Apache 2.0
 
+# Bongo Cat Asset Kit
+- assets/bongocat/*                             // benno@builder.group // CC BY 4.0
+
 # Others:
 - assets/logos/github.svg                       // https://github.com/logos // proprietary
 - assets/logos/gitlab.png                       // https://about.gitlab.com/press // proprietary

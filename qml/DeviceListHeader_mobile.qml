@@ -396,4 +396,35 @@ Column {
     }
 
     ////////////////
+
+    Rectangle { // BONGO CAT
+        width: singleColumn ? parent.width : 480
+        height: visible ? 96 : 0
+        radius: 4
+
+        visible: (networkClient !== null && networkClient.connected && networkClient.typingAvailable)
+
+        color: Theme.colorForeground
+        border.width: 2
+        border.color: singleColumn ? "transparent" : Theme.colorSeparator
+
+        BongoCat {
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            width: height * implicitWidth / implicitHeight
+
+            typing: networkClient.typing
+            face: SettingsManager.bongoFace
+            hat: SettingsManager.bongoHat
+            pawInterval: SettingsManager.bongoPawInterval
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: screenBongoCat.loadScreen()
+        }
+    }
+
+    ////////////////
 }

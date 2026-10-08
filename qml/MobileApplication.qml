@@ -224,6 +224,8 @@ Window {
                 }
             } else if (appContent.state === "VirtualInputs") {
                 screenVirtualInputs.backAction()
+            } else if (appContent.state === "ScreenBongoCat") {
+                screenBongoCat.backAction()
             } else if (appContent.state === "DeviceLight") {
                 screenDeviceLight.backAction()
             } else if (appContent.state === "ScreenAboutPermissions") {
@@ -251,6 +253,10 @@ Window {
 
         VirtualInputs {
             id: screenVirtualInputs
+            anchors.bottomMargin: mobileMenu.hhv
+        }
+        ScreenBongoCat {
+            id: screenBongoCat
             anchors.bottomMargin: mobileMenu.hhv
         }
 
@@ -303,6 +309,7 @@ Window {
                 PropertyChanges { target: appHeader; headerTitle: qsTr("Welcome"); }
                 PropertyChanges { target: screenTutorial; visible: true; enabled: true; }
                 PropertyChanges { target: screenVirtualInputs; visible: false; enabled: false; }
+                PropertyChanges { target: screenBongoCat; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
                 PropertyChanges { target: screenSettings; visible: false; enabled: false; }
@@ -314,6 +321,7 @@ Window {
                 PropertyChanges { target: appHeader; headerTitle: qsTr("Virtual inputs"); }
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
                 PropertyChanges { target: screenVirtualInputs; visible: true; enabled: true; }
+                PropertyChanges { target: screenBongoCat; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
                 PropertyChanges { target: screenSettings; visible: false; enabled: false; }
@@ -321,10 +329,23 @@ Window {
                 PropertyChanges { target: screenAbout; visible: false; enabled: false; }
             },
             State {
+                name: "ScreenBongoCat"
+                PropertyChanges { target: appHeader; headerTitle: qsTr("Bongo cat"); }
+                PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
+                PropertyChanges { target: screenVirtualInputs; visible: false; enabled: false; }
+                PropertyChanges { target: screenBongoCat; visible: true; enabled: true; }
+                PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
+                PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
+                PropertyChanges { target: screenSettings; visible: false; enabled: false; }
+                PropertyChanges { target: screenAbout; visible: false; enabled: false; }
+                PropertyChanges { target: screenAboutPermissions; visible: false; enabled: false; }
+            },
+            State {
                 name: "ScreenDeviceList"
                 PropertyChanges { target: appHeader; headerTitle: "Lighthouse"; }
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
                 PropertyChanges { target: screenVirtualInputs; visible: false; enabled: false; }
+                PropertyChanges { target: screenBongoCat; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceList; visible: true; enabled: true; }
                 PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
                 PropertyChanges { target: screenSettings; visible: false; enabled: false; }
@@ -336,6 +357,7 @@ Window {
                 PropertyChanges { target: appHeader; headerTitle: selectedDevice.deviceName; }
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
                 PropertyChanges { target: screenVirtualInputs; visible: false; enabled: false; }
+                PropertyChanges { target: screenBongoCat; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceLight; visible: true; enabled: true; }
                 PropertyChanges { target: screenSettings; visible: false; enabled: false; }
@@ -348,6 +370,7 @@ Window {
                 PropertyChanges { target: appHeader; headerTitle: qsTr("Settings"); }
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
                 PropertyChanges { target: screenVirtualInputs; visible: false; enabled: false; }
+                PropertyChanges { target: screenBongoCat; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
                 PropertyChanges { target: screenSettings; visible: true; enabled: true; }
@@ -359,6 +382,7 @@ Window {
                 PropertyChanges { target: appHeader; headerTitle: qsTr("About"); }
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
                 PropertyChanges { target: screenVirtualInputs; visible: false; enabled: false; }
+                PropertyChanges { target: screenBongoCat; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
                 PropertyChanges { target: screenSettings; visible: false; enabled: false; }
@@ -370,6 +394,7 @@ Window {
                 PropertyChanges { target: appHeader; headerTitle: qsTr("About permissions"); }
                 PropertyChanges { target: screenTutorial; visible: false; enabled: false; }
                 PropertyChanges { target: screenVirtualInputs; visible: false; enabled: false; }
+                PropertyChanges { target: screenBongoCat; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceList; visible: false; enabled: false; }
                 PropertyChanges { target: screenDeviceLight; visible: false; enabled: false; }
                 PropertyChanges { target: screenSettings; visible: false; enabled: false; }

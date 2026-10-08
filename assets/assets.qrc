@@ -12,6 +12,26 @@
         <file>icons/desk-lamp.svg</file>
         <file>icons/desk-lamp-logo.svg</file>
 
+        <file>bongocat/body/base.svg</file>
+        <file>bongocat/body/left-up.svg</file>
+        <file>bongocat/body/left-down.svg</file>
+        <file>bongocat/body/right-up.svg</file>
+        <file>bongocat/body/right-down.svg</file>
+        <file>bongocat/face/asia.svg</file>
+        <file>bongocat/face/cute.svg</file>
+        <file>bongocat/face/dead.svg</file>
+        <file>bongocat/face/fosure.svg</file>
+        <file>bongocat/face/harry_potter.svg</file>
+        <file>bongocat/face/nerd.svg</file>
+        <file>bongocat/face/pilot.svg</file>
+        <file>bongocat/face/pixel_cool.svg</file>
+        <file>bongocat/hat/banana.svg</file>
+        <file>bongocat/hat/crown.svg</file>
+        <file>bongocat/hat/heart.svg</file>
+        <file>bongocat/hat/lil_duck.svg</file>
+        <file>bongocat/hat/propeller_hat.svg</file>
+        <file>bongocat/hat/timer.svg</file>
+
         <file>models/pokeball/bottom_.mesh</file>
         <file>models/pokeball/bottom_black.mesh</file>
         <file>models/pokeball/button.mesh</file>

@@ -98,6 +98,10 @@ class SettingsManager: public QObject
     Q_PROPERTY(bool monitorClaude READ getMonitorClaude WRITE setMonitorClaude NOTIFY monitorClaudeChanged)
     Q_PROPERTY(bool monitorInput READ getMonitorInput WRITE setMonitorInput NOTIFY monitorInputChanged)
 
+    Q_PROPERTY(QString bongoFace READ getBongoFace WRITE setBongoFace NOTIFY bongoCatChanged)
+    Q_PROPERTY(QString bongoHat READ getBongoHat WRITE setBongoHat NOTIFY bongoCatChanged)
+    Q_PROPERTY(int bongoPawInterval READ getBongoPawInterval WRITE setBongoPawInterval NOTIFY bongoCatChanged)
+
     Q_PROPERTY(bool mysql READ getMySQL WRITE setMySQL NOTIFY mysqlChanged)
     Q_PROPERTY(QString mysqlHost READ getMysqlHost WRITE setMysqlHost NOTIFY mysqlChanged)
     Q_PROPERTY(uint mysqlPort READ getMysqlPort WRITE setMysqlPort NOTIFY mysqlChanged)
@@ -167,6 +171,10 @@ class SettingsManager: public QObject
 
     bool m_monitorClaude = true;            //!< Claude Code plan limits monitoring
     bool m_monitorInput = false;            //!< typing activity relay, opt-in as it reads the input devices
+
+    QString m_bongoFace = "cute";           //!< bongo cat face, see qml/components/BongoCat.qml
+    QString m_bongoHat;                     //!< bongo cat hat, empty for none
+    int m_bongoPawInterval = 250;           //!< bongo cat delay between two paw slaps, in ms
 
     bool m_mysql = false;
     QString m_mysqlHost;
@@ -238,6 +246,7 @@ Q_SIGNALS:
     void volumeLimitChanged();
     void monitorClaudeChanged();
     void monitorInputChanged();
+    void bongoCatChanged();
     void netclientChanged();
 
 public:
@@ -348,6 +357,13 @@ public:
 
     bool getMonitorInput() const { return m_monitorInput; }
     void setMonitorInput(const bool value);
+
+    QString getBongoFace() const { return m_bongoFace; }
+    void setBongoFace(const QString &value);
+    QString getBongoHat() const { return m_bongoHat; }
+    void setBongoHat(const QString &value);
+    int getBongoPawInterval() const { return m_bongoPawInterval; }
+    void setBongoPawInterval(const int value);
 
     ///
 

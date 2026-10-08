@@ -203,6 +203,7 @@ qt_add_qml_module(${PROJECT_NAME}
         qml/DeviceRemote.qml
         qml/DeviceLight.qml
         qml/VirtualInputs.qml
+        qml/ScreenBongoCat.qml
         qml/VirtualInput_touchpad.qml
         qml/VirtualInput_gamepad.qml
         qml/VirtualInput_remote.qml
@@ -226,6 +227,7 @@ qt_add_qml_module(${PROJECT_NAME}
         qml/components/MediaButtonRow.qml
         qml/components/VolumeButtonRow.qml
         qml/components/AnalogPad.qml
+        qml/components/BongoCat.qml
 
         qml/components/ItemKey.qml
         qml/components/PgpButtonKey.qml

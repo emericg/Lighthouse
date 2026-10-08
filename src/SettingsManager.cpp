@@ -173,6 +173,13 @@ bool SettingsManager::readSettings()
         if (settings.contains("monitors/input"))
             m_monitorInput = settings.value("monitors/input").toBool();
 
+        if (settings.contains("bongocat/face"))
+            m_bongoFace = settings.value("bongocat/face").toString();
+        if (settings.contains("bongocat/hat"))
+            m_bongoHat = settings.value("bongocat/hat").toString();
+        if (settings.contains("bongocat/pawInterval"))
+            m_bongoPawInterval = settings.value("bongocat/pawInterval").toInt();
+
         if (settings.contains("database/enabled"))
             m_mysql = settings.value("database/enabled").toBool();
         if (settings.contains("database/host"))
@@ -291,6 +298,10 @@ bool SettingsManager::writeSettings()
 
         settings.setValue("monitors/claude", m_monitorClaude);
         settings.setValue("monitors/input", m_monitorInput);
+
+        settings.setValue("bongocat/face", m_bongoFace);
+        settings.setValue("bongocat/hat", m_bongoHat);
+        settings.setValue("bongocat/pawInterval", m_bongoPawInterval);
 
         settings.setValue("database/enabled", m_mysql);
         settings.setValue("database/host", m_mysqlHost);
@@ -420,6 +431,11 @@ void SettingsManager::resetSettings()
     Q_EMIT monitorClaudeChanged();
     m_monitorInput = false;
     Q_EMIT monitorInputChanged();
+
+    m_bongoFace = "cute";
+    m_bongoHat = "";
+    m_bongoPawInterval = 250;
+    Q_EMIT bongoCatChanged();
 
     m_mysql = false;
     m_mysqlHost = "";
@@ -751,6 +767,38 @@ void SettingsManager::setMonitorInput(const bool value)
         m_monitorInput = value;
         writeSettings();
         Q_EMIT monitorInputChanged();
+    }
+}
+
+/* ************************************************************************** */
+
+void SettingsManager::setBongoFace(const QString &value)
+{
+    if (m_bongoFace != value)
+    {
+        m_bongoFace = value;
+        writeSettings();
+        Q_EMIT bongoCatChanged();
+    }
+}
+
+void SettingsManager::setBongoHat(const QString &value)
+{
+    if (m_bongoHat != value)
+    {
+        m_bongoHat = value;
+        writeSettings();
+        Q_EMIT bongoCatChanged();
+    }
+}
+
+void SettingsManager::setBongoPawInterval(const int value)
+{
+    if (m_bongoPawInterval != value)
+    {
+        m_bongoPawInterval = value;
+        writeSettings();
+        Q_EMIT bongoCatChanged();
     }
 }
 
