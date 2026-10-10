@@ -23,7 +23,7 @@ option(ENABLE_KEYBOARD_UINPUT "Virtual keyboard using UInput" ON)
 option(ENABLE_MBEDTLS "mbedTLS for proper crypto support" OFF)
 option(ENABLE_ZXING "QrCode generator and scanner support" ON)
 option(ENABLE_CLAUDE_MONITORING "Claude Code Plan stats" OFF)
-option(ENABLE_INPUT_MONITORING "Keyboard activity relay (bongo cat)" OFF)
+option(ENABLE_INPUT_MONITORING "Keyboard activity relay (bongo cat)" ON)
 
 ################################################################################
 
@@ -62,13 +62,6 @@ qt_policy(SET QTP0002 NEW)
 qt_policy(SET QTP0003 NEW)
 qt_policy(SET QTP0004 NEW)
 
-# Set app desktop icons
-#if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-#    set(app_icon_windows "${PROJECT_SOURCE_DIR}/platforms/windows/${PROJECT_NAME}.rc")
-#elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-#    set(app_icon_macos "${PROJECT_SOURCE_DIR}/platforms/macos/${PROJECT_NAME}.icns")
-#endif()
-
 set(SOURCES
     src/main.cpp
     src/SettingsManager.cpp src/SettingsManager.h
@@ -100,11 +93,6 @@ set(SOURCES
     src/crypto/aes_wrapper.cpp src/crypto/aes_wrapper.h
     src/crypto/pgp/pgp_crypto.cpp src/crypto/pgp/pgp_crypto.h
     src/crypto/pgp/pgp_keystore.cpp src/crypto/pgp/pgp_keystore.h
-
-    ${app_icon_macos}
-    ${app_icon_windows}
-    assets/assets.qrc
-    thirdparty/IconLibrary/IconLibrary_material.qrc
 )
 
 if(IOS OR ANDROID) # Mobile build
@@ -112,6 +100,12 @@ if(IOS OR ANDROID) # Mobile build
     set(QAPPLICATION_CLASS QGuiApplication)
 
 else() # Desktop build
+    # Desktop app icons
+    #if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    #    set(app_icon_windows "${PROJECT_SOURCE_DIR}/platforms/windows/${PROJECT_NAME}.rc")
+    #elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    #    set(app_icon_macos "${PROJECT_SOURCE_DIR}/platforms/macos/${PROJECT_NAME}.icns")
+    #endif()
 
     set(QAPPLICATION_CLASS QApplication)
 
@@ -173,17 +167,10 @@ else() # Desktop build
     endif()
 endif()
 
-qt_add_executable(${PROJECT_NAME} ${SOURCES} ${SOURCES_DESKTOP} ${SOURCES_MOBILE})
-
-qt_add_ios_ffmpeg_libraries(${PROJECT_NAME})
-
-qt_add_qml_module(${PROJECT_NAME}
-    URI ${PROJECT_NAME}
-    NO_PLUGIN
-    QML_FILES
-        qml/MobileApplication.qml
-        qml/MobileHeader.qml
-        qml/MobileDrawer.qml
+set(SOURCES_QML
+    qml/MobileApplication.qml
+    qml/MobileHeader.qml
+    qml/MobileDrawer.qml
         qml/MobilePermissions.qml
         qml/MobileMenu.qml
         qml/MobileExit.qml
@@ -207,7 +194,7 @@ qt_add_qml_module(${PROJECT_NAME}
         qml/VirtualInput_touchpad.qml
         qml/VirtualInput_gamepad.qml
         qml/VirtualInput_remote.qml
-        qml/VirtualInput_media.qml
+        qml/ScreenMedia.qml
 
         qml/widgets/DeviceWidget.qml
         qml/widgets/NetworkClientWidget.qml
@@ -249,8 +236,28 @@ qt_add_qml_module(${PROJECT_NAME}
         qml/components/SliderGradientLuminosity.qml
         qml/components/SliderGradientColor.qml
 
-        qml/components_js/UtilsActions.js
-        qml/components_js/UtilsDeviceSensors.js
+    qml/components_js/UtilsActions.js
+    qml/components_js/UtilsDeviceSensors.js
+)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    # Do not compile QML files to byte code for debug targets # Way too slow...
+    set_source_files_properties(${SOURCES_QML} PROPERTIES QT_QML_SKIP_CACHEGEN TRUE)
+endif()
+
+qt_add_executable(${PROJECT_NAME}
+    ${SOURCES}
+    ${SOURCES_DESKTOP} ${SOURCES_MOBILE}
+    assets/assets.qrc
+    thirdparty/IconLibrary/IconLibrary_material.qrc
+)
+
+qt_add_ios_ffmpeg_libraries(${PROJECT_NAME})
+
+qt_add_qml_module(${PROJECT_NAME}
+    URI ${PROJECT_NAME}
+    NO_PLUGIN
+    QML_FILES ${SOURCES_QML}
 )
 
 qt_add_translations(${PROJECT_NAME}

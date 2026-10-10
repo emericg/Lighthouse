@@ -53,7 +53,7 @@ Loader {
             contentWidth: -1
             contentHeight: contentColumn.height + 32
             interactive: bongoScreen.editing
-            boundsBehavior: isDesktop ? Flickable.OvershootBounds : Flickable.DragAndOvershootBounds
+            boundsBehavior: Theme.isDesktop ? Flickable.OvershootBounds : Flickable.DragAndOvershootBounds
 
             Column {
                 id: contentColumn

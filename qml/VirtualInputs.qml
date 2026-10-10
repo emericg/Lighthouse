@@ -31,14 +31,12 @@ Loader {
         focus: parent.focus
 
         function backAction() {
-            if (inputSelector.currentSelection === 0) {
+            if (inputSelector.currentSelection === 1) {
                 virtualInput_touchpad.backAction()
-            } else if (inputSelector.currentSelection === 1) {
-                virtualInput_gamepad.backAction()
             } else if (inputSelector.currentSelection === 2) {
-                virtualInput_remote.backAction()
+                virtualInput_gamepad.backAction()
             } else if (inputSelector.currentSelection === 3) {
-                virtualInput_media.backAction()
+                virtualInput_remote.backAction()
             } else {
                 screenDeviceList.loadScreen()
             }
@@ -58,7 +56,6 @@ Loader {
                 ListElement { idx: 1; txt: qsTr("touchpad"); src: ""; sz: 16; }
                 ListElement { idx: 2; txt: qsTr("gamepad"); src: ""; sz: 16; }
                 ListElement { idx: 3; txt: qsTr("remote"); src: ""; sz: 16; }
-                ListElement { idx: 4; txt: qsTr("media"); src: ""; sz: 16; }
             }
 
             currentSelection: 1
@@ -128,21 +125,6 @@ Loader {
                     highlighted: (inputSelector.currentSelection === 3)
                     onClicked: inputSelector.currentSelection = 3
                 }
-                MobileMenuItem_vertical {
-                    width: inputSelector.www
-                    height: inputSelector.hhh
-                    sourceSize: inputSelector.hhi
-
-                    colorContent: Theme.colorTabletmenuContent
-                    colorHighlight: Theme.colorTabletmenuHighlight
-
-                    text: qsTr("media")
-                    source: highlighted ?
-                                "qrc:/IconLibrary/material-symbols/media/album-fill.svg" :
-                                "qrc:/IconLibrary/material-symbols/media/album.svg"
-                    highlighted: (inputSelector.currentSelection === 4)
-                    onClicked: inputSelector.currentSelection = 4
-                }
             }
         }
 
@@ -183,14 +165,6 @@ Loader {
                 visible: (inputSelector.currentSelection === 3)
             }
 
-            ////
-
-            VirtualInput_media {
-                id: virtualInput_media
-                anchors.fill: parent
-
-                visible: (inputSelector.currentSelection === 4)
-            }
 
             ////
         }

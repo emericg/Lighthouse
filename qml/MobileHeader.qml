@@ -161,7 +161,8 @@ Rectangle {
                 height: headerHeight
 
                 visible: (appContent.state === "ScreenDeviceList" ||
-                          appContent.state === "VirtualInputs")
+                          appContent.state === "VirtualInputs" ||
+                          appContent.state === "ScreenMedia")
 
                 onClicked: {
                     if (!networkClient.connected) {

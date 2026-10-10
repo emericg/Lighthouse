@@ -75,6 +75,11 @@ Column {
         border.width: 2
         border.color: singleColumn ? "transparent" : Theme.colorSeparator
 
+        MouseArea {
+            anchors.fill: parent
+            onClicked: screenMedia.loadScreen()
+        }
+
         Item { // now playing
             anchors.verticalCenter: parent.verticalCenter
             width: parent.width
