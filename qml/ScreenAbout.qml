@@ -57,16 +57,16 @@ Loader {
             contentWidth: -1
             contentHeight: contentColumn.height
 
-            boundsBehavior: isDesktop ? Flickable.OvershootBounds : Flickable.DragAndOvershootBounds
+            boundsBehavior: Theme.isDesktop ? Flickable.OvershootBounds : Flickable.DragAndOvershootBounds
             ScrollBar.vertical: ScrollBar { visible: false }
 
             Column {
                 id: contentColumn
 
                 anchors.left: parent.left
-                anchors.leftMargin: ((singleColumn || isPhone) ? 0 : parent.width * 0.12)
+                anchors.leftMargin: ((Theme.singleColumn || Theme.isPhone) ? 0 : parent.width * 0.12)
                 anchors.right: parent.right
-                anchors.rightMargin: ((singleColumn || isPhone) ? 0 : parent.width * 0.12)
+                anchors.rightMargin: ((Theme.singleColumn || Theme.isPhone) ? 0 : parent.width * 0.12)
 
                 ////////////////
 
@@ -175,7 +175,7 @@ Loader {
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
                         height: 2
-                        visible: isDesktop
+                        visible: Theme.isDesktop
                         color: Theme.colorSeparator
                     }
                 }

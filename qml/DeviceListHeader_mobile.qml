@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 
 import ComponentLibrary
 
@@ -8,20 +7,20 @@ Column {
     anchors.right: parent.right
     spacing: 8
 
-    visible: isMobile
+    visible: Theme.isMobile
 
     ////////////////
 
     Rectangle { // NETWORK CONTROLS
-        width: singleColumn ? parent.width : 480
-        height: visible ? (singleColumn ? 112 : 128) : 0
+        width: Theme.singleColumn ? parent.width : 480
+        height: visible ? (Theme.singleColumn ? 112 : 128) : 0
         radius: 4
 
         visible: (networkClient !== null && networkClient.connected) || (SettingsManager.fakeIt)
 
         color: Theme.colorDeviceWidget
         border.width: 2
-        border.color: singleColumn ? "transparent" : Theme.colorSeparator
+        border.color: Theme.singleColumn ? "transparent" : Theme.colorSeparator
 
         Rectangle { // Actual background
             anchors.fill: parent
@@ -65,15 +64,15 @@ Column {
     ////////////////
 
     Rectangle { // MEDIA CONTROLS
-        width: singleColumn ? parent.width : 480
-        height: visible ? (singleColumn ? 96 : 96) : 0
+        width: Theme.singleColumn ? parent.width : 480
+        height: visible ? (Theme.singleColumn ? 96 : 96) : 0
         radius: 4
 
         visible: (networkClient !== null && networkClient.connected && networkClient.metaTitle !== "") || (SettingsManager.fakeIt)
 
         color: Theme.colorForeground
         border.width: 2
-        border.color: singleColumn ? "transparent" : Theme.colorSeparator
+        border.color: Theme.singleColumn ? "transparent" : Theme.colorSeparator
 
         MouseArea {
             anchors.fill: parent
@@ -403,7 +402,7 @@ Column {
     ////////////////
 
     Rectangle { // BONGO CAT
-        width: singleColumn ? parent.width : 480
+        width: Theme.singleColumn ? parent.width : 480
         height: visible ? 96 : 0
         radius: 4
 
@@ -411,7 +410,7 @@ Column {
 
         color: Theme.colorForeground
         border.width: 2
-        border.color: singleColumn ? "transparent" : Theme.colorSeparator
+        border.color: Theme.singleColumn ? "transparent" : Theme.colorSeparator
 
         BongoCat {
             anchors.horizontalCenter: parent.horizontalCenter

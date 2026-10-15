@@ -816,7 +816,7 @@ Loader {
                             border.width: (colorSaved.selection === cid) ? 3 : 2
                             border.color: (colorSaved.selection === cid) ? Theme.colorPrimary : Qt.darker(color, 1.05)
 
-                            visible: isDesktop
+                            visible: Theme.isDesktop
                             property int cid: 12
 
                             IconSvg {

@@ -163,13 +163,13 @@ Item {
         id: devicesView
 
         anchors.top: rowbar.bottom
-        anchors.topMargin: singleColumn ? 0 : 16
+        anchors.topMargin: Theme.singleColumn ? 0 : 16
         anchors.left: screenDeviceList.left
-        anchors.leftMargin: singleColumn ? 6 : 12
+        anchors.leftMargin: Theme.singleColumn ? 6 : 12
         anchors.right: screenDeviceList.right
-        anchors.rightMargin: singleColumn ? 6 : 12
+        anchors.rightMargin: Theme.singleColumn ? 6 : 12
         anchors.bottom: screenDeviceList.bottom
-        anchors.bottomMargin: singleColumn ? 0 : 16
+        anchors.bottomMargin: Theme.singleColumn ? 0 : 16
 
         ScrollBar.vertical: ScrollBar {
             visible: false
@@ -206,11 +206,11 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
 
-            topPadding: isDesktop ? 4 : 0
-            bottomPadding: isDesktop ? 16 : 0
-            spacing: isDesktop ? 20 : 8
+            topPadding: Theme.isDesktop ? 4 : 0
+            bottomPadding: Theme.isDesktop ? 16 : 0
+            spacing: Theme.isDesktop ? 20 : 8
 
-            //visible: (isDesktop) || (isMobile && networkClient.connected) || (SettingsManager.fakeIt)
+            //visible: (Theme.isDesktop) || (Theme.isMobile && networkClient.connected) || (SettingsManager.fakeIt)
 
             ////////////////
 
@@ -218,7 +218,7 @@ Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
 
-                active: isDesktop
+                active: Theme.isDesktop
                 asynchronous: false
                 sourceComponent: DeviceListHeader_desktop { }
             }
@@ -237,18 +237,18 @@ Item {
             ListTitle { ////////////////////////////////////////////////////////
                 anchors.leftMargin: devicesView.listMargin
                 anchors.rightMargin: devicesView.listMargin
-                visible: isDesktop
+                visible: Theme.isDesktop
                 text: qsTr("Bluetooth Low Energy device(s)")
             }
         }
 
         ////////////////
 
-        property bool bigWidget: (!isHdpi || (isTablet && width >= 480))
+        property bool bigWidget: (!Theme.isHdpi || (Theme.isTablet && width >= 480))
 
         property int cellWidthTarget: {
-            if (singleColumn) return devicesView.width
-            if (isTablet) return (bigWidget ? 350 : 280)
+            if (Theme.singleColumn) return devicesView.width
+            if (Theme.isTablet) return (bigWidget ? 350 : 280)
             return (bigWidget ? 440 : 320)
         }
         property int cellColumnsTarget: Math.trunc(devicesView.width / cellWidthTarget)

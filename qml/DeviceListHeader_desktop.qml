@@ -9,7 +9,7 @@ Column {
 
     spacing: 20
 
-    visible: isDesktop
+    visible: Theme.isDesktop
 
     ListTitle { ////////////////////////////////////////////////////////////////
         anchors.leftMargin: devicesView.listMargin
@@ -23,13 +23,13 @@ Column {
         anchors.right: parent.right
         anchors.rightMargin: 8
 
-        columns: singleColumn ? 1 : 4
+        columns: Theme.singleColumn ? 1 : 4
         spacing: 12
 
         ////////////////
 
         Rectangle { // MPRIS
-            width: singleColumn ? parent.width : 520
+            width: Theme.singleColumn ? parent.width : 520
             height: 128
             radius: 4
 
@@ -37,7 +37,7 @@ Column {
 
             color: Theme.colorDeviceWidget
             border.width: 2
-            border.color: singleColumn ? "transparent" : Theme.colorSeparator
+            border.color: Theme.singleColumn ? "transparent" : Theme.colorSeparator
 
             Column {
                 anchors.left: parent.left
@@ -221,15 +221,15 @@ Column {
 
         Rectangle { // CLAUDE CODE
             id: claudeWidget
-            width: singleColumn ? parent.width : 420
+            width: Theme.singleColumn ? parent.width : 420
             height: visible ? (ClaudeMonitor.cacheValid ? 164 : 128) : 0
             radius: 4
 
             color: Theme.colorDeviceWidget
             border.width: 2
-            border.color: singleColumn ? "transparent" : Theme.colorSeparator
+            border.color: Theme.singleColumn ? "transparent" : Theme.colorSeparator
 
-            visible: isDesktop && ClaudeMonitor.enabled && (ClaudeMonitor.available || ClaudeMonitor.probeAvailable)
+            visible: Theme.isDesktop && ClaudeMonitor.enabled && (ClaudeMonitor.available || ClaudeMonitor.probeAvailable)
 
             // Probing costs a little quota, so it is only offered when there is nothing fresh to show
             readonly property bool canProbe: ClaudeMonitor.probeAvailable &&

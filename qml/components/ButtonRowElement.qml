@@ -14,7 +14,7 @@ T.Button {
     clip: true
     flat: true
     checkable: false
-    hoverEnabled: isDesktop
+    hoverEnabled: Theme.isDesktop
     focusPolicy: Qt.NoFocus
 
     // icon

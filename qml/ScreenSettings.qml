@@ -290,7 +290,7 @@ Loader {
                     anchors.left: parent.left
                     anchors.right: parent.right
                     height: 1
-                    visible: isDesktop
+                    visible: Theme.isDesktop
                     color: Theme.colorSeparator
                 }
 
@@ -303,7 +303,7 @@ Loader {
                     anchors.rightMargin: contentColumn.paddingRight
                     height: Theme.componentHeightXL
 
-                    visible: isDesktop
+                    visible: Theme.isDesktop
 
                     IconSvg {
                         anchors.left: parent.left
